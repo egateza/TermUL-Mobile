@@ -1,0 +1,200 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>SFTP dan edit remote</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<sc-if value="{{isList}}" hint-placeholder-val="{{ true }}">
+<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+
+<div style="display: flex; align-items: center; gap: 4px; padding: 12px 8px 4px 8px">
+<a href="Terminal.dc.html" aria-label="Kembali ke terminal" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+</a>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<h1 style="margin: 0; font-size: 18px; font-weight: 600">SFTP</h1>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #5ED3A6">app-01 · terhubung</span>
+</div>
+<button type="button" aria-label="Unggah file dari perangkat" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5M7 10l5-5 5 5M5 19h14"/></svg>
+</button>
+</div>
+
+<div style="display: flex; align-items: center; gap: 6px; padding: 8px 20px 12px 20px; overflow-x: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #9AA8AF; white-space: nowrap">
+<span>/</span><span>etc</span><span>/</span><span style="color: #E8EEF0">nginx</span>
+</div>
+
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 8px 12px; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+<button type="button" onClick="{{it.pick}}" aria-pressed="{{it.on}}" style="width: 100%; min-height: 60px; flex: none; display: flex; align-items: center; gap: 14px; padding: 8px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid {{it.bd}}; background: {{it.bg}}; color: #E8EEF0; text-align: left; cursor: pointer">
+<sc-if value="{{it.isDir}}" hint-placeholder-val="{{ false }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#6CB4FF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+</sc-if>
+<sc-if value="{{it.isFile}}" hint-placeholder-val="{{ true }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M6 3h8l5 5v13H6z"/><path d="M14 3v5h5"/></svg>
+</sc-if>
+<sc-if value="{{it.isUp}}" hint-placeholder-val="{{ false }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 14l-4-4 4-4"/><path d="M5 10h9a5 5 0 0 1 5 5v3"/></svg>
+</sc-if>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">{{it.name}}</span>
+<span style="font-size: 12.5px; color: #9AA8AF">{{it.meta}}</span>
+</span>
+</button>
+</sc-for>
+</div>
+
+<sc-if value="{{hasSel}}" hint-placeholder-val="{{ true }}">
+<div style="flex: none; display: flex; flex-direction: column; gap: 10px; padding: 12px 12px 10px 12px; border-top: 1px solid #2A343A; background: #161C20">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">{{selName}} dipilih</span>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{openEditor}}" style="flex: 2; min-height: 48px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9l-4-4L4 16z"/></svg>
+Edit
+</button>
+<button type="button" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Unduh</button>
+<button type="button" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Salin path</button>
+</div>
+</div>
+</sc-if>
+
+<nav aria-label="Navigasi utama" style="flex: none; display: flex; border-top: 1px solid #2A343A; background: #0F1316; padding: 6px 12px 10px 12px">
+<a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+Host
+</a>
+<a href="Terminal.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<span style="position: relative; display: flex">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+<span style="position: absolute; top: -6px; right: -12px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 9px; background: #F0B34A; color: #1B1406; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center">2</span>
+</span>
+Sesi
+</a>
+<a href="Sftp.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #F0B34A; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+SFTP
+</a>
+<a href="Snippets.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3"/></svg>
+Snippet
+</a>
+<a href="Settings.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+Pengaturan
+</a>
+</nav>
+
+</div>
+</sc-if>
+
+<sc-if value="{{isEditor}}" hint-placeholder-val="{{ false }}">
+<div style="flex: 1; min-height: 0; display: flex; flex-direction: column">
+
+<div style="display: flex; align-items: center; gap: 4px; padding: 12px 8px 8px 8px">
+<button type="button" onClick="{{closeEditor}}" aria-label="Tutup editor" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #E8EEF0; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+</button>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 15px; font-weight: 500">default.conf</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: {{saveColor}}">{{saveText}}</span>
+</div>
+<button type="button" onClick="{{save}}" style="min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid {{saveBd}}; background: {{saveBg}}; color: {{saveFg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">{{saveLabel}}</button>
+</div>
+
+<div style="flex: 1; min-height: 0; margin: 0 12px; padding: 12px 0; box-sizing: border-box; border-radius: 12px; background: #0A0E10; border: 1px solid #1E262B; overflow: auto; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.6">
+<sc-for list="{{lines}}" as="ln" hint-placeholder-count="9">
+<div style="display: flex; gap: 14px; padding: 0 12px; white-space: pre">
+<span style="width: 20px; flex: none; text-align: right; color: #5C6A71">{{ln.n}}</span>
+<span style="color: #C9D4D9">{{ln.text}}</span>
+</div>
+</sc-for>
+</div>
+
+<p style="margin: 0; padding: 12px 20px 20px 20px; font-size: 13px; line-height: 1.5; color: #9AA8AF">Saat disimpan, file langsung diunggah ke app-01:/etc/nginx/default.conf.</p>
+
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const sel = s.sel === undefined ? 'default' : s.sel;
+    const view = s.view || 'list';
+    const saved = !!s.saved;
+
+    const defs = [
+      { id: 'up', name: '..', kind: 'up', meta: 'Naik satu level' },
+      { id: 'conf.d', name: 'conf.d', kind: 'dir', meta: '4 item' },
+      { id: 'sites', name: 'sites-available', kind: 'dir', meta: '2 item' },
+      { id: 'default', name: 'default.conf', kind: 'file', meta: '1,2 KB \u00b7 2 jam lalu' },
+      { id: 'app', name: 'app.conf', kind: 'file', meta: '0,9 KB \u00b7 kemarin' },
+      { id: 'ssl', name: 'ssl-params.conf', kind: 'file', meta: '0,4 KB \u00b7 12 Sep' }
+    ];
+    const items = defs.map((d) => {
+      const on = d.kind === 'file' && sel === d.id;
+      return {
+        name: d.name,
+        meta: d.meta,
+        isDir: d.kind === 'dir',
+        isFile: d.kind === 'file',
+        isUp: d.kind === 'up',
+        on: on,
+        bg: on ? '#1E262B' : '#161C20',
+        bd: on ? '#F0B34A' : '#2A343A',
+        pick: () => { if (d.kind === 'file') this.setState({ sel: d.id }); }
+      };
+    });
+
+    const selDef = defs.filter((d) => d.id === sel)[0];
+
+    const code = [
+      'server {',
+      '    listen 80;',
+      '    server_name app.example.com;',
+      '',
+      '    location / {',
+      '        proxy_pass http://127.0.0.1:8080;',
+      '        proxy_set_header Host $host;',
+      '    }',
+      '}'
+    ];
+    const lines = code.map((t, i) => ({ n: i + 1, text: t }));
+
+    return {
+      isList: view === 'list',
+      isEditor: view === 'editor',
+      items: items,
+      hasSel: !!selDef && selDef.kind === 'file',
+      selName: selDef ? selDef.name : '',
+      openEditor: () => this.setState({ view: 'editor', saved: false }),
+      closeEditor: () => this.setState({ view: 'list' }),
+      save: () => this.setState({ saved: true }),
+      lines: lines,
+      saveText: saved ? 'tersimpan dan diunggah' : 'perubahan belum diunggah',
+      saveColor: saved ? '#5ED3A6' : '#F0B34A',
+      saveLabel: saved ? 'Tersimpan' : 'Simpan & unggah',
+      saveBg: saved ? 'transparent' : '#F0B34A',
+      saveFg: saved ? '#5ED3A6' : '#1B1406',
+      saveBd: saved ? '#2A343A' : '#F0B34A'
+    };
+  }
+}
+</script>
+</body>
+</html>

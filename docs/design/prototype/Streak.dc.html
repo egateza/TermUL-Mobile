@@ -1,0 +1,418 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Streak</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+@keyframes ignite{0%{transform:scale(0.4);opacity:0}60%{transform:scale(1.18);opacity:1}100%{transform:scale(1);opacity:1}}
+@keyframes ring{0%{transform:scale(1);opacity:0.55}100%{transform:scale(1.9);opacity:0}}
+@keyframes flicker{0%,100%{transform:scale(1) rotate(0deg)}25%{transform:scale(1.04) rotate(-2deg)}60%{transform:scale(0.97) rotate(1.5deg)}}
+@keyframes roll{from{transform:translateY(0)}to{transform:translateY(-56px)}}
+@keyframes fillIn{0%{transform:scale(0.7);background-color:transparent}60%{transform:scale(1.18)}100%{transform:scale(1)}}
+@keyframes grow{from{width:var(--from)}to{width:var(--to)}}
+@keyframes slideUp{from{transform:translateY(8px);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes shakeA{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px) rotate(-1.5deg)}60%{transform:translateX(4px) rotate(1deg)}}
+@keyframes shakeB{0%,100%{transform:translateX(0)}25%{transform:translateX(-5px) rotate(-1.5deg)}60%{transform:translateX(4px) rotate(1deg)}}
+@keyframes shard{from{transform:translate(0,0) rotate(0deg);opacity:1}to{transform:translate(var(--dx),var(--dy)) rotate(var(--rot));opacity:0}}
+@keyframes smoke{from{transform:translateY(0) scaleX(1);opacity:0.5}to{transform:translateY(-40px) scaleX(2);opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="display: flex; align-items: center; gap: 4px; padding: 12px 8px 8px 8px">
+<a href="Main.dc.html" aria-label="Kembali ke daftar host" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+</a>
+<h1 style="flex: 1; margin: 0; font-size: 22px; font-weight: 600">Streak</h1>
+<button type="button" onClick="{{openHelp}}" aria-label="Bantuan: cara kerja streak" aria-haspopup="dialog" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #9AA8AF; padding: 0; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1.1.8-1.1 1.6"/><path d="M12 17h.01"/></svg>
+</button>
+<a href="Settings.dc.html" aria-label="Pengaturan streak" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+</a>
+</div>
+
+<sc-if value="{{playing}}" hint-placeholder-val="{{ true }}">
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 12px 20px 12px; display: flex; flex-direction: column; gap: 12px">
+
+<div style="display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 20px 16px; border-radius: 18px; border: 1px solid #2A343A; background: #161C20">
+<div style="position: relative; width: 150px; height: 140px">
+<sc-if value="{{isActive}}" hint-placeholder-val="{{ false }}">
+<span aria-hidden="true" style="position: absolute; left: 25px; top: 25px; width: 100px; height: 100px; box-sizing: border-box; border-radius: 50%; border: 2px solid {{ringColor}}; animation: ring 700ms ease-out 100ms both"></span>
+</sc-if>
+<div style="position: absolute; left: 0; top: 0; width: 150px; height: 140px; animation: {{shakeAnim}}">
+<button type="button" onClick="{{tap}}" disabled="{{locked}}" aria-label="{{stageLabel}}" style="position: absolute; left: 0; top: 0; width: 150px; height: 140px; padding: 0; border: none; background: transparent; cursor: pointer">
+<div style="position: absolute; left: 10px; bottom: 6px">
+<dc-import name="FlameArt" count="{{flameCount}}" mode="{{flameMode}}" size="100" cracks="{{flameCracks}}" need="{{flameNeed}}" animate="{{ true }}" hint-size="130px,125px"></dc-import>
+</div>
+</button>
+</div>
+<sc-for list="{{shards}}" as="sh" hint-placeholder-count="0">
+<span aria-hidden="true" style="position: absolute; left: 70px; top: 70px; width: 10px; height: 14px; border-radius: 2px; background: #BFE4F8; --dx: {{sh.dx}}px; --dy: {{sh.dy}}px; --rot: {{sh.rot}}deg; animation: shard 700ms ease-out both"></span>
+</sc-for>
+</div>
+<div style="display: flex; align-items: flex-end; gap: 8px">
+<div style="height: 56px; overflow: hidden">
+<sc-if value="{{isActive}}" hint-placeholder-val="{{ false }}">
+<div style="animation: roll 450ms cubic-bezier(0.4, 0, 0.2, 1) 350ms both">
+<div style="height: 56px; line-height: 56px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 56px; font-weight: 500">{{prevText}}</div>
+<div style="height: 56px; line-height: 56px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 56px; font-weight: 500">{{streakText}}</div>
+</div>
+</sc-if>
+<sc-if value="{{notActive}}" hint-placeholder-val="{{ true }}">
+<div style="height: 56px; line-height: 56px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 56px; font-weight: 500; color: {{numDim}}">{{streakText}}</div>
+</sc-if>
+</div>
+<span style="font-size: 16px; color: #9AA8AF; padding-bottom: 8px">hari berturut-turut</span>
+</div>
+<p aria-live="polite" style="margin: 0; text-align: center; font-size: 14px; line-height: 1.5; color: #C5D0D5">{{statusText}}</p>
+<sc-if value="{{waiting}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; gap: 8px; align-items: center" aria-hidden="true">
+<sc-for list="{{dots}}" as="dt" hint-placeholder-count="3"><span style="width: 14px; height: 14px; box-sizing: border-box; border-radius: 50%; border: 2px solid #F0B34A; background: {{dt.bg}}"></span></sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{isActive}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 2px">
+<span style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid #1F5A45; background: #12251E; color: #5ED3A6; font-size: 14px; font-weight: 500; animation: slideUp 350ms ease-out 700ms both">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+Hari ini selesai
+</span>
+<button type="button" onClick="{{replay}}" style="min-height: 44px; padding: 0 12px; border: none; background: transparent; color: #9AA8AF; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13px; text-decoration: underline; cursor: pointer">Putar ulang animasi</button>
+</div>
+</sc-if>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<span style="font-size: 15px; font-weight: 600">Pekan ini</span>
+<div style="display: flex; justify-content: space-between">
+<sc-for list="{{week}}" as="d" hint-placeholder-count="7">
+<div style="width: 40px; display: flex; flex-direction: column; align-items: center; gap: 6px">
+<span style="font-size: 12px; color: #9AA8AF">{{d.label}}</span>
+<span style="width: 36px; height: 36px; box-sizing: border-box; border-radius: 50%; display: flex; align-items: center; justify-content: center; border: 2px {{d.bs}} {{d.bd}}; background: {{d.bg}}; color: {{d.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; animation: {{d.anim}}">{{d.num}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<span style="font-size: 12px; color: #9AA8AF">Terpanjang</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 18px; font-weight: 500">{{longest}} hari</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<span style="font-size: 12px; color: #9AA8AF">Aktif bulan ini</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 18px; font-weight: 500">{{activeCount}} hari</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<span style="font-size: 12px; color: #9AA8AF">Level api</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 18px; font-weight: 500">{{lvl}} · {{lvlName}}</span>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<span style="font-size: 15px; font-weight: 600">Menuju Level {{nextLvl}} · hari ke-{{nextTarget}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">{{streak}} / {{nextTarget}}</span>
+</div>
+<div style="height: 8px; border-radius: 4px; background: #2A343A; overflow: hidden">
+<div style="height: 8px; border-radius: 4px; background: #F0B34A; width: {{pct}}%; --from: {{pctFrom}}%; --to: {{pct}}%; animation: {{barAnim}}"></div>
+</div>
+<span style="font-size: 13px; color: #9AA8AF">{{leftText}}</span>
+<div style="display: grid; grid-template-columns: repeat(9, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{badges}}" as="b" hint-placeholder-count="9">
+<div style="display: flex; align-items: center; justify-content: center; height: 36px; border-radius: 8px; border: 1px solid {{b.bd}}; background: {{b.bg}}">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; color: {{b.fg}}">{{b.label}}</span>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<span style="font-size: 15px; font-weight: 600">Oktober 2026</span>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px; text-align: center; font-size: 12px; color: #9AA8AF">
+<span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span>
+</div>
+<div style="display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 4px">
+<sc-for list="{{cells}}" as="c" hint-placeholder-count="35">
+<div style="height: 40px; box-sizing: border-box; border-radius: 10px; display: flex; align-items: center; justify-content: center; border: 2px {{c.bs}} {{c.bd}}; background: {{c.bg}}; color: {{c.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; animation: {{c.anim}}">{{c.text}}</div>
+</sc-for>
+</div>
+<span style="font-size: 12px; line-height: 1.4; color: #9AA8AF">Kotak terisi = hari aktif. Bingkai amber = hari ini. Bingkai putus-putus berwarna = hari absen.</span>
+<sc-if value="{{hasAbsen}}" hint-placeholder-val="{{ false }}">
+<span style="font-size: 13px; line-height: 1.45; color: #E8EEF0">{{absenCaption}}</span>
+</sc-if>
+
+</div>
+
+<button type="button" onClick="{{openHelp}}" aria-haspopup="dialog" style="display: flex; align-items: center; gap: 12px; width: 100%; box-sizing: border-box; min-height: 56px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; font: inherit; text-align: left; cursor: pointer">
+<span aria-hidden="true" style="flex: none; width: 28px; height: 28px; box-sizing: border-box; border-radius: 50%; border: 2px solid #9AA8AF; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 600; color: #9AA8AF">?</span>
+<span style="flex: 1; font-size: 15px; font-weight: 500">Cara kerja streak dan contoh jika absen</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+
+</div>
+</sc-if>
+<sc-if value="{{help}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; display: flex; flex-direction: column; justify-content: flex-end">
+<button type="button" onClick="{{closeHelp}}" aria-label="Tutup bantuan" style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; padding: 0; border: none; background: rgba(0, 0, 0, 0.6); cursor: default"></button>
+<div role="dialog" aria-modal="true" aria-label="Cara kerja streak" style="position: relative; max-height: 82%; box-sizing: border-box; display: flex; flex-direction: column; border-radius: 18px 18px 0 0; border: 1px solid #5C6A71; border-bottom: none; background: #161C20; animation: slideUp 200ms ease-out both">
+<div style="display: flex; align-items: center; padding: 8px 8px 4px 16px">
+<h2 style="flex: 1; margin: 0; font-size: 17px; font-weight: 600">Cara kerja streak</h2>
+<button type="button" onClick="{{closeHelp}}" aria-label="Tutup" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #9AA8AF; padding: 0; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+</button>
+</div>
+<div style="overflow-y: auto; padding: 4px 16px 20px 16px; display: flex; flex-direction: column; gap: 12px">
+<p style="margin: 0; font-size: 13.5px; line-height: 1.5; color: #C5D0D5">Satu hari dihitung saat Tuan membuka aplikasi. Bila tanggal berganti selagi aplikasi terbuka, hari baru dihitung seperti membuka lagi.</p>
+<p style="margin: 0; font-size: 13.5px; line-height: 1.5; color: #C5D0D5">Hari 1-2 tampil sebagai bara dengan angka N/3 dan belum dihitung sebagai streak. Mulai hari ke-3 api menyala.</p>
+<p style="margin: 0; font-size: 13.5px; line-height: 1.5; color: #C5D0D5">Absen 1-2 hari: api padam, ketuk 3 kali cepat untuk menyalakan. Absen 3-10 hari: api membeku, ketukan = 5 + (hari absen - 3), maksimal 10. Absen lebih dari 10 hari: streak hangus dan mulai lagi dari 1/3.</p>
+<a href="Settings.dc.html" style="min-height: 44px; display: flex; align-items: center; color: #F0B34A; font-size: 14px; font-weight: 500">Atur tampilan streak dan pengingat</a>
+<div style="display: flex; flex-direction: column; gap: 12px; padding-top: 12px; border-top: 1px solid #2A343A">
+<span style="font-size: 13.5px; font-weight: 600">Contoh jika tidak membuka TermUL</span>
+<sc-for list="{{absenRows}}" as="r" hint-placeholder-count="3">
+<div style="display: flex; align-items: center; gap: 12px">
+<div style="flex: none; width: 36px; display: flex; justify-content: center">
+<dc-import name="FlameArt" count="47" mode="{{r.mode}}" size="22" cracks="{{r.cracks}}" need="{{r.need}}" hint-size="29px,28px"></dc-import>
+</div>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; font-weight: 500">{{r.title}}</span>
+<div style="display: flex; flex-wrap: wrap; gap: 3px">
+<sc-for list="{{r.dots}}" as="dt" hint-placeholder-count="6"><span style="width: 9px; height: 9px; box-sizing: border-box; border-radius: 50%; border: 2px {{dt.bs}} {{dt.bd}}; background: {{dt.bg}}"></span></sc-for>
+</div>
+<span style="font-size: 12px; line-height: 1.4; color: #9AA8AF">{{r.text}}</span>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+</div>
+</div>
+</sc-if>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","default":"aktif","options":["aktif","bara","padam","beku"],"section":"Keadaan"},"todayActive":{"editor":"boolean","default":true,"section":"Keadaan"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const ta = this.props.todayActive;
+    const modes = ['aktif', 'bara', 'padam', 'beku'];
+    const mode = modes.indexOf(this.props.mode) >= 0 ? this.props.mode : 'aktif';
+    const clicksToThaw = (m) => Math.min(10, Math.max(5, 5 + (m - 3)));
+    const need = mode === 'padam' ? 3 : (mode === 'beku' ? clicksToThaw(5) : 0);
+    const taps = Math.min(s.taps || 0, need);
+    const waiting = need > 0 && taps < need;
+    const relit = need > 0 && taps >= need;
+    const todayActive = need > 0 ? relit : !(ta === false || ta === 'false');
+    const POP = 'fillIn 450ms cubic-bezier(0.34, 1.56, 0.64, 1) 450ms both';
+    const TODAY = 15;
+    const BASES = {
+      aktif: [1, 2, 3, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14],
+      bara: [14],
+      padam: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13],
+      beku: [1, 2, 3, 4, 5, 6, 7, 8, 9]
+    };
+    const active = {};
+    BASES[mode].forEach((dd) => { active[dd] = true; });
+    if (todayActive) active[TODAY] = true;
+
+    let streak = 0;
+    let longest = 0;
+    if (need > 0) {
+      // Padam dan beku: streak sebelumnya 23 hari (sebagian di bulan lalu).
+      streak = relit ? 24 : 23;
+      longest = streak;
+    } else {
+      let d = todayActive ? TODAY : TODAY - 1;
+      while (d >= 1 && active[d]) {
+        streak++;
+        d--;
+      }
+      let run = 0;
+      for (let n = 1; n <= TODAY; n++) {
+        if (active[n]) {
+          run++;
+          if (run > longest) longest = run;
+        } else {
+          run = 0;
+        }
+      }
+    }
+    const activeCount = Object.keys(active).length;
+
+    // Ambang dan warna level hanya contoh; ganti dengan nilai StreakTier di desktop.
+    const MIN = [1, 3, 10, 30, 60, 100, 180, 365, 730];
+    const COLORS = ['#d0601f', '#ff9d1f', '#ff4d2e', '#ff3f9f', '#9a5cff', '#3c8cff', '#1edb98', '#ffc21a', '#ffb000'];
+    const NAMES = ['Bara', 'Api Jingga', 'Api Merah', 'Api Magenta', 'Api Ungu', 'Api Biru', 'Api Zamrud', 'Api Emas', 'Api Pelangi'];
+    let lvl = 1;
+    for (let i = 0; i < MIN.length; i++) {
+      if (streak >= MIN[i]) lvl = i + 1;
+    }
+    const nextLvl = Math.min(9, lvl + 1);
+    const nextTarget = lvl >= 9 ? MIN[8] : MIN[lvl];
+    const curMin = MIN[lvl - 1];
+    const span = Math.max(1, nextTarget - curMin);
+    const pct = lvl >= 9 ? 100 : Math.min(100, Math.round(((streak - curMin) / span) * 100));
+    const pctPrev = lvl >= 9 ? 100 : Math.max(0, Math.min(100, Math.round((((streak - 1) - curMin) / span) * 100)));
+    const left = Math.max(0, nextTarget - streak);
+    const badges = MIN.map((m, i) => {
+      const n = i + 1;
+      const reached = n <= lvl;
+      const current = n === lvl;
+      return {
+        label: String(n),
+        bg: current ? COLORS[i] : 'transparent',
+        bd: reached ? COLORS[i] : '#2A343A',
+        fg: current ? '#0A0E10' : (reached ? COLORS[i] : '#7F8D94')
+      };
+    });
+
+    const runStart = (mode === 'padam' || mode === 'beku') ? Math.max.apply(null, BASES[mode]) + 1 : 0;
+    const absenTone = mode === 'beku' ? '#9fd6ff' : '#8d9299';
+    const kind = (n) => {
+      if (n === TODAY) return todayActive ? 'on' : 'pending';
+      if (n > TODAY) return 'future';
+      if (active[n]) return 'on';
+      return (runStart && n >= runStart) ? 'absent' : 'missed';
+    };
+    const look = {
+      on: { bg: '#F0B34A', fg: '#1B1406', bd: '#F0B34A', bs: 'solid' },
+      pending: { bg: 'transparent', fg: '#F0B34A', bd: '#F0B34A', bs: 'dashed' },
+      future: { bg: 'transparent', fg: '#5C6A71', bd: '#2A343A', bs: 'solid' },
+      missed: { bg: 'transparent', fg: '#9AA8AF', bd: '#2A343A', bs: 'solid' },
+      absent: { bg: 'transparent', fg: absenTone, bd: absenTone, bs: 'dashed' }
+    };
+
+    const labels = ['Sen', 'Sel', 'Rab', 'Kam', 'Jum', 'Sab', 'Min'];
+    const week = labels.map((l, i) => {
+      const n = 12 + i;
+      const k = look[kind(n)];
+      return { label: l, num: n, bg: k.bg, fg: k.fg, bd: k.bd, bs: k.bs, anim: (n === 15 && todayActive) ? POP : 'none' };
+    });
+
+    const cells = [];
+    for (let i = 0; i < 3; i++) cells.push({ text: '', bg: 'transparent', fg: 'transparent', bd: 'transparent', bs: 'solid', anim: 'none' });
+    for (let n = 1; n <= 31; n++) {
+      const k = kind(n);
+      const l = look[k];
+      cells.push({
+        text: n,
+        bg: l.bg,
+        fg: l.fg,
+        bd: (k === 'pending' || k === 'on') ? '#F0B34A' : (k === 'absent' ? l.bd : 'transparent'),
+        bs: (k === 'pending' || k === 'absent') ? 'dashed' : 'solid',
+        anim: (n === 15 && todayActive) ? POP : 'none'
+      });
+    }
+
+    const dotsOf = (on, miss, tone) => {
+      const out = [];
+      for (let i = 0; i < on; i++) out.push({ bg: '#F0B34A', bd: '#F0B34A', bs: 'solid' });
+      for (let i = 0; i < miss; i++) out.push({ bg: 'transparent', bd: tone, bs: 'dashed' });
+      return out;
+    };
+    const absenRows = [
+      { mode: 'gray', cracks: 0, need: 5, title: 'Absen 1-2 hari', text: 'Api padam. Ketuk 3 kali cepat untuk menyalakan.', dots: dotsOf(5, 1, '#8d9299') },
+      { mode: 'frozen', cracks: 0, need: 7, title: 'Absen 3-10 hari', text: 'Api membeku. Ketukan = 5 + (hari absen - 3), jadi absen 5 hari = 7 ketukan.', dots: dotsOf(4, 5, '#9fd6ff') },
+      { mode: 'reset', cracks: 0, need: 5, title: 'Absen lebih dari 10 hari', text: 'Streak hangus dan mulai lagi dari 1/3.', dots: dotsOf(3, 11, '#8d9299') }
+    ];
+    const absenCaption = mode === 'beku'
+      ? 'Absen 5 hari (10-14 Okt): api membeku. Ketuk 7 kali untuk memecahkan es.'
+      : (mode === 'padam' ? 'Absen 1 hari (14 Okt): api padam. Ketuk 3 kali cepat untuk menyalakan.' : '');
+
+    const CR = ['M75 10 L68 45 L82 70', 'M82 70 L110 85 L118 120', 'M68 45 L38 60 L30 95', 'M82 70 L70 110 L78 150', 'M38 60 L20 40', 'M110 85 L135 70'];
+    const cracks = CR.map((p, i) => ({ d: p, op: (mode === 'beku' && i < taps) ? '1' : '0' }));
+    const SH = [[-60, -46, -140], [54, -56, 120], [-66, 14, -90], [62, 20, 160], [-26, 62, -60], [34, 66, 80], [0, -66, 30]];
+    const shards = (mode === 'beku' && relit) ? SH.map((a) => ({ dx: a[0], dy: a[1], rot: a[2] })) : [];
+    const dots = [];
+    for (let i = 0; i < need; i++) dots.push({ bg: i < taps ? '#F0B34A' : 'transparent' });
+    const tapsLeft = need - taps;
+    let statusText = todayActive
+      ? 'Hari ini terhitung sejak aplikasi dibuka. Sampai jumpa besok.'
+      : 'Hari ini belum terhitung. Buka aplikasi untuk menghitungnya.';
+    if (mode === 'bara') statusText = 'Buka TermUL lagi besok. Streak menyala di hari ke-3.';
+    if (mode === 'padam') {
+      if (relit) statusText = 'Api menyala lagi. Hari ini terhitung.';
+      else if (taps > 0) statusText = 'Sisa ' + tapsLeft + ' ketukan lagi untuk menyalakan api.';
+      else statusText = 'Kemarin kamu tidak membuka TermUL, jadi api padam. Ketuk api 3x cepat untuk menyalakannya lagi.';
+    }
+    if (mode === 'beku') {
+      if (relit) statusText = 'Es pecah! Streak dilanjutkan. Hari ini terhitung.';
+      else if (taps > 0) statusText = 'Sisa ' + tapsLeft + ' ketukan lagi untuk memecahkan es.';
+      else statusText = 'Kamu absen 5 hari, api membeku. Ketuk api ' + need + ' kali untuk memecahkan es.';
+    }
+    const shakeAnim = (waiting && taps > 0) ? (taps % 2 === 1 ? 'shakeA 260ms ease-out' : 'shakeB 260ms ease-out') : 'none';
+    const outlineColor = waiting ? (mode === 'beku' ? '#6E8BA0' : '#5C6A71') : '#F0B34A';
+    const heroBg = todayActive ? '#3A2A0B' : (mode === 'beku' ? '#10202B' : '#1E262B');
+    const stageLabel = mode === 'padam' ? 'Ketuk api untuk menyalakan' : (mode === 'beku' ? 'Ketuk untuk memecahkan es' : 'Api streak');
+
+    return {
+      help: s.help === true,
+      openHelp: () => this.setState({ help: true }),
+      closeHelp: () => this.setState({ help: false }),
+      tap: () => {
+        if (waiting) this.setState({ taps: taps + 1 });
+      },
+      locked: !waiting,
+      stageLabel: stageLabel,
+      flameCount: streak,
+      flameMode: waiting ? (mode === 'beku' ? 'frozen' : 'gray') : 'active',
+      flameCracks: mode === 'beku' ? taps : 0,
+      flameNeed: need > 0 ? need : 5,
+      ringColor: COLORS[lvl - 1],
+      streakText: streak < 3 ? (streak + '/3') : String(streak),
+      prevText: (streak - 1) < 3 ? ((streak - 1) + '/3') : String(streak - 1),
+      showSmoke: mode === 'padam' && waiting,
+      showIce: mode === 'beku' && !relit,
+      cracks: cracks,
+      shards: shards,
+      shakeAnim: shakeAnim,
+      outlineColor: outlineColor,
+      flameSize: mode === 'bara' ? 26 : 48,
+      waiting: waiting,
+      dots: dots,
+      numDim: waiting ? '#7F8D94' : '#E8EEF0',
+      streak: streak,
+      longest: longest,
+      activeCount: activeCount,
+      nextTarget: nextTarget,
+      pct: pct,
+      leftText: left === 1 ? 'Tinggal 1 hari lagi.' : ('Tinggal ' + left + ' hari lagi.'),
+      badges: badges,
+      week: week,
+      cells: cells,
+      hasAbsen: runStart > 0,
+      absenCaption: absenCaption,
+      absenRows: absenRows,
+      playing: s.playing !== false,
+      prevStreak: streak - 1,
+      pctFrom: pctPrev,
+      lvl: lvl,
+      lvlName: NAMES[lvl - 1],
+      nextLvl: nextLvl,
+      barAnim: todayActive ? 'grow 600ms cubic-bezier(0.4, 0, 0.2, 1) 500ms both' : 'none',
+      replay: () => {
+        this.setState({ playing: false, taps: 0 });
+        setTimeout(() => this.setState({ playing: true }), 80);
+      },
+      isActive: todayActive,
+      notActive: !todayActive,
+      heroBg: heroBg,
+      flameFill: 'none',
+      statusText: statusText
+    };
+  }
+}
+</script>
+</body>
+</html>

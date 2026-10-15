@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Galeri widget</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1080px; height: 880px; box-sizing: border-box; padding: 40px; display: flex; flex-direction: column; gap: 28px; background: #0B0F12; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Streak 2x2 · aktif, bara, padam, beku, hangus</span>
+<div style="display: flex; gap: 24px">
+<dc-import name="WidgetStreak" size="small" state="aktif" level="3" w="148" h="148" hint-size="148px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="small" state="bara" level="3" w="148" h="148" hint-size="148px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="small" state="padam" level="3" w="148" h="148" hint-size="148px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="small" state="beku" level="3" w="148" h="148" hint-size="148px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="small" state="hangus" level="3" w="148" h="148" hint-size="148px,148px"></dc-import>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Streak 4x2 · aktif (level 3), aktif (level 7), bara</span>
+<div style="display: flex; gap: 24px">
+<dc-import name="WidgetStreak" size="medium" state="aktif" level="3" w="312" h="148" hint-size="312px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="medium" state="aktif" level="7" w="312" h="148" hint-size="312px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="medium" state="bara" level="3" w="312" h="148" hint-size="312px,148px"></dc-import>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Streak 4x2 · padam, beku, hangus</span>
+<div style="display: flex; gap: 24px">
+<dc-import name="WidgetStreak" size="medium" state="padam" level="3" w="312" h="148" hint-size="312px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="medium" state="beku" level="3" w="312" h="148" hint-size="312px,148px"></dc-import>
+<dc-import name="WidgetStreak" size="medium" state="hangus" level="3" w="312" h="148" hint-size="312px,148px"></dc-import>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Favorit 4x2</span>
+<dc-import name="WidgetFavorit" w="312" h="148" hint-size="312px,148px"></dc-import>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1080,"height":880}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return {};
+  }
+}
+</script>
+</body>
+</html>

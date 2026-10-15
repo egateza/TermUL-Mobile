@@ -1,0 +1,278 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Streak saat aplikasi dibuka</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+@keyframes sp-in{from{transform:scale(0)}to{transform:scale(1)}}
+@keyframes sp-fade-in{from{opacity:0}to{opacity:1}}
+@keyframes sp-fade-out{from{opacity:1}to{opacity:0}}
+@keyframes sp-dying{0%{transform:scale(1) translateY(0);filter:none;opacity:1}55%{filter:grayscale(1) brightness(0.9)}100%{transform:scale(0.08) translateY(18px);filter:grayscale(1);opacity:0}}
+@keyframes sp-pop{0%{transform:scale(0.55)}100%{transform:scale(1)}}
+@keyframes sp-roll{from{transform:translateY(0)}to{transform:translateY(-72px)}}
+@keyframes sp-strike{to{text-decoration:line-through;text-decoration-thickness:4px;opacity:0.7}}
+@keyframes sp-shakeA{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}45%{transform:translateX(6px)}70%{transform:translateX(-4px)}}
+@keyframes sp-shakeB{0%,100%{transform:translateX(0)}20%{transform:translateX(-7px)}45%{transform:translateX(6px)}70%{transform:translateX(-4px)}}
+@keyframes sp-bA{0%{transform:translate(0,0) scale(1);opacity:1}60%{transform:translate(calc(var(--dx) * 0.85),calc(var(--dy) * 0.85 - 14px)) scale(0.8);opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 46px)) scale(0.3);opacity:0}}
+@keyframes sp-bB{0%{transform:translate(0,0) scale(1);opacity:1}60%{transform:translate(calc(var(--dx) * 0.85),calc(var(--dy) * 0.85 - 14px)) scale(0.8);opacity:1}100%{transform:translate(var(--dx),calc(var(--dy) + 46px)) scale(0.3);opacity:0}}
+@keyframes sp-ringA{0%{transform:scale(0.3);opacity:0.9}100%{transform:scale(2.2);opacity:0}}
+@keyframes sp-ringB{0%{transform:scale(0.3);opacity:0.9}100%{transform:scale(2.2);opacity:0}}
+@keyframes sp-shA{from{transform:translate(0,0) rotate(0deg);opacity:1}to{transform:translate(var(--dx),calc(var(--dy) + 70px)) rotate(var(--rot));opacity:0}}
+@keyframes sp-shB{from{transform:translate(0,0) rotate(0deg);opacity:1}to{transform:translate(var(--dx),calc(var(--dy) + 70px)) rotate(var(--rot));opacity:0}}
+@keyframes sp-smokeA{0%{transform:translateY(0) scale(0.8);opacity:0.4}100%{transform:translateY(-46px) scale(1.9);opacity:0}}
+@keyframes sp-smokeB{0%{transform:translateY(0) scale(0.8);opacity:0.4}100%{transform:translateY(-46px) scale(1.9);opacity:0}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: radial-gradient(circle at 50% 40%, #28160a 0%, #060709 85%); color: #FFFFFF; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden; --tc: {{tc}}">
+
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 12px 12px 0 20px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: rgba(255,255,255,0.65)">Streak harian</span>
+<button type="button" onClick="{{replay}}" style="min-height: 44px; padding: 0 12px; border: none; background: transparent; color: rgba(255,255,255,0.65); font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13px; text-decoration: underline; cursor: pointer">Putar ulang</button>
+</div>
+
+<sc-if value="{{playing}}" hint-placeholder-val="{{ true }}">
+<div style="flex: 1; min-height: 0; display: flex; flex-direction: column; align-items: center; justify-content: space-between; padding: 0 24px 28px 24px">
+
+<div style="flex: 1; min-height: 0; width: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px">
+
+<div style="position: relative; width: 240px; height: 210px; flex: none">
+
+<sc-for list="{{fx}}" as="p" hint-placeholder-count="0">
+<span aria-hidden="true" style="position: absolute; left: {{p.left}}px; top: {{p.top}}px; width: {{p.w}}px; height: {{p.h}}px; border-radius: {{p.radius}}; background: {{p.bg}}; border: {{p.border}}; box-sizing: border-box; --dx: {{p.dx}}px; --dy: {{p.dy}}px; --rot: {{p.rot}}deg; clip-path: {{p.clip}}; animation: {{p.anim}}"></span>
+</sc-for>
+
+<div style="position: absolute; left: 0; top: 0; width: 240px; height: 210px; animation: {{shakeAnim}}">
+<button type="button" onClick="{{tap}}" disabled="{{locked}}" aria-label="{{stageLabel}}" style="position: absolute; left: 0; top: 0; width: 240px; height: 210px; padding: 0; border: none; background: transparent; cursor: {{cursor}}">
+<sc-for list="{{flames}}" as="fl" hint-placeholder-count="1">
+<div style="position: absolute; left: 35px; bottom: 6px; animation: {{fl.outer}}; opacity: {{fl.op}}">
+<div style="animation: {{fl.inner}}">
+<dc-import name="FlameArt" count="{{fl.count}}" mode="{{fl.mode}}" size="130" cracks="{{fl.cracks}}" need="{{fl.need}}" animate="{{ true }}" hint-size="169px,163px"></dc-import>
+</div>
+</div>
+</sc-for>
+</button>
+</div>
+
+</div>
+
+<div style="display: grid; width: 100%; min-height: 210px; justify-items: center; align-items: start">
+<sc-for list="{{blocks}}" as="b" hint-placeholder-count="1">
+<div style="grid-area: 1 / 1; display: flex; flex-direction: column; align-items: center; gap: 8px; width: 100%; text-align: center; animation: {{b.anim}}">
+<div style="height: 72px; overflow: hidden">
+<sc-if value="{{b.roll}}" hint-placeholder-val="{{ false }}">
+<div style="animation: {{b.rollAnim}}">
+<div style="height: 72px; line-height: 72px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 64px; font-weight: 500; color: var(--tc)">{{b.from}}</div>
+<div style="height: 72px; line-height: 72px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 64px; font-weight: 500; color: var(--tc)">{{b.to}}</div>
+</div>
+</sc-if>
+<sc-if value="{{b.plain}}" hint-placeholder-val="{{ true }}">
+<div style="height: 72px; line-height: 72px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 64px; font-weight: 500; color: var(--tc); animation: {{b.countAnim}}">{{b.text}}</div>
+</sc-if>
+</div>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; letter-spacing: 0.12em; text-transform: uppercase; color: rgba(255,255,255,0.65)">{{b.unit}}</span>
+<sc-if value="{{b.hasBadge}}" hint-placeholder-val="{{ false }}">
+<span style="padding: 3px 11px; border-radius: 999px; background: var(--tc); color: #14100c; font-size: 12.5px; font-weight: 600; animation: {{b.badgeAnim}}">{{b.badge}}</span>
+</sc-if>
+<sc-if value="{{b.hasMsg}}" hint-placeholder-val="{{ false }}">
+<p aria-live="polite" style="margin: 0; max-width: 300px; font-size: 14px; line-height: 1.45; color: rgba(255,255,255,0.86)">{{b.msg}}</p>
+</sc-if>
+<sc-if value="{{b.hasProg}}" hint-placeholder-val="{{ false }}">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; font-weight: 500; color: #bfe6ff">{{b.prog}}</span>
+</sc-if>
+</div>
+</sc-for>
+</div>
+
+</div>
+
+<div style="width: 100%; display: flex; flex-direction: column; gap: 8px; flex: none">
+<sc-if value="{{showContinue}}" hint-placeholder-val="{{ true }}">
+<a href="Main.dc.html" style="min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #F0B34A; color: #1B1406; font-size: 16px; font-weight: 600">Lanjut</a>
+</sc-if>
+<sc-if value="{{showLater}}" hint-placeholder-val="{{ false }}">
+<a href="Main.dc.html" style="min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; border: 1px solid rgba(255,255,255,0.35); color: #FFFFFF; font-size: 16px">Nanti saja</a>
+</sc-if>
+</div>
+
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","default":"naik","options":["aktif","naik","bara","padam","beku","hangus"],"section":"Keadaan"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const modes = ['aktif', 'naik', 'bara', 'padam', 'beku', 'hangus'];
+    const mode = modes.indexOf(this.props.mode) >= 0 ? this.props.mode : 'naik';
+
+    // Tier dan palet sama dengan artifact desktop "Streak Api TermUL".
+    const TIERS = [
+      { name: 'Bara', min: 1, max: 2, m: '#d0601f', c: '#ffc07a' },
+      { name: 'Api Jingga', min: 3, max: 9, m: '#ff9d1f', c: '#ffe28a' },
+      { name: 'Api Merah', min: 10, max: 29, m: '#ff4d2e', c: '#ffc76b' },
+      { name: 'Api Magenta', min: 30, max: 59, m: '#ff3f9f', c: '#ffd3ea' },
+      { name: 'Api Ungu', min: 60, max: 99, m: '#9a5cff', c: '#eadcff' },
+      { name: 'Api Biru', min: 100, max: 179, m: '#3c8cff', c: '#dcefff' },
+      { name: 'Api Zamrud', min: 180, max: 364, m: '#1edb98', c: '#e3fff3' },
+      { name: 'Api Emas', min: 365, max: 729, m: '#ffc21a', c: '#fff7c9' },
+      { name: 'Api Pelangi', min: 730, max: 1e9, m: '#ffb000', c: '#d9f7ff', rainbow: true }
+    ];
+    const tierOf = (n) => { let t = TIERS[0]; for (let i = 0; i < TIERS.length; i++) { if (n >= TIERS[i].min && n <= TIERS[i].max) t = TIERS[i]; } return t; };
+    const clicksToThaw = (m) => Math.min(10, Math.max(5, 5 + (m - 3)));
+
+    const CFG = {
+      aktif: { kind: 'active', from: 22, count: 23 },
+      naik: { kind: 'active', from: 9, count: 10 },
+      bara: { kind: 'ember', count: 2 },
+      padam: { kind: 'gray', count: 47, missed: 1 },
+      beku: { kind: 'frozen', count: 47, missed: 5 },
+      hangus: { kind: 'reset', count: 47, missed: 12 }
+    };
+    const c = CFG[mode];
+    const kind = c.kind;
+    const need = kind === 'gray' ? 3 : (kind === 'frozen' ? clicksToThaw(c.missed) : 0);
+    const taps = s.taps || 0;
+    const cracks = Math.min(s.cracks || 0, need);
+    const revived = (kind === 'gray' && taps >= 3) || (kind === 'frozen' && cracks >= need);
+    const waiting = (kind === 'gray' || kind === 'frozen') && !revived;
+
+    const IN = 'sp-in 0.7s cubic-bezier(0.3, 1.7, 0.5, 1) both';
+    const POP = (d) => 'sp-pop 0.45s cubic-bezier(0.3, 1.7, 0.5, 1) ' + d + 's both';
+
+    // warna aksen teks
+    let tier = tierOf(c.count);
+    let tc = tier.rainbow ? '#ffd36b' : tier.m;
+    if (waiting && kind === 'gray') tc = '#b4b8bd';
+    if (waiting && kind === 'frozen') tc = '#bfe6ff';
+    if (kind === 'reset') tc = '#b4b8bd';
+    if (kind === 'ember') tc = tierOf(2).m;
+    if (revived) tc = tierOf(c.count + 1).rainbow ? '#ffd36b' : tierOf(c.count + 1).m;
+
+    // ---- api ----
+    const flames = [];
+    const f0 = { count: c.count, mode: 'active', cracks: 0, need: 5, outer: IN, inner: 'none', op: 1 };
+    if (kind === 'active') {
+      const t0 = tierOf(c.from), t1 = tierOf(c.count);
+      if (t0 !== t1) {
+        flames.push(Object.assign({}, f0, { count: c.from, outer: IN + ', sp-fade-out 0.3s linear 1s forwards' }));
+        flames.push(Object.assign({}, f0, { count: c.count, outer: 'sp-fade-in 0.3s linear 1s both', op: 0 }));
+      } else {
+        flames.push(Object.assign({}, f0, { count: c.count }));
+      }
+    } else if (kind === 'ember') {
+      flames.push(Object.assign({}, f0, { count: c.count }));
+    } else if (kind === 'gray') {
+      flames.push(Object.assign({}, f0, { count: c.count, mode: revived ? 'active' : 'gray', outer: revived ? 'none' : IN }));
+    } else if (kind === 'frozen') {
+      flames.push(Object.assign({}, f0, { count: c.count, mode: revived ? 'active' : 'frozen', cracks: cracks, need: need, outer: revived ? 'none' : IN }));
+    } else {
+      flames.push(Object.assign({}, f0, { count: c.count, inner: 'sp-dying 1.6s ease-in 1s forwards' }));
+      flames.push(Object.assign({}, f0, { count: 1, outer: 'sp-in 0.5s cubic-bezier(0.3, 1.7, 0.5, 1) 3.2s both', op: 0 }));
+    }
+
+    // ---- teks ----
+    const blocks = [];
+    const base = { roll: false, plain: true, from: '', to: '', text: '', unit: 'hari streak', badge: '', msg: '', prog: '', anim: 'none', countAnim: 'none', badgeAnim: 'none', rollAnim: 'none' };
+    const mk = (o) => {
+      const b = Object.assign({}, base, o);
+      b.hasBadge = !!b.badge; b.hasMsg = !!b.msg; b.hasProg = !!b.prog;
+      return b;
+    };
+    if (kind === 'active') {
+      const t0 = tierOf(c.from), t1 = tierOf(c.count);
+      let badge = '';
+      if (c.from < 3) badge = 'Streak menyala \u00b7 ' + t1.name; else if (t0 !== t1) badge = 'Naik level \u00b7 ' + t1.name;
+      blocks.push(mk({ roll: true, plain: false, from: c.from, to: c.count, unit: c.from < 3 ? 'hari berturut-turut' : 'hari streak', badge: badge, rollAnim: 'sp-roll 0.45s cubic-bezier(0.4, 0, 0.2, 1) 1s both', badgeAnim: POP(1.0) }));
+    } else if (kind === 'ember') {
+      blocks.push(mk({ text: c.count + '/3', unit: 'hari berturut-turut', msg: 'Buka TermUL lagi besok. Streak menyala di hari ke-3.', countAnim: POP(0.1) }));
+    } else if (revived) {
+      blocks.push(mk({ roll: true, plain: false, from: c.count, to: c.count + 1, badge: tierOf(c.count + 1).name, msg: 'Api menyala lagi. Streak lanjut, hari ini ikut dihitung.', rollAnim: 'sp-roll 0.45s cubic-bezier(0.4, 0, 0.2, 1) 0.3s both', badgeAnim: POP(0.3) }));
+    } else if (kind === 'gray') {
+      blocks.push(mk({ text: String(c.count), msg: 'Kemarin kamu tidak membuka TermUL, jadi api padam. Ketuk api 3x cepat untuk menyalakannya lagi.' }));
+    } else if (kind === 'frozen') {
+      blocks.push(mk({ text: String(c.count), msg: 'Kamu absen ' + c.missed + ' hari, api membeku. Ketuk api ' + need + ' kali untuk memecahkan es.', prog: 'Retak ' + cracks + '/' + need }));
+    } else {
+      blocks.push(mk({ text: String(c.count), msg: 'Kamu absen ' + c.missed + ' hari. Streak ' + c.count + ' hari hangus.', anim: 'sp-fade-out 0.25s ease 3s forwards', countAnim: 'sp-strike 0.01s linear 1s forwards' }));
+      blocks.push(mk({ text: '1/3', unit: 'hari berturut-turut', msg: 'Mulai lagi hari ini. Buka TermUL 3 hari berturut-turut untuk menyalakan streak.', anim: 'sp-fade-in 0.35s ease 3.2s both', countAnim: POP(3.2) }));
+      blocks[1].anim = 'sp-fade-in 0.35s ease 3.2s both';
+    }
+
+    // ---- efek partikel ----
+    const fx = [];
+    const pal = revived ? tierOf(c.count + 1) : (kind === 'reset' ? TIERS[0] : tierOf(c.count));
+    const par = (i, n) => i % 2 === 0 ? pal.c : pal.m;
+    const par2 = s.fxN ? (s.fxN % 2 === 1 ? 'A' : 'B') : 'A';
+    const CX = 120, CY = 128;
+    const sparks = (n, delay, tag, rad) => {
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + (i % 3) * 0.2;
+        const r = rad * (0.7 + ((i * 37) % 10) / 12);
+        fx.push({ left: CX - 3, top: CY - 3, w: 6, h: 6, radius: '50%', bg: par(i, n), border: 'none', dx: Math.round(Math.cos(a) * r), dy: Math.round(Math.sin(a) * r - 20), rot: 0, clip: 'none', anim: 'sp-b' + tag + ' 0.9s ease-out ' + delay + 's both' });
+      }
+    };
+    const ring = (delay, tag) => fx.push({ left: CX - 36, top: CY - 36, w: 72, h: 72, radius: '50%', bg: 'transparent', border: '3px solid ' + pal.m, dx: 0, dy: 0, rot: 0, clip: 'none', anim: 'sp-ring' + tag + ' 0.6s ease-out ' + delay + 's both' });
+    const shards = (n, tag, spread) => {
+      for (let i = 0; i < n; i++) {
+        const a = (i / n) * Math.PI * 2 + 0.4;
+        fx.push({ left: CX - 7 + ((i * 17) % 40) - 20, top: CY - 8 + ((i * 29) % 50) - 25, w: 14, h: 16, radius: '0', bg: 'rgba(206,237,255,0.92)', border: 'none', dx: Math.round(Math.cos(a) * spread), dy: Math.round(Math.sin(a) * spread - 30), rot: ((i * 53) % 360) - 180, clip: 'polygon(50% 0, 100% 80%, 0 70%)', anim: 'sp-sh' + tag + ' 0.8s ease-out both' });
+      }
+    };
+    const smoke = (n, tag) => {
+      for (let i = 0; i < n; i++) {
+        fx.push({ left: CX - 30 + i * 12, top: CY - 70, w: 14, h: 14, radius: '50%', bg: '#b4b8bd', border: 'none', dx: 0, dy: 0, rot: 0, clip: 'none', anim: 'sp-smoke' + tag + ' 1s ease-out ' + (i * 0.08) + 's both' });
+      }
+    };
+    if (kind === 'active') { ring(1, 'A'); sparks(18, 1, 'A', 110); }
+    if (kind === 'reset') { sparks(10, 3.2, 'A', 80); }
+    if (s.fx === 'puff') smoke(5, par2);
+    if (s.fx === 'chips') shards(4, par2, 70);
+    if (s.fx === 'shatter') { shards(18, par2, 130); ring(0, par2); sparks(18, 0, par2, 110); }
+    if (s.fx === 'burst') { ring(0, par2); sparks(18, 0, par2, 110); }
+
+    const shake = s.shake ? (s.shake % 2 === 1 ? 'sp-shakeA 0.3s ease-out' : 'sp-shakeB 0.3s ease-out') : 'none';
+
+    return {
+      tc: tc,
+      playing: s.playing !== false,
+      replay: () => {
+        this.setState({ playing: false, taps: 0, cracks: 0, lastTap: 0, fx: null, fxN: 0, shake: 0 });
+        setTimeout(() => this.setState({ playing: true }), 80);
+      },
+      tap: () => {
+        if (!waiting) return;
+        const now = Date.now();
+        const n = (s.fxN || 0) + 1;
+        if (kind === 'gray') {
+          const t = (now - (s.lastTap || 0)) < 500 ? taps + 1 : 1;
+          this.setState({ taps: t, lastTap: now, fx: t >= 3 ? 'burst' : 'puff', fxN: n, shake: (s.shake || 0) + 1 });
+        } else {
+          const k = cracks + 1;
+          this.setState({ cracks: k, fx: k >= need ? 'shatter' : 'chips', fxN: n, shake: (s.shake || 0) + 1 });
+        }
+      },
+      locked: !waiting,
+      cursor: waiting ? 'pointer' : 'default',
+      stageLabel: kind === 'gray' ? 'Ketuk api tiga kali cepat untuk menyalakan' : (kind === 'frozen' ? 'Ketuk api untuk memecahkan es' : 'Api streak'),
+      shakeAnim: shake,
+      flames: flames,
+      blocks: blocks,
+      fx: fx,
+      showContinue: !waiting,
+      showLater: waiting
+    };
+  }
+}
+</script>
+</body>
+</html>

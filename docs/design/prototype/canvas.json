@@ -1,0 +1,343 @@
+{
+ "v": 3,
+ "createdOnFiles": {
+  "v": 1,
+  "at": "2026-10-15T09:00:00Z"
+ },
+ "title": "TermUL Mobile — Prototipe UI",
+ "launch": {
+  "view": "canvas"
+ },
+ "pages": [],
+ "boards": {
+  "Main.dc.html": {
+   "x": 0,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "1 · Daftar host",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "Terminal.dc.html": {
+   "x": 470,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "2 · Terminal multi-sesi",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SudoSheet.dc.html": {
+   "x": 940,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "3 · Vault + inject sudo",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "Sftp.dc.html": {
+   "x": 1410,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "4 · SFTP + edit remote",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "HostKey.dc.html": {
+   "x": 1880,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "5 · Verifikasi host key",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "Settings.dc.html": {
+   "x": 2350,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "6 · Pengaturan",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalPasteMenu.dc.html": {
+   "x": 470,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "2b · Contoh: menu Tempel di prompt",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalPaste.dc.html": {
+   "x": 940,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "2c · Contoh: tempel perintah berisiko",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "Snippets.dc.html": {
+   "x": 2820,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "7 · Snippet",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SnippetNew.dc.html": {
+   "x": 2820,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "7b · Contoh: simpan snippet dari terminal",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "Streak.dc.html": {
+   "x": 0,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "8 · Streak (layar)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakScreenPadam.dc.html": {
+   "x": 1880,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "8b · Streak: padam (ketuk api 3x)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakScreenBeku.dc.html": {
+   "x": 2350,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "8c · Streak: beku (ketuk api 6x)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakActive.dc.html": {
+   "x": 0,
+   "y": 2188,
+   "w": 390,
+   "h": 844,
+   "title": "9a · Aplikasi dibuka: hari bertambah",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakSplash.dc.html": {
+   "x": 470,
+   "y": 2188,
+   "w": 390,
+   "h": 844,
+   "title": "9b · Aplikasi dibuka: naik level",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakBara.dc.html": {
+   "x": 940,
+   "y": 2188,
+   "w": 390,
+   "h": 844,
+   "title": "9c · Bara (hari 1-2)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakPadam.dc.html": {
+   "x": 1410,
+   "y": 2188,
+   "w": 390,
+   "h": 844,
+   "title": "9d · Padam (absen 1-2 hari)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakBeku.dc.html": {
+   "x": 1880,
+   "y": 2188,
+   "w": 390,
+   "h": 844,
+   "title": "9e · Beku (absen 3-10 hari)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "StreakHangus.dc.html": {
+   "x": 2350,
+   "y": 2188,
+   "w": 390,
+   "h": 844,
+   "title": "9f · Hangus (absen lebih dari 10 hari)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "Widgets.dc.html": {
+   "x": 1410,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "10 · Widget di layar utama",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "WidgetGallery.dc.html": {
+   "x": 0,
+   "y": 3412,
+   "w": 1080,
+   "h": 880,
+   "title": "10b · Galeri widget (semua state)",
+   "is_interactive": true,
+   "radius": 12
+  },
+  "WidgetStreak.dc.html": {
+   "x": 1160,
+   "y": 3412,
+   "w": 148,
+   "h": 148,
+   "title": "Komponen: WidgetStreak",
+   "radius": 24
+  },
+  "WidgetFavorit.dc.html": {
+   "x": 1160,
+   "y": 3640,
+   "w": 312,
+   "h": 148,
+   "title": "Komponen: WidgetFavorit",
+   "radius": 24
+  },
+  "StreakTiers.dc.html": {
+   "x": 0,
+   "y": 4412,
+   "w": 1080,
+   "h": 1040,
+   "title": "11 · Galeri api streak (9 tier dan state)",
+   "radius": 12
+  },
+  "FlameArt.dc.html": {
+   "x": 1160,
+   "y": 4412,
+   "w": 156,
+   "h": 150,
+   "title": "Komponen: FlameArt",
+   "radius": 12
+  },
+  "TerminalReconnect.dc.html": {
+   "x": 0,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2d · Terputus: sesi tmux (sambung ulang melanjutkan)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalReconnectPlain.dc.html": {
+   "x": 470,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2e · Terputus: sesi biasa (sambung ulang membuka sesi baru)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalLandscape.dc.html": {
+   "x": 940,
+   "y": 5732,
+   "w": 844,
+   "h": 390,
+   "title": "2f · Landscape ringkas, keyboard tertutup (18 baris)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalLandscapeKb.dc.html": {
+   "x": 940,
+   "y": 6202,
+   "w": 844,
+   "h": 390,
+   "title": "2g · Landscape ringkas, keyboard terbuka (sekitar 5 baris)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SettingsFg.dc.html": {
+   "x": 3290,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "6b · Pengaturan: pertahankan koneksi di latar belakang (menyala)",
+   "is_interactive": true,
+   "radius": 28
+  }
+ },
+ "order": [
+  "Main.dc.html",
+  "Terminal.dc.html",
+  "SudoSheet.dc.html",
+  "Sftp.dc.html",
+  "HostKey.dc.html",
+  "Settings.dc.html",
+  "TerminalPasteMenu.dc.html",
+  "TerminalPaste.dc.html",
+  "Snippets.dc.html",
+  "SnippetNew.dc.html",
+  "Streak.dc.html",
+  "StreakActive.dc.html",
+  "StreakSplash.dc.html",
+  "StreakBara.dc.html",
+  "StreakPadam.dc.html",
+  "StreakBeku.dc.html",
+  "StreakHangus.dc.html",
+  "Widgets.dc.html",
+  "WidgetGallery.dc.html",
+  "WidgetStreak.dc.html",
+  "WidgetFavorit.dc.html",
+  "StreakScreenPadam.dc.html",
+  "StreakScreenBeku.dc.html",
+  "StreakTiers.dc.html",
+  "FlameArt.dc.html",
+  "TerminalReconnect.dc.html",
+  "TerminalReconnectPlain.dc.html",
+  "TerminalLandscape.dc.html",
+  "TerminalLandscapeKb.dc.html",
+  "SettingsFg.dc.html"
+ ],
+ "notes": {
+  "judul": {
+   "x": 0,
+   "y": -260,
+   "text": "TermUL Mobile — alur inti: host → sesi → vault → SFTP → host key → pengaturan → snippet",
+   "kind": "title1",
+   "maxW": 3210
+  },
+  "splash": {
+   "x": 0,
+   "y": 1928,
+   "text": "Streak saat aplikasi dibuka: aktif, naik level, bara, padam, beku, hangus",
+   "kind": "title1",
+   "maxW": 2740
+  },
+  "widget": {
+   "x": 0,
+   "y": 3152,
+   "text": "Widget layar utama: galeri dan komponen",
+   "kind": "title1",
+   "maxW": 1700
+  },
+  "spike": {
+   "x": 0,
+   "y": 5472,
+   "text": "Temuan spike (Android): sambung ulang saat koneksi putus dan terminal landscape ringkas",
+   "kind": "title1",
+   "maxW": 2400
+  }
+ },
+ "designSystems": []
+}

@@ -1,0 +1,175 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Api streak</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+@keyframes fa-l1{0%,100%{transform:skewX(0deg) scaleY(1)}30%{transform:skewX(-3.5deg) scaleY(1.035)}65%{transform:skewX(3deg) scaleY(0.97)}}
+@keyframes fa-l2{0%,100%{transform:skewX(0deg) scaleY(1)}35%{transform:skewX(4deg) scaleY(0.965)}70%{transform:skewX(-3deg) scaleY(1.04)}}
+@keyframes fa-l3{0%,100%{transform:skewX(0deg) scaleY(1)}40%{transform:skewX(-4deg) scaleY(1.05)}75%{transform:skewX(3.5deg) scaleY(0.95)}}
+@keyframes fa-tl{0%,100%{transform:skewX(0deg) scaleY(1)}50%{transform:skewX(-6deg) scaleY(1.07)}}
+@keyframes fa-tr{0%,100%{transform:skewX(0deg) scaleY(1)}50%{transform:skewX(6deg) scaleY(1.07)}}
+@keyframes fa-spark{0%{transform:translateY(0) scale(1);opacity:0.95}100%{transform:translateY(-30px) scale(0.4);opacity:0}}
+@keyframes fa-twinkle{0%,100%{transform:scale(0.25);opacity:0.5}50%{transform:scale(1);opacity:1}}
+@keyframes fa-smoke{0%{transform:translateY(0) scale(0.8);opacity:0.4}100%{transform:translateY(-28px) scale(1.7);opacity:0}}
+@keyframes fa-hue{from{filter:drop-shadow(0 0 var(--gs) var(--gc)) hue-rotate(0deg)}to{filter:drop-shadow(0 0 var(--gs) var(--gc)) hue-rotate(360deg)}}
+@media (prefers-reduced-motion: reduce){*{animation:none !important}}
+</style>
+</helmet>
+<div style="display: inline-block; line-height: 0; width: {{w}}px; height: {{h}}px; --gs: {{gs}}px; --gc: {{gc}}; filter: {{wrapFilter}}; animation: {{wrapAnim}}">
+<svg width="{{w}}" height="{{h}}" viewBox="-65 -15 130 125" role="img" aria-label="{{label}}" style="overflow: visible">
+<defs>
+<linearGradient id="{{gid}}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dcf3ff" stop-opacity="0.62"/><stop offset="1" stop-color="#6eb6ec" stop-opacity="0.46"/></linearGradient>
+<clipPath id="{{cid}}"><path d="{{iceD}}"/></clipPath>
+</defs>
+<sc-for list="{{items}}" as="it" hint-placeholder-count="5">
+<path d="{{it.d}}" fill="{{it.fill}}" stroke="{{it.stroke}}" stroke-width="{{it.sw}}" stroke-linecap="round" stroke-linejoin="round" opacity="{{it.op}}" style="transform-box: fill-box; transform-origin: {{it.origin}}; animation: {{it.anim}}"/>
+</sc-for>
+<g clip-path="{{clipRef}}">
+<sc-for list="{{cracks}}" as="k" hint-placeholder-count="0">
+<path d="{{k.d}}" fill="none" stroke="#ffffff" stroke-opacity="0.95" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/>
+</sc-for>
+</g>
+<sc-for list="{{fx}}" as="it" hint-placeholder-count="0">
+<path d="{{it.d}}" fill="{{it.fill}}" stroke="none" opacity="{{it.op}}" style="transform-box: fill-box; transform-origin: {{it.origin}}; animation: {{it.anim}}"/>
+</sc-for>
+</svg>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"count":{"editor":"int","default":23,"min":1,"max":999,"section":"Api"},"mode":{"editor":"enum","default":"active","options":["active","gray","frozen","reset"],"section":"Api"},"size":{"editor":"int","default":120,"min":16,"max":240,"section":"Api"},"cracks":{"editor":"int","default":0,"min":0,"max":10,"section":"Es"},"need":{"editor":"int","default":5,"min":1,"max":10,"section":"Es"},"animate":{"editor":"boolean","default":false,"section":"Api"},"$preview":{"width":156,"height":150}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = this.props;
+    const count = parseInt(P.count, 10) || 23;
+    const mode = ['active', 'gray', 'frozen', 'reset'].indexOf(P.mode) >= 0 ? P.mode : 'active';
+    const size = parseInt(P.size, 10) || 120;
+    const need = Math.max(1, parseInt(P.need, 10) || 5);
+    const cracksN = Math.max(0, parseInt(P.cracks, 10) || 0);
+    const animate = P.animate === true || P.animate === 'true';
+    const k = size / 100;
+    if (!this._uid) this._uid = 'fa' + Math.floor(Math.random() * 1e6);
+    const uid = this._uid;
+
+    const TIERS = [
+      { id: 'bara', name: 'Bara', min: 1, max: 2, o: '#8a3a17', m: '#d0601f', c: '#ffc07a', glow: '#ff7a2a', tongues: 0, sparks: 0 },
+      { id: 'jingga', name: 'Api Jingga', min: 3, max: 9, o: '#ff6a00', m: '#ff9d1f', c: '#ffe28a', glow: '#ff7a00', tongues: 0, sparks: 1 },
+      { id: 'merah', name: 'Api Merah', min: 10, max: 29, o: '#e01a2b', m: '#ff4d2e', c: '#ffc76b', glow: '#ff2a1a', tongues: 1, sparks: 2 },
+      { id: 'magenta', name: 'Api Magenta', min: 30, max: 59, o: '#c8106a', m: '#ff3f9f', c: '#ffd3ea', glow: '#ff2f8f', tongues: 1, sparks: 2 },
+      { id: 'ungu', name: 'Api Ungu', min: 60, max: 99, o: '#5b1fc4', m: '#9a5cff', c: '#eadcff', glow: '#8a4dff', tongues: 2, sparks: 3 },
+      { id: 'biru', name: 'Api Biru', min: 100, max: 179, o: '#1149d8', m: '#3c8cff', c: '#dcefff', glow: '#2f7dff', tongues: 2, sparks: 3 },
+      { id: 'zamrud', name: 'Api Zamrud', min: 180, max: 364, o: '#05875e', m: '#1edb98', c: '#e3fff3', glow: '#16c98a', tongues: 2, sparks: 4 },
+      { id: 'emas', name: 'Api Emas', min: 365, max: 729, o: '#c07d00', m: '#ffc21a', c: '#fff7c9', glow: '#ffb800', tongues: 2, sparks: 4, stars: true },
+      { id: 'pelangi', name: 'Api Pelangi', min: 730, max: 1e9, o: '#ff3d6e', m: '#ffb000', c: '#d9f7ff', glow: '#ff7a00', tongues: 2, sparks: 5, stars: true, rainbow: true }
+    ];
+    const GRAY = { o: '#55585d', m: '#7e8288', c: '#aeb2b8' };
+    const ICE = { o: '#4f9fdc', m: '#86c9f7', c: '#e4f5ff' };
+    let tier = TIERS[0];
+    for (let i = 0; i < TIERS.length; i++) { if (count >= TIERS[i].min && count <= TIERS[i].max) tier = TIERS[i]; }
+
+    const f = (n) => Math.round(n * 100) / 100;
+    const fp = (cx, by, H, sway) => {
+      const W = H * 0.62, R = W / 2, top = by - H * 0.97, cy = top + H * 0.66, tx = cx + sway;
+      return 'M' + f(tx) + ' ' + f(top) + ' C' + f(tx + R * 0.35) + ' ' + f(top + H * 0.22) + ' ' + f(cx + R * 1.08) + ' ' + f(cy - H * 0.22) + ' ' + f(cx + R) + ' ' + f(cy) +
+        ' A' + f(R) + ' ' + f(R) + ' 0 0 1 ' + f(cx - R) + ' ' + f(cy) +
+        ' C' + f(cx - R * 1.08) + ' ' + f(cy - H * 0.22) + ' ' + f(tx - R * 0.35) + ' ' + f(top + H * 0.22) + ' ' + f(tx) + ' ' + f(top) + 'Z';
+    };
+    const ell = (cx, cy, rx, ry) => 'M' + f(cx - rx) + ' ' + f(cy) + ' a' + f(rx) + ' ' + f(ry) + ' 0 1 0 ' + f(2 * rx) + ' 0 a' + f(rx) + ' ' + f(ry) + ' 0 1 0 ' + f(-2 * rx) + ' 0Z';
+    const starD = (x, y, s) => 'M' + f(x) + ' ' + f(y - s) + ' Q' + f(x) + ' ' + f(y) + ' ' + f(x + s) + ' ' + f(y) + ' Q' + f(x) + ' ' + f(y) + ' ' + f(x) + ' ' + f(y + s) + ' Q' + f(x) + ' ' + f(y) + ' ' + f(x - s) + ' ' + f(y) + ' Q' + f(x) + ' ' + f(y) + ' ' + f(x) + ' ' + f(y - s) + 'Z';
+    const rrD = (x, y, w, h, r) => 'M' + f(x + r) + ' ' + f(y) + ' H' + f(x + w - r) + ' Q' + f(x + w) + ' ' + f(y) + ' ' + f(x + w) + ' ' + f(y + r) + ' V' + f(y + h - r) + ' Q' + f(x + w) + ' ' + f(y + h) + ' ' + f(x + w - r) + ' ' + f(y + h) + ' H' + f(x + r) + ' Q' + f(x) + ' ' + f(y + h) + ' ' + f(x) + ' ' + f(y + h - r) + ' V' + f(y + r) + ' Q' + f(x) + ' ' + f(y) + ' ' + f(x + r) + ' ' + f(y) + 'Z';
+    const A = (name, dur, delay) => (animate ? (name + ' ' + dur + 's ease-in-out ' + delay + 's infinite') : 'none');
+    const item = (d, fill, anim, extra) => Object.assign({ d: d, fill: fill, stroke: 'none', sw: 0, op: 1, anim: anim || 'none', origin: '50% 100%' }, extra || {});
+
+    const layers = (cx, by, S, pal, tongues) => {
+      const out = [];
+      if (tongues >= 1) { const H = S * 0.5; out.push(item(fp(cx - S * 0.2, by - S * 0.06, H, -H * 0.14), pal.o, A('fa-tl', 0.9, -0.3))); }
+      if (tongues >= 2) { const H = S * 0.42; out.push(item(fp(cx + S * 0.2, by - S * 0.07, H, H * 0.14), pal.o, A('fa-tr', 0.75, -0.5))); }
+      out.push(item(fp(cx, by, S, 0), pal.o, A('fa-l1', 1.1, 0)));
+      out.push(item(fp(cx, by - S * 0.02, S * 0.7, 0), pal.m, A('fa-l2', 0.85, -0.2)));
+      out.push(item(fp(cx, by - S * 0.05, S * 0.4, 0), pal.c, A('fa-l3', 0.65, -0.4)));
+      return out;
+    };
+
+    const items = [];
+    const fx = [];
+    let glowColor = null;
+    let iceD = rrD(-49, -3, 98, 106, 18);
+
+    if (mode === 'frozen') {
+      layers(0, 92, 78, ICE, 0).forEach((x) => items.push(x));
+      const w = 98, hh = 106, x0 = -49, y0 = -3;
+      items.push(item(rrD(x0, y0, w, hh, 18), 'url(#' + uid + 'g)', 'none', { stroke: 'rgba(236,250,255,0.95)', sw: 3 }));
+      items.push(item('M' + f(x0 + w * 0.2) + ' ' + f(y0 + hh * 0.15) + ' L' + f(x0 + w * 0.2) + ' ' + f(y0 + hh * 0.36), 'none', 'none', { stroke: 'rgba(255,255,255,0.9)', sw: 4.5 }));
+      items.push(item('M' + f(x0 + w * 0.2) + ' ' + f(y0 + hh * 0.45) + ' L' + f(x0 + w * 0.2) + ' ' + f(y0 + hh * 0.5), 'none', 'none', { stroke: 'rgba(255,255,255,0.9)', sw: 4 }));
+      for (let i = 0; i < 3; i++) {
+        const sx = x0 + w * (0.3 + i * 0.25), sy = y0 + hh * (0.22 + ((i * 37) % 5) * 0.12);
+        fx.push(item(starD(sx, sy, 3.5), 'rgba(255,255,255,0.95)', animate ? ('fa-twinkle 1.8s ease-in-out ' + (i * 0.6) + 's infinite') : 'none', { origin: 'center' }));
+      }
+    } else if (mode === 'gray' || mode === 'reset') {
+      layers(0, 100, 100, GRAY, 0).forEach((x) => items.push(x));
+      for (let i = 0; i < 3; i++) {
+        fx.push(item(ell(-6 + i * 6, 4 - i * 4, 4 + i, 4 + i), '#9a9ea4', animate ? ('fa-smoke 2s ease-out ' + (i * 0.7) + 's infinite') : 'none', { op: animate ? 0.4 : 0.3, origin: 'center' }));
+      }
+    } else if (tier.id === 'bara') {
+      glowColor = tier.glow;
+      items.push(item(ell(0, 95, 30, 8), '#3d1b0c', 'none'));
+      layers(0, 92, 70, tier, 0).forEach((x) => items.push(x));
+    } else {
+      glowColor = tier.glow;
+      layers(0, 100, 100, tier, tier.tongues).forEach((x) => items.push(x));
+      const sx = [-12, 10, -4, 14, 0], sy = [48, 40, 34, 52, 30];
+      for (let i = 0; i < tier.sparks; i++) {
+        fx.push(item(ell(sx[i], sy[i], 1.6, 1.6), i % 2 === 0 ? tier.c : tier.m, animate ? ('fa-spark ' + (0.9 + i * 0.12) + 's ease-out ' + (i * 0.3) + 's infinite') : 'none', { op: animate ? 1 : 0.85, origin: 'center' }));
+      }
+      if (tier.stars) {
+        for (let i = 0; i < 3; i++) {
+          const a = i * 2.1 + 0.6;
+          fx.push(item(starD(Math.cos(a) * 52, 45 + Math.sin(a) * 40, 7), tier.c, animate ? ('fa-twinkle 2.2s ease-in-out ' + (i * 0.7) + 's infinite') : 'none', { origin: 'center' }));
+        }
+      }
+    }
+
+    // retakan es (10 garis, sama seperti desktop: rng seed 42)
+    const rng = (seed) => () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; };
+    const r = rng(42);
+    const raw = [];
+    for (let i = 0; i < 10; i++) {
+      let a = (i / 10) * Math.PI * 2 + (r() - 0.5) * 0.5, x = 0.52, y = 0.46;
+      const pts = [[x, y]];
+      const n = 3 + Math.floor(r() * 2);
+      for (let j = 0; j < n; j++) { a += (r() - 0.5) * 0.8; const L = 0.08 + r() * 0.11; x += Math.cos(a) * L; y += Math.sin(a) * L; pts.push([x, y]); }
+      raw.push(pts);
+    }
+    const order = [0, 3, 6, 9, 2, 5, 8, 1, 4, 7].map((i) => raw[i]);
+    const kShown = mode === 'frozen' ? Math.round((cracksN / need) * 10) : 0;
+    const cracks = [];
+    for (let i = 0; i < kShown && i < order.length; i++) {
+      const c = order[i];
+      let d = 'M' + f(-49 + c[0][0] * 98) + ' ' + f(-3 + c[0][1] * 106);
+      for (let j = 1; j < c.length; j++) d += ' L' + f(-49 + c[j][0] * 98) + ' ' + f(-3 + c[j][1] * 106);
+      cracks.push({ d: d });
+    }
+
+    const glowOn = glowColor && P.glow !== false;
+    const rainbow = mode === 'active' && tier.rainbow && animate;
+    const label = mode === 'gray' ? 'Api padam' : (mode === 'frozen' ? 'Api membeku' : (mode === 'reset' ? 'Api hangus' : (tier.id === 'bara' ? 'Bara' : tier.name)));
+
+    return {
+      w: f(130 * k), h: f(125 * k),
+      gs: f(size * 0.17), gc: glowColor || 'transparent',
+      wrapFilter: glowOn ? ('drop-shadow(0 0 ' + f(size * 0.17) + 'px ' + glowColor + ')') : 'none',
+      wrapAnim: rainbow ? 'fa-hue 6s linear infinite' : 'none',
+      gid: uid + 'g', cid: uid + 'c', iceD: iceD,
+      clipRef: mode === 'frozen' ? ('url(#' + uid + 'c)') : 'none',
+      items: items, fx: fx, cracks: cracks, label: label
+    };
+  }
+}
+</script>
+</body>
+</html>

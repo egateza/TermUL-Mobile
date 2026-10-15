@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Verifikasi host key</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="display: flex; align-items: center; gap: 4px; padding: 12px 8px 4px 8px">
+<a href="Main.dc.html" aria-label="Batalkan dan kembali" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+</a>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #9AA8AF">stg-app-01 · deploy@10.0.2.11:22</span>
+</div>
+
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 16px 20px 12px 20px; display: flex; flex-direction: column; gap: 18px">
+
+<sc-if value="{{isNew}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="width: 56px; height: 56px; border-radius: 16px; background: #231C0E; display: flex; align-items: center; justify-content: center; color: #F0B34A">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6z"/><path d="M9 12l2 2 4-4"/></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600">Host baru</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #9AA8AF">Ini koneksi pertama ke stg-app-01. Pastikan fingerprint di bawah cocok dengan yang Anda ketahui sebelum melanjutkan.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 14px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; justify-content: space-between; font-size: 13px; color: #9AA8AF"><span>Algoritma</span><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; color: #E8EEF0">ssh-ed25519</span></div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: #9AA8AF">Fingerprint (SHA256)</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; line-height: 1.5; color: #E8EEF0; word-break: break-all">SHA256:c2FtcGxlLWZpbmdlcnByaW50LW5vdC1yZWFs</span>
+</div>
+</div>
+<p style="margin: 0; font-size: 13px; line-height: 1.5; color: #9AA8AF">Fingerprint disimpan di perangkat ini. Bila nanti berubah, Anda akan diperingatkan sebelum sambungan dibuka.</p>
+</div>
+</sc-if>
+
+<sc-if value="{{isChanged}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 18px">
+<div style="width: 56px; height: 56px; border-radius: 16px; background: #2A1512; display: flex; align-items: center; justify-content: center; color: #FF7F70">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 4l10 17H2z"/><path d="M12 10v5M12 18h.01"/></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0; font-size: 24px; font-weight: 600; color: #FF7F70">Host key berubah</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.55; color: #9AA8AF">Fingerprint stg-app-01 berbeda dari yang tersimpan. Penyebabnya bisa server dibangun ulang, atau koneksi sedang disadap.</p>
+</div>
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 14px; border-radius: 14px; border: 1px solid #6B2C25; background: #1D1210">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; color: #9AA8AF">Tersimpan</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5; color: #C9D4D9; word-break: break-all">SHA256:c2FtcGxlLWZpbmdlcnByaW50LW5vdC1yZWFs</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 13px; color: #FF7F70">Diterima sekarang</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5; color: #E8EEF0; word-break: break-all">SHA256:bmV3LXNhbXBsZS1maW5nZXJwcmludC1ub3QtcmVhbA</span>
+</div>
+</div>
+<button type="button" onClick="{{toggleAck}}" aria-pressed="{{ack}}" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 4px; border: none; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="width: 24px; height: 24px; flex: none; border-radius: 6px; box-sizing: border-box; border: 2px solid {{ackRing}}; background: {{ackFill}}; display: flex; align-items: center; justify-content: center; color: #1B1406">
+<sc-if value="{{ack}}" hint-placeholder-val="{{ false }}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="3" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+</sc-if>
+</span>
+<span style="flex: 1; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; line-height: 1.45">Saya sudah memastikan perubahan ini sah dengan pemilik server</span>
+</button>
+</div>
+</sc-if>
+
+</div>
+
+<div style="flex: none; display: flex; flex-direction: column; gap: 8px; padding: 12px 20px 28px 20px; border-top: 1px solid #2A343A; background: #0F1316">
+
+<sc-if value="{{isNew}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a href="Terminal.dc.html" style="min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #F0B34A; color: #1B1406; font-size: 16px; font-weight: 600">Percayai dan sambung</a>
+<a href="Terminal.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid #2A343A; color: #E8EEF0; font-size: 15px">Sambung sekali saja</a>
+<a href="Main.dc.html" style="min-height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF; font-size: 15px">Batalkan</a>
+</div>
+</sc-if>
+
+<sc-if value="{{isChanged}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 8px">
+<a href="Main.dc.html" style="min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #F0B34A; color: #1B1406; font-size: 16px; font-weight: 600">Batalkan koneksi</a>
+<sc-if value="{{ack}}" hint-placeholder-val="{{ false }}">
+<a href="Terminal.dc.html" style="min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid #FF7F70; color: #FF7F70; font-size: 15px; font-weight: 500">Ganti key dan sambung</a>
+</sc-if>
+<sc-if value="{{notAck}}" hint-placeholder-val="{{ true }}">
+<button type="button" disabled style="min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #5C6A71; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: 500">Ganti key dan sambung</button>
+</sc-if>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"mode":{"editor":"enum","default":"new","options":["new","changed"],"section":"Skenario"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const mode = this.props.mode === 'changed' ? 'changed' : 'new';
+    const ack = !!s.ack;
+    return {
+      isNew: mode === 'new',
+      isChanged: mode === 'changed',
+      ack: ack,
+      notAck: !ack,
+      toggleAck: () => this.setState({ ack: !ack }),
+      ackRing: ack ? '#F0B34A' : '#5C6A71',
+      ackFill: ack ? '#F0B34A' : 'transparent'
+    };
+  }
+}
+</script>
+</body>
+</html>

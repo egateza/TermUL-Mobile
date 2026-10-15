@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Widget favorit</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="box-sizing: border-box; width: {{w}}px; height: {{h}}px; padding: 12px 14px 14px 14px; border-radius: 24px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; display: flex; flex-direction: column; gap: 8px; overflow: hidden">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<span style="font-size: 13px; font-weight: 600">Favorit</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 10.5px; color: #9AA8AF">diperiksa 5 mnt lalu</span>
+</div>
+<div style="flex: 1; min-height: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(2, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{hosts}}" as="h" hint-placeholder-count="4">
+<a href="Terminal.dc.html" aria-label="{{h.aria}}" style="display: flex; align-items: center; gap: 8px; min-width: 0; padding: 0 10px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B">
+<span style="width: 8px; height: 8px; flex: none; border-radius: 50%; background: {{h.dot}}"></span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 1px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{h.name}}</span>
+<span style="font-size: 10.5px; color: {{h.fg}}">{{h.status}}</span>
+</span>
+</a>
+</sc-for>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":312,"height":148}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const P = this.props;
+    const w = parseInt(P.w, 10) || 312;
+    const h = parseInt(P.h, 10) || 148;
+    const defs = [
+      { name: 'app-01', on: true },
+      { name: 'db-01', on: true },
+      { name: 'proxy-01', on: true },
+      { name: 'stg-db-01', on: false }
+    ];
+    const hosts = defs.map((d) => ({
+      name: d.name,
+      dot: d.on ? '#5ED3A6' : '#FF7F70',
+      status: d.on ? 'online' : 'offline',
+      fg: d.on ? '#5ED3A6' : '#FF7F70',
+      aria: 'Sambung ke ' + d.name + ', ' + (d.on ? 'online' : 'offline')
+    }));
+    return { w: w, h: h, hosts: hosts };
+  }
+}
+</script>
+</body>
+</html>

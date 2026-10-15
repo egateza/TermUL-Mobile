@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Widget di layar utama</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; padding: 40px 20px 20px 20px; display: flex; flex-direction: column; gap: 16px; background: #0B0F12; overflow: hidden">
+<dc-import name="WidgetStreak" size="medium" state="{{streakState}}" level="{{level}}" w="350" h="158" hint-size="350px,158px"></dc-import>
+<dc-import name="WidgetFavorit" w="350" h="158" hint-size="350px,158px"></dc-import>
+<div style="display: flex; gap: 16px">
+<dc-import name="WidgetStreak" size="small" state="{{streakState}}" level="{{level}}" w="167" h="158" hint-size="167px,158px"></dc-import>
+<dc-import name="WidgetStreak" size="small" state="beku" level="{{level}}" w="167" h="158" hint-size="167px,158px"></dc-import>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"streakState":{"editor":"enum","default":"aktif","options":["aktif","bara","padam","beku","hangus"],"section":"Widget streak"},"level":{"editor":"range","default":3,"min":1,"max":9,"step":1,"section":"Widget streak"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const modes = ['aktif', 'bara', 'padam', 'beku', 'hangus'];
+    const st = modes.indexOf(this.props.streakState) >= 0 ? this.props.streakState : 'aktif';
+    let level = parseInt(this.props.level, 10);
+    if (!(level >= 1 && level <= 9)) level = 3;
+    return { streakState: st, level: level };
+  }
+}
+</script>
+</body>
+</html>

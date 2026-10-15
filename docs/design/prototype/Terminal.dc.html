@@ -1,0 +1,642 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Terminal multi-sesi</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="display: flex; align-items: center; gap: 4px; padding: 12px 8px 8px 8px">
+<a href="Main.dc.html" aria-label="Kembali ke daftar host" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+</a>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 16px; font-weight: 600">{{hostName}}</span>
+<span style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: {{statusColor}}">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{statusColor}}"></span>
+{{statusText}}
+</span>
+</div>
+<a href="Sftp.dc.html" aria-label="Buka panel SFTP" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+</a>
+</div>
+
+<div style="display: flex; gap: 6px; padding: 0 12px 8px 12px">
+<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
+<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; gap: 8px; border-radius: 12px; border: 1px solid {{t.bd}}; background: {{t.bg}}; color: {{t.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; cursor: pointer">
+<span style="width: 7px; height: 7px; border-radius: 50%; background: {{t.dot}}"></span>
+{{t.label}}
+</button>
+</sc-for>
+<button type="button" aria-label="Sesi baru" style="width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px dashed #2A343A; background: transparent; color: #9AA8AF; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+</button>
+</div>
+
+<sc-if value="{{reconnecting}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; gap: 12px; margin: 0 12px 8px 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid #5A4720; background: #231C0E">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F0B34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+<span style="flex: 1; font-size: 13px; line-height: 1.4; color: #F3D9A4">{{reconnectText}}</span>
+<button type="button" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #F0B34A; background: transparent; color: #F0B34A; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13px; font-weight: 500; cursor: pointer">{{reconnectBtn}}</button>
+</div>
+</sc-if>
+
+<sc-if value="{{isTop}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; gap: 12px; margin: 0 12px 8px 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid {{fsBd}}; background: {{fsBg}}">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="{{fsIcon}}" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9V5h4M20 9V5h-4M4 15v4h4M20 15v4h-4"/></svg>
+<span style="flex: 1; font-size: 13px; line-height: 1.4; color: {{fsFg}}">{{fsText}}</span>
+<button type="button" onClick="{{toggleFree}}" aria-pressed="{{free}}" style="min-height: 44px; padding: 0 14px; border-radius: 10px; border: 1px solid #6CB4FF; background: {{fsBtnBg}}; color: {{fsBtnFg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13px; font-weight: 600; cursor: pointer">{{fsBtn}}</button>
+</div>
+</sc-if>
+
+<div style="flex: 1; min-height: 0; margin: 0 12px; position: relative; display: flex; flex-direction: column">
+<div onScroll="{{onTermScroll}}" style="flex: 1; min-height: 0; padding: 12px; box-sizing: border-box; border-radius: 12px; background: #0A0E10; border: 1px solid {{termBd}}; overflow-y: {{termOverflow}}; overscroll-behavior: contain; display: flex; flex-direction: column-reverse; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5; color: #C9D4D9; opacity: {{termOpacity}}">
+<div style="flex: none; margin-bottom: auto">
+
+<sc-for list="{{lines}}" as="ln" hint-placeholder-count="7">
+<div style="white-space: pre-wrap; min-height: 19.5px"><sc-for list="{{ln.toks}}" as="w" hint-placeholder-count="5"><button type="button" onClick="{{w.pick}}" aria-pressed="{{w.on}}" style="display: inline; position: relative; margin: 0; padding: 0; border: none; border-radius: 2px; background: {{w.bg}}; color: {{w.fg}}; font: inherit; text-align: left; white-space: pre-wrap; cursor: text">{{w.t}}<sc-if value="{{w.startHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; left: -7px; top: 100%; width: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none"><span style="width: 2px; height: 4px; background: #6CB4FF"></span><span style="width: 14px; height: 14px; border-radius: 50%; background: #6CB4FF"></span></span></sc-if><sc-if value="{{w.endHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; right: -7px; top: 100%; width: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none"><span style="width: 2px; height: 4px; background: #6CB4FF"></span><span style="width: 14px; height: 14px; border-radius: 50%; background: #6CB4FF"></span></span></sc-if></button></sc-for><sc-if value="{{ln.cursor}}" hint-placeholder-val="{{ false }}"><span style="position: relative; display: inline-block; vertical-align: text-bottom"><button type="button" onClick="{{togglePasteMenu}}" aria-label="Menu tempel di prompt" aria-expanded="{{pasteMenu}}" style="display: block; margin: 0 -6px; padding: 0 6px; border: none; background: transparent; cursor: text"><span style="display: block; width: 8px; height: 15px; background: #E8EEF0"></span></button><sc-if value="{{pasteMenu}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; bottom: 100%; margin-bottom: 6px; z-index: 2; display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; white-space: nowrap"><button type="button" onClick="{{pasteNow}}" style="min-height: 44px; padding: 0 18px; border-radius: 8px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Tempel</button><span style="padding: 0 4px 2px 4px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 11.5px; color: #9AA8AF">Papan klip: {{clipSummary}}</span></span></sc-if></span></sc-if></div>
+</sc-for>
+
+</div>
+</div>
+
+<sc-if value="{{showDown}}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{toBottom}}" aria-label="Gulir ke bawah" style="position: absolute; right: 12px; bottom: 12px; min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 22px; border: 1px solid #F0B34A; background: #1E262B; color: #F0B34A; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M6 13l6 6 6-6"/></svg>
+Ke bawah
+</button>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 12px; right: 12px; bottom: 68px; display: flex; justify-content: center; pointer-events: none">
+<div style="display: flex; align-items: center; gap: 8px; padding: 10px 14px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-size: 13px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5ED3A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+<span>{{toast}}</span>
+</div>
+</div>
+</sc-if>
+
+</div>
+
+<sc-if value="{{selecting}}" hint-placeholder-val="{{ true }}">
+<div style="flex: none; display: flex; flex-direction: column; gap: 8px; padding: 8px 12px 8px 12px">
+
+<sc-if value="{{more}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; border-radius: 12px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+<button type="button" onClick="{{oneLine}}" style="min-height: 48px; padding: 0 16px; border: none; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Salin sebagai satu baris</button>
+<a href="SnippetNew.dc.html" style="min-height: 48px; display: flex; align-items: center; padding: 0 16px; border-top: 1px solid #2A343A; color: #E8EEF0; font-size: 15px">Simpan sebagai snippet</a>
+<button type="button" onClick="{{share}}" style="min-height: 48px; padding: 0 16px; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Bagikan…</button>
+</div>
+</sc-if>
+
+<div style="display: flex; align-items: center; gap: 8px; padding: 0 4px">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #E8EEF0">{{selCount}} karakter dipilih</span>
+<span style="font-size: 12px; color: #9AA8AF">Ketuk kata lain untuk memperluas pilihan</span>
+</div>
+<button type="button" onClick="{{cancel}}" style="min-height: 44px; padding: 0 12px; border: none; background: transparent; color: #9AA8AF; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; cursor: pointer">Batal</button>
+</div>
+
+<div style="display: flex; gap: 6px">
+<button type="button" onClick="{{copy}}" style="flex: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; border: 1px solid #F0B34A; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; font-weight: 600; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>
+Salin
+</button>
+<button type="button" onClick="{{selectAll}}" style="flex: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2"/><path d="M8 12h8"/></svg>
+Semua
+</button>
+<button type="button" onClick="{{find}}" style="flex: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="11" cy="11" r="7"/><path d="M20 20l-3.5-3.5"/></svg>
+Cari
+</button>
+<button type="button" onClick="{{send}}" aria-label="Kirim ke {{otherHost}}" style="flex: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 12h13M13 6l6 6-6 6"/></svg>
+Kirim
+</button>
+<button type="button" onClick="{{toggleMore}}" aria-expanded="{{more}}" aria-label="Opsi lainnya" style="flex: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor" aria-hidden="true"><circle cx="5" cy="12" r="1.75"/><circle cx="12" cy="12" r="1.75"/><circle cx="19" cy="12" r="1.75"/></svg>
+Lainnya
+</button>
+</div>
+
+</div>
+</sc-if>
+
+<sc-if value="{{confirm}}" hint-placeholder-val="{{ false }}">
+<div style="flex: none; display: flex; flex-direction: column; gap: 10px; margin: 8px 12px 0 12px; padding: 12px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<span style="font-size: 16px; font-weight: 600">Tempel {{clipCount}} baris?</span>
+<sc-if value="{{hasRisk}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid #6B2C25; background: #1D1210; color: #FFB3A9; font-size: 13px; line-height: 1.4">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M12 4l10 17H2z"/><path d="M12 10v5M12 18h.01"/></svg>
+<span>{{riskText}}</span>
+</div>
+</sc-if>
+<div style="max-height: 96px; overflow-y: auto; padding: 8px 10px; border-radius: 10px; background: #0A0E10; border: 1px solid #1E262B; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; line-height: 1.5">
+<sc-for list="{{clipRows}}" as="cr" hint-placeholder-count="3">
+<div style="display: flex; gap: 10px; white-space: pre-wrap; word-break: break-all"><span style="width: 14px; flex: none; text-align: right; color: #5C6A71">{{cr.n}}</span><span style="flex: 1; color: {{cr.fg}}">{{cr.text}}</span><sc-if value="{{cr.risky}}" hint-placeholder-val="{{ false }}"><span style="flex: none; color: #FF7F70">berisiko</span></sc-if></div>
+</sc-for>
+</div>
+<span style="font-size: 12.5px; line-height: 1.4; color: #9AA8AF">Teks masuk ke prompt tanpa menekan Enter, jadi belum dijalankan.</span>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{cancelPaste}}" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Batal</button>
+<button type="button" onClick="{{confirmPaste}}" style="flex: 2; min-height: 48px; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer">Tempel</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showSudo}}" hint-placeholder-val="{{ true }}">
+<a href="SudoSheet.dc.html" style="display: flex; align-items: center; gap: 12px; margin: 8px 12px 0 12px; min-height: 48px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid #F0B34A; background: #1E1A10; color: #F0B34A; font-size: 14px; font-weight: 500">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+<span style="flex: 1">Prompt sudo terdeteksi — isi dari vault</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</a>
+</sc-if>
+
+<sc-if value="{{showBar}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; gap: 6px; padding: 8px 12px">
+<button type="button" onClick="{{togglePanel}}" aria-expanded="{{panel}}" aria-label="Semua tombol" style="flex: none; width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid {{panelBd}}; background: {{panelBg}}; color: {{panelFg}}; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h.01M11 9h.01M15 9h.01M7 13h.01M11 13h.01M15 13h.01M8 16.5h8"/></svg>
+</button>
+<button type="button" onClick="{{toggleSnip}}" aria-expanded="{{snip}}" aria-label="Snippet" style="flex: none; width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid {{snipBd}}; background: {{snipBg}}; color: {{snipFg}}; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3"/></svg>
+</button>
+<div style="flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="8">
+<button type="button" onClick="{{k.pick}}" aria-label="{{k.aria}}" aria-pressed="{{k.on}}" style="flex: none; min-width: 44px; min-height: 44px; padding: 0 12px; border-radius: 10px; border: 1px solid {{k.bd}}; background: {{k.bg}}; color: {{k.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px; cursor: pointer">{{k.label}}</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showPanel}}" hint-placeholder-val="{{ false }}">
+<div style="height: 240px; flex: none; box-sizing: border-box; display: flex; flex-direction: column; gap: 8px; padding: 10px 12px; border-top: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; gap: 6px">
+<div style="flex: 1; min-width: 0; display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #0F1316; border: 1px solid #2A343A">
+<sc-for list="{{pages}}" as="pg" hint-placeholder-count="3">
+<button type="button" onClick="{{pg.pick}}" aria-pressed="{{pg.on}}" style="flex: 1; min-height: 36px; border-radius: 9px; border: none; background: {{pg.bg}}; color: {{pg.fg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">{{pg.label}}</button>
+</sc-for>
+</div>
+<button type="button" onClick="{{togglePanel}}" aria-label="Kembali ke keyboard huruf" style="flex: none; width: 56px; min-height: 46px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; font-weight: 500; cursor: pointer">ABC</button>
+</div>
+<div style="display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 6px">
+<sc-for list="{{pageKeys}}" as="pk" hint-placeholder-count="12">
+<button type="button" onClick="{{pk.pick}}" aria-label="{{pk.aria}}" style="min-height: 48px; padding: 0 2px; border-radius: 10px; border: 1px solid {{pk.bd}}; background: {{pk.bg}}; color: {{pk.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: {{pk.size}}px; cursor: pointer">{{pk.label}}</button>
+</sc-for>
+</div>
+<sc-if value="{{isRec}}" hint-placeholder-val="{{ true }}">
+<span style="font-size: 12px; line-height: 1.4; color: #9AA8AF">Urut dari yang paling baru dipakai (maksimal 12 tombol).</span>
+</sc-if>
+</div>
+</sc-if>
+
+<sc-if value="{{showSnip}}" hint-placeholder-val="{{ false }}">
+<div style="height: 240px; flex: none; box-sizing: border-box; display: flex; flex-direction: column; gap: 6px; padding: 6px 12px 10px 12px; border-top: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; align-items: center; justify-content: space-between">
+<span style="font-size: 15px; font-weight: 600">Snippet</span>
+<a href="Snippets.dc.html" style="min-height: 44px; display: flex; align-items: center; padding: 0 4px; color: #F0B34A; font-size: 14px; font-weight: 500">Kelola semua</a>
+</div>
+<div style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 6px">
+<sc-for list="{{snipRows}}" as="sn" hint-placeholder-count="4">
+<button type="button" onClick="{{sn.pick}}" style="flex: none; min-height: 52px; width: 100%; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px">{{sn.title}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; color: #9AA8AF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{sn.first}}</span>
+</span>
+<sc-if value="{{sn.risky}}" hint-placeholder-val="{{ false }}"><span style="flex: none; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 11.5px; color: #FF7F70">berisiko</span></sc-if>
+</button>
+</sc-for>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showSystemKb}}" hint-placeholder-val="{{ true }}">
+<div style="height: 240px; flex: none; display: flex; align-items: center; justify-content: center; border-top: 1px solid #2A343A; background: #161C20; color: #7F8D94; font-size: 13px">Area keyboard sistem</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"connection":{"editor":"enum","default":"connected","options":["connected","reconnecting"],"section":"Status"},"session":{"editor":"enum","default":"tmux","options":["tmux","biasa"],"section":"Status"},"showKeyboard":{"editor":"boolean","default":true,"section":"Tampilan"},"preselect":{"editor":"boolean","default":true,"section":"Tampilan"},"startAt":{"editor":"enum","default":"normal","options":["normal","menu","dialog"],"section":"Papan klip"},"clipboard":{"editor":"enum","default":"berisiko","options":["berisiko","aman","kosong"],"section":"Papan klip"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const startAt = this.props.startAt || 'normal';
+    const tab = s.tab || (startAt === 'normal' ? 'app' : 'db');
+    const ctrl = !!s.ctrl;
+    const reconnecting = this.props.connection === 'reconnecting';
+    const inTmux = this.props.session !== 'biasa';
+    const showKeyboard = this.props.showKeyboard !== false;
+
+    const tabDefs = [
+      { id: 'app', label: 'app-01' },
+      { id: 'db', label: 'db-01' },
+      { id: 'top', label: 'htop' }
+    ];
+    const tabs = tabDefs.map((t) => {
+      const on = tab === t.id;
+      return {
+        label: t.label,
+        on: on,
+        bg: on ? '#1E262B' : '#161C20',
+        fg: on ? '#E8EEF0' : '#9AA8AF',
+        bd: on ? '#F0B34A' : '#2A343A',
+        dot: reconnecting && on ? '#F0B34A' : '#5ED3A6',
+        pick: () => {
+          if (this._term) this._term.scrollTop = 0;
+          this.setState({ tab: t.id, sel: null, more: false, free: false, atBottom: true, pasteMenu: false, confirm: false });
+        }
+      };
+    });
+
+    const keyDefs = [
+      { id: 'esc', label: 'Esc', aria: 'Escape' },
+      { id: 'tab', label: 'Tab', aria: 'Tab' },
+      { id: 'ctrl', label: 'Ctrl', aria: 'Control (tahan)' },
+      { id: 'alt', label: 'Alt', aria: 'Alt' },
+      { id: 'up', label: '\u2191', aria: 'Panah atas' },
+      { id: 'down', label: '\u2193', aria: 'Panah bawah' },
+      { id: 'left', label: '\u2190', aria: 'Panah kiri' },
+      { id: 'right', label: '\u2192', aria: 'Panah kanan' },
+      { id: 'pipe', label: '|', aria: 'Pipa' },
+      { id: 'tilde', label: '~', aria: 'Tilde' },
+      { id: 'slash', label: '/', aria: 'Garis miring' },
+      { id: 'dash', label: '-', aria: 'Strip' }
+    ];
+    const keys = keyDefs.map((k) => {
+      const on = (k.id === 'ctrl' && ctrl) || (k.id === 'alt' && !!s.alt);
+      return {
+        label: k.label,
+        aria: k.aria,
+        on: on,
+        bg: on ? '#F0B34A' : '#1E262B',
+        fg: on ? '#1B1406' : '#E8EEF0',
+        bd: on ? '#F0B34A' : '#2A343A',
+        pick: () => {
+          if (k.id === 'ctrl') this.setState({ ctrl: !ctrl });
+          else if (k.id === 'alt') this.setState({ alt: !s.alt });
+          else sent(k.label);
+        }
+      };
+    });
+
+    const P = '#5ED3A6', B = '#6CB4FF', M = '#9AA8AF', N = '#C9D4D9';
+    const words = (str, c) => (str.match(/\s*\S+\s*/g) || []).map((t) => ({ t: t, c: c }));
+    const prompt = (user, host) => [
+      { t: user + '@' + host, c: P },
+      { t: ':', c: N },
+      { t: '~', c: B },
+      { t: '$ ', c: N }
+    ];
+    const pad2 = (n) => (n < 10 ? '0' + n : '' + n);
+    const logPaths = ['/health', '/api/v1/status', '/api/v1/orders', '/static/app.js'];
+    const logStats = ['200', '200', '304', '200', '200', '502', '200'];
+    const logDefs = [];
+    for (let i = 0; i < 28; i++) {
+      const st = logStats[i % logStats.length];
+      const stamp = 'Oct 15 08:' + pad2(30 + Math.floor(i / 4)) + ':' + pad2((i % 4) * 15 + (i % 3));
+      logDefs.push({ toks: words(stamp + ' nginx: ' + logPaths[i % logPaths.length] + ' ' + st, st === '502' ? '#FF7F70' : M) });
+    }
+    const row = (pid, user, cpu, mem, cmd) => '  ' + String(pid).padStart(4) + ' ' + user.padEnd(10) + String(cpu).padStart(5) + ' ' + String(mem).padStart(4) + ' ' + cmd;
+    const topHead = '  ' + 'PID'.padStart(4) + ' ' + 'USER'.padEnd(10) + 'CPU%'.padStart(5) + ' ' + 'MEM%'.padStart(4) + ' Command';
+    const topDefs = [
+      { toks: [{ t: '  CPU[', c: N }, { t: '|||||||||||||||', c: P }, { t: '        34.2%]', c: N }] },
+      { toks: [{ t: '  Mem[', c: N }, { t: '||||||||||||||||', c: B }, { t: '  1.82G/3.84G]', c: N }] },
+      { toks: [{ t: '  Swp[', c: N }, { t: '                  0K/2.00G]', c: N }] },
+      { toks: words('  Tasks: 96, 2 running  Load: 0.42', M) },
+      { toks: words(topHead, '#F0B34A') },
+      { toks: words(row(1042, 'www-data', '12.3', '1.4', 'nginx'), N) },
+      { toks: words(row(1043, 'www-data', '4.1', '1.2', 'nginx'), N) },
+      { toks: words(row(2210, 'deploy', '8.7', '9.6', 'java'), N) },
+      { toks: words(row(2214, 'deploy', '2.0', '4.2', 'java'), N) },
+      { toks: words(row(611, 'redis', '1.3', '0.8', 'redis-server'), N) },
+      { toks: words(row(402, 'root', '0.7', '0.5', 'sshd'), N) },
+      { toks: words(row(1, 'root', '0.0', '0.3', 'systemd'), N) },
+      { toks: words(row(3377, 'deploy', '0.0', '0.1', 'bash'), N) },
+      { toks: words(row(3391, 'deploy', '0.0', '0.1', 'htop'), N) },
+      { toks: words('F1Help F2Setup F3Search F6Sort F10Quit', B) }
+    ];
+
+    const lineDefs = tab === 'top' ? topDefs : tab === 'app' ? [
+      { toks: prompt('deploy', 'app-01').concat(words('journalctl -u nginx -n 28 --no-pager', N)) }
+    ].concat(logDefs, [
+      { toks: prompt('deploy', 'app-01').concat(words('uptime', N)) },
+      { toks: words(' 09:14:02 up 41 days, 3:22, 1 user', M) },
+      { toks: prompt('deploy', 'app-01').concat(words('df -h /', N)) },
+      { toks: words('Filesystem  Size  Used  Avail  Use%', M) },
+      { toks: words('/dev/sda1    80G   31G    45G   41%', M) },
+      { toks: prompt('deploy', 'app-01').concat(words('sudo systemctl restart nginx', N)) },
+      { toks: words('[sudo] password for deploy: ', N), cursor: true }
+    ]) : [
+      { toks: prompt('postgres', 'db-01').concat(words('psql -c "select 1;"', N)) },
+      { toks: words(' ?column?', M) },
+      { toks: words('----------', M) },
+      { toks: words('        1', M) },
+      { toks: words('(1 row)', M) },
+      { toks: prompt('postgres', 'db-01'), cursor: true }
+    ];
+
+    const flat = [];
+    const lines = lineDefs.map((ld, li) => {
+      const toks = ld.toks.map((tk) => {
+        const o = { t: tk.t, c: tk.c, i: flat.length, li: li };
+        flat.push(o);
+        return o;
+      });
+      return { toks: toks, cursor: !!ld.cursor };
+    });
+
+    const free = !!s.free;
+    const findIdx = (txt, from) => {
+      for (let n = from; n < flat.length; n++) {
+        if (flat[n].t.replace(/\s+$/, '') === txt) return n;
+      }
+      return -1;
+    };
+    let sel = s.sel;
+    if (sel === undefined) {
+      sel = null;
+      if (this.props.preselect !== false && tab === 'app') {
+        const a0 = findIdx('systemctl', 0);
+        const f0 = a0 >= 0 ? findIdx('nginx', a0) : -1;
+        if (a0 >= 0 && f0 >= 0) sel = { a: a0, f: f0 };
+      }
+    }
+    const selecting = !!sel;
+    const lo = sel ? Math.min(sel.a, sel.f) : -1;
+    const hi = sel ? Math.max(sel.a, sel.f) : -2;
+    const more = selecting && !!s.more;
+
+    lines.forEach((ln) => {
+      ln.toks.forEach((tk) => {
+        const on = tk.i >= lo && tk.i <= hi;
+        tk.on = on;
+        tk.bg = on ? '#2C4F6B' : 'transparent';
+        tk.fg = on ? '#F4F8FA' : tk.c;
+        tk.startHandle = selecting && tk.i === lo;
+        tk.endHandle = selecting && tk.i === hi;
+        tk.pick = () => {
+          if (tab === 'top' && !free) {
+            this.setState({ toast: 'Ketukan diteruskan ke htop' });
+            setTimeout(() => this.setState({ toast: null }), 1800);
+            return;
+          }
+          if (!sel) this.setState({ sel: { a: tk.i, f: tk.i }, more: false });
+          else if (sel.a === sel.f && sel.a === tk.i) this.setState({ sel: null, more: false });
+          else this.setState({ sel: { a: sel.a, f: tk.i }, more: false });
+        };
+      });
+    });
+
+    let text = '';
+    let lastLi = -1;
+    flat.forEach((tk) => {
+      if (tk.i >= lo && tk.i <= hi) {
+        if (lastLi !== -1 && tk.li !== lastLi) text += '\n';
+        text += tk.t;
+        lastLi = tk.li;
+      }
+    });
+    text = text.replace(/^\s+|\s+$/g, '');
+    const count = text.length;
+    const flatText = text.replace(/\s+/g, ' ');
+    const short = flatText.slice(0, 18) + (flatText.length > 18 ? '\u2026' : '');
+    const other = tab === 'db' ? 'app-01' : 'db-01';
+    const toast = s.toast || null;
+    const done = (msg) => {
+      this.setState({ sel: null, more: false, free: false, toast: msg });
+      setTimeout(() => this.setState({ toast: null }), 2200);
+    };
+
+    const panel = !!s.panel;
+    const page = s.page || 'rec';
+    const recentNow = s.recent || ['Ctrl+C', 'Esc', 'Tab', 'Ctrl+R', '\u2191', 'Ctrl+L'];
+    const sent = (label) => {
+      this.setState({
+        toast: 'Terkirim \u00b7 ' + label,
+        recent: [label].concat(recentNow.filter((l) => l !== label)).slice(0, 12)
+      });
+      setTimeout(() => this.setState({ toast: null }), 1500);
+    };
+    const confirm = s.confirm === undefined ? startAt === 'dialog' : !!s.confirm;
+    const pasteMenu = s.pasteMenu === undefined ? startAt === 'menu' : !!s.pasteMenu;
+    const clipDefaults = {
+      berisiko: 'sudo systemctl stop nginx\nsudo rm -rf /var/cache/nginx/*\nsudo systemctl start nginx',
+      aman: 'systemctl status nginx',
+      kosong: ''
+    };
+    const clipSeed = clipDefaults[this.props.clipboard] !== undefined ? clipDefaults[this.props.clipboard] : clipDefaults.berisiko;
+    const clipNow = s.clip === undefined ? clipSeed : s.clip;
+    const riskRe = /\brm\s+-[a-z]*[rf]|\bdd\s+if=|\bmkfs|\bshutdown\b|\breboot\b|\bchmod\s+-R|\bchown\s+-R|\btruncate\b|\bdrop\s+(table|database)\b/i;
+    const clipLines = clipNow.split('\n');
+    const clipRows = clipLines.map((t, i) => {
+      const risky = riskRe.test(t);
+      return { n: i + 1, text: t, risky: risky, fg: risky ? '#FF7F70' : '#C9D4D9' };
+    });
+    const riskCount = clipRows.filter((r) => r.risky).length;
+    const needConfirm = clipLines.length > 1 || riskCount > 0;
+    const record = (label) => this.setState({ recent: [label].concat(recentNow.filter((l) => l !== label)).slice(0, 12) });
+    const flash = (msg) => {
+      this.setState({ toast: msg });
+      setTimeout(() => this.setState({ toast: null }), 2000);
+    };
+    const startPaste = () => {
+      if (!clipNow) {
+        this.setState({ pasteMenu: false });
+        flash('Papan klip kosong');
+      } else if (needConfirm) {
+        this.setState({ confirm: true, pasteMenu: false });
+      } else {
+        this.setState({ pasteMenu: false });
+        flash('Ditempel \u00b7 1 baris \u00b7 belum dijalankan');
+      }
+    };
+
+    const snip = !!s.snip;
+    const snipDefs = [
+      { title: 'Cek config lalu reload Nginx', cmd: 'sudo nginx -t && sudo systemctl reload nginx' },
+      { title: 'Pemakaian disk', cmd: 'df -h /\ndu -sh /var/log/* | sort -h | tail -5' },
+      { title: 'Koneksi aktif PostgreSQL', cmd: 'psql -c "select count(*) from pg_stat_activity;"' },
+      { title: 'Bersihkan cache Nginx', cmd: 'sudo rm -rf /var/cache/nginx/*' }
+    ];
+    const pasteText = (txt) => {
+      const risky = txt.split('\n').some((l) => riskRe.test(l));
+      if (txt.indexOf('\n') >= 0 || risky) {
+        this.setState({ clip: txt, confirm: true, pasteMenu: false, snip: false });
+      } else {
+        this.setState({ clip: txt, pasteMenu: false, snip: false });
+        flash('Ditempel \u00b7 1 baris \u00b7 belum dijalankan');
+      }
+    };
+    const snipRows = snipDefs.map((d) => ({
+      title: d.title,
+      first: d.cmd.split('\n')[0] + (d.cmd.indexOf('\n') >= 0 ? ' \u2026' : ''),
+      risky: riskRe.test(d.cmd),
+      pick: () => pasteText(d.cmd)
+    }));
+
+    const mods = { ctrl: !!s.ctrl, alt: !!s.alt, shift: !!s.shift };
+    const mkKeys = (defs, size) => defs.map((d) => {
+      const isMod = !!d[2];
+      const on = isMod && mods[d[2]];
+      return {
+        label: d[0],
+        aria: d[1],
+        size: d[0].length > 4 ? 11 : 14,
+        bg: on ? '#F0B34A' : '#1E262B',
+        fg: on ? '#1B1406' : '#E8EEF0',
+        bd: on ? '#F0B34A' : '#2A343A',
+        pick: () => {
+          if (isMod) this.setState({ [d[2]]: !mods[d[2]] });
+          else if (d[0] === 'Tempel') { record('Tempel'); startPaste(); }
+          else sent(d[0]);
+        }
+      };
+    });
+    const fnDefs = [];
+    for (let n = 1; n <= 12; n++) fnDefs.push(['F' + n, 'F' + n]);
+    const navDefs = [
+      ['Esc', 'Escape'], ['Tab', 'Tab'], ['Home', 'Home'], ['End', 'End'], ['PgUp', 'Page Up'], ['PgDn', 'Page Down'],
+      ['Ins', 'Insert'], ['Del', 'Delete'], ['\u2191', 'Panah atas'], ['\u2193', 'Panah bawah'], ['\u2190', 'Panah kiri'], ['\u2192', 'Panah kanan'],
+      ['\u232b', 'Backspace'], ['\u23ce', 'Enter'],
+      ['Ctrl', 'Control (tahan)', 'ctrl'], ['Alt', 'Alt (tahan)', 'alt'], ['Shift', 'Shift (tahan)', 'shift'],
+      ['Tempel', 'Tempel dari papan klip']
+    ];
+    const scDefs = [
+      ['Ctrl+C', 'Ctrl C, hentikan proses'], ['Ctrl+D', 'Ctrl D, akhiri input'], ['Ctrl+Z', 'Ctrl Z, jeda proses'],
+      ['Ctrl+L', 'Ctrl L, bersihkan layar'], ['Ctrl+R', 'Ctrl R, cari riwayat'], ['Ctrl+A', 'Ctrl A, awal baris'],
+      ['Ctrl+E', 'Ctrl E, akhir baris'], ['Ctrl+W', 'Ctrl W, hapus kata'], ['Ctrl+U', 'Ctrl U, hapus baris'],
+      ['Ctrl+K', 'Ctrl K, hapus ke akhir'], ['Ctrl+B', 'Ctrl B, awalan tmux'], ['Ctrl+X', 'Ctrl X']
+    ];
+    const extraDefs = [['|', 'Pipa'], ['~', 'Tilde'], ['/', 'Garis miring'], ['-', 'Strip']];
+    const lookup = {};
+    fnDefs.concat(navDefs, scDefs, extraDefs).forEach((d) => { lookup[d[0]] = d; });
+    const recDefs = recentNow.filter((l) => lookup[l]).map((l) => lookup[l]);
+    const pageKeys = page === 'fn' ? mkKeys(fnDefs) : (page === 'sc' ? mkKeys(scDefs) : (page === 'rec' ? mkKeys(recDefs) : mkKeys(navDefs)));
+    const pageDefs = [
+      { id: 'rec', label: 'Terakhir' },
+      { id: 'fn', label: 'Fn' },
+      { id: 'nav', label: 'Navigasi' },
+      { id: 'sc', label: 'Pintasan' }
+    ];
+    const pages = pageDefs.map((p) => {
+      const on = page === p.id;
+      return {
+        label: p.label,
+        on: on,
+        bg: on ? '#F0B34A' : 'transparent',
+        fg: on ? '#1B1406' : '#C5D0D5',
+        pick: () => this.setState({ page: p.id })
+      };
+    });
+
+    return {
+      hostName: tab === 'db' ? 'db-01' : (tab === 'top' ? 'app-01 \u00b7 htop' : 'app-01'),
+      statusColor: reconnecting ? '#F0B34A' : '#5ED3A6',
+      statusText: reconnecting ? 'menyambung ulang · percobaan 2/5' : (tab === 'db' ? 'terhubung · 21 ms' : 'terhubung · 18 ms'),
+      reconnecting: reconnecting,
+      reconnectText: inTmux ? 'Koneksi terputus. Sambung ulang akan melanjutkan sesi tmux di server.' : 'Koneksi terputus. Sambung ulang membuka sesi baru; proses di sesi lama tidak ikut.',
+      reconnectBtn: 'Sambung ulang',
+      termOpacity: reconnecting ? '0.55' : '1',
+      isApp: tab === 'app',
+      isDb: tab === 'db',
+      showSudo: tab === 'app' && !reconnecting && !selecting && !confirm,
+      showKeyboard: showKeyboard,
+      tabs: tabs,
+      keys: keys,
+      lines: lines,
+      selecting: selecting,
+      notSelecting: !selecting,
+      more: more,
+      selCount: count,
+      otherHost: other,
+      toast: toast,
+      hasToast: !!toast,
+      copy: () => {
+        this.setState({ clip: text });
+        done('Disalin \u00b7 ' + count + ' karakter');
+      },
+      selectAll: () => this.setState({ sel: { a: 0, f: flat.length - 1 }, more: false }),
+      find: () => done('Mencari \u201c' + short + '\u201d di scrollback'),
+      send: () => done('Ditempel ke ' + other + ' \u00b7 belum dijalankan'),
+      toggleMore: () => this.setState({ more: !more }),
+      cancel: () => this.setState({ sel: null, more: false }),
+      oneLine: () => {
+        this.setState({ clip: text.replace(/\s*\n\s*/g, ' ') });
+        done('Disalin sebagai satu baris');
+      },
+      snippet: () => done('Disimpan sebagai snippet'),
+      share: () => done('Membuka menu bagikan'),
+      showBar: !selecting && !panel && !confirm,
+      panel: panel,
+      showPanel: panel,
+      showSystemKb: showKeyboard && !panel && !confirm && !snip,
+      snip: snip,
+      showSnip: snip && !confirm,
+      snipRows: snipRows,
+      toggleSnip: () => this.setState({ snip: !snip, panel: false }),
+      snipBg: snip ? '#F0B34A' : '#1E262B',
+      snipFg: snip ? '#1B1406' : '#E8EEF0',
+      snipBd: snip ? '#F0B34A' : '#2A343A',
+      confirm: confirm,
+      pasteMenu: pasteMenu,
+      clipSummary: clipLines.length + ' baris',
+      clipRows: clipRows,
+      clipCount: clipLines.length,
+      hasRisk: riskCount > 0,
+      riskText: riskCount + ' baris berisiko (mis. rm -rf). Periksa sebelum menekan Enter.',
+      togglePasteMenu: () => this.setState({ pasteMenu: !pasteMenu }),
+      pasteNow: () => startPaste(),
+      confirmPaste: () => {
+        this.setState({ confirm: false });
+        flash('Ditempel \u00b7 ' + clipLines.length + ' baris \u00b7 belum dijalankan');
+      },
+      cancelPaste: () => this.setState({ confirm: false }),
+      panelBg: panel ? '#F0B34A' : '#1E262B',
+      panelFg: panel ? '#1B1406' : '#E8EEF0',
+      panelBd: panel ? '#F0B34A' : '#2A343A',
+      togglePanel: () => this.setState({ panel: !panel, snip: false }),
+      pages: pages,
+      isRec: page === 'rec',
+      pageKeys: pageKeys,
+      isTop: tab === 'top',
+      free: free,
+      termBd: tab === 'top' && free ? '#6CB4FF' : '#1E262B',
+      termOverflow: tab === 'top' ? 'hidden' : 'auto',
+      showDown: tab === 'app' && s.atBottom === false,
+      onTermScroll: (e) => {
+        const el = e.target;
+        this._term = el;
+        const bottom = Math.abs(el.scrollTop) < 24;
+        if (bottom !== (s.atBottom !== false)) this.setState({ atBottom: bottom });
+      },
+      toBottom: () => {
+        if (this._term) this._term.scrollTo({ top: 0, behavior: 'smooth' });
+        this.setState({ atBottom: true });
+      },
+      toggleFree: () => this.setState({ free: !free, sel: null, more: false }),
+      fsBg: free ? '#12202B' : '#161C20',
+      fsBd: free ? '#6CB4FF' : '#2A343A',
+      fsIcon: free ? '#6CB4FF' : '#9AA8AF',
+      fsFg: free ? '#CFE6FA' : '#C5D0D5',
+      fsText: free ? 'Seleksi bebas: layar dibekukan. Ketuk kata untuk memilih.' : 'htop berjalan layar penuh. Swipe dikirim ke aplikasi sebagai scroll.',
+      fsBtn: free ? 'Selesai' : 'Seleksi bebas',
+      fsBtnBg: free ? '#6CB4FF' : 'transparent',
+      fsBtnFg: free ? '#08141C' : '#6CB4FF'
+    };
+  }
+}
+</script>
+</body>
+</html>

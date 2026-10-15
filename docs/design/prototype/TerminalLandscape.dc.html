@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Terminal landscape ringkas</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; width: 844px; height: 390px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="flex: none; height: {{statusH}}px; display: flex; align-items: center; gap: 8px; padding: 0 8px; background: #161C20; border-bottom: 1px solid #2A343A">
+<sc-if value="{{keyboardClosed}}" hint-placeholder-val="{{ true }}">
+<a href="Main.dc.html" aria-label="Kembali ke daftar host" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+</a>
+</sc-if>
+<span style="font-size: 13px; font-weight: 600">app-01</span>
+<span style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #5ED3A6">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #5ED3A6"></span>
+terhubung · 18 ms
+</span>
+<span style="flex: 1"></span>
+<sc-if value="{{keyboardClosed}}" hint-placeholder-val="{{ true }}">
+<button type="button" aria-label="Sambung ulang" style="width: 32px; height: 32px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #9AA8AF; padding: 0; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M21 12a9 9 0 1 1-3-6.7"/><path d="M21 4v5h-5"/></svg>
+</button>
+</sc-if>
+</div>
+
+<div style="flex: 1; min-height: 0; overflow: hidden; padding: 4px 12px 0 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; line-height: 17px; color: #E8EEF0">
+<sc-for list="{{lines}}" as="ln" hint-placeholder-count="6">
+<div style="white-space: pre; overflow: hidden; color: {{ln.color}}">{{ln.text}}</div>
+</sc-for>
+<div style="display: flex; align-items: center; white-space: pre"><span style="color: #5ED3A6">deploy@app-01</span><span>:~$ </span><span style="display: inline-block; width: 8px; height: 15px; background: #F0B34A"></span></div>
+</div>
+
+<div style="flex: none; height: 36px; display: flex; align-items: center; overflow-x: auto; overflow-y: hidden; border-top: 1px solid #2A343A; background: #161C20">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="12">
+<button type="button" style="flex: none; width: 56px; height: 36px; border: none; border-right: 1px solid #2A343A; background: transparent; color: {{k.color}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; cursor: pointer">{{k.label}}</button>
+</sc-for>
+</div>
+
+<sc-if value="{{keyboardOpen}}" hint-placeholder-val="{{ false }}">
+<div style="flex: none; height: 220px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; background: #1B2126; border-top: 1px solid #2A343A; color: #9AA8AF; font-size: 13px">Keyboard sistem (220 dp)</div>
+</sc-if>
+<div style="flex: none; height: 16px; background: {{gestureBg}}"></div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"keyboard":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":844,"height":390}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const open = this.props.keyboard === true || this.props.keyboard === 'true';
+    const all = [
+      { text: 'deploy@app-01:~$ tail -n 4 app.log', color: '#E8EEF0' },
+      { text: '15:02:11 INFO  payment ok trx=88121', color: '#9AA8AF' },
+      { text: '15:02:13 WARN  retry rabbitmq (1/3)', color: '#F0B34A' },
+      { text: '15:02:14 INFO  payment ok trx=88122', color: '#9AA8AF' },
+      { text: '15:02:19 INFO  settlement batch 14 done', color: '#9AA8AF' },
+      { text: 'deploy@app-01:~$ df -h /', color: '#E8EEF0' },
+      { text: 'Filesystem      Size  Used Avail Use% Mounted on', color: '#9AA8AF' },
+      { text: '/dev/sda1        80G   52G   28G  65% /', color: '#9AA8AF' },
+      { text: 'deploy@app-01:~$ uptime', color: '#E8EEF0' },
+      { text: ' 15:03:02 up 41 days,  3:12,  1 user,  load average: 0.21, 0.18, 0.15', color: '#9AA8AF' },
+      { text: 'deploy@app-01:~$ free -m', color: '#E8EEF0' },
+      { text: '              total        used        free      shared  buff/cache   available', color: '#9AA8AF' },
+      { text: 'Mem:           7955        3120         812         114        4022        4480', color: '#9AA8AF' },
+      { text: 'Swap:          2047           0        2047', color: '#9AA8AF' },
+      { text: 'deploy@app-01:~$ date', color: '#E8EEF0' },
+      { text: 'Thu Oct 15 15:03:41 WIB 2026', color: '#9AA8AF' },
+      { text: 'deploy@app-01:~$ whoami', color: '#E8EEF0' },
+      { text: 'deploy', color: '#9AA8AF' }
+    ];
+    // layar penuh baris terakhir; ruang tersisa menentukan jumlahnya
+    const rows = open ? 4 : 17;
+    const lines = all.slice(Math.max(0, all.length - rows));
+    const labels = ['Esc', 'Tab', 'Ctrl', 'Alt', '^C', '^D', '\u2190', '\u2193', '\u2191', '\u2192', 'Home', 'End', 'PgUp', 'PgDn', '|', '~', '/', '-', 'Fn'];
+    return {
+      keyboardOpen: open,
+      keyboardClosed: !open,
+      statusH: open ? 20 : 32,
+      gestureBg: open ? '#1B2126' : '#0F1316',
+      lines: lines,
+      keys: labels.map((l) => ({ label: l, color: (l === 'Ctrl' || l === 'Alt') ? '#F0B34A' : '#E8EEF0' }))
+    };
+  }
+}
+</script>
+</body>
+</html>

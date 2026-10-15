@@ -1,0 +1,151 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Vault dan inject sudo</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0A0E10; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="flex: 1; min-height: 0; padding: 20px 12px 0 12px; opacity: 0.35; overflow: hidden" aria-hidden="true">
+<div style="font-size: 16px; font-weight: 600; padding: 0 8px 14px 8px">app-01</div>
+<div style="padding: 12px; border-radius: 12px; border: 1px solid #1E262B; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5; color: #C9D4D9">
+<div><span style="color: #5ED3A6">deploy@app-01</span>:<span style="color: #6CB4FF">~</span>$ sudo systemctl restart nginx</div>
+<div>[sudo] password for deploy:</div>
+</div>
+</div>
+
+<div style="flex: none; box-sizing: border-box; padding: 12px 20px 28px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto 20px auto" aria-hidden="true"></div>
+
+<sc-if value="{{isLocked}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="width: 56px; height: 56px; border-radius: 16px; background: #1E262B; display: flex; align-items: center; justify-content: center; color: #F0B34A">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 22px; font-weight: 600">Vault terkunci</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #9AA8AF">Buka dengan biometrik untuk mengisi password sudo untuk deploy@app-01.</p>
+</div>
+<button type="button" onClick="{{unlock}}" style="width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 10px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 9a9 9 0 0 1 16 0"/><path d="M6 12a6 6 0 0 1 12 0v2"/><path d="M9 14v-2a3 3 0 0 1 6 0v3a6 6 0 0 1-1 3"/><path d="M12 12v4"/></svg>
+Buka dengan sidik jari
+</button>
+<div style="display: flex; gap: 8px">
+<button type="button" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Gunakan PIN master</button>
+<a href="Terminal.dc.html" style="flex: 1; min-height: 48px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px solid #2A343A; color: #9AA8AF; font-size: 15px">Batal</a>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isConfirm}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 22px; font-weight: 600">Isi password sudo?</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #9AA8AF">Password dikirim langsung ke sesi ini, satu kali.</p>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 4px; padding: 12px 14px; border-radius: 12px; background: #0F1316; border: 1px solid #2A343A">
+<span style="font-size: 12px; color: #9AA8AF">Perintah yang meminta password</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #E8EEF0">sudo systemctl restart nginx</span>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{creds}}" as="c" hint-placeholder-count="2">
+<button type="button" onClick="{{c.pick}}" aria-pressed="{{c.on}}" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-sizing: border-box; border-radius: 12px; border: 1px solid {{c.bd}}; background: {{c.bg}}; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="width: 18px; height: 18px; flex: none; border-radius: 50%; box-sizing: border-box; border: 2px solid {{c.ring}}; background: {{c.fill}}"></span>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">{{c.title}}</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; color: #9AA8AF">{{c.sub}}</span>
+</span>
+</button>
+</sc-for>
+</div>
+
+<button type="button" onClick="{{toggleAuto}}" aria-pressed="{{auto}}" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 4px; border: none; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">Isi otomatis selama 5 menit</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; color: #9AA8AF">Hanya untuk sesi ini; berhenti jika layar terkunci</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{switchBg}}; display: flex; justify-content: {{switchAlign}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{knob}}"></span>
+</span>
+</button>
+
+<div style="display: flex; gap: 8px">
+<a href="Terminal.dc.html" style="flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; border: 1px solid #2A343A; color: #E8EEF0; font-size: 16px">Batal</a>
+<button type="button" onClick="{{inject}}" style="flex: 2; min-height: 52px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">Isi password</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{isDone}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; flex-direction: column; gap: 16px">
+<div style="width: 56px; height: 56px; border-radius: 16px; background: #14271F; display: flex; align-items: center; justify-content: center; color: #5ED3A6">
+<svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px">
+<h1 style="margin: 0; font-size: 22px; font-weight: 600">Password terkirim</h1>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #9AA8AF">Vault terkunci kembali dalam 30 detik. Tidak ada yang disalin ke clipboard.</p>
+</div>
+<a href="Terminal.dc.html" style="width: 100%; min-height: 52px; display: flex; align-items: center; justify-content: center; border-radius: 14px; background: #F0B34A; color: #1B1406; font-size: 16px; font-weight: 600">Kembali ke terminal</a>
+</div>
+</sc-if>
+
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const step = s.step || 'locked';
+    const cred = s.cred || 'sudo';
+    const auto = !!s.auto;
+
+    const credDefs = [
+      { id: 'sudo', title: 'deploy \u00b7 sudo', sub: 'Untuk sudo di app-01' },
+      { id: 'su', title: 'root \u00b7 su', sub: 'Untuk su - di app-01' }
+    ];
+    const creds = credDefs.map((c) => {
+      const on = cred === c.id;
+      return {
+        title: c.title,
+        sub: c.sub,
+        on: on,
+        bg: on ? '#1E262B' : 'transparent',
+        bd: on ? '#F0B34A' : '#2A343A',
+        ring: on ? '#F0B34A' : '#5C6A71',
+        fill: on ? '#F0B34A' : 'transparent',
+        pick: () => this.setState({ cred: c.id })
+      };
+    });
+
+    return {
+      isLocked: step === 'locked',
+      isConfirm: step === 'confirm',
+      isDone: step === 'done',
+      unlock: () => this.setState({ step: 'confirm' }),
+      inject: () => this.setState({ step: 'done' }),
+      creds: creds,
+      auto: auto,
+      toggleAuto: () => this.setState({ auto: !auto }),
+      switchBg: auto ? '#F0B34A' : '#2A343A',
+      switchAlign: auto ? 'flex-end' : 'flex-start',
+      knob: auto ? '#1B1406' : '#9AA8AF'
+    };
+  }
+}
+</script>
+</body>
+</html>

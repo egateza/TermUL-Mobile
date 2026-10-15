@@ -1,0 +1,353 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Pengaturan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="padding: 20px 20px 12px 20px">
+<h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.01em">Pengaturan</h1>
+</div>
+
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 16px 12px; display: flex; flex-direction: column; gap: 20px">
+
+<sc-if value="{{showTop}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Terminal</div>
+<div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+
+<div style="padding: 14px">
+<div style="padding: 12px; border-radius: 10px; background: {{pvBg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: {{fontPx}}px; line-height: 1.5; color: {{pvFg}}; overflow: hidden; white-space: nowrap">
+<div><span style="color: {{pvPrompt}}">deploy@app-01</span>:~$ ls -la</div>
+<div>drwxr-xr-x 4 deploy deploy</div>
+</div>
+</div>
+
+<div style="display: flex; align-items: center; gap: 12px; padding: 8px 14px; min-height: 56px; border-top: 1px solid #2A343A">
+<span style="flex: 1; font-size: 15px">Ukuran font</span>
+<button type="button" onClick="{{fontDec}}" aria-label="Kecilkan font" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 20px; cursor: pointer; opacity: {{decOpacity}}">&#8722;</button>
+<span style="min-width: 48px; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">{{fontPx}} px</span>
+<button type="button" onClick="{{fontInc}}" aria-label="Besarkan font" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 20px; cursor: pointer; opacity: {{incOpacity}}">+</button>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px 14px; border-top: 1px solid #2A343A">
+<span style="font-size: 15px">Tema</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
+<sc-for list="{{themes}}" as="t" hint-placeholder-count="3">
+<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="min-height: 72px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 6px; padding: 8px 4px; border-radius: 12px; border: 2px solid {{t.bd}}; background: {{t.bg}}; color: {{t.fg}}; cursor: pointer">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 16px; font-weight: 500">Aa</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px">{{t.label}}</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Keamanan</div>
+<div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+
+<sc-for list="{{secSwitches}}" as="sw" hint-placeholder-count="3">
+<button type="button" onClick="{{sw.toggle}}" aria-pressed="{{sw.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">{{sw.label}}</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">{{sw.sub}}</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{sw.bg}}; display: flex; justify-content: {{sw.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{sw.knob}}"></span>
+</span>
+</button>
+</sc-for>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px 14px; border-top: 1px solid #2A343A">
+<span style="font-size: 15px">Kunci vault otomatis</span>
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #0F1316; border: 1px solid #2A343A">
+<sc-for list="{{lockOpts}}" as="o" hint-placeholder-count="3">
+<button type="button" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="flex: 1; min-height: 44px; border-radius: 9px; border: none; background: {{o.bg}}; color: {{o.fg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">{{o.label}}</button>
+</sc-for>
+</div>
+</div>
+
+</div>
+</div>
+
+</sc-if>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Koneksi</div>
+<div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+
+<sc-for list="{{connSwitches}}" as="sw" hint-placeholder-count="1">
+<button type="button" onClick="{{sw.toggle}}" aria-pressed="{{sw.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border: none; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">{{sw.label}}</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">{{sw.sub}}</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{sw.bg}}; display: flex; justify-content: {{sw.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{sw.knob}}"></span>
+</span>
+</button>
+</sc-for>
+
+<button type="button" onClick="{{fg.toggle}}" aria-pressed="{{fg.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">Pertahankan koneksi di latar belakang</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">Sesi tetap tersambung saat aplikasi ditutup ke latar belakang. Memakai baterai lebih banyak dan menampilkan notifikasi permanen.</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{fg.bg}}; display: flex; justify-content: {{fg.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{fg.knob}}"></span>
+</span>
+</button>
+
+<sc-if value="{{fg.on}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 12px; padding: 4px 14px 14px 14px">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 12.5px; color: #9AA8AF">Tampilan notifikasi di Android</span>
+<div style="display: flex; flex-direction: column; gap: 8px; padding: 12px; border-radius: 14px; background: #1E262B; border: 1px solid #2A343A">
+<div style="display: flex; align-items: center; gap: 10px">
+<span style="width: 20px; height: 20px; flex: none; border-radius: 6px; background: #F0B34A; color: #1B1406; display: flex; align-items: center; justify-content: center">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+</span>
+<span style="font-size: 12px; color: #9AA8AF">TermUL</span>
+</div>
+<div style="display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px; font-weight: 600">2 sesi tersambung</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">app-01, db-01</span>
+</div>
+<span style="align-self: flex-start; min-height: 44px; display: flex; align-items: center; font-size: 13px; font-weight: 600; color: #F0B34A">Putuskan semua</span>
+</div>
+</div>
+
+<p style="margin: 0; font-size: 12.5px; line-height: 1.5; color: #9AA8AF">Membantu sambungan bertahan, tetapi tidak menjaminnya: perpindahan jaringan atau sinyal hilang tetap memutus sesi, lalu sambung ulang otomatis berjalan.</p>
+
+<div style="display: flex; align-items: center; gap: 12px; min-height: 56px; padding: 8px 12px; border-radius: 12px; border: 1px solid #2A343A; background: #0F1316">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 14px">Izin notifikasi</span>
+<span style="font-size: 12.5px; color: #5ED3A6">Diizinkan</span>
+</span>
+</div>
+
+<button type="button" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 12px; box-sizing: border-box; border-radius: 12px; border: 1px solid #2A343A; background: #0F1316; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px">Pembatasan baterai HP</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">Beberapa HP (misalnya HyperOS) perlu diatur ke "Tanpa batasan" agar sesi tidak dihentikan.</span>
+</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px 14px; border-top: 1px solid #2A343A">
+<span style="font-size: 15px">Interval keepalive</span>
+<div style="display: flex; gap: 4px; padding: 4px; border-radius: 12px; background: #0F1316; border: 1px solid #2A343A">
+<sc-for list="{{kaOpts}}" as="o" hint-placeholder-count="3">
+<button type="button" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="flex: 1; min-height: 44px; border-radius: 9px; border: none; background: {{o.bg}}; color: {{o.fg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">{{o.label}}</button>
+</sc-for>
+</div>
+</div>
+
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Data</div>
+<div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+<button type="button" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-sizing: border-box; border: none; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">
+<span style="flex: 1">Host key tepercaya</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+<button type="button" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-sizing: border-box; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">
+<span style="flex: 1">Ekspor vault terenkripsi</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+<button type="button" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-sizing: border-box; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">
+<span style="flex: 1">Impor vault</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Streak</div>
+<div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+<sc-for list="{{streakSwitches}}" as="sw" hint-placeholder-count="3">
+<button type="button" onClick="{{sw.toggle}}" aria-pressed="{{sw.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">{{sw.label}}</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">{{sw.sub}}</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{sw.bg}}; display: flex; justify-content: {{sw.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{sw.knob}}"></span>
+</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Widget</div>
+<div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+<a href="Widgets.dc.html" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-sizing: border-box; color: #E8EEF0; font-size: 15px">
+<span style="flex: 1">Tambahkan widget ke layar utama</span>
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6l6 6-6 6"/></svg>
+</a>
+<sc-for list="{{widgetSwitches}}" as="sw" hint-placeholder-count="1">
+<button type="button" onClick="{{sw.toggle}}" aria-pressed="{{sw.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">{{sw.label}}</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">{{sw.sub}}</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{sw.bg}}; display: flex; justify-content: {{sw.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{sw.knob}}"></span>
+</span>
+</button>
+</sc-for>
+</div>
+</div>
+
+<div style="padding: 0 8px 4px 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #7F8D94">TermUL Mobile · prototipe UI</div>
+
+</div>
+
+<nav aria-label="Navigasi utama" style="flex: none; display: flex; border-top: 1px solid #2A343A; background: #0F1316; padding: 6px 12px 10px 12px">
+<a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+Host
+</a>
+<a href="Terminal.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<span style="position: relative; display: flex">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+<span style="position: absolute; top: -6px; right: -12px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 9px; background: #F0B34A; color: #1B1406; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center">2</span>
+</span>
+Sesi
+</a>
+<a href="Sftp.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+SFTP
+</a>
+<a href="Snippets.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3"/></svg>
+Snippet
+</a>
+<a href="Settings.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #F0B34A; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+Pengaturan
+</a>
+</nav>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"fgOn":{"editor":"boolean","default":false,"section":"Tampilan"},"view":{"editor":"enum","default":"semua","options":["semua","koneksi"],"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const font = s.font || 13;
+    const theme = s.theme || 'ops';
+    const lock = s.lock || '60';
+    const ka = s.ka || '30';
+    const fgDefault = this.props.fgOn === true || this.props.fgOn === 'true';
+    const showTop = this.props.view !== 'koneksi';
+    const sw = Object.assign({ bio: true, sudo: false, shot: true, recon: true, streak: true, noprod: true, remind: true, wstatus: true, fg: fgDefault }, s.sw || {});
+
+    const themeDefs = {
+      ops: { label: 'Ops', bg: '#0A0E10', fg: '#C9D4D9', prompt: '#5ED3A6' },
+      contrast: { label: 'Kontras', bg: '#000000', fg: '#FFFFFF', prompt: '#F0B34A' },
+      light: { label: 'Terang', bg: '#F5F3EE', fg: '#1F2528', prompt: '#1B6B4D' }
+    };
+    const pv = themeDefs[theme];
+    const themes = Object.keys(themeDefs).map((id) => {
+      const t = themeDefs[id];
+      const on = theme === id;
+      return {
+        label: t.label,
+        on: on,
+        bg: t.bg,
+        fg: t.fg,
+        bd: on ? '#F0B34A' : '#2A343A',
+        pick: () => this.setState({ theme: id })
+      };
+    });
+
+    const mkSwitch = (id, label, sub) => {
+      const on = sw[id];
+      return {
+        label: label,
+        sub: sub,
+        on: on,
+        bg: on ? '#F0B34A' : '#2A343A',
+        align: on ? 'flex-end' : 'flex-start',
+        knob: on ? '#1B1406' : '#9AA8AF',
+        toggle: () => this.setState({ sw: Object.assign({}, sw, { [id]: !on }) })
+      };
+    };
+
+    const mkOpts = (list, current, key) => list.map((o) => {
+      const on = current === o.id;
+      return {
+        label: o.label,
+        on: on,
+        bg: on ? '#F0B34A' : 'transparent',
+        fg: on ? '#1B1406' : '#C5D0D5',
+        pick: () => this.setState({ [key]: o.id })
+      };
+    });
+
+    const fgSw = mkSwitch('fg', 'Pertahankan koneksi di latar belakang', '');
+
+    return {
+      showTop: showTop,
+      fg: fgSw,
+      fontPx: font,
+      pvBg: pv.bg,
+      pvFg: pv.fg,
+      pvPrompt: pv.prompt,
+      decOpacity: font <= 10 ? '0.4' : '1',
+      incOpacity: font >= 20 ? '0.4' : '1',
+      fontDec: () => this.setState({ font: Math.max(10, font - 1) }),
+      fontInc: () => this.setState({ font: Math.min(20, font + 1) }),
+      themes: themes,
+      secSwitches: [
+        mkSwitch('bio', 'Biometrik untuk membuka vault', 'Sidik jari atau wajah'),
+        mkSwitch('sudo', 'Isi sudo otomatis', 'Hanya setelah konfirmasi pertama di tiap sesi'),
+        mkSwitch('shot', 'Blokir screenshot di terminal', 'Layar terminal tidak bisa direkam atau di-screenshot')
+      ],
+      lockOpts: mkOpts([
+        { id: '30', label: '30 dtk' },
+        { id: '60', label: '1 mnt' },
+        { id: '300', label: '5 mnt' }
+      ], lock, 'lock'),
+      connSwitches: [
+        mkSwitch('recon', 'Sambung ulang otomatis', 'Saat jaringan berpindah atau aplikasi kembali aktif')
+      ],
+      kaOpts: mkOpts([
+        { id: '15', label: '15 dtk' },
+        { id: '30', label: '30 dtk' },
+        { id: '60', label: '60 dtk' }
+      ], ka, 'ka'),
+      streakSwitches: [
+        mkSwitch('streak', 'Tampilkan streak api', 'Hari tetap dihitung walau ikonnya disembunyikan'),
+        mkSwitch('remind', 'Pengingat harian', 'Notifikasi pukul 20.00 bila belum membuka aplikasi hari ini')
+      ],
+      widgetSwitches: [
+        mkSwitch('wstatus', 'Perbarui status host di widget', 'Memeriksa host favorit secara berkala saat ada jaringan')
+      ]
+    };
+  }
+}
+</script>
+</body>
+</html>

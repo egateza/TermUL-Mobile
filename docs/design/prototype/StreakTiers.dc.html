@@ -1,0 +1,85 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Galeri api streak</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+</style>
+</helmet>
+<div style="width: 1080px; height: 1040px; box-sizing: border-box; padding: 40px; display: flex; flex-direction: column; gap: 28px; background: #0B0F12; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Sembilan tier api (ambang dan palet dari artifact desktop)</span>
+<div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px">
+<sc-for list="{{tiers}}" as="t" hint-placeholder-count="9">
+<div style="display: flex; flex-direction: column; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
+<div style="display: flex; align-items: flex-end; justify-content: center; height: 140px; background: #17130f; padding-top: 6px">
+<dc-import name="FlameArt" count="{{t.count}}" mode="active" size="92" animate="{{ true }}" hint-size="120px,115px"></dc-import>
+</div>
+<div style="display: flex; flex-direction: column; gap: 6px; padding: 12px 14px 14px 14px">
+<div style="display: flex; align-items: baseline; justify-content: space-between">
+<span style="font-size: 16px; font-weight: 600">{{t.name}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">{{t.range}}</span>
+</div>
+<div style="display: flex; gap: 4px">
+<span style="width: 14px; height: 14px; border-radius: 4px; background: {{t.o}}"></span>
+<span style="width: 14px; height: 14px; border-radius: 4px; background: {{t.m}}"></span>
+<span style="width: 14px; height: 14px; border-radius: 4px; background: {{t.c}}"></span>
+</div>
+</div>
+</div>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">State: aktif, padam, beku (retak 3 dari 7), hangus</span>
+<div style="display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px">
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0 14px 0; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; justify-content: center; height: 120px; align-items: flex-end"><dc-import name="FlameArt" count="47" mode="active" size="92" animate="{{ true }}" hint-size="120px,115px"></dc-import></div>
+<span style="font-size: 14px; font-weight: 500">Aktif · 47 hari</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0 14px 0; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; justify-content: center; height: 120px; align-items: flex-end"><dc-import name="FlameArt" count="47" mode="gray" size="92" animate="{{ true }}" hint-size="120px,115px"></dc-import></div>
+<span style="font-size: 14px; font-weight: 500">Padam · absen 1-2 hari</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0 14px 0; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; justify-content: center; height: 120px; align-items: flex-end"><dc-import name="FlameArt" count="47" mode="frozen" size="92" cracks="3" need="7" animate="{{ true }}" hint-size="120px,115px"></dc-import></div>
+<span style="font-size: 14px; font-weight: 500">Beku · retak 3/7</span>
+</div>
+<div style="display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 12px 0 14px 0; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<div style="display: flex; justify-content: center; height: 120px; align-items: flex-end"><dc-import name="FlameArt" count="47" mode="reset" size="92" animate="{{ true }}" hint-size="120px,115px"></dc-import></div>
+<span style="font-size: 14px; font-weight: 500">Hangus · absen lebih dari 10 hari</span>
+</div>
+</div>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":1080,"height":1040}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const T = [
+      ['Bara', 2, '1-2 hari', '#8a3a17', '#d0601f', '#ffc07a'],
+      ['Api Jingga', 3, '3-9 hari', '#ff6a00', '#ff9d1f', '#ffe28a'],
+      ['Api Merah', 10, '10-29 hari', '#e01a2b', '#ff4d2e', '#ffc76b'],
+      ['Api Magenta', 30, '30-59 hari', '#c8106a', '#ff3f9f', '#ffd3ea'],
+      ['Api Ungu', 60, '60-99 hari', '#5b1fc4', '#9a5cff', '#eadcff'],
+      ['Api Biru', 100, '100-179 hari', '#1149d8', '#3c8cff', '#dcefff'],
+      ['Api Zamrud', 180, '180-364 hari', '#05875e', '#1edb98', '#e3fff3'],
+      ['Api Emas', 365, '365-729 hari', '#c07d00', '#ffc21a', '#fff7c9'],
+      ['Api Pelangi', 730, '730+ hari', '#ff3d6e', '#ffb000', '#d9f7ff']
+    ];
+    return { tiers: T.map((t) => ({ name: t[0], count: t[1], range: t[2], o: t[3], m: t[4], c: t[5] })) };
+  }
+}
+</script>
+</body>
+</html>
