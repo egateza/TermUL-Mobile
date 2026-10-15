@@ -11,7 +11,17 @@ void showTermulToast(
   TermulIconName icon = TermulIconName.check,
   double bottomOffset = 0,
 }) {
-  final messenger = ScaffoldMessenger.of(context);
+  showTermulToastOn(ScaffoldMessenger.of(context), message, icon: icon, bottomOffset: bottomOffset);
+}
+
+/// Seperti [showTermulToast] tetapi memakai messenger yang sudah diambil sebelumnya, supaya aman dipakai
+/// sesudah `await` tanpa menyentuh `BuildContext`.
+void showTermulToastOn(
+  ScaffoldMessengerState messenger,
+  String message, {
+  TermulIconName icon = TermulIconName.check,
+  double bottomOffset = 0,
+}) {
   messenger.hideCurrentSnackBar();
   messenger.showSnackBar(
     SnackBar(

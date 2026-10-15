@@ -36,5 +36,333 @@
   "hostStatusNotChecked": "belum diperiksa",
   "@hostStatusNotChecked": {
     "description": "Status baris host sebelum pengecekan pertama (cache, bukan fakta)."
+  },
+  "actionCancel": "Batal",
+  "@actionCancel": {
+    "description": "Tombol batal di sheet dan form."
+  },
+  "actionClose": "Tutup",
+  "@actionClose": {
+    "description": "Tombol tutup banner atau sheet."
+  },
+  "actionSave": "Simpan",
+  "@actionSave": {
+    "description": "Tombol simpan form."
+  },
+  "hostsTitle": "Host",
+  "@hostsTitle": {
+    "description": "Judul layar daftar host."
+  },
+  "hostsAddHost": "Tambah host",
+  "@hostsAddHost": {
+    "description": "Nama aksesibilitas tombol tambah host."
+  },
+  "hostsSearchLabel": "Cari host",
+  "@hostsSearchLabel": {
+    "description": "Label kolom pencarian (disembunyikan secara visual)."
+  },
+  "hostsSearchPlaceholder": "Cari nama, user, atau IP",
+  "@hostsSearchPlaceholder": {
+    "description": "Placeholder kolom pencarian host."
+  },
+  "filterAll": "Semua",
+  "@filterAll": {
+    "description": "Chip filter: semua host."
+  },
+  "filterFavorites": "Favorit",
+  "@filterFavorites": {
+    "description": "Chip filter: host favorit."
+  },
+  "hostsRootGroup": "Tanpa grup",
+  "@hostsRootGroup": {
+    "description": "Nama grup untuk host yang tidak punya grup."
+  },
+  "hostsGroupToggle": "Grup {name}, {count} host",
+  "@hostsGroupToggle": {
+    "description": "Nama aksesibilitas tombol buka-tutup grup.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "hostsEmptyTitle": "Belum ada host",
+  "@hostsEmptyTitle": {
+    "description": "Judul keadaan kosong daftar host."
+  },
+  "hostsEmptyBody": "Tambahkan server pertama Anda untuk menyambung lewat SSH.",
+  "@hostsEmptyBody": {
+    "description": "Isi keadaan kosong daftar host."
+  },
+  "hostsNoMatch": "Tidak ada host yang cocok. Ubah kata kunci atau filter.",
+  "@hostsNoMatch": {
+    "description": "Pesan saat pencarian atau filter tidak menemukan host."
+  },
+  "corruptHostsTitle": "Daftar host rusak",
+  "@corruptHostsTitle": {
+    "description": "Judul banner bila profiles.json rusak."
+  },
+  "corruptHostsBody": "Berkas daftar host tidak bisa dibaca dan disimpan sebagai {name}. Aplikasi mulai dari daftar kosong; berkas lama tidak dihapus.",
+  "@corruptHostsBody": {
+    "description": "Isi banner bila profiles.json rusak.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "corruptKnownTitle": "Sidik jari server hilang",
+  "@corruptKnownTitle": {
+    "description": "Judul banner bila known_hosts.json rusak."
+  },
+  "corruptKnownBody": "Berkas sidik jari rusak dan disimpan sebagai {name}. Setiap server dianggap host baru sampai Anda memercayainya lagi.",
+  "@corruptKnownBody": {
+    "description": "Isi banner bila known_hosts.json rusak.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hostActionsTitle": "Aksi untuk {name}",
+  "@hostActionsTitle": {
+    "description": "Judul sheet aksi host.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "actionConnect": "Sambung",
+  "@actionConnect": {
+    "description": "Aksi menyambung ke host."
+  },
+  "actionEdit": "Ubah",
+  "@actionEdit": {
+    "description": "Aksi mengubah host."
+  },
+  "actionFavorite": "Jadikan favorit",
+  "@actionFavorite": {
+    "description": "Aksi menambah host ke favorit."
+  },
+  "actionUnfavorite": "Hapus dari favorit",
+  "@actionUnfavorite": {
+    "description": "Aksi menghapus host dari favorit."
+  },
+  "actionDelete": "Hapus",
+  "@actionDelete": {
+    "description": "Aksi menghapus host."
+  },
+  "agentNeedsCompletionTitle": "Perlu dilengkapi",
+  "@agentNeedsCompletionTitle": {
+    "description": "Judul peringatan profil bermetode agen SSH."
+  },
+  "agentNeedsCompletionBody": "Profil ini memakai agen SSH di desktop. HP tidak punya agen, jadi pilih password atau kunci di HP lalu simpan.",
+  "@agentNeedsCompletionBody": {
+    "description": "Isi peringatan profil bermetode agen SSH."
+  },
+  "actionComplete": "Lengkapi",
+  "@actionComplete": {
+    "description": "Aksi melengkapi profil agen di form."
+  },
+  "deleteHostTitle": "Hapus {name}?",
+  "@deleteHostTitle": {
+    "description": "Judul konfirmasi hapus host.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "deleteHostBody": "Password atau kunci yang tersimpan untuk host ini ikut terhapus, begitu juga sidik jari servernya. Server sendiri tidak berubah.",
+  "@deleteHostBody": {
+    "description": "Isi konfirmasi hapus host."
+  },
+  "deleteHostFailed": "Host belum terhapus. Penyimpanan perangkat bermasalah; coba lagi.",
+  "@deleteHostFailed": {
+    "description": "Pesan bila hapus host gagal."
+  },
+  "hostDeleted": "Dihapus · {name}",
+  "@hostDeleted": {
+    "description": "Toast setelah host dihapus.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "formAddTitle": "Host baru",
+  "@formAddTitle": {
+    "description": "Judul form tambah host."
+  },
+  "formEditTitle": "Ubah host",
+  "@formEditTitle": {
+    "description": "Judul form ubah host."
+  },
+  "fieldName": "Nama",
+  "@fieldName": {
+    "description": "Label kolom nama host."
+  },
+  "fieldHost": "Host",
+  "@fieldHost": {
+    "description": "Label kolom host."
+  },
+  "fieldHostHelper": "Nama host atau alamat IP",
+  "@fieldHostHelper": {
+    "description": "Teks bantu kolom host."
+  },
+  "fieldPort": "Port",
+  "@fieldPort": {
+    "description": "Label kolom port."
+  },
+  "fieldUsername": "User",
+  "@fieldUsername": {
+    "description": "Label kolom user."
+  },
+  "fieldGroup": "Grup (opsional)",
+  "@fieldGroup": {
+    "description": "Label kolom grup."
+  },
+  "fieldGroupHelper": "Pisahkan tingkat dengan /, mis. Produksi/Backend",
+  "@fieldGroupHelper": {
+    "description": "Teks bantu kolom grup."
+  },
+  "authMethodLabel": "Cara login",
+  "@authMethodLabel": {
+    "description": "Label pilihan metode login."
+  },
+  "authPassword": "Password",
+  "@authPassword": {
+    "description": "Opsi metode login: password."
+  },
+  "authKey": "Kunci",
+  "@authKey": {
+    "description": "Opsi metode login: kunci privat."
+  },
+  "fieldPassword": "Password",
+  "@fieldPassword": {
+    "description": "Label kolom password."
+  },
+  "passwordStoredHint": "Kosongkan untuk tetap memakai password yang tersimpan",
+  "@passwordStoredHint": {
+    "description": "Teks bantu kolom password saat mengubah host."
+  },
+  "keyImport": "Impor kunci dari berkas",
+  "@keyImport": {
+    "description": "Tombol impor kunci privat."
+  },
+  "keyReplace": "Ganti kunci",
+  "@keyReplace": {
+    "description": "Tombol mengganti kunci privat."
+  },
+  "keyReady": "Kunci {type} siap disimpan",
+  "@keyReady": {
+    "description": "Status kunci yang baru diimpor.",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "keyStored": "Kunci tersimpan di perangkat",
+  "@keyStored": {
+    "description": "Status kunci yang sudah tersimpan."
+  },
+  "keyPassphraseEncrypted": "Kunci ini dilindungi passphrase.",
+  "@keyPassphraseEncrypted": {
+    "description": "Keterangan kunci yang dienkripsi."
+  },
+  "fieldPassphrase": "Passphrase kunci",
+  "@fieldPassphrase": {
+    "description": "Label kolom passphrase."
+  },
+  "errNameRequired": "Nama wajib diisi",
+  "@errNameRequired": {
+    "description": "Galat form: nama kosong."
+  },
+  "errHostRequired": "Host wajib diisi",
+  "@errHostRequired": {
+    "description": "Galat form: host kosong."
+  },
+  "errPortInvalid": "Port harus 1 sampai 65535",
+  "@errPortInvalid": {
+    "description": "Galat form: port tidak valid."
+  },
+  "errUserRequired": "User wajib diisi",
+  "@errUserRequired": {
+    "description": "Galat form: user kosong."
+  },
+  "errPasswordRequired": "Password wajib diisi",
+  "@errPasswordRequired": {
+    "description": "Galat form: password kosong."
+  },
+  "errKeyRequired": "Pilih berkas kunci privat",
+  "@errKeyRequired": {
+    "description": "Galat form: kunci belum dipilih."
+  },
+  "errPassphraseWrong": "Passphrase salah atau kosong",
+  "@errPassphraseWrong": {
+    "description": "Galat form: passphrase tidak cocok."
+  },
+  "keyErrNotAKey": "Berkas ini bukan kunci privat (terlalu besar atau bukan teks).",
+  "@keyErrNotAKey": {
+    "description": "Galat impor kunci: bukan kunci."
+  },
+  "keyErrNotPem": "Berkas ini bukan kunci dalam format PEM.",
+  "@keyErrNotPem": {
+    "description": "Galat impor kunci: bukan PEM."
+  },
+  "keyErrPkcs8": "Format kunci ini belum didukung (PKCS#8). Ubah dengan ssh-keygen -p -m PEM, atau pakai kunci OpenSSH.",
+  "@keyErrPkcs8": {
+    "description": "Galat impor kunci: PKCS#8."
+  },
+  "keyErrType": "Jenis kunci {type} belum didukung.",
+  "@keyErrType": {
+    "description": "Galat impor kunci: jenis lain.",
+    "placeholders": {
+      "type": {
+        "type": "String"
+      }
+    }
+  },
+  "keyErrMalformed": "Kunci rusak atau tidak terbaca.",
+  "@keyErrMalformed": {
+    "description": "Galat impor kunci: rusak."
+  },
+  "lockWarningTitle": "HP ini tidak punya kunci layar",
+  "@lockWarningTitle": {
+    "description": "Judul peringatan HP tanpa penguncian layar."
+  },
+  "lockWarningBody": "Siapa pun yang memegang HP bisa membuka server ini tanpa kata sandi. Menyimpan kredensial di sini berbahaya, tetapi tetap bisa dilakukan.",
+  "@lockWarningBody": {
+    "description": "Isi peringatan HP tanpa penguncian layar."
+  },
+  "hostSaved": "Disimpan · {name}",
+  "@hostSaved": {
+    "description": "Toast setelah host disimpan.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "saveFailed": "Belum tersimpan. Penyimpanan perangkat bermasalah; coba lagi.",
+  "@saveFailed": {
+    "description": "Pesan bila simpan host gagal."
+  },
+  "bootErrorTitle": "Penyimpanan tidak bisa dibuka",
+  "@bootErrorTitle": {
+    "description": "Judul layar galat saat aplikasi mulai."
+  },
+  "bootErrorBody": "Data Anda tidak diubah. Mulai ulang aplikasi; bila berulang, periksa ruang penyimpanan HP.",
+  "@bootErrorBody": {
+    "description": "Isi layar galat saat aplikasi mulai."
+  },
+  "connectNotAvailable": "Sambungan belum tersedia di versi ini",
+  "@connectNotAvailable": {
+    "description": "Toast sementara saat host ditekan sebelum alur sambung dibuat."
   }
 }

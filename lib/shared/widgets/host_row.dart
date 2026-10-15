@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/semantics.dart';
 
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -16,6 +17,7 @@ class HostRow extends StatelessWidget {
     this.status,
     this.latencyMs,
     this.onLongPress,
+    this.actionsLabel,
   });
 
   final String name;
@@ -24,6 +26,9 @@ class HostRow extends StatelessWidget {
   final int? latencyMs;
   final VoidCallback? onPressed;
   final VoidCallback? onLongPress;
+
+  /// Nama aksi semantik untuk [onLongPress] (pembaca layar tidak bisa menahan lama).
+  final String? actionsLabel;
 
   @override
   Widget build(BuildContext context) {
@@ -38,49 +43,54 @@ class HostRow extends StatelessWidget {
       HostStatus.busy => (l.statusBusy, TermulPalette.accent, HostStatus.busy),
       HostStatus.idle || null => (l.hostStatusNotChecked, TermulPalette.inkMuted, HostStatus.idle),
     };
-    return GestureDetector(
-      onLongPress: onLongPress,
-      child: Pressable(
-        onPressed: onPressed,
-        semanticLabel: '$name, $target, $text',
-        radius: TermulRadius.radiusXl,
-        minHeight: TermulSize.rowComfy,
-        builder: (context, pressed) => Container(
-          constraints: const BoxConstraints(minHeight: TermulSize.rowComfy),
-          padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space6, vertical: TermulSpacing.space4),
-          decoration: BoxDecoration(
-            color: TermulPalette.surface,
-            borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
-            border: Border.all(color: pressed ? TermulPalette.accent : TermulPalette.line),
-          ),
-          child: Row(
-            children: [
-              StatusDot(status: dot, showLabel: false),
-              const SizedBox(width: TermulSpacing.space6),
-              Expanded(
-                child: Column(
-                  mainAxisSize: MainAxisSize.min,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Text(
-                      name,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TermulText.title.copyWith(color: TermulPalette.ink),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      target,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TermulText.terminalSm.copyWith(color: TermulPalette.inkMuted, fontSize: 12.5),
-                    ),
-                  ],
+    return Semantics(
+      customSemanticsActions: {
+        if (onLongPress != null && actionsLabel != null) CustomSemanticsAction(label: actionsLabel!): onLongPress!,
+      },
+      child: GestureDetector(
+        onLongPress: onLongPress,
+        child: Pressable(
+          onPressed: onPressed,
+          semanticLabel: '$name, $target, $text',
+          radius: TermulRadius.radiusXl,
+          minHeight: TermulSize.rowComfy,
+          builder: (context, pressed) => Container(
+            constraints: const BoxConstraints(minHeight: TermulSize.rowComfy),
+            padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space6, vertical: TermulSpacing.space4),
+            decoration: BoxDecoration(
+              color: TermulPalette.surface,
+              borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
+              border: Border.all(color: pressed ? TermulPalette.accent : TermulPalette.line),
+            ),
+            child: Row(
+              children: [
+                StatusDot(status: dot, showLabel: false),
+                const SizedBox(width: TermulSpacing.space6),
+                Expanded(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.min,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        name,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TermulText.title.copyWith(color: TermulPalette.ink),
+                      ),
+                      const SizedBox(height: 3),
+                      Text(
+                        target,
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TermulText.terminalSm.copyWith(color: TermulPalette.inkMuted, fontSize: 12.5),
+                      ),
+                    ],
+                  ),
                 ),
-              ),
-              const SizedBox(width: TermulSpacing.space3),
-              Text(text, style: TermulText.terminalSm.copyWith(color: color)),
-            ],
+                const SizedBox(width: TermulSpacing.space3),
+                Text(text, style: TermulText.terminalSm.copyWith(color: color)),
+              ],
+            ),
           ),
         ),
       ),

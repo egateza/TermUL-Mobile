@@ -138,6 +138,426 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'belum diperiksa'**
   String get hostStatusNotChecked;
+
+  /// Tombol batal di sheet dan form.
+  ///
+  /// In id, this message translates to:
+  /// **'Batal'**
+  String get actionCancel;
+
+  /// Tombol tutup banner atau sheet.
+  ///
+  /// In id, this message translates to:
+  /// **'Tutup'**
+  String get actionClose;
+
+  /// Tombol simpan form.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan'**
+  String get actionSave;
+
+  /// Judul layar daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Host'**
+  String get hostsTitle;
+
+  /// Nama aksesibilitas tombol tambah host.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah host'**
+  String get hostsAddHost;
+
+  /// Label kolom pencarian (disembunyikan secara visual).
+  ///
+  /// In id, this message translates to:
+  /// **'Cari host'**
+  String get hostsSearchLabel;
+
+  /// Placeholder kolom pencarian host.
+  ///
+  /// In id, this message translates to:
+  /// **'Cari nama, user, atau IP'**
+  String get hostsSearchPlaceholder;
+
+  /// Chip filter: semua host.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua'**
+  String get filterAll;
+
+  /// Chip filter: host favorit.
+  ///
+  /// In id, this message translates to:
+  /// **'Favorit'**
+  String get filterFavorites;
+
+  /// Nama grup untuk host yang tidak punya grup.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanpa grup'**
+  String get hostsRootGroup;
+
+  /// Nama aksesibilitas tombol buka-tutup grup.
+  ///
+  /// In id, this message translates to:
+  /// **'Grup {name}, {count} host'**
+  String hostsGroupToggle(String name, int count);
+
+  /// Judul keadaan kosong daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada host'**
+  String get hostsEmptyTitle;
+
+  /// Isi keadaan kosong daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambahkan server pertama Anda untuk menyambung lewat SSH.'**
+  String get hostsEmptyBody;
+
+  /// Pesan saat pencarian atau filter tidak menemukan host.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada host yang cocok. Ubah kata kunci atau filter.'**
+  String get hostsNoMatch;
+
+  /// Judul banner bila profiles.json rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Daftar host rusak'**
+  String get corruptHostsTitle;
+
+  /// Isi banner bila profiles.json rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas daftar host tidak bisa dibaca dan disimpan sebagai {name}. Aplikasi mulai dari daftar kosong; berkas lama tidak dihapus.'**
+  String corruptHostsBody(String name);
+
+  /// Judul banner bila known_hosts.json rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Sidik jari server hilang'**
+  String get corruptKnownTitle;
+
+  /// Isi banner bila known_hosts.json rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas sidik jari rusak dan disimpan sebagai {name}. Setiap server dianggap host baru sampai Anda memercayainya lagi.'**
+  String corruptKnownBody(String name);
+
+  /// Judul sheet aksi host.
+  ///
+  /// In id, this message translates to:
+  /// **'Aksi untuk {name}'**
+  String hostActionsTitle(String name);
+
+  /// Aksi menyambung ke host.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambung'**
+  String get actionConnect;
+
+  /// Aksi mengubah host.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah'**
+  String get actionEdit;
+
+  /// Aksi menambah host ke favorit.
+  ///
+  /// In id, this message translates to:
+  /// **'Jadikan favorit'**
+  String get actionFavorite;
+
+  /// Aksi menghapus host dari favorit.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus dari favorit'**
+  String get actionUnfavorite;
+
+  /// Aksi menghapus host.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus'**
+  String get actionDelete;
+
+  /// Judul peringatan profil bermetode agen SSH.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlu dilengkapi'**
+  String get agentNeedsCompletionTitle;
+
+  /// Isi peringatan profil bermetode agen SSH.
+  ///
+  /// In id, this message translates to:
+  /// **'Profil ini memakai agen SSH di desktop. HP tidak punya agen, jadi pilih password atau kunci di HP lalu simpan.'**
+  String get agentNeedsCompletionBody;
+
+  /// Aksi melengkapi profil agen di form.
+  ///
+  /// In id, this message translates to:
+  /// **'Lengkapi'**
+  String get actionComplete;
+
+  /// Judul konfirmasi hapus host.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus {name}?'**
+  String deleteHostTitle(String name);
+
+  /// Isi konfirmasi hapus host.
+  ///
+  /// In id, this message translates to:
+  /// **'Password atau kunci yang tersimpan untuk host ini ikut terhapus, begitu juga sidik jari servernya. Server sendiri tidak berubah.'**
+  String get deleteHostBody;
+
+  /// Pesan bila hapus host gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Host belum terhapus. Penyimpanan perangkat bermasalah; coba lagi.'**
+  String get deleteHostFailed;
+
+  /// Toast setelah host dihapus.
+  ///
+  /// In id, this message translates to:
+  /// **'Dihapus · {name}'**
+  String hostDeleted(String name);
+
+  /// Judul form tambah host.
+  ///
+  /// In id, this message translates to:
+  /// **'Host baru'**
+  String get formAddTitle;
+
+  /// Judul form ubah host.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah host'**
+  String get formEditTitle;
+
+  /// Label kolom nama host.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama'**
+  String get fieldName;
+
+  /// Label kolom host.
+  ///
+  /// In id, this message translates to:
+  /// **'Host'**
+  String get fieldHost;
+
+  /// Teks bantu kolom host.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama host atau alamat IP'**
+  String get fieldHostHelper;
+
+  /// Label kolom port.
+  ///
+  /// In id, this message translates to:
+  /// **'Port'**
+  String get fieldPort;
+
+  /// Label kolom user.
+  ///
+  /// In id, this message translates to:
+  /// **'User'**
+  String get fieldUsername;
+
+  /// Label kolom grup.
+  ///
+  /// In id, this message translates to:
+  /// **'Grup (opsional)'**
+  String get fieldGroup;
+
+  /// Teks bantu kolom grup.
+  ///
+  /// In id, this message translates to:
+  /// **'Pisahkan tingkat dengan /, mis. Produksi/Backend'**
+  String get fieldGroupHelper;
+
+  /// Label pilihan metode login.
+  ///
+  /// In id, this message translates to:
+  /// **'Cara login'**
+  String get authMethodLabel;
+
+  /// Opsi metode login: password.
+  ///
+  /// In id, this message translates to:
+  /// **'Password'**
+  String get authPassword;
+
+  /// Opsi metode login: kunci privat.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci'**
+  String get authKey;
+
+  /// Label kolom password.
+  ///
+  /// In id, this message translates to:
+  /// **'Password'**
+  String get fieldPassword;
+
+  /// Teks bantu kolom password saat mengubah host.
+  ///
+  /// In id, this message translates to:
+  /// **'Kosongkan untuk tetap memakai password yang tersimpan'**
+  String get passwordStoredHint;
+
+  /// Tombol impor kunci privat.
+  ///
+  /// In id, this message translates to:
+  /// **'Impor kunci dari berkas'**
+  String get keyImport;
+
+  /// Tombol mengganti kunci privat.
+  ///
+  /// In id, this message translates to:
+  /// **'Ganti kunci'**
+  String get keyReplace;
+
+  /// Status kunci yang baru diimpor.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci {type} siap disimpan'**
+  String keyReady(String type);
+
+  /// Status kunci yang sudah tersimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci tersimpan di perangkat'**
+  String get keyStored;
+
+  /// Keterangan kunci yang dienkripsi.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci ini dilindungi passphrase.'**
+  String get keyPassphraseEncrypted;
+
+  /// Label kolom passphrase.
+  ///
+  /// In id, this message translates to:
+  /// **'Passphrase kunci'**
+  String get fieldPassphrase;
+
+  /// Galat form: nama kosong.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama wajib diisi'**
+  String get errNameRequired;
+
+  /// Galat form: host kosong.
+  ///
+  /// In id, this message translates to:
+  /// **'Host wajib diisi'**
+  String get errHostRequired;
+
+  /// Galat form: port tidak valid.
+  ///
+  /// In id, this message translates to:
+  /// **'Port harus 1 sampai 65535'**
+  String get errPortInvalid;
+
+  /// Galat form: user kosong.
+  ///
+  /// In id, this message translates to:
+  /// **'User wajib diisi'**
+  String get errUserRequired;
+
+  /// Galat form: password kosong.
+  ///
+  /// In id, this message translates to:
+  /// **'Password wajib diisi'**
+  String get errPasswordRequired;
+
+  /// Galat form: kunci belum dipilih.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih berkas kunci privat'**
+  String get errKeyRequired;
+
+  /// Galat form: passphrase tidak cocok.
+  ///
+  /// In id, this message translates to:
+  /// **'Passphrase salah atau kosong'**
+  String get errPassphraseWrong;
+
+  /// Galat impor kunci: bukan kunci.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas ini bukan kunci privat (terlalu besar atau bukan teks).'**
+  String get keyErrNotAKey;
+
+  /// Galat impor kunci: bukan PEM.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas ini bukan kunci dalam format PEM.'**
+  String get keyErrNotPem;
+
+  /// Galat impor kunci: PKCS#8.
+  ///
+  /// In id, this message translates to:
+  /// **'Format kunci ini belum didukung (PKCS#8). Ubah dengan ssh-keygen -p -m PEM, atau pakai kunci OpenSSH.'**
+  String get keyErrPkcs8;
+
+  /// Galat impor kunci: jenis lain.
+  ///
+  /// In id, this message translates to:
+  /// **'Jenis kunci {type} belum didukung.'**
+  String keyErrType(String type);
+
+  /// Galat impor kunci: rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci rusak atau tidak terbaca.'**
+  String get keyErrMalformed;
+
+  /// Judul peringatan HP tanpa penguncian layar.
+  ///
+  /// In id, this message translates to:
+  /// **'HP ini tidak punya kunci layar'**
+  String get lockWarningTitle;
+
+  /// Isi peringatan HP tanpa penguncian layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Siapa pun yang memegang HP bisa membuka server ini tanpa kata sandi. Menyimpan kredensial di sini berbahaya, tetapi tetap bisa dilakukan.'**
+  String get lockWarningBody;
+
+  /// Toast setelah host disimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Disimpan · {name}'**
+  String hostSaved(String name);
+
+  /// Pesan bila simpan host gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum tersimpan. Penyimpanan perangkat bermasalah; coba lagi.'**
+  String get saveFailed;
+
+  /// Judul layar galat saat aplikasi mulai.
+  ///
+  /// In id, this message translates to:
+  /// **'Penyimpanan tidak bisa dibuka'**
+  String get bootErrorTitle;
+
+  /// Isi layar galat saat aplikasi mulai.
+  ///
+  /// In id, this message translates to:
+  /// **'Data Anda tidak diubah. Mulai ulang aplikasi; bila berulang, periksa ruang penyimpanan HP.'**
+  String get bootErrorBody;
+
+  /// Toast sementara saat host ditekan sebelum alur sambung dibuat.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambungan belum tersedia di versi ini'**
+  String get connectNotAvailable;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
