@@ -196,17 +196,7 @@ abstract final class TermulPalette {
   };
 
   /// level-1 sampai level-9, hanya untuk api streak.
-  static const List<Color> levels = [
-    level1,
-    level2,
-    level3,
-    level4,
-    level5,
-    level6,
-    level7,
-    level8,
-    level9,
-  ];
+  static const List<Color> levels = [level1, level2, level3, level4, level5, level6, level7, level8, level9];
 }
 
 abstract final class TermulSpacing {
@@ -266,8 +256,7 @@ abstract final class TermulRadius {
   static const double radius2xl = 18.0;
   static const double radius3xl = 24.0;
   static const double radiusPill = 999.0;
-  static const double radiusRound =
-      999.0; // 50% di token; dipakai sebagai bulat penuh
+  static const double radiusRound = 999.0; // 50% di token; dipakai sebagai bulat penuh
 
   static const Map<String, double> byName = {
     'radius-xs': radiusXs,

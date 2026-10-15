@@ -66,17 +66,13 @@ class _TermulTextFieldState extends State<TermulTextField> {
 
   @override
   Widget build(BuildContext context) {
-    final style = (widget.mono ? TermulText.terminal : TermulText.body)
-        .copyWith(color: TermulPalette.ink);
+    final style = (widget.mono ? TermulText.terminal : TermulText.body).copyWith(color: TermulPalette.ink);
     final hasError = widget.error != null;
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         if (!widget.hideLabel) ...[
-          Text(
-            widget.label,
-            style: TermulText.caption.copyWith(color: TermulPalette.inkMuted),
-          ),
+          Text(widget.label, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
           const SizedBox(height: TermulSpacing.space1),
         ],
         Stack(
@@ -84,26 +80,16 @@ class _TermulTextFieldState extends State<TermulTextField> {
           children: [
             Container(
               constraints: const BoxConstraints(minHeight: TermulSize.inputH),
-              padding: const EdgeInsets.symmetric(
-                horizontal: TermulSpacing.space6,
-              ),
+              padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space6),
               decoration: BoxDecoration(
                 color: TermulPalette.surface,
                 borderRadius: BorderRadius.circular(TermulRadius.radiusLg),
-                border: Border.all(
-                  color: hasError
-                      ? TermulPalette.bad
-                      : TermulPalette.lineStrong,
-                ),
+                border: Border.all(color: hasError ? TermulPalette.bad : TermulPalette.lineStrong),
               ),
               child: Row(
                 children: [
                   if (widget.icon != null) ...[
-                    TermulIcon(
-                      widget.icon!,
-                      size: 18,
-                      color: TermulPalette.inkMuted,
-                    ),
+                    TermulIcon(widget.icon!, size: 18, color: TermulPalette.inkMuted),
                     const SizedBox(width: TermulSpacing.space4),
                   ],
                   Expanded(
@@ -127,13 +113,9 @@ class _TermulTextFieldState extends State<TermulTextField> {
                         decoration: InputDecoration(
                           isCollapsed: true,
                           border: InputBorder.none,
-                          contentPadding: const EdgeInsets.symmetric(
-                            vertical: TermulSpacing.space5,
-                          ),
+                          contentPadding: const EdgeInsets.symmetric(vertical: TermulSpacing.space5),
                           hintText: widget.placeholder,
-                          hintStyle: style.copyWith(
-                            color: TermulPalette.inkFaint,
-                          ),
+                          hintStyle: style.copyWith(color: TermulPalette.inkFaint),
                         ),
                       ),
                     ),
@@ -153,9 +135,7 @@ class _TermulTextFieldState extends State<TermulTextField> {
                     key: const ValueKey('field-focus-ring'),
                     decoration: BoxDecoration(
                       border: Border.all(color: TermulPalette.accent, width: 2),
-                      borderRadius: BorderRadius.circular(
-                        TermulRadius.radiusLg + 4,
-                      ),
+                      borderRadius: BorderRadius.circular(TermulRadius.radiusLg + 4),
                     ),
                   ),
                 ),
@@ -166,9 +146,7 @@ class _TermulTextFieldState extends State<TermulTextField> {
           const SizedBox(height: TermulSpacing.space1),
           Text(
             widget.error ?? widget.helper!,
-            style: TermulText.caption.copyWith(
-              color: hasError ? TermulPalette.bad : TermulPalette.inkMuted,
-            ),
+            style: TermulText.caption.copyWith(color: hasError ? TermulPalette.bad : TermulPalette.inkMuted),
           ),
         ],
       ],

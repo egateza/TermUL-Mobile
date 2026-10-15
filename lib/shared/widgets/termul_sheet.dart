@@ -26,14 +26,10 @@ Future<T?> showTermulSheet<T>(
     backgroundColor: TermulPalette.surface,
     barrierColor: TermulPalette.scrim,
     shape: const RoundedRectangleBorder(
-      borderRadius: BorderRadius.vertical(
-        top: Radius.circular(TermulRadius.radius3xl),
-      ),
+      borderRadius: BorderRadius.vertical(top: Radius.circular(TermulRadius.radius3xl)),
       side: BorderSide(color: TermulPalette.line),
     ),
-    constraints: BoxConstraints(
-      maxHeight: MediaQuery.sizeOf(context).height * 0.84,
-    ),
+    constraints: BoxConstraints(maxHeight: MediaQuery.sizeOf(context).height * 0.84),
     builder: (sheetContext) => SafeArea(
       child: Padding(
         padding: const EdgeInsets.fromLTRB(
@@ -50,19 +46,13 @@ Future<T?> showTermulSheet<T>(
               child: Container(
                 width: 40,
                 height: 4,
-                decoration: BoxDecoration(
-                  color: TermulPalette.lineStrong,
-                  borderRadius: BorderRadius.circular(2),
-                ),
+                decoration: BoxDecoration(color: TermulPalette.lineStrong, borderRadius: BorderRadius.circular(2)),
               ),
             ),
             const SizedBox(height: TermulSpacing.space7),
             Semantics(
               header: true,
-              child: Text(
-                title,
-                style: TermulText.h2.copyWith(color: TermulPalette.ink),
-              ),
+              child: Text(title, style: TermulText.h2.copyWith(color: TermulPalette.ink)),
             ),
             const SizedBox(height: TermulSpacing.space5),
             Flexible(child: SingleChildScrollView(child: child)),
@@ -86,9 +76,7 @@ Future<T?> showTermulSheet<T>(
                   child: TermulButton(
                     label: confirmLabel,
                     size: TermulButtonSize.lg,
-                    variant: confirmIsDanger
-                        ? TermulButtonVariant.danger
-                        : TermulButtonVariant.primary,
+                    variant: confirmIsDanger ? TermulButtonVariant.danger : TermulButtonVariant.primary,
                     onPressed: () {
                       Navigator.of(sheetContext).pop();
                       onConfirm();

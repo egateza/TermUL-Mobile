@@ -7,8 +7,7 @@ String _rect(double x, double y, double w, double h, double r) =>
     'M${x + r} $y H${x + w - r} A$r $r 0 0 1 ${x + w} ${y + r} V${y + h - r} A$r $r 0 0 1 ${x + w - r} ${y + h} '
     'H${x + r} A$r $r 0 0 1 $x ${y + h - r} V${y + r} A$r $r 0 0 1 ${x + r} $y Z';
 
-String _circle(double cx, double cy, double r) =>
-    'M${cx - r} $cy a$r $r 0 1 0 ${2 * r} 0 a$r $r 0 1 0 ${-2 * r} 0 Z';
+String _circle(double cx, double cy, double r) => 'M${cx - r} $cy a$r $r 0 1 0 ${2 * r} 0 a$r $r 0 1 0 ${-2 * r} 0 Z';
 
 /// Ikon garis inline (viewBox 24, tebal 1,75, ujung dan sambungan bulat, warna dari [color] atau `IconTheme`).
 /// Bentuk dari prototipe desain; ikon yang tidak ada di prototipe (hapus, ubah, kunci, bintang, muat ulang,
@@ -26,21 +25,15 @@ enum TermulIconName {
   lock('M8 11V8a4 4 0 0 1 8 0v3'),
   hosts('M7 7.5h.01M7 16.5h.01'),
   terminal('M7 9l3 3-3 3M13 15h4'),
-  folder(
-    'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z',
-  ),
+  folder('M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'),
   snippets(
     'M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3',
   ),
   settings('M4 7h10M18 7h2M4 17h2M10 17h10'),
-  trash(
-    'M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3',
-  ),
+  trash('M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3'),
   edit('M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4'),
   key('M11 12l9-9M16 7l3 3M14 9l2 2'),
-  star(
-    'M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z',
-  ),
+  star('M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'),
   refresh('M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4'),
   more('M12 6h.01M12 12h.01M12 18h.01');
 
@@ -64,14 +57,7 @@ enum TermulIconName {
 }
 
 class TermulIcon extends StatelessWidget {
-  const TermulIcon(
-    this.name, {
-    super.key,
-    this.size = 20,
-    this.color,
-    this.label,
-    this.filled = false,
-  });
+  const TermulIcon(this.name, {super.key, this.size = 20, this.color, this.label, this.filled = false});
 
   final TermulIconName name;
   final double size;
@@ -91,9 +77,7 @@ class TermulIcon extends StatelessWidget {
       height: size,
       child: CustomPaint(painter: _IconPainter(name.path, c, filled)),
     );
-    return label == null
-        ? ExcludeSemantics(child: icon)
-        : Semantics(label: label, image: true, child: icon);
+    return label == null ? ExcludeSemantics(child: icon) : Semantics(label: label, image: true, child: icon);
   }
 }
 
@@ -120,6 +104,5 @@ class _IconPainter extends CustomPainter {
   }
 
   @override
-  bool shouldRepaint(_IconPainter old) =>
-      old.path != path || old.color != color || old.filled != filled;
+  bool shouldRepaint(_IconPainter old) => old.path != path || old.color != color || old.filled != filled;
 }

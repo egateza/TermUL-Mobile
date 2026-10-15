@@ -39,9 +39,7 @@ class TermulButton extends StatelessWidget {
   /// Mengisi lebar yang tersedia.
   final bool expand;
 
-  double get _radius => size == TermulButtonSize.lg
-      ? TermulRadius.radiusXl
-      : TermulRadius.radiusLg;
+  double get _radius => size == TermulButtonSize.lg ? TermulRadius.radiusXl : TermulRadius.radiusLg;
 
   @override
   Widget build(BuildContext context) {
@@ -75,9 +73,7 @@ class TermulButton extends StatelessWidget {
                   style: TermulText.label.copyWith(
                     color: fg,
                     fontSize: size.fontSize,
-                    fontWeight: variant == TermulButtonVariant.primary
-                        ? FontWeight.w600
-                        : FontWeight.w500,
+                    fontWeight: variant == TermulButtonVariant.primary ? FontWeight.w600 : FontWeight.w500,
                   ),
                 ),
               ),
@@ -90,11 +86,7 @@ class TermulButton extends StatelessWidget {
 
   (Color, Color, Color?) _colors(bool pressed) {
     if (pressed && variant != TermulButtonVariant.primary) {
-      return (
-        TermulPalette.accent,
-        TermulPalette.onAccent,
-        TermulPalette.accent,
-      );
+      return (TermulPalette.accent, TermulPalette.onAccent, TermulPalette.accent);
     }
     return switch (variant) {
       TermulButtonVariant.primary => (
@@ -102,21 +94,9 @@ class TermulButton extends StatelessWidget {
         pressed ? TermulPalette.ink : TermulPalette.onAccent,
         null,
       ),
-      TermulButtonVariant.secondary => (
-        Colors.transparent,
-        TermulPalette.ink,
-        TermulPalette.lineStrong,
-      ),
-      TermulButtonVariant.ghost => (
-        Colors.transparent,
-        TermulPalette.inkMuted,
-        null,
-      ),
-      TermulButtonVariant.danger => (
-        Colors.transparent,
-        TermulPalette.bad,
-        TermulPalette.bad,
-      ),
+      TermulButtonVariant.secondary => (Colors.transparent, TermulPalette.ink, TermulPalette.lineStrong),
+      TermulButtonVariant.ghost => (Colors.transparent, TermulPalette.inkMuted, null),
+      TermulButtonVariant.danger => (Colors.transparent, TermulPalette.bad, TermulPalette.bad),
     };
   }
 }

@@ -6,6 +6,5 @@ class StorageException implements Exception {
   final Object? cause;
 
   @override
-  String toString() =>
-      'StorageException: $message${cause == null ? '' : ' ($cause)'}';
+  String toString() => 'StorageException: $message${cause == null ? '' : ' ($cause)'}';
 }

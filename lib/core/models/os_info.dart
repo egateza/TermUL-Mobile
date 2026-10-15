@@ -29,27 +29,18 @@ final class OsInfo {
   final String? versionId;
   final String? prettyName;
 
-  Map<String, Object?> toJson() => {
-    'id': id,
-    'versionId': versionId,
-    'prettyName': prettyName,
-  };
+  Map<String, Object?> toJson() => {'id': id, 'versionId': versionId, 'prettyName': prettyName};
 
   static String? _clean(String? s) {
     if (s == null) return null;
-    final t = String.fromCharCodes(
-      s.runes.where((c) => c >= 0x20 && !(c >= 0x7f && c <= 0x9f)),
-    ).trim();
+    final t = String.fromCharCodes(s.runes.where((c) => c >= 0x20 && !(c >= 0x7f && c <= 0x9f))).trim();
     if (t.isEmpty) return null;
     return t.length > _maxText ? t.substring(0, _maxText) : t;
   }
 
   @override
   bool operator ==(Object other) =>
-      other is OsInfo &&
-      other.id == id &&
-      other.versionId == versionId &&
-      other.prettyName == prettyName;
+      other is OsInfo && other.id == id && other.versionId == versionId && other.prettyName == prettyName;
 
   @override
   int get hashCode => Object.hash(id, versionId, prettyName);

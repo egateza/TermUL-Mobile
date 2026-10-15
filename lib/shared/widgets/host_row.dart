@@ -34,14 +34,9 @@ class HostRow extends StatelessWidget {
         TermulPalette.ok,
         HostStatus.online,
       ),
-      HostStatus.offline => (
-        l.hostStatusUnreachable,
-        TermulPalette.bad,
-        HostStatus.offline,
-      ),
+      HostStatus.offline => (l.hostStatusUnreachable, TermulPalette.bad, HostStatus.offline),
       HostStatus.busy => (l.statusBusy, TermulPalette.accent, HostStatus.busy),
-      HostStatus.idle ||
-      null => (l.hostStatusNotChecked, TermulPalette.inkMuted, HostStatus.idle),
+      HostStatus.idle || null => (l.hostStatusNotChecked, TermulPalette.inkMuted, HostStatus.idle),
     };
     return GestureDetector(
       onLongPress: onLongPress,
@@ -52,16 +47,11 @@ class HostRow extends StatelessWidget {
         minHeight: TermulSize.rowComfy,
         builder: (context, pressed) => Container(
           constraints: const BoxConstraints(minHeight: TermulSize.rowComfy),
-          padding: const EdgeInsets.symmetric(
-            horizontal: TermulSpacing.space6,
-            vertical: TermulSpacing.space4,
-          ),
+          padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space6, vertical: TermulSpacing.space4),
           decoration: BoxDecoration(
             color: TermulPalette.surface,
             borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
-            border: Border.all(
-              color: pressed ? TermulPalette.accent : TermulPalette.line,
-            ),
+            border: Border.all(color: pressed ? TermulPalette.accent : TermulPalette.line),
           ),
           child: Row(
             children: [
@@ -76,19 +66,14 @@ class HostRow extends StatelessWidget {
                       name,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TermulText.title.copyWith(
-                        color: TermulPalette.ink,
-                      ),
+                      style: TermulText.title.copyWith(color: TermulPalette.ink),
                     ),
                     const SizedBox(height: 3),
                     Text(
                       target,
                       maxLines: 1,
                       overflow: TextOverflow.ellipsis,
-                      style: TermulText.terminalSm.copyWith(
-                        color: TermulPalette.inkMuted,
-                        fontSize: 12.5,
-                      ),
+                      style: TermulText.terminalSm.copyWith(color: TermulPalette.inkMuted, fontSize: 12.5),
                     ),
                   ],
                 ),

@@ -14,16 +14,10 @@ final _random = Random.secure();
 /// [beforeRename] hanya untuk test (menyuntik galat tepat sebelum rename).
 ///
 /// Belum diverifikasi di Android: apakah `flush` melakukan `fsync`; Dart tidak punya `fsync` untuk folder.
-Future<void> writeAtomic(
-  File target,
-  List<int> bytes, {
-  Future<void> Function()? beforeRename,
-}) async {
+Future<void> writeAtomic(File target, List<int> bytes, {Future<void> Function()? beforeRename}) async {
   final dir = target.absolute.parent;
   final name = target.uri.pathSegments.last;
-  final tmp = File(
-    '${dir.path}${Platform.pathSeparator}.$name.${_random.nextInt(1 << 32).toRadixString(16)}.tmp',
-  );
+  final tmp = File('${dir.path}${Platform.pathSeparator}.$name.${_random.nextInt(1 << 32).toRadixString(16)}.tmp');
   try {
     await dir.create(recursive: true);
     final raf = await tmp.open(mode: FileMode.write);

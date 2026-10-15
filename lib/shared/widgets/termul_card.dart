@@ -38,15 +38,9 @@ class TermulCard extends StatelessWidget {
     Widget box(bool pressed) => Container(
       padding: EdgeInsets.all(padding.value),
       decoration: BoxDecoration(
-        color: tone == CardTone.inset
-            ? TermulPalette.groundDeep
-            : TermulPalette.surface,
+        color: tone == CardTone.inset ? TermulPalette.groundDeep : TermulPalette.surface,
         borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
-        border: Border.all(
-          color: tone == CardTone.selected || pressed
-              ? TermulPalette.accent
-              : TermulPalette.line,
-        ),
+        border: Border.all(color: tone == CardTone.selected || pressed ? TermulPalette.accent : TermulPalette.line),
       ),
       child: child,
     );

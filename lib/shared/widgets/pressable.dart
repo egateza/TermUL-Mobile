@@ -5,11 +5,7 @@ import '../../core/theme/termul_theme.dart';
 /// Cincin fokus papan ketik: 2 px `accent`, offset 2 px, di sekeliling [child]. Hanya tampil bila fokus berasal
 /// dari papan ketik (mode sorot tradisional), bukan dari sentuhan.
 class FocusRing extends StatefulWidget {
-  const FocusRing({
-    super.key,
-    required this.child,
-    this.radius = TermulRadius.radiusLg,
-  });
+  const FocusRing({super.key, required this.child, this.radius = TermulRadius.radiusLg});
 
   final Widget child;
   final double radius;
@@ -27,10 +23,7 @@ class _FocusRingState extends State<FocusRing> {
       canRequestFocus: false,
       skipTraversal: true,
       onFocusChange: (focused) {
-        final visible =
-            focused &&
-            FocusManager.instance.highlightMode ==
-                FocusHighlightMode.traditional;
+        final visible = focused && FocusManager.instance.highlightMode == FocusHighlightMode.traditional;
         if (visible != _show) setState(() => _show = visible);
       },
       child: Stack(
@@ -97,10 +90,7 @@ class _PressableState extends State<Pressable> {
   Widget build(BuildContext context) {
     final enabled = widget.onPressed != null;
     final body = ConstrainedBox(
-      constraints: BoxConstraints(
-        minWidth: widget.minWidth,
-        minHeight: widget.minHeight,
-      ),
+      constraints: BoxConstraints(minWidth: widget.minWidth, minHeight: widget.minHeight),
       child: Material(
         type: MaterialType.transparency,
         child: InkWell(

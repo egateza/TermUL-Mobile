@@ -8,12 +8,7 @@ enum HostStatus { online, offline, busy, idle }
 /// Titik status. Warna tidak pernah berdiri sendiri: `ok` dan `bad` nyaris sama terang, jadi selalu ada kata.
 /// [showLabel] false hanya bila kata yang sama sudah tampil di dekatnya (mis. di `HostRow`).
 class StatusDot extends StatelessWidget {
-  const StatusDot({
-    super.key,
-    required this.status,
-    this.label,
-    this.showLabel = true,
-  });
+  const StatusDot({super.key, required this.status, this.label, this.showLabel = true});
 
   final HostStatus status;
   final String? label;

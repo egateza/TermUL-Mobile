@@ -41,36 +41,30 @@ class JsonHostRepository implements HostRepository {
   });
 
   @override
-  Future<ProfileSnapshot> save(HostProfile profile) =>
-      _mutate((s) => s.withProfile(profile));
+  Future<ProfileSnapshot> save(HostProfile profile) => _mutate((s) => s.withProfile(profile));
 
   @override
-  Future<ProfileSnapshot> delete(String id) =>
-      _mutate((s) => s.find(id) == null ? s : s.withoutProfile(id));
+  Future<ProfileSnapshot> delete(String id) => _mutate((s) => s.find(id) == null ? s : s.withoutProfile(id));
 
   @override
-  Future<ProfileSnapshot> setFavorite(String id, {required bool favorite}) =>
-      _mutate((s) {
-        if (s.find(id) == null || s.isFavorite(id) == favorite) return s;
-        return s.withFavorite(id, favorite: favorite);
-      });
+  Future<ProfileSnapshot> setFavorite(String id, {required bool favorite}) => _mutate((s) {
+    if (s.find(id) == null || s.isFavorite(id) == favorite) return s;
+    return s.withFavorite(id, favorite: favorite);
+  });
 
   @override
   Future<ProfileSnapshot> markUsed(String id) => _mutate((s) {
-    if (s.find(id) == null ||
-        (s.recent.isNotEmpty && s.recent.first == id.toLowerCase())) {
+    if (s.find(id) == null || (s.recent.isNotEmpty && s.recent.first == id.toLowerCase())) {
       return s;
     }
     return s.withUsed(id);
   });
 
   @override
-  Future<ProfileSnapshot> clearRecent() =>
-      _mutate((s) => s.recent.isEmpty ? s : s.withoutRecent());
+  Future<ProfileSnapshot> clearRecent() => _mutate((s) => s.recent.isEmpty ? s : s.withoutRecent());
 
   @override
-  Future<ProfileSnapshot> addGroup(String group) =>
-      _mutate((s) => s.withGroups([...s.groups, group]));
+  Future<ProfileSnapshot> addGroup(String group) => _mutate((s) => s.withGroups([...s.groups, group]));
 
   @override
   Future<ProfileSnapshot> deleteGroup(String group) {
@@ -92,9 +86,7 @@ class JsonHostRepository implements HostRepository {
     final dst = HostProfile.normalizeGroup(to);
     if (src.isEmpty) throw ArgumentError('Grup root tidak bisa di-rename');
     return _mutate((s) {
-      var result = s.withGroups([
-        for (final g in s.groups) _rebase(g, src, dst),
-      ]);
+      var result = s.withGroups([for (final g in s.groups) _rebase(g, src, dst)]);
       for (final p in s.profiles) {
         if (_sameOrChild(p.group, src)) {
           result = result.withProfile(p.withGroup(_rebase(p.group, src, dst)));
@@ -104,9 +96,7 @@ class JsonHostRepository implements HostRepository {
     });
   }
 
-  Future<ProfileSnapshot> _mutate(
-    ProfileSnapshot Function(ProfileSnapshot) change,
-  ) => _lock.run(() async {
+  Future<ProfileSnapshot> _mutate(ProfileSnapshot Function(ProfileSnapshot) change) => _lock.run(() async {
     final updated = change(_snapshot);
     if (identical(updated, _snapshot)) return updated;
     const encoder = JsonEncoder.withIndent('  ');
@@ -116,8 +106,7 @@ class JsonHostRepository implements HostRepository {
     return updated;
   });
 
-  static bool _sameOrChild(String group, String parent) =>
-      group == parent || group.startsWith('$parent/');
+  static bool _sameOrChild(String group, String parent) => group == parent || group.startsWith('$parent/');
 
   static String _rebase(String group, String src, String dst) {
     if (!_sameOrChild(group, src)) return group;

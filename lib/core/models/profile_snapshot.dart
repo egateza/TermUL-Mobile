@@ -17,13 +17,7 @@ final class ProfileSnapshot {
     List<String> favorites = const [],
     List<String> recent = const [],
   }) {
-    final cleanGroups =
-        groups
-            .map(HostProfile.normalizeGroup)
-            .where((g) => g.isNotEmpty)
-            .toSet()
-            .toList()
-          ..sort();
+    final cleanGroups = groups.map(HostProfile.normalizeGroup).where((g) => g.isNotEmpty).toSet().toList()..sort();
     final ids = <String>{};
     for (final p in profiles) {
       if (!ids.add(p.id)) throw ArgumentError('Terdapat id profil duplikat');
@@ -37,30 +31,20 @@ final class ProfileSnapshot {
     );
   }
 
-  const ProfileSnapshot._(
-    this.version,
-    this.groups,
-    this.profiles,
-    this.favorites,
-    this.recent,
-  );
+  const ProfileSnapshot._(this.version, this.groups, this.profiles, this.favorites, this.recent);
 
   factory ProfileSnapshot.empty() => ProfileSnapshot();
 
-  factory ProfileSnapshot.fromJson(Map<String, Object?> json) =>
-      ProfileSnapshot(
-        version: optInt(json, 'version') ?? currentVersion,
-        groups: stringList(json, 'groups'),
-        profiles: [
-          for (final p in optList(json, 'profiles'))
-            if (p is Map<String, Object?>)
-              HostProfile.fromJson(p)
-            else
-              throw const FormatException('Profil bukan objek'),
-        ],
-        favorites: stringList(json, 'favorites'),
-        recent: stringList(json, 'recent'),
-      );
+  factory ProfileSnapshot.fromJson(Map<String, Object?> json) => ProfileSnapshot(
+    version: optInt(json, 'version') ?? currentVersion,
+    groups: stringList(json, 'groups'),
+    profiles: [
+      for (final p in optList(json, 'profiles'))
+        if (p is Map<String, Object?>) HostProfile.fromJson(p) else throw const FormatException('Profil bukan objek'),
+    ],
+    favorites: stringList(json, 'favorites'),
+    recent: stringList(json, 'recent'),
+  );
 
   static const currentVersion = 1;
   static const recentLimit = 5;
@@ -137,8 +121,7 @@ final class ProfileSnapshot {
     ],
   );
 
-  ProfileSnapshot withGroups(List<String> newGroups) =>
-      _copy(groups: newGroups);
+  ProfileSnapshot withGroups(List<String> newGroups) => _copy(groups: newGroups);
 
   ProfileSnapshot withFavorite(String id, {required bool favorite}) {
     final key = id.toLowerCase();
@@ -168,15 +151,9 @@ final class ProfileSnapshot {
     recent: recent ?? this.recent,
   );
 
-  List<HostProfile> _resolve(List<String> ids) => [
-    for (final id in ids) ?find(id),
-  ];
+  List<HostProfile> _resolve(List<String> ids) => [for (final id in ids) ?find(id)];
 
-  static List<String> _existingIds(
-    List<String> list,
-    Set<String> ids,
-    int? limit,
-  ) {
+  static List<String> _existingIds(List<String> list, Set<String> ids, int? limit) {
     final seen = <String>{};
     final out = <String>[];
     for (final raw in list) {

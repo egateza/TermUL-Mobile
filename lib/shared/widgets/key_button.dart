@@ -45,12 +45,7 @@ class KeyButton extends StatelessWidget {
             color: on ? TermulPalette.accent : TermulPalette.surfaceRaised,
             borderRadius: BorderRadius.circular(TermulRadius.radiusMd),
           ),
-          child: Text(
-            label,
-            style: TermulText.key.copyWith(
-              color: on ? TermulPalette.onAccent : TermulPalette.ink,
-            ),
-          ),
+          child: Text(label, style: TermulText.key.copyWith(color: on ? TermulPalette.onAccent : TermulPalette.ink)),
         );
       },
     );

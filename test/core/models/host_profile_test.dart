@@ -28,18 +28,9 @@ HostProfile profile({
 void main() {
   group('validasi (meniru HostProfile desktop)', () {
     test('nama, host, dan username wajib; di-trim', () {
-      expect(
-        () => HostProfile(id: id1, name: ' ', host: 'h', username: 'u'),
-        throwsArgumentError,
-      );
-      expect(
-        () => HostProfile(id: id1, name: 'n', host: '', username: 'u'),
-        throwsArgumentError,
-      );
-      expect(
-        () => HostProfile(id: id1, name: 'n', host: 'h', username: '  '),
-        throwsArgumentError,
-      );
+      expect(() => HostProfile(id: id1, name: ' ', host: 'h', username: 'u'), throwsArgumentError);
+      expect(() => HostProfile(id: id1, name: 'n', host: '', username: 'u'), throwsArgumentError);
+      expect(() => HostProfile(id: id1, name: 'n', host: 'h', username: '  '), throwsArgumentError);
       final p = HostProfile(id: id1, name: ' n ', host: ' h ', username: ' u ');
       expect((p.name, p.host, p.username), ('n', 'h', 'u'));
     });
@@ -75,20 +66,14 @@ void main() {
       expect((p.notes, p.privateKeyPath, p.wslDistro), (null, null, null));
     });
 
-    test(
-      'KEY tanpa privateKeyPath diizinkan di mobile (beda dengan desktop)',
-      () {
-        expect(profile(auth: AuthMethod.key).privateKeyPath, isNull);
-      },
-    );
+    test('KEY tanpa privateKeyPath diizinkan di mobile (beda dengan desktop)', () {
+      expect(profile(auth: AuthMethod.key).privateKeyPath, isNull);
+    });
   });
 
   group('normalizeGroup', () {
     test('segmen di-trim, kosong dibuang, backslash menjadi slash', () {
-      expect(
-        HostProfile.normalizeGroup(' Produksi \\ Backend / '),
-        'Produksi/Backend',
-      );
+      expect(HostProfile.normalizeGroup(' Produksi \\ Backend / '), 'Produksi/Backend');
       expect(HostProfile.normalizeGroup('//a//b//'), 'a/b');
       expect(HostProfile.normalizeGroup('   '), '');
       expect(HostProfile.normalizeGroup(null), '');
@@ -96,33 +81,30 @@ void main() {
   });
 
   group('JSON', () {
-    test(
-      'toJson menulis semua 16 field dengan urutan desktop, termasuk null',
-      () {
-        final json = profile().toJson();
-        expect(json.keys.toList(), [
-          'id',
-          'name',
-          'group',
-          'host',
-          'port',
-          'username',
-          'authMethod',
-          'privateKeyPath',
-          'jumpHostId',
-          'environment',
-          'initialDirectory',
-          'notes',
-          'autoSudo',
-          'os',
-          'terminalTheme',
-          'wslDistro', //
-        ]);
-        expect(json['authMethod'], 'AGENT');
-        expect(json['environment'], 'NONE');
-        expect(json['os'], isNull);
-      },
-    );
+    test('toJson menulis semua 16 field dengan urutan desktop, termasuk null', () {
+      final json = profile().toJson();
+      expect(json.keys.toList(), [
+        'id',
+        'name',
+        'group',
+        'host',
+        'port',
+        'username',
+        'authMethod',
+        'privateKeyPath',
+        'jumpHostId',
+        'environment',
+        'initialDirectory',
+        'notes',
+        'autoSudo',
+        'os',
+        'terminalTheme',
+        'wslDistro', //
+      ]);
+      expect(json['authMethod'], 'AGENT');
+      expect(json['environment'], 'NONE');
+      expect(json['os'], isNull);
+    });
 
     test('bolak-balik tidak menghilangkan field', () {
       final p = HostProfile(
@@ -138,11 +120,7 @@ void main() {
         initialDirectory: '/srv',
         notes: 'catatan',
         autoSudo: true,
-        os: OsInfo(
-          id: 'ubuntu',
-          versionId: '24.04',
-          prettyName: 'Ubuntu 24.04 LTS',
-        ),
+        os: OsInfo(id: 'ubuntu', versionId: '24.04', prettyName: 'Ubuntu 24.04 LTS'),
         terminalTheme: 'tema',
         wslDistro: 'Ubuntu-22.04',
       );
@@ -157,57 +135,28 @@ void main() {
         'username': 'u',
         'masa_depan': {'x': 1},
       });
-      expect(
-        (p.port, p.authMethod, p.autoSudo, p.os),
-        (22, AuthMethod.agent, false, null),
-      );
+      expect((p.port, p.authMethod, p.autoSudo, p.os), (22, AuthMethod.agent, false, null));
     });
 
     test('tipe salah dan nilai enum asing ditolak sebagai FormatException', () {
-      Map<String, Object?> base() => {
-        'id': id1,
-        'name': 'n',
-        'host': 'h',
-        'username': 'u',
-      };
-      expect(
-        () => HostProfile.fromJson({...base(), 'port': '22'}),
-        throwsFormatException,
-      );
-      expect(
-        () => HostProfile.fromJson({...base(), 'authMethod': 'CERT'}),
-        throwsFormatException,
-      );
-      expect(
-        () => HostProfile.fromJson({...base(), 'environment': 'QA'}),
-        throwsFormatException,
-      );
-      expect(
-        () => HostProfile.fromJson({...base(), 'autoSudo': 'ya'}),
-        throwsFormatException,
-      );
-      expect(
-        () => HostProfile.fromJson({'name': 'n', 'host': 'h', 'username': 'u'}),
-        throwsFormatException,
-      );
+      Map<String, Object?> base() => {'id': id1, 'name': 'n', 'host': 'h', 'username': 'u'};
+      expect(() => HostProfile.fromJson({...base(), 'port': '22'}), throwsFormatException);
+      expect(() => HostProfile.fromJson({...base(), 'authMethod': 'CERT'}), throwsFormatException);
+      expect(() => HostProfile.fromJson({...base(), 'environment': 'QA'}), throwsFormatException);
+      expect(() => HostProfile.fromJson({...base(), 'autoSudo': 'ya'}), throwsFormatException);
+      expect(() => HostProfile.fromJson({'name': 'n', 'host': 'h', 'username': 'u'}), throwsFormatException);
     });
   });
 
   group('OsInfo', () {
-    test(
-      'id harus [a-z0-9._-], huruf kecil; teks dibersihkan dan dipotong 80',
-      () {
-        expect(OsInfo(id: ' Ubuntu ').id, 'ubuntu');
-        expect(() => OsInfo(id: 'ubu ntu'), throwsArgumentError);
-        expect(() => OsInfo(id: null), throwsArgumentError);
-        expect(OsInfo(id: 'a', prettyName: 'x\u0007y').prettyName, 'xy');
-        expect(
-          OsInfo(id: 'a', prettyName: 'z' * 200).prettyName,
-          hasLength(80),
-        );
-        expect(OsInfo(id: 'a', versionId: '  ').versionId, isNull);
-      },
-    );
+    test('id harus [a-z0-9._-], huruf kecil; teks dibersihkan dan dipotong 80', () {
+      expect(OsInfo(id: ' Ubuntu ').id, 'ubuntu');
+      expect(() => OsInfo(id: 'ubu ntu'), throwsArgumentError);
+      expect(() => OsInfo(id: null), throwsArgumentError);
+      expect(OsInfo(id: 'a', prettyName: 'x\u0007y').prettyName, 'xy');
+      expect(OsInfo(id: 'a', prettyName: 'z' * 200).prettyName, hasLength(80));
+      expect(OsInfo(id: 'a', versionId: '  ').versionId, isNull);
+    });
   });
 
   test('duplicate: id baru, nama "(salinan)"', () {

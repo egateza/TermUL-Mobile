@@ -8,14 +8,7 @@ enum BannerTone { info, warn, risk, ice, ok }
 /// Pesan sebaris berwarna nada untuk menjelaskan keadaan atau risiko. `risk` dan `warn` diumumkan sebagai
 /// peringatan. Konfirmasi sesaat memakai `showTermulToast`, bukan banner.
 class TermulBanner extends StatelessWidget {
-  const TermulBanner({
-    super.key,
-    required this.tone,
-    required this.child,
-    this.title,
-    this.icon,
-    this.action,
-  });
+  const TermulBanner({super.key, required this.tone, required this.child, this.title, this.icon, this.action});
 
   final BannerTone tone;
   final Widget child;
@@ -83,13 +76,8 @@ class TermulBanner extends StatelessWidget {
                 children: [
                   if (title != null)
                     Padding(
-                      padding: const EdgeInsets.only(
-                        bottom: TermulSpacing.space1,
-                      ),
-                      child: Text(
-                        title!,
-                        style: TermulText.title.copyWith(color: accent),
-                      ),
+                      padding: const EdgeInsets.only(bottom: TermulSpacing.space1),
+                      child: Text(title!, style: TermulText.title.copyWith(color: accent)),
                     ),
                   DefaultTextStyle.merge(
                     style: TermulText.bodySm.copyWith(color: body),

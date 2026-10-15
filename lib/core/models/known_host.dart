@@ -27,13 +27,7 @@ final class KnownHost {
     return KnownHost._(h, port, t, fp, addedAt?.toUtc());
   }
 
-  const KnownHost._(
-    this.host,
-    this.port,
-    this.type,
-    this.fingerprint,
-    this.addedAt,
-  );
+  const KnownHost._(this.host, this.port, this.type, this.fingerprint, this.addedAt);
 
   factory KnownHost.fromJson(Map<String, Object?> json) {
     final added = optString(json, 'addedAt');
@@ -62,8 +56,7 @@ final class KnownHost {
   /// Kunci pencarian `host:port`.
   String get id => idFor(host, port);
 
-  static String idFor(String host, int port) =>
-      '${host.trim().toLowerCase()}:$port';
+  static String idFor(String host, int port) => '${host.trim().toLowerCase()}:$port';
 
   Map<String, Object?> toJson() => {
     'host': host,
@@ -102,11 +95,7 @@ enum HostKeyVerdict {
 ///
 /// Tipe asing pada host yang sudah dikenal juga dianggap [HostKeyVerdict.changed] (konservatif); dengan
 /// pembatasan algoritma host key ke tipe tersimpan, kasus itu seharusnya tidak muncul.
-HostKeyVerdict evaluateHostKey(
-  List<KnownHost> stored, {
-  required String type,
-  required String fingerprint,
-}) {
+HostKeyVerdict evaluateHostKey(List<KnownHost> stored, {required String type, required String fingerprint}) {
   if (stored.isEmpty) return HostKeyVerdict.newHost;
   for (final k in stored) {
     if (k.type == type && k.fingerprint == fingerprint) {

@@ -31,10 +31,7 @@ Future<JsonLoad<T>> loadJsonOrQuarantine<T>(
     return JsonLoad(empty);
   } on FileSystemException catch (e) {
     if (!await file.exists()) return JsonLoad(empty);
-    throw StorageException(
-      'Berkas ${file.uri.pathSegments.last} tidak bisa dibaca',
-      e,
-    );
+    throw StorageException('Berkas ${file.uri.pathSegments.last} tidak bisa dibaca', e);
   } on FormatException {
     return JsonLoad(empty, quarantinedPath: await _quarantine(file));
   }
@@ -62,10 +59,7 @@ Future<String> _quarantine(File file) async {
   try {
     await file.rename(target);
   } on FileSystemException catch (e) {
-    throw StorageException(
-      'Berkas ${file.uri.pathSegments.last} rusak dan tidak bisa disisihkan',
-      e,
-    );
+    throw StorageException('Berkas ${file.uri.pathSegments.last} rusak dan tidak bisa disisihkan', e);
   }
   return target;
 }

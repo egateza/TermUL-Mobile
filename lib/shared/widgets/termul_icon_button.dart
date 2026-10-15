@@ -39,17 +39,12 @@ class TermulIconButton extends StatelessWidget {
           final on = down || pressed || tone == IconButtonTone.accent;
           final bg = on
               ? TermulPalette.accent
-              : (tone == IconButtonTone.filled
-                    ? TermulPalette.surfaceRaised
-                    : Colors.transparent);
+              : (tone == IconButtonTone.filled ? TermulPalette.surfaceRaised : Colors.transparent);
           final fg = on ? TermulPalette.onAccent : TermulPalette.ink;
           return Container(
             width: TermulSize.tapMin,
             height: TermulSize.tapMin,
-            decoration: BoxDecoration(
-              color: bg,
-              borderRadius: BorderRadius.circular(TermulRadius.radiusLg),
-            ),
+            decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(TermulRadius.radiusLg)),
             alignment: Alignment.center,
             child: TermulIcon(icon, size: 22, color: fg),
           );

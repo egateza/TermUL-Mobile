@@ -35,10 +35,7 @@ class _WidgetGalleryState extends State<WidgetGallery> {
     child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        Text(
-          title.toUpperCase(),
-          style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
-        ),
+        Text(title.toUpperCase(), style: TermulText.overline.copyWith(color: TermulPalette.inkMuted)),
         const SizedBox(height: TermulSpacing.space4),
         child,
       ],
@@ -52,10 +49,7 @@ class _WidgetGalleryState extends State<WidgetGallery> {
         child: ListView(
           padding: const EdgeInsets.all(TermulSpacing.space8),
           children: [
-            Text(
-              'Galeri widget',
-              style: TermulText.h1.copyWith(color: TermulPalette.ink),
-            ),
+            Text('Galeri widget', style: TermulText.h1.copyWith(color: TermulPalette.ink)),
             const SizedBox(height: TermulSpacing.space9),
             _section(
               'Tombol',
@@ -69,11 +63,7 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                     onPressed: () {},
                   ),
                   TermulButton(label: 'Sambung sekali saja', onPressed: () {}),
-                  TermulButton(
-                    label: 'Ganti key dan sambung',
-                    variant: TermulButtonVariant.danger,
-                    onPressed: () {},
-                  ),
+                  TermulButton(label: 'Ganti key dan sambung', variant: TermulButtonVariant.danger, onPressed: () {}),
                   TermulButton(
                     label: 'Batalkan',
                     variant: TermulButtonVariant.ghost,
@@ -96,17 +86,8 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                         tone: IconButtonTone.filled,
                         onPressed: () {},
                       ),
-                      TermulIconButton(
-                        icon: TermulIconName.trash,
-                        label: 'Hapus',
-                        onPressed: () {},
-                      ),
-                      TermulIconButton(
-                        icon: TermulIconName.star,
-                        label: 'Favorit',
-                        pressed: true,
-                        onPressed: () {},
-                      ),
+                      TermulIconButton(icon: TermulIconName.trash, label: 'Hapus', onPressed: () {}),
+                      TermulIconButton(icon: TermulIconName.star, label: 'Favorit', pressed: true, onPressed: () {}),
                     ],
                   ),
                 ],
@@ -117,10 +98,7 @@ class _WidgetGalleryState extends State<WidgetGallery> {
               Wrap(
                 spacing: TermulSpacing.space6,
                 runSpacing: TermulSpacing.space6,
-                children: [
-                  for (final n in TermulIconName.values)
-                    TermulIcon(n, size: 24, color: TermulPalette.ink),
-                ],
+                children: [for (final n in TermulIconName.values) TermulIcon(n, size: 24, color: TermulPalette.ink)],
               ),
             ),
             _section(
@@ -132,16 +110,8 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                   Row(
                     spacing: TermulSpacing.space3,
                     children: [
-                      for (final (i, l) in [
-                        'Semua',
-                        'Favorit',
-                        'Online',
-                      ].indexed)
-                        FilterChipButton(
-                          label: l,
-                          selected: _chip == i,
-                          onPressed: () => setState(() => _chip = i),
-                        ),
+                      for (final (i, l) in ['Semua', 'Favorit', 'Online'].indexed)
+                        FilterChipButton(label: l, selected: _chip == i, onPressed: () => setState(() => _chip = i)),
                     ],
                   ),
                   const Wrap(
@@ -212,15 +182,10 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                     placeholder: '192.0.2.11',
                     helper: 'Nama host atau alamat IP',
                   ),
-                  const TermulTextField(
-                    label: 'Port',
-                    mono: true,
-                    error: 'Port harus 1 sampai 65535',
-                  ),
+                  const TermulTextField(label: 'Port', mono: true, error: 'Port harus 1 sampai 65535'),
                   SwitchRow(
                     label: 'Biometrik untuk membuka vault',
-                    description:
-                        'Hanya setelah konfirmasi pertama di tiap sesi.',
+                    description: 'Hanya setelah konfirmasi pertama di tiap sesi.',
                     value: _switch,
                     onChanged: (v) => setState(() => _switch = v),
                   ),
@@ -249,14 +214,8 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                     title: 'Koneksi terputus',
                     child: Text('Menyambung ulang…'),
                   ),
-                  const TermulBanner(
-                    tone: BannerTone.info,
-                    child: Text('Fingerprint disimpan di perangkat ini.'),
-                  ),
-                  const TermulBanner(
-                    tone: BannerTone.ok,
-                    child: Text('Tersambung ke app-01.'),
-                  ),
+                  const TermulBanner(tone: BannerTone.info, child: Text('Fingerprint disimpan di perangkat ini.')),
+                  const TermulBanner(tone: BannerTone.ok, child: Text('Tersambung ke app-01.')),
                 ],
               ),
             ),
@@ -273,43 +232,20 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                     width: double.infinity,
                     child: TermulCard(
                       tone: CardTone.inset,
-                      child: Text(
-                        'sudo systemctl restart nginx',
-                        style: TermulText.terminalSm,
-                      ),
+                      child: Text('sudo systemctl restart nginx', style: TermulText.terminalSm),
                     ),
                   ),
                   const SizedBox(
                     width: double.infinity,
-                    child: TermulCard(
-                      tone: CardTone.selected,
-                      child: Text('Kartu terpilih'),
-                    ),
+                    child: TermulCard(tone: CardTone.selected, child: Text('Kartu terpilih')),
                   ),
                   Row(
                     spacing: TermulSpacing.space2,
                     children: [
-                      KeyButton(
-                        label: 'Esc',
-                        ariaLabel: 'Escape',
-                        onPressed: () {},
-                      ),
-                      KeyButton(
-                        label: 'Tab',
-                        ariaLabel: 'Tab',
-                        onPressed: () {},
-                      ),
-                      KeyButton(
-                        label: 'Ctrl',
-                        ariaLabel: 'Control',
-                        pressed: true,
-                        onPressed: () {},
-                      ),
-                      KeyButton(
-                        label: '^C',
-                        ariaLabel: 'Control C',
-                        onPressed: () {},
-                      ),
+                      KeyButton(label: 'Esc', ariaLabel: 'Escape', onPressed: () {}),
+                      KeyButton(label: 'Tab', ariaLabel: 'Tab', onPressed: () {}),
+                      KeyButton(label: 'Ctrl', ariaLabel: 'Control', pressed: true, onPressed: () {}),
+                      KeyButton(label: '^C', ariaLabel: 'Control C', onPressed: () {}),
                     ],
                   ),
                 ],
@@ -328,9 +264,7 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                         title: 'Tempel 3 baris?',
                         child: const TermulBanner(
                           tone: BannerTone.risk,
-                          child: Text(
-                            'Baris kedua mengandung rm -rf. Bila dikirim, perintah langsung dijalankan.',
-                          ),
+                          child: Text('Baris kedua mengandung rm -rf. Bila dikirim, perintah langsung dijalankan.'),
                         ),
                         cancelLabel: 'Batal',
                         confirmLabel: 'Tempel',
@@ -341,8 +275,7 @@ class _WidgetGalleryState extends State<WidgetGallery> {
                   Expanded(
                     child: TermulButton(
                       label: 'Toast',
-                      onPressed: () =>
-                          showTermulToast(context, 'Disalin · 27 karakter'),
+                      onPressed: () => showTermulToast(context, 'Disalin · 27 karakter'),
                     ),
                   ),
                 ],

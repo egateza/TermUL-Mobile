@@ -16,25 +16,14 @@ void showTermulToast(
   messenger.showSnackBar(
     SnackBar(
       duration: const Duration(seconds: 2),
-      margin: EdgeInsets.fromLTRB(
-        TermulSpacing.space8,
-        0,
-        TermulSpacing.space8,
-        TermulSpacing.space8 + bottomOffset,
-      ),
+      margin: EdgeInsets.fromLTRB(TermulSpacing.space8, 0, TermulSpacing.space8, TermulSpacing.space8 + bottomOffset),
       content: Semantics(
         liveRegion: true,
         child: Row(
           children: [
             TermulIcon(icon, size: 18, color: TermulPalette.ok),
             const SizedBox(width: TermulSpacing.space4),
-            Expanded(
-              child: Text(
-                message,
-                maxLines: 1,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ),
+            Expanded(child: Text(message, maxLines: 1, overflow: TextOverflow.ellipsis)),
           ],
         ),
       ),

@@ -31,10 +31,7 @@ class JsonKnownHostsRepository implements KnownHostsRepository {
       _file,
       parse: (json) => List.unmodifiable([
         for (final e in optList(json, 'hosts'))
-          if (e is Map<String, Object?>)
-            KnownHost.fromJson(e)
-          else
-            throw const FormatException('Entri bukan objek'),
+          if (e is Map<String, Object?>) KnownHost.fromJson(e) else throw const FormatException('Entri bukan objek'),
       ]),
       empty: const [],
     );
@@ -59,9 +56,7 @@ class JsonKnownHostsRepository implements KnownHostsRepository {
     for (final e in _entries) {
       if (e.id != entry.id || e.type != entry.type) continue;
       if (e.fingerprint == entry.fingerprint) return;
-      throw StateError(
-        'Sudah ada sidik jari ${entry.type} berbeda untuk ${entry.id}; gunakan replace',
-      );
+      throw StateError('Sudah ada sidik jari ${entry.type} berbeda untuk ${entry.id}; gunakan replace');
     }
     await _commit([..._entries, entry]);
   });
