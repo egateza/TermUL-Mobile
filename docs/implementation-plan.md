@@ -462,7 +462,7 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-15. Langkah 0 sampai 4 selesai; langkah 5 selesai di sisi logika. **Langkah 6 sedang dikerjakan**: sudah ada `lib/features/connect/connect_flow.dart` (mesin keadaan: baca rahasia dengan satu prompt, sambung, keputusan host key, rahasia hilang, autentikasi dibatalkan, pemetaan kegagalan; belum punya tes) dan 45 string ARB baru (alur sambung dan layar host key). **Belum ada**: tes `ConnectFlow`, widget `HostKeyPrompt` (prototipe `HostKey.dc.html`, dua varian: host baru dan host key berubah dengan kotak persetujuan; pilihan aman jadi tombol utama), `ConnectScreen` (status menyambung, layar "Rahasia hilang", galat per jenis kegagalan, hubungan ke `HostListScreen.onConnect`), `sshConnectorProvider`, dan uji ujung ke ujung di emulator (alamat server uji dari emulator: `10.0.2.2`). Setelah itu langkah 7 dan 8. Dulu (rencana awal) (layar alur sambung: verifikasi host key host baru dan berubah, layar "Rahasia hilang", status menyambung; memanggil `SshConnector` dan memakai `HostKeyChoice`), lalu 7 (terminal) dan 8 (sambung ulang).
+Terakhir diperbarui: 2026-10-15. Langkah 0 sampai 6 selesai (6 sampai uji ujung ke ujung di emulator). **Berikutnya: langkah 7** (layar terminal; menggantikan keterangan sementara di `ConnectScreen` untuk `ConnectDone`), lalu 8 (sambung ulang).
 
 Cara menjalankan tes:
 
