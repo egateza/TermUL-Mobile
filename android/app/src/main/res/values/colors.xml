@@ -1,0 +1,5 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!-- Nilai token `ground` dari docs/design/tokens.json; hanya untuk jendela saat aplikasi mulai. -->
+    <color name="termul_ground">#0F1316</color>
+</resources>

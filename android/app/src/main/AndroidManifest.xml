@@ -1,8 +1,14 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
+    <!-- SSH langsung dari perangkat; dibutuhkan juga di build rilis (manifest debug/profile hanya untuk alat Flutter). -->
+    <uses-permission android:name="android.permission.INTERNET"/>
+    <!-- Prompt biometrik untuk membuka rahasia (local_auth). -->
+    <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+
     <application
-        android:label="termul_mobile"
+        android:label="TermUL"
         android:name="${applicationName}"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher"
+        android:allowBackup="false">
         <activity
             android:name=".MainActivity"
             android:exported="true"
