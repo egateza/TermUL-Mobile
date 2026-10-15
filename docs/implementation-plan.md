@@ -402,7 +402,7 @@ Usulan: **ARB sejak awal**, dengan satu bahasa (`id`).
 - **Dipasang dan dibuka di emulator** (Android 14, x86_64; build `--target-platform android-x64`): proses hidup, tidak ada crash di logcat, layar gelap kosong sesuai harapan. **HP fisik belum.** APK arm64 yang dibangun lebih dulu tidak bisa dipakai di emulator x86_64.
 - **Temuan di luar rencana:** izin `INTERNET` hanya ada di manifest debug/profile bawaan Flutter, jadi build rilis tidak bisa SSH. Ditambahkan ke manifest utama.
 - Jendela awal aplikasi memakai warna token `ground` (`#0F1316`) lewat `values/colors.xml`; `values-night/styles.xml` dihapus karena identik. Tema `LaunchTheme` dan `NormalTheme` berinduk `Theme.AppCompat.DayNight.NoActionBar`; apakah `local_auth` menarik AppCompat sampai tidak crash di Android 8 ke bawah belum diuji (build berhasil).
-- `docs/licenses.md` dihasilkan dari `pubspec.lock`: 89 paket hosted, 89 cocok dengan tag pub.dev, 0 copyleft. Skrip pembuatnya ada di luar repo; hasil perlu dibuat ulang bila `pubspec.lock` berubah.
+- `docs/licenses.md` dihasilkan dari `pubspec.lock`: 89 paket hosted, 89 cocok dengan tag pub.dev, 0 copyleft. Skrip pembuatnya: `tool/gen_licenses.py`; hasil perlu dibuat ulang bila `pubspec.lock` berubah.
 - `lib/l10n/app_localizations*.dart` hasil `flutter gen-l10n` ikut di repo (ARB di `lib/l10n/app_id.arb`).
 - Belum diverifikasi: lisensi font IBM Plex Sans dan JetBrains Mono (langkah 2).
 
@@ -424,9 +424,56 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 
 ### Langkah 2 (selesai di PC dan emulator)
 
-- Token dihasilkan dari `docs/design/tokens.json` (`lib/core/theme/termul_tokens.g.dart`, skrip pembuat di luar repo), dan `test/core/theme/tokens_test.dart` membandingkan Dart dengan JSON (93 warna, 27 ukuran, 16 gaya teks, kontras utama). Tema memakai konstanta statis, bukan `ThemeExtension` seperti saran `flutter.md`, karena hanya ada tema Gelap.
+- Token dihasilkan dari `docs/design/tokens.json` (`lib/core/theme/termul_tokens.g.dart`, skrip pembuat di `tool/gen_tokens.py`), dan `test/core/theme/tokens_test.dart` membandingkan Dart dengan JSON (93 warna, 27 ukuran, 16 gaya teks, kontras utama). Tema memakai konstanta statis, bukan `ThemeExtension` seperti saran `flutter.md`, karena hanya ada tema Gelap.
 - Font IBM Plex Sans dan JetBrains Mono (variabel, OFL 1.1) dibundel; lisensi dan sha256 ada di `docs/licenses.md`. Paket tambahan: `path_drawing` 1.0.1 (MIT) untuk menggambar ikon dari data path SVG.
 - Widget: `TermulButton`, `TermulIconButton`, `TermulCard`, `FilterChipButton`, `TermulTag`, `TermulTextField`, `TermulBanner`, `showTermulSheet`, `StatusDot`, `HostRow`, `SwitchRow`, `KeyButton`, `showTermulToast`, `TermulIcon`. 37 tes widget (target sentuh, status dengan kata, fokus papan ketik, banner peringatan, dan seterusnya).
 - Galeri visual: `lib/debug/widget_gallery.dart`, aktif hanya dengan `--dart-define=TERMUL_GALLERY=true`. Diperiksa di emulator: font dan token tampil sesuai desain.
 - **Bukan perbandingan piksel dengan prototipe.** Berkas `.dc.html` tidak bisa dirender (butuh `support.js` yang tidak tersalin); bentuk ikon dan susunan layar `Main` dan `HostKey` diambil dari kodenya. Ikon hapus, ubah, kunci, bintang, muat ulang, dan lainnya dibuat sendiri dengan gaya yang sama dan belum ditinjau.
 - Belum dibuat: `NavBar` lima tab (hanya Host dan Sesi yang akan ada di irisan pertama), `Switch` sudah ada tetapi `Segmented`, `Progress`, dan `Flame` belum (streak di luar irisan).
+
+### Langkah 3 (selesai di PC dan emulator)
+
+- Kode: `lib/core/vault/` (`CredentialVault`, `KeystoreCredentialVault`, `DeviceAuth`/`LocalAuthDeviceAuth`, `SecretStore`, `JsonVaultIndex`, `SecretType` dengan kode 5 khusus mobile), `lib/core/keys/private_key_inspector.dart`, dan `lib/features/hosts/host_service.dart` (urutan simpan dan hapus, pembersihan rahasia yatim saat mulai). Aturan penguncian tiga tingkat sudah tertulis di `CLAUDE.md` (butir "Rahasia").
+- Tes otomatis: 33 tes vault dan kunci (kunci uji dibuat saat tes berjalan dengan `ssh-keygen`; tidak ada kunci privat di repo) dan 17 tes `HostService`.
+- Di emulator Android 14 (`integration_test/vault_test.dart`): Keystore sungguhan (simpan, ada, hapus, pembersihan yatim) lulus; deteksi tingkat memberi `biometric` pada AVD `hp_besar_pin_121212_` (sudah punya sidik jari terdaftar); **prompt biometrik nyata dijawab dengan sidik jari virtual (`adb emu finger touch 1`) dan rahasia terbaca**.
+- **Belum teruji:** jalur PIN/pola/sandi (`deviceCredential`) dan deteksi HP tanpa kunci layar (`none`). Percobaan di AVD bersih `termul_uji_bersih` terhenti karena memori mesin habis dengan dua emulator berjalan; ulangi dengan satu emulator bersih. Jalur "biometrik dibatalkan", sidik jari ditambah atau dihapus, dan semuanya di HP fisik juga belum.
+
+### Langkah 4 (selesai di PC dan emulator)
+
+- Kode: `lib/bootstrap.dart`, `lib/app_providers.dart` (Riverpod 3), `lib/features/hosts/` (`host_list_screen`, `host_form_screen`, `host_list_model`), `lib/shared/widgets/termul_segmented.dart` dan `termul_action_sheet.dart`, `lib/core/keys/key_file_picker.dart` (`file_selector`), `lib/boot_error_app.dart`. 77 string di `lib/l10n/app_id.arb`.
+- Daftar host: grup, pencarian, filter Semua dan Favorit, status "belum diperiksa", banner bila berkas rusak dikarantina, aksi lewat tekan-tahan (Sambung, Ubah, Favorit, Hapus dengan konfirmasi), profil agen dari desktop diarahkan ke form untuk dilengkapi. Form: password atau impor kunci dari berkas, passphrase diverifikasi sebelum simpan, peringatan bila HP tanpa kunci layar.
+- Tes: 188 tes otomatis (termasuk 13 tes layar daftar dan 16 tes form dengan repository dan vault di memori). Di emulator: `integration_test/host_flow_test.dart` (tambah host, restart lewat `bootstrap()` ulang, hapus; berkas rusak dikarantina) lulus dengan berkas dan Keystore sungguhan.
+- Perbandingan visual: tangkapan layar daftar host dirender dengan font asli dan dibandingkan dengan `Main.dc.html` di prototipe; sangat dekat. Bedanya yang disengaja: tanpa bar navigasi lima tab, tanpa chip streak dan vault, tanpa filter Online (belum ada pengecekan status).
+- Bukan bagian rencana awal tetapi dikerjakan: `support.js` prototipe disalin (lihat `SUMBER.md`) supaya prototipe bisa dirender lokal.
+- **Belum teruji:** semuanya di HP fisik; impor kunci lewat pemilih berkas Android (`file_selector`) belum dijalankan di perangkat; lama simpan ke Keystore terasa beberapa detik di emulator dan form belum punya indikator kemajuan.
+
+### Langkah 5 (logika selesai dan teruji terhadap server sungguhan; belum dipakai UI)
+
+- Kode: `lib/core/ssh/` (`ssh_connector.dart`, `host_key_policy.dart`, `ssh_failure.dart`, `keepalive_watchdog.dart`). Isi: ChaCha20 didahulukan, `keepAliveInterval: null` dengan pengawas sendiri, verifikasi host key lewat `KnownHostsRepository` (sidik jari baru ditulis permanen **sebelum** login lanjut; gagal tulis membatalkan koneksi), host key berubah memblokir kecuali "ganti dan sambung", pilihan "sambung sekali saja" tidak sah untuk host key berubah, algoritma host key dibatasi ke keluarga tersimpan, tipe `rsa-sha2-*` dan `ssh-rsa` dilipat menjadi satu keluarga `ssh-rsa`, galat dipetakan ke `SshFailure` bertipe (termasuk penolakan host key yang oleh `dartssh2` dilaporkan sebagai `SSHAuthAbortError`).
+- Tes: `test/core/ssh/ssh_connector_test.dart` (21 tes) berjalan terhadap server nyata bila `--dart-define=SSH_TEST_CONFIG=<config.json>` diisi, dan dilewati bila tidak. **Lulus terhadap OpenSSH 9.6 (WSL Ubuntu-22.04) dan OpenSSH 7.6 (WSL Ubuntu-18.04)**: login password, kunci ed25519 (dengan dan tanpa passphrase), RSA PEM, ECDSA, passphrase salah, PKCS#8 (dilewati di 7.6), password salah, user tidak ada, host baru, host key berubah, ganti dan sambung, gagal simpan sidik jari, host yang dikenal dibatasi ke tipe tersimpan, port tertutup, `checkAlive`, dan keepalive memakai proxy yang membisu (terdeteksi `keepAliveTimeout`).
+- **Belum teruji:** Ubuntu 14.04 (OpenSSH 6.6; 7 dari 23 profil desktop Anda), jaringan sungguhan (Wi-Fi ke seluler), semuanya di HP fisik, dan `keyboard-interactive` (server tanpa metode password, belum ditangani). Waktu pengguna memutuskan host key dihitung di luar batas waktu aplikasi, tetapi `LoginGraceTime` sshd (bawaan 120 detik) tetap bisa menutup koneksi bila pengguna terlalu lama.
+
+## 12. Status terkini dan cara melanjutkan
+
+Terakhir diperbarui: 2026-10-15. Langkah 0 sampai 4 selesai; langkah 5 selesai di sisi logika. **Berikutnya: langkah 6** (layar alur sambung: verifikasi host key host baru dan berubah, layar "Rahasia hilang", status menyambung; memanggil `SshConnector` dan memakai `HostKeyChoice`), lalu 7 (terminal) dan 8 (sambung ulang).
+
+Cara menjalankan tes:
+
+```
+flutter analyze
+flutter test                                   # 200+ tes otomatis, tanpa jaringan
+flutter test integration_test/storage_test.dart -d <perangkat>
+flutter test integration_test/host_flow_test.dart -d <perangkat>
+flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]
+flutter test test/core/ssh/ssh_connector_test.dart --dart-define=SSH_TEST_CONFIG=<config.json>
+```
+
+Skrip bantu ada di `tool/` (pembuat token dari `tokens.json`, pembuat `docs/licenses.md`, pemasang dan pembongkar server uji SSH di WSL). Jalankan `tool/ssh_test_server/setup.sh` di dalam WSL sebagai root untuk membuat server uji (kredensial acak, ditulis ke folder yang Anda tunjuk, bukan ke repo) dan `teardown.sh` untuk menghapus semuanya.
+
+**Sumber daya sementara yang masih ada dan harus dibersihkan saat selesai:**
+
+- WSL Ubuntu-22.04 dan Ubuntu-18.04: user `termul_t`, berkas `/etc/ssh/termul_test_*.conf`, `/etc/ssh/termul_alt/`, dan proses `sshd` uji di port 2222, 2224 (22.04) serta 2223, 2225 (18.04). Dua proses `wsl ... sleep infinity` di Windows menjaga distro tetap hidup. Bersihkan dengan `teardown.sh` di kedua distro, lalu hentikan proses `sleep infinity`.
+- Berkas kredensial uji (`config.json`, kunci privat uji) ada di folder scratchpad sesi, di luar repo. Hapus setelah selesai.
+- AVD sementara `termul_uji_bersih` (buat dengan `avdmanager`): hapus dengan `avdmanager delete avd -n termul_uji_bersih`.
+- Emulator `hp_besar_pin_121212_` Anda masih memuat aplikasi spike lama `com.example.termul_spike` dengan kredensial uji terenkripsi di Keystore-nya; uninstall bila sudah tidak dipakai.
+- Server Ubuntu 24.04 dari spike: user `spike` di sana masih belum dibersihkan (tidak ada akses dari sesi ini).

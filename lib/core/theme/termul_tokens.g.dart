@@ -1,4 +1,4 @@
-// GENERATED dari docs/design/tokens.json oleh skrip di luar repo. Jangan diubah tangan;
+// GENERATED dari docs/design/tokens.json oleh tool/gen_tokens.py. Jangan diubah tangan;
 // test/core/theme/tokens_test.dart membandingkan berkas ini dengan tokens.json.
 import 'package:flutter/painting.dart';
 
