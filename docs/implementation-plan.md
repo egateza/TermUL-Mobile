@@ -1,6 +1,6 @@
 # Rencana implementasi: irisan pertama
 
-Status: **revisi 3, menunggu persetujuan akhir.** Belum ada kode aplikasi yang ditulis.
+Status: **disetujui; langkah 0 dan 1 dikerjakan (lihat bagian 11).** Langkah 2 dan seterusnya menunggu laporan dua langkah ini.
 Tanggal: 2026-10-15
 
 ## 0. Perubahan di revisi 3
@@ -393,3 +393,29 @@ Usulan: **ARB sejak awal**, dengan satu bahasa (`id`).
 1. **Menguji server Ubuntu 14.04.** 7 dari 23 profil Anda berjalan di 14.04 dan spike tidak pernah mengujinya. Cara yang paling bermakna adalah satu kali login percobaan ke salah satu server 14.04 sungguhan (hanya login dan `exit`, tanpa perubahan apa pun), memakai kredensial yang Anda ketik sendiri di HP. Alternatifnya WSL dengan distro 14.04, yang tidak ada di daftar distro Anda saat ini. Pilih yang mana, atau lewati dan terima risikonya?
 2. **Server Ubuntu 24.04 dari spike**: user `spike` di sana belum dibersihkan (tidak ada akses dari sesi ini). Perintah: `sudo pkill -u spike; sudo userdel -r spike`, hapus `spike_sshd_config` bila ada.
 3. **Perubahan keputusan tetap.** Usulan kalimat baru untuk `CLAUDE.md` (butir "Rahasia") bila Anda setuju: "Rahasia: kunci privat dan password hanya di Android Keystore dan selalu terenkripsi. Pembacaan dijaga biometrik, atau PIN/pola/sandi perangkat; bila HP tanpa penguncian layar, tampilkan peringatan tetapi tetap izinkan penyimpanan. Jangan menulis rahasia ke berkas, log, atau konsol." Catatan K15 di `spike.md` ("tanpa jatuh ke PIN") tidak lagi berlaku; salinan desain tidak saya ubah lokal, perubahan ini dicatat di dokumen ini dan artifact desain perlu diperbarui.
+
+## 11. Catatan pelaksanaan
+
+### Langkah 0 (selesai, commit `0087831`)
+
+- Terbukti otomatis: `flutter analyze` bersih, `flutter test` lulus, `flutter build apk --debug` berhasil (sekitar 166 detik). Isi APK diperiksa dengan `aapt2`: paket `io.github.egateza.termul`, `minSdk` 24, izin `INTERNET`, `USE_BIOMETRIC`, `allowBackup=false`, aktivitas `MainActivity`.
+- **Belum dilakukan:** memasang dan membuka APK di HP. Tidak ada perangkat yang terhubung lewat adb saat dikerjakan. Uji manual: pasang dan buka; layar yang muncul kosong gelap.
+- **Temuan di luar rencana:** izin `INTERNET` hanya ada di manifest debug/profile bawaan Flutter, jadi build rilis tidak bisa SSH. Ditambahkan ke manifest utama.
+- Jendela awal aplikasi memakai warna token `ground` (`#0F1316`) lewat `values/colors.xml`; `values-night/styles.xml` dihapus karena identik. Tema `LaunchTheme` dan `NormalTheme` berinduk `Theme.AppCompat.DayNight.NoActionBar`; apakah `local_auth` menarik AppCompat sampai tidak crash di Android 8 ke bawah belum diuji (build berhasil).
+- `docs/licenses.md` dihasilkan dari `pubspec.lock`: 89 paket hosted, 89 cocok dengan tag pub.dev, 0 copyleft. Skrip pembuatnya ada di luar repo; hasil perlu dibuat ulang bila `pubspec.lock` berubah.
+- `lib/l10n/app_localizations*.dart` hasil `flutter gen-l10n` ikut di repo (ARB di `lib/l10n/app_id.arb`).
+- Belum diverifikasi: lisensi font IBM Plex Sans dan JetBrains Mono (langkah 2).
+
+### Langkah 1 (selesai di PC; belum diuji di HP)
+
+Isi: `lib/core/io/` (tulis atomik, karantina, kunci async), `lib/core/models/` (`HostProfile`, `ProfileSnapshot`, `OsInfo`, `AuthMethod`, `EnvironmentTag`, `KnownHost`, `evaluateHostKey`), `lib/core/storage/` (antarmuka `HostRepository` dan `KnownHostsRepository`, implementasi JSON). 71 tes, termasuk fixture karangan 23 profil bergaya desktop.
+
+Keputusan kecil yang dibuat saat implementasi:
+
+- Nilai enum asing (`authMethod`, `environment`) dan tipe field yang salah membuat berkas dianggap rusak (dikarantina), sama ketatnya dengan desktop. Konsekuensinya: berkas dari desktop versi mendatang dengan enum baru akan dikarantina seluruhnya.
+- Bila berkas rusak **tidak bisa dipindahkan**, memuat melempar `StorageException` dan tidak lanjut, supaya simpan berikutnya tidak menimpa berkas rusak (desktop `StreakStore` hanya mencatat log lalu lanjut).
+- `KnownHostsRepository.add` melempar `StateError` bila sudah ada sidik jari bertipe sama yang berbeda; penggantian hanya lewat `replace`, supaya penambahan biasa tidak menggandakan pin yang membuat `evaluateHostKey` menganggap kunci lama masih sah.
+- `known_hosts.json` rusak berarti semua host kembali "baru" sampai dipercaya lagi; UI wajib menampilkan `LoadResult.hadCorruptFile`.
+- Tes menemukan satu bug nyata: UTF-8 tidak sah muncul sebagai `FileSystemException`, bukan `FormatException`, sehingga berkas tidak dikarantina. Diperbaiki dengan decode sendiri (`utf8.decode`).
+
+Belum teruji (tetap berlaku dari bagian 9): `rename` dan `flush` di Android, folder `path_provider` di HP, ketahanan terhadap mati daya sungguhan, dan alur di HP sungguhan.
