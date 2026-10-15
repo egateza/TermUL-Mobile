@@ -558,6 +558,270 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Sambungan belum tersedia di versi ini'**
   String get connectNotAvailable;
+
+  /// Tombol membatalkan sambungan yang sedang berjalan.
+  ///
+  /// In id, this message translates to:
+  /// **'Batalkan'**
+  String get actionAbort;
+
+  /// Tombol mengulang sambungan.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba lagi'**
+  String get actionRetry;
+
+  /// Tombol kembali ke daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Kembali'**
+  String get actionBack;
+
+  /// Tombol memutus sambungan.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan'**
+  String get actionDisconnect;
+
+  /// Tombol menyimpan rahasia yang dimasukkan ulang lalu menyambung.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan dan sambung'**
+  String get actionSaveAndConnect;
+
+  /// Status saat rahasia dibuka dari vault.
+  ///
+  /// In id, this message translates to:
+  /// **'Membuka kredensial…'**
+  String get connectPreparing;
+
+  /// Status saat menyambung.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyambung ke {name}…'**
+  String connectConnecting(String name);
+
+  /// Judul bila autentikasi perangkat dibatalkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Autentikasi dibatalkan'**
+  String get authDeniedTitle;
+
+  /// Isi bila autentikasi perangkat dibatalkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Kredensial tidak dibuka, jadi tidak ada yang dikirim ke server.'**
+  String get authDeniedBody;
+
+  /// Judul bila autentikasi perangkat tidak tersedia.
+  ///
+  /// In id, this message translates to:
+  /// **'Autentikasi perangkat tidak bisa dipakai'**
+  String get authUnavailableTitle;
+
+  /// Isi bila autentikasi perangkat tidak tersedia.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa pengaturan kunci layar atau sidik jari di HP, lalu coba lagi.'**
+  String get authUnavailableBody;
+
+  /// Judul layar saat rahasia tidak ditemukan di vault.
+  ///
+  /// In id, this message translates to:
+  /// **'Rahasia hilang'**
+  String get secretMissingTitle;
+
+  /// Isi layar rahasia hilang (password).
+  ///
+  /// In id, this message translates to:
+  /// **'Password untuk {name} tidak ditemukan di perangkat ini. Masukkan ulang untuk melanjutkan.'**
+  String secretMissingPasswordBody(String name);
+
+  /// Isi layar rahasia hilang (kunci).
+  ///
+  /// In id, this message translates to:
+  /// **'Kunci untuk {name} tidak ditemukan atau tidak bisa dibuka di perangkat ini. Impor ulang untuk melanjutkan.'**
+  String secretMissingKeyBody(String name);
+
+  /// Isi layar rahasia hilang bila passphrase tidak cocok.
+  ///
+  /// In id, this message translates to:
+  /// **'Passphrase tersimpan tidak cocok dengan kunci. Impor ulang kunci beserta passphrase-nya.'**
+  String get secretWrongPassphraseBody;
+
+  /// Judul galat jaringan.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak bisa tersambung'**
+  String get failNetworkTitle;
+
+  /// Isi galat jaringan.
+  ///
+  /// In id, this message translates to:
+  /// **'Server tidak terjangkau atau menutup koneksi. Periksa alamat, port, dan jaringan Anda.'**
+  String get failNetworkBody;
+
+  /// Judul galat negosiasi protokol.
+  ///
+  /// In id, this message translates to:
+  /// **'Negosiasi gagal'**
+  String get failHandshakeTitle;
+
+  /// Isi galat negosiasi protokol.
+  ///
+  /// In id, this message translates to:
+  /// **'Server memakai algoritma yang belum didukung, atau pertukaran kunci gagal. Server yang sangat lama mungkin tidak bisa disambung.'**
+  String get failHandshakeBody;
+
+  /// Judul galat login ditolak.
+  ///
+  /// In id, this message translates to:
+  /// **'Login ditolak'**
+  String get failAuthTitle;
+
+  /// Isi galat login ditolak.
+  ///
+  /// In id, this message translates to:
+  /// **'Server menolak kredensial. Periksa user, password atau kunci, lalu ubah host.'**
+  String get failAuthBody;
+
+  /// Judul bila pengguna menolak host key baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Host key ditolak'**
+  String get failRejectedTitle;
+
+  /// Isi bila pengguna menolak host key baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Anda menolak host key server ini. Koneksi dibatalkan dan tidak ada yang disimpan.'**
+  String get failRejectedBody;
+
+  /// Judul bila host key berubah tidak diganti.
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi dibatalkan'**
+  String get failRejectedChangedTitle;
+
+  /// Isi bila host key berubah tidak diganti.
+  ///
+  /// In id, this message translates to:
+  /// **'Host key yang berubah tidak diganti, jadi koneksi tidak dibuka.'**
+  String get failRejectedChangedBody;
+
+  /// Judul bila sidik jari tidak bisa ditulis ke penyimpanan.
+  ///
+  /// In id, this message translates to:
+  /// **'Sidik jari tidak tersimpan'**
+  String get failStoreTitle;
+
+  /// Isi bila sidik jari tidak bisa ditulis ke penyimpanan.
+  ///
+  /// In id, this message translates to:
+  /// **'Penyimpanan perangkat bermasalah, jadi koneksi dibatalkan demi keamanan.'**
+  String get failStoreBody;
+
+  /// Judul galat tidak dikenal.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal menyambung'**
+  String get failUnknownTitle;
+
+  /// Isi galat tidak dikenal.
+  ///
+  /// In id, this message translates to:
+  /// **'Terjadi kesalahan yang tidak dikenal. Coba lagi; bila berulang, ubah host atau periksa server.'**
+  String get failUnknownBody;
+
+  /// Judul layar verifikasi host key (host baru).
+  ///
+  /// In id, this message translates to:
+  /// **'Host baru'**
+  String get hostKeyNewTitle;
+
+  /// Isi layar verifikasi host key (host baru).
+  ///
+  /// In id, this message translates to:
+  /// **'Ini koneksi pertama ke {name}. Pastikan fingerprint di bawah cocok dengan yang Anda ketahui sebelum melanjutkan.'**
+  String hostKeyNewBody(String name);
+
+  /// Label algoritma host key.
+  ///
+  /// In id, this message translates to:
+  /// **'Algoritma'**
+  String get hostKeyAlgorithm;
+
+  /// Label sidik jari host key.
+  ///
+  /// In id, this message translates to:
+  /// **'Fingerprint (SHA256)'**
+  String get hostKeyFingerprint;
+
+  /// Catatan di layar host baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Fingerprint disimpan di perangkat ini. Bila nanti berubah, Anda akan diperingatkan sebelum sambungan dibuka.'**
+  String get hostKeyNewNote;
+
+  /// Tombol utama layar host baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Percayai dan sambung'**
+  String get hostKeyTrustAndConnect;
+
+  /// Tombol sambung tanpa menyimpan sidik jari.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambung sekali saja'**
+  String get hostKeyConnectOnce;
+
+  /// Judul layar host key berubah.
+  ///
+  /// In id, this message translates to:
+  /// **'Host key berubah'**
+  String get hostKeyChangedTitle;
+
+  /// Isi layar host key berubah.
+  ///
+  /// In id, this message translates to:
+  /// **'Fingerprint {name} berbeda dari yang tersimpan. Penyebabnya bisa server dibangun ulang, atau koneksi sedang disadap.'**
+  String hostKeyChangedBody(String name);
+
+  /// Label sidik jari yang tersimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Tersimpan'**
+  String get hostKeyStored;
+
+  /// Label sidik jari yang baru diterima.
+  ///
+  /// In id, this message translates to:
+  /// **'Diterima sekarang'**
+  String get hostKeyReceived;
+
+  /// Kotak persetujuan sebelum mengganti host key.
+  ///
+  /// In id, this message translates to:
+  /// **'Saya sudah memastikan perubahan ini sah dengan pemilik server'**
+  String get hostKeyAck;
+
+  /// Tombol utama (pilihan aman) layar host key berubah.
+  ///
+  /// In id, this message translates to:
+  /// **'Batalkan koneksi'**
+  String get hostKeyCancelConnection;
+
+  /// Tombol berisiko mengganti host key lalu menyambung.
+  ///
+  /// In id, this message translates to:
+  /// **'Ganti key dan sambung'**
+  String get hostKeyReplaceAndConnect;
+
+  /// Judul sementara setelah tersambung.
+  ///
+  /// In id, this message translates to:
+  /// **'Tersambung ke {name}'**
+  String connectedTitle(String name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -364,5 +364,211 @@
   "connectNotAvailable": "Sambungan belum tersedia di versi ini",
   "@connectNotAvailable": {
     "description": "Toast sementara saat host ditekan sebelum alur sambung dibuat."
+  },
+  "actionAbort": "Batalkan",
+  "@actionAbort": {
+    "description": "Tombol membatalkan sambungan yang sedang berjalan."
+  },
+  "actionRetry": "Coba lagi",
+  "@actionRetry": {
+    "description": "Tombol mengulang sambungan."
+  },
+  "actionBack": "Kembali",
+  "@actionBack": {
+    "description": "Tombol kembali ke daftar host."
+  },
+  "actionDisconnect": "Putuskan",
+  "@actionDisconnect": {
+    "description": "Tombol memutus sambungan."
+  },
+  "actionSaveAndConnect": "Simpan dan sambung",
+  "@actionSaveAndConnect": {
+    "description": "Tombol menyimpan rahasia yang dimasukkan ulang lalu menyambung."
+  },
+  "connectPreparing": "Membuka kredensial…",
+  "@connectPreparing": {
+    "description": "Status saat rahasia dibuka dari vault."
+  },
+  "connectConnecting": "Menyambung ke {name}…",
+  "@connectConnecting": {
+    "description": "Status saat menyambung.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "authDeniedTitle": "Autentikasi dibatalkan",
+  "@authDeniedTitle": {
+    "description": "Judul bila autentikasi perangkat dibatalkan."
+  },
+  "authDeniedBody": "Kredensial tidak dibuka, jadi tidak ada yang dikirim ke server.",
+  "@authDeniedBody": {
+    "description": "Isi bila autentikasi perangkat dibatalkan."
+  },
+  "authUnavailableTitle": "Autentikasi perangkat tidak bisa dipakai",
+  "@authUnavailableTitle": {
+    "description": "Judul bila autentikasi perangkat tidak tersedia."
+  },
+  "authUnavailableBody": "Periksa pengaturan kunci layar atau sidik jari di HP, lalu coba lagi.",
+  "@authUnavailableBody": {
+    "description": "Isi bila autentikasi perangkat tidak tersedia."
+  },
+  "secretMissingTitle": "Rahasia hilang",
+  "@secretMissingTitle": {
+    "description": "Judul layar saat rahasia tidak ditemukan di vault."
+  },
+  "secretMissingPasswordBody": "Password untuk {name} tidak ditemukan di perangkat ini. Masukkan ulang untuk melanjutkan.",
+  "@secretMissingPasswordBody": {
+    "description": "Isi layar rahasia hilang (password).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "secretMissingKeyBody": "Kunci untuk {name} tidak ditemukan atau tidak bisa dibuka di perangkat ini. Impor ulang untuk melanjutkan.",
+  "@secretMissingKeyBody": {
+    "description": "Isi layar rahasia hilang (kunci).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "secretWrongPassphraseBody": "Passphrase tersimpan tidak cocok dengan kunci. Impor ulang kunci beserta passphrase-nya.",
+  "@secretWrongPassphraseBody": {
+    "description": "Isi layar rahasia hilang bila passphrase tidak cocok."
+  },
+  "failNetworkTitle": "Tidak bisa tersambung",
+  "@failNetworkTitle": {
+    "description": "Judul galat jaringan."
+  },
+  "failNetworkBody": "Server tidak terjangkau atau menutup koneksi. Periksa alamat, port, dan jaringan Anda.",
+  "@failNetworkBody": {
+    "description": "Isi galat jaringan."
+  },
+  "failHandshakeTitle": "Negosiasi gagal",
+  "@failHandshakeTitle": {
+    "description": "Judul galat negosiasi protokol."
+  },
+  "failHandshakeBody": "Server memakai algoritma yang belum didukung, atau pertukaran kunci gagal. Server yang sangat lama mungkin tidak bisa disambung.",
+  "@failHandshakeBody": {
+    "description": "Isi galat negosiasi protokol."
+  },
+  "failAuthTitle": "Login ditolak",
+  "@failAuthTitle": {
+    "description": "Judul galat login ditolak."
+  },
+  "failAuthBody": "Server menolak kredensial. Periksa user, password atau kunci, lalu ubah host.",
+  "@failAuthBody": {
+    "description": "Isi galat login ditolak."
+  },
+  "failRejectedTitle": "Host key ditolak",
+  "@failRejectedTitle": {
+    "description": "Judul bila pengguna menolak host key baru."
+  },
+  "failRejectedBody": "Anda menolak host key server ini. Koneksi dibatalkan dan tidak ada yang disimpan.",
+  "@failRejectedBody": {
+    "description": "Isi bila pengguna menolak host key baru."
+  },
+  "failRejectedChangedTitle": "Koneksi dibatalkan",
+  "@failRejectedChangedTitle": {
+    "description": "Judul bila host key berubah tidak diganti."
+  },
+  "failRejectedChangedBody": "Host key yang berubah tidak diganti, jadi koneksi tidak dibuka.",
+  "@failRejectedChangedBody": {
+    "description": "Isi bila host key berubah tidak diganti."
+  },
+  "failStoreTitle": "Sidik jari tidak tersimpan",
+  "@failStoreTitle": {
+    "description": "Judul bila sidik jari tidak bisa ditulis ke penyimpanan."
+  },
+  "failStoreBody": "Penyimpanan perangkat bermasalah, jadi koneksi dibatalkan demi keamanan.",
+  "@failStoreBody": {
+    "description": "Isi bila sidik jari tidak bisa ditulis ke penyimpanan."
+  },
+  "failUnknownTitle": "Gagal menyambung",
+  "@failUnknownTitle": {
+    "description": "Judul galat tidak dikenal."
+  },
+  "failUnknownBody": "Terjadi kesalahan yang tidak dikenal. Coba lagi; bila berulang, ubah host atau periksa server.",
+  "@failUnknownBody": {
+    "description": "Isi galat tidak dikenal."
+  },
+  "hostKeyNewTitle": "Host baru",
+  "@hostKeyNewTitle": {
+    "description": "Judul layar verifikasi host key (host baru)."
+  },
+  "hostKeyNewBody": "Ini koneksi pertama ke {name}. Pastikan fingerprint di bawah cocok dengan yang Anda ketahui sebelum melanjutkan.",
+  "@hostKeyNewBody": {
+    "description": "Isi layar verifikasi host key (host baru).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hostKeyAlgorithm": "Algoritma",
+  "@hostKeyAlgorithm": {
+    "description": "Label algoritma host key."
+  },
+  "hostKeyFingerprint": "Fingerprint (SHA256)",
+  "@hostKeyFingerprint": {
+    "description": "Label sidik jari host key."
+  },
+  "hostKeyNewNote": "Fingerprint disimpan di perangkat ini. Bila nanti berubah, Anda akan diperingatkan sebelum sambungan dibuka.",
+  "@hostKeyNewNote": {
+    "description": "Catatan di layar host baru."
+  },
+  "hostKeyTrustAndConnect": "Percayai dan sambung",
+  "@hostKeyTrustAndConnect": {
+    "description": "Tombol utama layar host baru."
+  },
+  "hostKeyConnectOnce": "Sambung sekali saja",
+  "@hostKeyConnectOnce": {
+    "description": "Tombol sambung tanpa menyimpan sidik jari."
+  },
+  "hostKeyChangedTitle": "Host key berubah",
+  "@hostKeyChangedTitle": {
+    "description": "Judul layar host key berubah."
+  },
+  "hostKeyChangedBody": "Fingerprint {name} berbeda dari yang tersimpan. Penyebabnya bisa server dibangun ulang, atau koneksi sedang disadap.",
+  "@hostKeyChangedBody": {
+    "description": "Isi layar host key berubah.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "hostKeyStored": "Tersimpan",
+  "@hostKeyStored": {
+    "description": "Label sidik jari yang tersimpan."
+  },
+  "hostKeyReceived": "Diterima sekarang",
+  "@hostKeyReceived": {
+    "description": "Label sidik jari yang baru diterima."
+  },
+  "hostKeyAck": "Saya sudah memastikan perubahan ini sah dengan pemilik server",
+  "@hostKeyAck": {
+    "description": "Kotak persetujuan sebelum mengganti host key."
+  },
+  "hostKeyCancelConnection": "Batalkan koneksi",
+  "@hostKeyCancelConnection": {
+    "description": "Tombol utama (pilihan aman) layar host key berubah."
+  },
+  "hostKeyReplaceAndConnect": "Ganti key dan sambung",
+  "@hostKeyReplaceAndConnect": {
+    "description": "Tombol berisiko mengganti host key lalu menyambung."
+  },
+  "connectedTitle": "Tersambung ke {name}",
+  "@connectedTitle": {
+    "description": "Judul sementara setelah tersambung.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

@@ -267,4 +267,153 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get connectNotAvailable => 'Sambungan belum tersedia di versi ini';
+
+  @override
+  String get actionAbort => 'Batalkan';
+
+  @override
+  String get actionRetry => 'Coba lagi';
+
+  @override
+  String get actionBack => 'Kembali';
+
+  @override
+  String get actionDisconnect => 'Putuskan';
+
+  @override
+  String get actionSaveAndConnect => 'Simpan dan sambung';
+
+  @override
+  String get connectPreparing => 'Membuka kredensial…';
+
+  @override
+  String connectConnecting(String name) {
+    return 'Menyambung ke $name…';
+  }
+
+  @override
+  String get authDeniedTitle => 'Autentikasi dibatalkan';
+
+  @override
+  String get authDeniedBody => 'Kredensial tidak dibuka, jadi tidak ada yang dikirim ke server.';
+
+  @override
+  String get authUnavailableTitle => 'Autentikasi perangkat tidak bisa dipakai';
+
+  @override
+  String get authUnavailableBody => 'Periksa pengaturan kunci layar atau sidik jari di HP, lalu coba lagi.';
+
+  @override
+  String get secretMissingTitle => 'Rahasia hilang';
+
+  @override
+  String secretMissingPasswordBody(String name) {
+    return 'Password untuk $name tidak ditemukan di perangkat ini. Masukkan ulang untuk melanjutkan.';
+  }
+
+  @override
+  String secretMissingKeyBody(String name) {
+    return 'Kunci untuk $name tidak ditemukan atau tidak bisa dibuka di perangkat ini. Impor ulang untuk melanjutkan.';
+  }
+
+  @override
+  String get secretWrongPassphraseBody =>
+      'Passphrase tersimpan tidak cocok dengan kunci. Impor ulang kunci beserta passphrase-nya.';
+
+  @override
+  String get failNetworkTitle => 'Tidak bisa tersambung';
+
+  @override
+  String get failNetworkBody =>
+      'Server tidak terjangkau atau menutup koneksi. Periksa alamat, port, dan jaringan Anda.';
+
+  @override
+  String get failHandshakeTitle => 'Negosiasi gagal';
+
+  @override
+  String get failHandshakeBody =>
+      'Server memakai algoritma yang belum didukung, atau pertukaran kunci gagal. Server yang sangat lama mungkin tidak bisa disambung.';
+
+  @override
+  String get failAuthTitle => 'Login ditolak';
+
+  @override
+  String get failAuthBody => 'Server menolak kredensial. Periksa user, password atau kunci, lalu ubah host.';
+
+  @override
+  String get failRejectedTitle => 'Host key ditolak';
+
+  @override
+  String get failRejectedBody => 'Anda menolak host key server ini. Koneksi dibatalkan dan tidak ada yang disimpan.';
+
+  @override
+  String get failRejectedChangedTitle => 'Koneksi dibatalkan';
+
+  @override
+  String get failRejectedChangedBody => 'Host key yang berubah tidak diganti, jadi koneksi tidak dibuka.';
+
+  @override
+  String get failStoreTitle => 'Sidik jari tidak tersimpan';
+
+  @override
+  String get failStoreBody => 'Penyimpanan perangkat bermasalah, jadi koneksi dibatalkan demi keamanan.';
+
+  @override
+  String get failUnknownTitle => 'Gagal menyambung';
+
+  @override
+  String get failUnknownBody =>
+      'Terjadi kesalahan yang tidak dikenal. Coba lagi; bila berulang, ubah host atau periksa server.';
+
+  @override
+  String get hostKeyNewTitle => 'Host baru';
+
+  @override
+  String hostKeyNewBody(String name) {
+    return 'Ini koneksi pertama ke $name. Pastikan fingerprint di bawah cocok dengan yang Anda ketahui sebelum melanjutkan.';
+  }
+
+  @override
+  String get hostKeyAlgorithm => 'Algoritma';
+
+  @override
+  String get hostKeyFingerprint => 'Fingerprint (SHA256)';
+
+  @override
+  String get hostKeyNewNote =>
+      'Fingerprint disimpan di perangkat ini. Bila nanti berubah, Anda akan diperingatkan sebelum sambungan dibuka.';
+
+  @override
+  String get hostKeyTrustAndConnect => 'Percayai dan sambung';
+
+  @override
+  String get hostKeyConnectOnce => 'Sambung sekali saja';
+
+  @override
+  String get hostKeyChangedTitle => 'Host key berubah';
+
+  @override
+  String hostKeyChangedBody(String name) {
+    return 'Fingerprint $name berbeda dari yang tersimpan. Penyebabnya bisa server dibangun ulang, atau koneksi sedang disadap.';
+  }
+
+  @override
+  String get hostKeyStored => 'Tersimpan';
+
+  @override
+  String get hostKeyReceived => 'Diterima sekarang';
+
+  @override
+  String get hostKeyAck => 'Saya sudah memastikan perubahan ini sah dengan pemilik server';
+
+  @override
+  String get hostKeyCancelConnection => 'Batalkan koneksi';
+
+  @override
+  String get hostKeyReplaceAndConnect => 'Ganti key dan sambung';
+
+  @override
+  String connectedTitle(String name) {
+    return 'Tersambung ke $name';
+  }
 }
