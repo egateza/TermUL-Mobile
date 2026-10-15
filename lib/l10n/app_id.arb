@@ -1,7 +1,40 @@
-﻿{
+{
   "@@locale": "id",
   "appTitle": "TermUL",
   "@appTitle": {
     "description": "Nama aplikasi di daftar aplikasi terbaru Android."
+  },
+  "statusOnline": "online",
+  "@statusOnline": {
+    "description": "Kata status titik: server terjangkau."
+  },
+  "statusOffline": "offline",
+  "@statusOffline": {
+    "description": "Kata status titik: server tidak terjangkau."
+  },
+  "statusBusy": "menyambung ulang",
+  "@statusBusy": {
+    "description": "Kata status titik: sedang menyambung ulang."
+  },
+  "statusIdle": "siaga",
+  "@statusIdle": {
+    "description": "Kata status titik: siaga."
+  },
+  "hostStatusOnlineMs": "online · {ms} ms",
+  "@hostStatusOnlineMs": {
+    "description": "Status baris host saat online beserta latensi.",
+    "placeholders": {
+      "ms": {
+        "type": "int"
+      }
+    }
+  },
+  "hostStatusUnreachable": "tidak terjangkau",
+  "@hostStatusUnreachable": {
+    "description": "Status baris host saat server tidak terjangkau."
+  },
+  "hostStatusNotChecked": "belum diperiksa",
+  "@hostStatusNotChecked": {
+    "description": "Status baris host sebelum pengecekan pertama (cache, bukan fakta)."
   }
 }

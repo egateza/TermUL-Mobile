@@ -1,10 +1,12 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app.dart';
 import 'package:termul_mobile/l10n/app_localizations.dart';
 
 void main() {
-  testWidgets('aplikasi menyala dengan bahasa Indonesia dan judul dari ARB', (tester) async {
+  testWidgets('aplikasi menyala dengan bahasa Indonesia dan judul dari ARB', (
+    tester,
+  ) async {
     await tester.pumpWidget(const TermulApp());
     await tester.pumpAndSettle();
 

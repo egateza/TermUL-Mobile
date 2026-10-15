@@ -421,3 +421,12 @@ Keputusan kecil yang dibuat saat implementasi:
 Uji di Android: `integration_test/storage_test.dart` (7 tes, dependensi dev `integration_test` dari SDK) lulus di **emulator** Android 14 x86_64, memakai folder `path_provider` asli: tulis atomik, timpa, galat sebelum rename, 50 simpanan serentak lalu muat ulang, karantina, kegagalan tulis, dan `known_hosts`. Jalankan dengan `flutter test integration_test -d <perangkat>`.
 
 Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `flush` benar-benar `fsync` di Android; ketahanan terhadap mati daya atau proses dimatikan paksa (tes hanya memeriksa kegagalan yang disuntik, bukan kematian proses); emulator memakai disk virtual, jadi bukan bukti untuk penyimpanan flash HP.
+
+### Langkah 2 (selesai di PC dan emulator)
+
+- Token dihasilkan dari `docs/design/tokens.json` (`lib/core/theme/termul_tokens.g.dart`, skrip pembuat di luar repo), dan `test/core/theme/tokens_test.dart` membandingkan Dart dengan JSON (93 warna, 27 ukuran, 16 gaya teks, kontras utama). Tema memakai konstanta statis, bukan `ThemeExtension` seperti saran `flutter.md`, karena hanya ada tema Gelap.
+- Font IBM Plex Sans dan JetBrains Mono (variabel, OFL 1.1) dibundel; lisensi dan sha256 ada di `docs/licenses.md`. Paket tambahan: `path_drawing` 1.0.1 (MIT) untuk menggambar ikon dari data path SVG.
+- Widget: `TermulButton`, `TermulIconButton`, `TermulCard`, `FilterChipButton`, `TermulTag`, `TermulTextField`, `TermulBanner`, `showTermulSheet`, `StatusDot`, `HostRow`, `SwitchRow`, `KeyButton`, `showTermulToast`, `TermulIcon`. 37 tes widget (target sentuh, status dengan kata, fokus papan ketik, banner peringatan, dan seterusnya).
+- Galeri visual: `lib/debug/widget_gallery.dart`, aktif hanya dengan `--dart-define=TERMUL_GALLERY=true`. Diperiksa di emulator: font dan token tampil sesuai desain.
+- **Bukan perbandingan piksel dengan prototipe.** Berkas `.dc.html` tidak bisa dirender (butuh `support.js` yang tidak tersalin); bentuk ikon dan susunan layar `Main` dan `HostKey` diambil dari kodenya. Ikon hapus, ubah, kunci, bintang, muat ulang, dan lainnya dibuat sendiri dengan gaya yang sama dan belum ditinjau.
+- Belum dibuat: `NavBar` lima tab (hanya Host dan Sesi yang akan ada di irisan pertama), `Switch` sudah ada tetapi `Segmented`, `Progress`, dan `Flame` belum (streak di luar irisan).

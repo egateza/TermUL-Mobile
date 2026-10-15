@@ -1,4 +1,4 @@
-﻿import 'dart:async';
+import 'dart:async';
 
 /// Kunci async sederhana: tugas dijalankan satu per satu sesuai urutan masuk.
 /// Dipakai agar mutasi penyimpanan tidak saling menimpa walau ada `await` di tengahnya.

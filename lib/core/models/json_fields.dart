@@ -1,4 +1,4 @@
-﻿/// Pembaca field JSON yang ketat tentang tipe. Tipe salah melempar [FormatException]
+/// Pembaca field JSON yang ketat tentang tipe. Tipe salah melempar [FormatException]
 /// (berkas dianggap rusak), field hilang atau `null` menghasilkan `null`.
 library;
 
@@ -38,6 +38,6 @@ List<Object?> optList(Map<String, Object?> json, String key) {
 }
 
 List<String> stringList(Map<String, Object?> json, String key) => [
-      for (final e in optList(json, key))
-        if (e is String) e else throw FormatException('Isi "$key" harus teks'),
-    ];
+  for (final e in optList(json, key))
+    if (e is String) e else throw FormatException('Isi "$key" harus teks'),
+];

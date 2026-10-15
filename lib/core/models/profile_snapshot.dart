@@ -17,7 +17,13 @@ final class ProfileSnapshot {
     List<String> favorites = const [],
     List<String> recent = const [],
   }) {
-    final cleanGroups = groups.map(HostProfile.normalizeGroup).where((g) => g.isNotEmpty).toSet().toList()..sort();
+    final cleanGroups =
+        groups
+            .map(HostProfile.normalizeGroup)
+            .where((g) => g.isNotEmpty)
+            .toSet()
+            .toList()
+          ..sort();
     final ids = <String>{};
     for (final p in profiles) {
       if (!ids.add(p.id)) throw ArgumentError('Terdapat id profil duplikat');
@@ -31,16 +37,26 @@ final class ProfileSnapshot {
     );
   }
 
-  const ProfileSnapshot._(this.version, this.groups, this.profiles, this.favorites, this.recent);
+  const ProfileSnapshot._(
+    this.version,
+    this.groups,
+    this.profiles,
+    this.favorites,
+    this.recent,
+  );
 
   factory ProfileSnapshot.empty() => ProfileSnapshot();
 
-  factory ProfileSnapshot.fromJson(Map<String, Object?> json) => ProfileSnapshot(
+  factory ProfileSnapshot.fromJson(Map<String, Object?> json) =>
+      ProfileSnapshot(
         version: optInt(json, 'version') ?? currentVersion,
         groups: stringList(json, 'groups'),
         profiles: [
           for (final p in optList(json, 'profiles'))
-            if (p is Map<String, Object?>) HostProfile.fromJson(p) else throw const FormatException('Profil bukan objek'),
+            if (p is Map<String, Object?>)
+              HostProfile.fromJson(p)
+            else
+              throw const FormatException('Profil bukan objek'),
         ],
         favorites: stringList(json, 'favorites'),
         recent: stringList(json, 'recent'),
@@ -62,12 +78,12 @@ final class ProfileSnapshot {
   final List<String> recent;
 
   Map<String, Object?> toJson() => {
-        'version': version,
-        'groups': groups,
-        'profiles': [for (final p in profiles) p.toJson()],
-        'favorites': favorites,
-        'recent': recent,
-      };
+    'version': version,
+    'groups': groups,
+    'profiles': [for (final p in profiles) p.toJson()],
+    'favorites': favorites,
+    'recent': recent,
+  };
 
   HostProfile? find(String id) {
     final key = id.toLowerCase();
@@ -92,8 +108,10 @@ final class ProfileSnapshot {
   /// Profil tepat di grup [group] (bukan subgrup), terurut nama tanpa membedakan huruf besar kecil.
   List<HostProfile> profilesIn(String? group) {
     final g = HostProfile.normalizeGroup(group);
-    return [for (final p in profiles) if (p.group == g) p]
-      ..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
+    return [
+      for (final p in profiles)
+        if (p.group == g) p,
+    ]..sort((a, b) => a.name.toLowerCase().compareTo(b.name.toLowerCase()));
   }
 
   bool isFavorite(String id) => favorites.contains(id.toLowerCase());
@@ -112,9 +130,15 @@ final class ProfileSnapshot {
     return _copy(profiles: list);
   }
 
-  ProfileSnapshot withoutProfile(String id) => _copy(profiles: [for (final p in profiles) if (p.id != id.toLowerCase()) p]);
+  ProfileSnapshot withoutProfile(String id) => _copy(
+    profiles: [
+      for (final p in profiles)
+        if (p.id != id.toLowerCase()) p,
+    ],
+  );
 
-  ProfileSnapshot withGroups(List<String> newGroups) => _copy(groups: newGroups);
+  ProfileSnapshot withGroups(List<String> newGroups) =>
+      _copy(groups: newGroups);
 
   ProfileSnapshot withFavorite(String id, {required bool favorite}) {
     final key = id.toLowerCase();
@@ -136,18 +160,23 @@ final class ProfileSnapshot {
     List<HostProfile>? profiles,
     List<String>? favorites,
     List<String>? recent,
-  }) =>
-      ProfileSnapshot(
-        version: version,
-        groups: groups ?? this.groups,
-        profiles: profiles ?? this.profiles,
-        favorites: favorites ?? this.favorites,
-        recent: recent ?? this.recent,
-      );
+  }) => ProfileSnapshot(
+    version: version,
+    groups: groups ?? this.groups,
+    profiles: profiles ?? this.profiles,
+    favorites: favorites ?? this.favorites,
+    recent: recent ?? this.recent,
+  );
 
-  List<HostProfile> _resolve(List<String> ids) => [for (final id in ids) ?find(id)];
+  List<HostProfile> _resolve(List<String> ids) => [
+    for (final id in ids) ?find(id),
+  ];
 
-  static List<String> _existingIds(List<String> list, Set<String> ids, int? limit) {
+  static List<String> _existingIds(
+    List<String> list,
+    Set<String> ids,
+    int? limit,
+  ) {
     final seen = <String>{};
     final out = <String>[];
     for (final raw in list) {

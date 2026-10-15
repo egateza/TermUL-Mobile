@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 import 'dart:math';
 
 import 'storage_exception.dart';
@@ -21,7 +21,9 @@ Future<void> writeAtomic(
 }) async {
   final dir = target.absolute.parent;
   final name = target.uri.pathSegments.last;
-  final tmp = File('${dir.path}${Platform.pathSeparator}.$name.${_random.nextInt(1 << 32).toRadixString(16)}.tmp');
+  final tmp = File(
+    '${dir.path}${Platform.pathSeparator}.$name.${_random.nextInt(1 << 32).toRadixString(16)}.tmp',
+  );
   try {
     await dir.create(recursive: true);
     final raf = await tmp.open(mode: FileMode.write);

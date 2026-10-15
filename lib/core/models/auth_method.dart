@@ -1,4 +1,4 @@
-﻿/// Metode autentikasi. Nilai JSON sama dengan desktop (`KEY`, `AGENT`, `PASSWORD`).
+/// Metode autentikasi. Nilai JSON sama dengan desktop (`KEY`, `AGENT`, `PASSWORD`).
 ///
 /// Mobile membaca ketiganya supaya `profiles.json` dari desktop tetap termuat, tetapi UI mobile hanya
 /// menawarkan [key] dan [password]; profil [agent] tidak bisa disambung di HP (tidak ada agen SSH).

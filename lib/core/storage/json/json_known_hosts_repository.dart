@@ -27,17 +27,20 @@ class JsonKnownHostsRepository implements KnownHostsRepository {
 
   @override
   Future<LoadResult> load() => _lock.run(() async {
-        final loaded = await loadJsonOrQuarantine<List<KnownHost>>(
-          _file,
-          parse: (json) => List.unmodifiable([
-            for (final e in optList(json, 'hosts'))
-              if (e is Map<String, Object?>) KnownHost.fromJson(e) else throw const FormatException('Entri bukan objek'),
-          ]),
-          empty: const [],
-        );
-        _entries = loaded.value;
-        return LoadResult(quarantinedPath: loaded.quarantinedPath);
-      });
+    final loaded = await loadJsonOrQuarantine<List<KnownHost>>(
+      _file,
+      parse: (json) => List.unmodifiable([
+        for (final e in optList(json, 'hosts'))
+          if (e is Map<String, Object?>)
+            KnownHost.fromJson(e)
+          else
+            throw const FormatException('Entri bukan objek'),
+      ]),
+      empty: const [],
+    );
+    _entries = loaded.value;
+    return LoadResult(quarantinedPath: loaded.quarantinedPath);
+  });
 
   @override
   List<KnownHost> get all => _entries;
@@ -45,40 +48,51 @@ class JsonKnownHostsRepository implements KnownHostsRepository {
   @override
   List<KnownHost> entriesFor(String host, int port) {
     final id = KnownHost.idFor(host, port);
-    return [for (final e in _entries) if (e.id == id) e];
+    return [
+      for (final e in _entries)
+        if (e.id == id) e,
+    ];
   }
 
   @override
   Future<void> add(KnownHost entry) => _lock.run(() async {
-        for (final e in _entries) {
-          if (e.id != entry.id || e.type != entry.type) continue;
-          if (e.fingerprint == entry.fingerprint) return;
-          throw StateError('Sudah ada sidik jari ${entry.type} berbeda untuk ${entry.id}; gunakan replace');
-        }
-        await _commit([..._entries, entry]);
-      });
+    for (final e in _entries) {
+      if (e.id != entry.id || e.type != entry.type) continue;
+      if (e.fingerprint == entry.fingerprint) return;
+      throw StateError(
+        'Sudah ada sidik jari ${entry.type} berbeda untuk ${entry.id}; gunakan replace',
+      );
+    }
+    await _commit([..._entries, entry]);
+  });
 
   @override
   Future<void> replace(KnownHost entry) => _lock.run(() async {
-        await _commit([
-          for (final e in _entries)
-            if (!(e.id == entry.id && e.type == entry.type)) e,
-          entry,
-        ]);
-      });
+    await _commit([
+      for (final e in _entries)
+        if (!(e.id == entry.id && e.type == entry.type)) e,
+      entry,
+    ]);
+  });
 
   @override
   Future<int> removeFor(String host, int port) => _lock.run(() async {
-        final id = KnownHost.idFor(host, port);
-        final kept = [for (final e in _entries) if (e.id != id) e];
-        final removed = _entries.length - kept.length;
-        if (removed > 0) await _commit(kept);
-        return removed;
-      });
+    final id = KnownHost.idFor(host, port);
+    final kept = [
+      for (final e in _entries)
+        if (e.id != id) e,
+    ];
+    final removed = _entries.length - kept.length;
+    if (removed > 0) await _commit(kept);
+    return removed;
+  });
 
   Future<void> _commit(List<KnownHost> next) async {
     const encoder = JsonEncoder.withIndent('  ');
-    final json = {'version': currentVersion, 'hosts': [for (final e in next) e.toJson()]};
+    final json = {
+      'version': currentVersion,
+      'hosts': [for (final e in next) e.toJson()],
+    };
     await _writer(_file, utf8.encode(encoder.convert(json)));
     _entries = List.unmodifiable(next);
   }

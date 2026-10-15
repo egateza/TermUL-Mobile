@@ -18,7 +18,7 @@ Baca dulu sebelum menulis kode:
 - **`minSdk` 24.**
 - **Host key:** tampilkan dan simpan sidik jari berformat `SHA256:…`, disimpan permanen. Host key berubah harus memblokir koneksi dengan peringatan tersendiri.
 - **Koneksi putus itu normal.** Android menutup soket TCP aplikasi di latar belakang. Sambung ulang adalah alur utama, bukan penanganan galat. Gunakan pengawas keepalive seperti di lampiran spike-temuan.md, jangan hanya mengandalkan keepalive bawaan.
-- **Rahasia:** kunci privat dan password hanya di Android Keystore, dibuka dengan biometrik. Jangan menulisnya ke berkas, log, atau konsol.
+- **Rahasia:** kunci privat dan password hanya di Android Keystore dan selalu terenkripsi. Pembacaan dijaga biometrik, atau PIN/pola/sandi perangkat bila HP tanpa biometrik; bila HP tanpa penguncian layar, tampilkan peringatan tetapi tetap izinkan penyimpanan (diputuskan 2026-10-15, menggantikan "sidik jari saja" dari spike). Jangan menulisnya ke berkas, log, atau konsol.
 - **Foreground service:** pengaturan opt-in, default mati. Rancangannya ada di `android.md`; efektivitasnya belum diuji, dan nama izin serta tipe service harus diverifikasi di dokumentasi resmi sebelum dipakai.
 
 ## Antarmuka

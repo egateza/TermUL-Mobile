@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 
 import 'json_fields.dart';
 
@@ -17,10 +17,10 @@ final class OsInfo {
   const OsInfo._(this.id, this.versionId, this.prettyName);
 
   factory OsInfo.fromJson(Map<String, Object?> json) => OsInfo(
-        id: optString(json, 'id'),
-        versionId: optString(json, 'versionId'),
-        prettyName: optString(json, 'prettyName'),
-      );
+    id: optString(json, 'id'),
+    versionId: optString(json, 'versionId'),
+    prettyName: optString(json, 'prettyName'),
+  );
 
   static final _safeId = RegExp(r'^[a-z0-9._-]{1,32}$');
   static const _maxText = 80;
@@ -29,18 +29,27 @@ final class OsInfo {
   final String? versionId;
   final String? prettyName;
 
-  Map<String, Object?> toJson() => {'id': id, 'versionId': versionId, 'prettyName': prettyName};
+  Map<String, Object?> toJson() => {
+    'id': id,
+    'versionId': versionId,
+    'prettyName': prettyName,
+  };
 
   static String? _clean(String? s) {
     if (s == null) return null;
-    final t = String.fromCharCodes(s.runes.where((c) => c >= 0x20 && !(c >= 0x7f && c <= 0x9f))).trim();
+    final t = String.fromCharCodes(
+      s.runes.where((c) => c >= 0x20 && !(c >= 0x7f && c <= 0x9f)),
+    ).trim();
     if (t.isEmpty) return null;
     return t.length > _maxText ? t.substring(0, _maxText) : t;
   }
 
   @override
   bool operator ==(Object other) =>
-      other is OsInfo && other.id == id && other.versionId == versionId && other.prettyName == prettyName;
+      other is OsInfo &&
+      other.id == id &&
+      other.versionId == versionId &&
+      other.prettyName == prettyName;
 
   @override
   int get hashCode => Object.hash(id, versionId, prettyName);

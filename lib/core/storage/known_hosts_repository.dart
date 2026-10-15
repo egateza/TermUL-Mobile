@@ -1,4 +1,4 @@
-﻿import '../models/known_host.dart';
+import '../models/known_host.dart';
 import 'load_result.dart';
 
 /// Penyimpanan sidik jari host key yang dipercaya (`known_hosts.json`), permanen.

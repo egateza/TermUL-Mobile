@@ -1,6 +1,8 @@
-﻿import 'package:flutter/material.dart';
+import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 
+import 'core/theme/termul_theme.dart';
+import 'debug/widget_gallery.dart';
 import 'l10n/app_localizations.dart';
 
 /// Akar aplikasi. Tema token dan rute dibangun di langkah berikutnya.
@@ -19,12 +21,8 @@ class TermulApp extends StatelessWidget {
       ],
       supportedLocales: const [Locale('id')],
       locale: const Locale('id'),
-      theme: ThemeData(
-        useMaterial3: true,
-        brightness: Brightness.dark,
-        scaffoldBackgroundColor: const Color(0xFF0F1316), // token ground; diganti tema di langkah 2
-      ),
-      home: const Scaffold(),
+      theme: termulTheme(),
+      home: WidgetGallery.enabled ? const WidgetGallery() : const Scaffold(),
     );
   }
 }

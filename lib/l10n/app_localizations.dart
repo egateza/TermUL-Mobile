@@ -99,6 +99,48 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'TermUL'**
   String get appTitle;
+
+  /// Kata status titik: server terjangkau.
+  ///
+  /// In id, this message translates to:
+  /// **'online'**
+  String get statusOnline;
+
+  /// Kata status titik: server tidak terjangkau.
+  ///
+  /// In id, this message translates to:
+  /// **'offline'**
+  String get statusOffline;
+
+  /// Kata status titik: sedang menyambung ulang.
+  ///
+  /// In id, this message translates to:
+  /// **'menyambung ulang'**
+  String get statusBusy;
+
+  /// Kata status titik: siaga.
+  ///
+  /// In id, this message translates to:
+  /// **'siaga'**
+  String get statusIdle;
+
+  /// Status baris host saat online beserta latensi.
+  ///
+  /// In id, this message translates to:
+  /// **'online · {ms} ms'**
+  String hostStatusOnlineMs(int ms);
+
+  /// Status baris host saat server tidak terjangkau.
+  ///
+  /// In id, this message translates to:
+  /// **'tidak terjangkau'**
+  String get hostStatusUnreachable;
+
+  /// Status baris host sebelum pengecekan pertama (cache, bukan fakta).
+  ///
+  /// In id, this message translates to:
+  /// **'belum diperiksa'**
+  String get hostStatusNotChecked;
 }
 
 class _AppLocalizationsDelegate

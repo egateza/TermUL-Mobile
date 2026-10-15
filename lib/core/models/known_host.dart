@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 
 import 'json_fields.dart';
 
@@ -15,15 +15,25 @@ final class KnownHost {
   }) {
     final h = host.trim().toLowerCase();
     if (h.isEmpty) throw ArgumentError('Host wajib diisi');
-    if (port < 1 || port > 65535) throw ArgumentError('Port harus di antara 1 dan 65535: $port');
+    if (port < 1 || port > 65535) {
+      throw ArgumentError('Port harus di antara 1 dan 65535: $port');
+    }
     final t = type.trim();
     if (t.isEmpty) throw ArgumentError('Tipe host key wajib diisi');
     final fp = fingerprint.trim();
-    if (!_fingerprint.hasMatch(fp)) throw ArgumentError('Sidik jari harus berformat SHA256:...');
+    if (!_fingerprint.hasMatch(fp)) {
+      throw ArgumentError('Sidik jari harus berformat SHA256:...');
+    }
     return KnownHost._(h, port, t, fp, addedAt?.toUtc());
   }
 
-  const KnownHost._(this.host, this.port, this.type, this.fingerprint, this.addedAt);
+  const KnownHost._(
+    this.host,
+    this.port,
+    this.type,
+    this.fingerprint,
+    this.addedAt,
+  );
 
   factory KnownHost.fromJson(Map<String, Object?> json) {
     final added = optString(json, 'addedAt');
@@ -52,15 +62,16 @@ final class KnownHost {
   /// Kunci pencarian `host:port`.
   String get id => idFor(host, port);
 
-  static String idFor(String host, int port) => '${host.trim().toLowerCase()}:$port';
+  static String idFor(String host, int port) =>
+      '${host.trim().toLowerCase()}:$port';
 
   Map<String, Object?> toJson() => {
-        'host': host,
-        'port': port,
-        'type': type,
-        'fingerprint': fingerprint,
-        'addedAt': addedAt?.toIso8601String(),
-      };
+    'host': host,
+    'port': port,
+    'type': type,
+    'fingerprint': fingerprint,
+    'addedAt': addedAt?.toIso8601String(),
+  };
 
   @override
   bool operator ==(Object other) =>
@@ -91,10 +102,16 @@ enum HostKeyVerdict {
 ///
 /// Tipe asing pada host yang sudah dikenal juga dianggap [HostKeyVerdict.changed] (konservatif); dengan
 /// pembatasan algoritma host key ke tipe tersimpan, kasus itu seharusnya tidak muncul.
-HostKeyVerdict evaluateHostKey(List<KnownHost> stored, {required String type, required String fingerprint}) {
+HostKeyVerdict evaluateHostKey(
+  List<KnownHost> stored, {
+  required String type,
+  required String fingerprint,
+}) {
   if (stored.isEmpty) return HostKeyVerdict.newHost;
   for (final k in stored) {
-    if (k.type == type && k.fingerprint == fingerprint) return HostKeyVerdict.trusted;
+    if (k.type == type && k.fingerprint == fingerprint) {
+      return HostKeyVerdict.trusted;
+    }
   }
   return HostKeyVerdict.changed;
 }

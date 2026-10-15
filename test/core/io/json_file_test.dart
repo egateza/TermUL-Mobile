@@ -1,4 +1,4 @@
-﻿import 'dart:io';
+import 'dart:io';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/core/io/async_lock.dart';
@@ -18,8 +18,11 @@ void main() {
   Future<JsonLoad<int>> load() =>
       loadJsonOrQuarantine<int>(file, parse: (j) => j['n']! as int, empty: -1);
 
-  List<File> corrupt() =>
-      dir.listSync().whereType<File>().where((f) => RegExp(r'data\.json\.corrupt-\d+').hasMatch(f.path)).toList();
+  List<File> corrupt() => dir
+      .listSync()
+      .whereType<File>()
+      .where((f) => RegExp(r'data\.json\.corrupt-\d+').hasMatch(f.path))
+      .toList();
 
   test('berkas belum ada: nilai kosong tanpa karantina', () async {
     final r = await load();
@@ -40,15 +43,18 @@ void main() {
     'tipe salah': '{"n": "lima"}',
     'field wajib hilang': '{}',
   }.entries) {
-    test('${entry.key}: dipindah ke .corrupt-<waktu> dengan isi utuh', () async {
-      await file.writeAsString(entry.value);
-      final r = await load();
-      expect(r.value, -1);
-      expect(r.quarantinedPath, isNotNull);
-      expect(await file.exists(), isFalse);
-      expect(corrupt(), hasLength(1));
-      expect(await corrupt().single.readAsString(), entry.value);
-    });
+    test(
+      '${entry.key}: dipindah ke .corrupt-<waktu> dengan isi utuh',
+      () async {
+        await file.writeAsString(entry.value);
+        final r = await load();
+        expect(r.value, -1);
+        expect(r.quarantinedPath, isNotNull);
+        expect(await file.exists(), isFalse);
+        expect(corrupt(), hasLength(1));
+        expect(await corrupt().single.readAsString(), entry.value);
+      },
+    );
   }
 
   test('UTF-8 tidak sah dianggap rusak', () async {
@@ -83,7 +89,10 @@ void main() {
 
   test('AsyncLock tetap jalan setelah satu tugas gagal', () async {
     final lock = AsyncLock();
-    await expectLater(lock.run<void>(() async => throw const StorageException('x')), throwsA(isA<StorageException>()));
+    await expectLater(
+      lock.run<void>(() async => throw const StorageException('x')),
+      throwsA(isA<StorageException>()),
+    );
     expect(await lock.run(() async => 7), 7);
   });
 }

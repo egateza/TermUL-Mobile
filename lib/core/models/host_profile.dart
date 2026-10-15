@@ -1,4 +1,4 @@
-﻿import 'package:flutter/foundation.dart';
+import 'package:flutter/foundation.dart';
 import 'package:uuid/uuid.dart';
 
 import 'auth_method.dart';
@@ -81,15 +81,26 @@ final class HostProfile {
   });
 
   /// Profil baru dengan id acak (UUID v4) dan nilai bawaan. Metode awal [AuthMethod.password].
-  factory HostProfile.create({required String name, required String host, required String username}) =>
-      HostProfile(id: const Uuid().v4(), name: name, host: host, username: username, authMethod: AuthMethod.password);
+  factory HostProfile.create({
+    required String name,
+    required String host,
+    required String username,
+  }) => HostProfile(
+    id: const Uuid().v4(),
+    name: name,
+    host: host,
+    username: username,
+    authMethod: AuthMethod.password,
+  );
 
   factory HostProfile.fromJson(Map<String, Object?> json) {
     final auth = optString(json, 'authMethod');
     final env = optString(json, 'environment');
     final os = optObject(json, 'os');
     return HostProfile(
-      id: optString(json, 'id') ?? (throw const FormatException('Profil tanpa id')),
+      id:
+          optString(json, 'id') ??
+          (throw const FormatException('Profil tanpa id')),
       name: optString(json, 'name') ?? '',
       group: optString(json, 'group'),
       host: optString(json, 'host') ?? '',
@@ -109,7 +120,9 @@ final class HostProfile {
   }
 
   static const defaultPort = 22;
-  static final _uuid = RegExp(r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$');
+  static final _uuid = RegExp(
+    r'^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$',
+  );
 
   /// Identitas stabil profil; juga kunci rahasia di vault. Huruf kecil.
   final String id;
@@ -133,33 +146,37 @@ final class HostProfile {
 
   /// Urutan field sama dengan desktop. Semua field ditulis, termasuk yang `null`.
   Map<String, Object?> toJson() => {
-        'id': id,
-        'name': name,
-        'group': group,
-        'host': host,
-        'port': port,
-        'username': username,
-        'authMethod': authMethod.wire,
-        'privateKeyPath': privateKeyPath,
-        'jumpHostId': jumpHostId,
-        'environment': environment.wire,
-        'initialDirectory': initialDirectory,
-        'notes': notes,
-        'autoSudo': autoSudo,
-        'os': os?.toJson(),
-        'terminalTheme': terminalTheme,
-        'wslDistro': wslDistro,
-      };
+    'id': id,
+    'name': name,
+    'group': group,
+    'host': host,
+    'port': port,
+    'username': username,
+    'authMethod': authMethod.wire,
+    'privateKeyPath': privateKeyPath,
+    'jumpHostId': jumpHostId,
+    'environment': environment.wire,
+    'initialDirectory': initialDirectory,
+    'notes': notes,
+    'autoSudo': autoSudo,
+    'os': os?.toJson(),
+    'terminalTheme': terminalTheme,
+    'wslDistro': wslDistro,
+  };
 
   /// Label singkat `user@host[:port]`.
-  String get address => port == defaultPort ? '$username@$host' : '$username@$host:$port';
+  String get address =>
+      port == defaultPort ? '$username@$host' : '$username@$host:$port';
 
   /// Salinan dengan id baru dan nama "(salinan)".
-  HostProfile duplicate() => _with(id: const Uuid().v4(), name: '$name (salinan)');
+  HostProfile duplicate() =>
+      _with(id: const Uuid().v4(), name: '$name (salinan)');
 
-  HostProfile withGroup(String? newGroup) => _with(group: normalizeGroup(newGroup));
+  HostProfile withGroup(String? newGroup) =>
+      _with(group: normalizeGroup(newGroup));
   HostProfile withOs(OsInfo? newOs) => _with(os: () => newOs);
-  HostProfile withJumpHostId(String? newJumpHostId) => _with(jumpHostId: () => newJumpHostId);
+  HostProfile withJumpHostId(String? newJumpHostId) =>
+      _with(jumpHostId: () => newJumpHostId);
 
   HostProfile _with({
     String? id,
@@ -167,25 +184,24 @@ final class HostProfile {
     String? group,
     ValueGetter<OsInfo?>? os,
     ValueGetter<String?>? jumpHostId,
-  }) =>
-      HostProfile(
-        id: id ?? this.id,
-        name: name ?? this.name,
-        group: group ?? this.group,
-        host: host,
-        port: port,
-        username: username,
-        authMethod: authMethod,
-        privateKeyPath: privateKeyPath,
-        jumpHostId: jumpHostId != null ? jumpHostId() : this.jumpHostId,
-        environment: environment,
-        initialDirectory: initialDirectory,
-        notes: notes,
-        autoSudo: autoSudo,
-        os: os != null ? os() : this.os,
-        terminalTheme: terminalTheme,
-        wslDistro: wslDistro,
-      );
+  }) => HostProfile(
+    id: id ?? this.id,
+    name: name ?? this.name,
+    group: group ?? this.group,
+    host: host,
+    port: port,
+    username: username,
+    authMethod: authMethod,
+    privateKeyPath: privateKeyPath,
+    jumpHostId: jumpHostId != null ? jumpHostId() : this.jumpHostId,
+    environment: environment,
+    initialDirectory: initialDirectory,
+    notes: notes,
+    autoSudo: autoSudo,
+    os: os != null ? os() : this.os,
+    terminalTheme: terminalTheme,
+    wslDistro: wslDistro,
+  );
 
   /// Menormalkan id: harus UUID, hasilnya huruf kecil.
   static String normalizeId(String id) {
@@ -197,7 +213,12 @@ final class HostProfile {
   /// Menormalkan path grup: pemisah `\` menjadi `/`, tiap segmen di-trim, segmen kosong dibuang.
   static String normalizeGroup(String? group) {
     if (group == null || group.trim().isEmpty) return '';
-    return group.replaceAll(r'\', '/').split('/').map((p) => p.trim()).where((p) => p.isNotEmpty).join('/');
+    return group
+        .replaceAll(r'\', '/')
+        .split('/')
+        .map((p) => p.trim())
+        .where((p) => p.isNotEmpty)
+        .join('/');
   }
 
   static String _requireText(String value, String field) {
@@ -232,6 +253,22 @@ final class HostProfile {
       other.wslDistro == wslDistro;
 
   @override
-  int get hashCode => Object.hash(id, name, group, host, port, username, authMethod, privateKeyPath, jumpHostId,
-      environment, initialDirectory, notes, autoSudo, os, terminalTheme, wslDistro);
+  int get hashCode => Object.hash(
+    id,
+    name,
+    group,
+    host,
+    port,
+    username,
+    authMethod,
+    privateKeyPath,
+    jumpHostId,
+    environment,
+    initialDirectory,
+    notes,
+    autoSudo,
+    os,
+    terminalTheme,
+    wslDistro,
+  );
 }

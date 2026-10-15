@@ -1,4 +1,4 @@
-﻿/// Tag environment server. Nilai JSON sama dengan desktop. Mobile belum memakainya untuk guard.
+/// Tag environment server. Nilai JSON sama dengan desktop. Mobile belum memakainya untuk guard.
 enum EnvironmentTag {
   prod('PROD'),
   staging('STAGING'),

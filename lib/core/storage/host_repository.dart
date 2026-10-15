@@ -1,4 +1,4 @@
-﻿import '../models/host_profile.dart';
+import '../models/host_profile.dart';
 import '../models/profile_snapshot.dart';
 import 'load_result.dart';
 

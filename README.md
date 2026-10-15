@@ -1,4 +1,4 @@
-﻿# TermUL Mobile
+# TermUL Mobile
 
 Klien SSH pribadi untuk Android, dibuat dengan Flutter. Pendampingnya adalah TermUL desktop (`egateza/TermUL`).
 

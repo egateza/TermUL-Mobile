@@ -2,11 +2,14 @@
 
 Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa dua arah: (1) berkas `LICENSE` di arsip paket, dan (2) tag `license:` dari API pub.dev (`/api/packages/<nama>/score`). Kolom "Cocok" bernilai ya bila keduanya sama. Klasifikasi `LICENSE` memakai pencocokan teks; ini bukan pembacaan hukum.
 
-- Paket hosted diperiksa: **93**; cocok: **93**; tidak cocok atau gagal diambil: **0**.
+- Paket hosted diperiksa: **95**; cocok: **95**; tidak cocok atau gagal diambil: **0**.
 - Paket berlisensi copyleft (GPL, LGPL, AGPL, MPL): **0**.
 - Paket SDK (flutter, flutter_driver, flutter_localizations, flutter_test, flutter_web_plugins, fuchsia_remote_debug_protocol, integration_test, sky_engine) mengikuti lisensi Flutter SDK (BSD-3-Clause); `sky_engine` memuat Apache-2.0.
 - `xterm` 4.0.0 (MIT) dipakai, bukan `xterm3` (AGPL-3.0).
-- Belum diverifikasi: lisensi font (IBM Plex Sans, JetBrains Mono), paket yang belum ditambahkan, dan apakah paket platform non-Android ikut masuk APK.
+- Font (dibundel di `assets/fonts`, diambil dari repo google/fonts commit `94301472b4d809299b4775bc6502592b83dd6934`, berkas lisensi dibaca): IBM Plex Sans (`IBMPlexSans-Variable.ttf`, SIL OFL 1.1, hak cipta IBM Corp., nama font cadangan "Plex") dan JetBrains Mono (`JetBrainsMono-Variable.ttf`, SIL OFL 1.1, JetBrains Mono Project Authors). Berkas lisensi: `assets/fonts/OFL-*.txt`. Font dipakai tanpa modifikasi.
+  - sha256 `IBMPlexSans-Variable.ttf`: `3b031aa4216174205bd8471f88a49b91f093169e9e87bd5262242bc5967fe2e3`
+  - sha256 `JetBrainsMono-Variable.ttf`: `48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda`
+- Belum diverifikasi: paket yang belum ditambahkan, dan apakah paket platform non-Android ikut masuk APK.
 - Perbarui berkas ini setiap `pubspec.lock` berubah.
 
 | Paket | Versi | Jenis | Lisensi (LICENSE) | Lisensi (pub.dev) | Cocok |
@@ -18,6 +21,7 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 | `flutter_secure_storage` | 11.2.0 | direct | bsd-3-clause | bsd-3-clause | ya |
 | `intl` | 0.20.3 | direct | bsd-3-clause | bsd-3-clause | ya |
 | `local_auth` | 3.0.2 | direct | bsd-3-clause | bsd-3-clause | ya |
+| `path_drawing` | 1.0.1 | direct | mit | mit | ya |
 | `path_provider` | 2.1.6 | direct | bsd-3-clause | bsd-3-clause | ya |
 | `uuid` | 4.6.0 | direct | mit | mit | ya |
 | `xterm` | 4.0.0 | direct | mit | mit | ya |
@@ -73,6 +77,7 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 | `objective_c` | 9.5.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `package_config` | 3.0.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `path` | 1.9.1 | transitive | bsd-3-clause | bsd-3-clause | ya |
+| `path_parsing` | 1.1.0 | transitive | mit | mit | ya |
 | `path_provider_android` | 2.3.1 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `path_provider_foundation` | 2.6.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `path_provider_linux` | 2.2.2 | transitive | bsd-3-clause | bsd-3-clause | ya |
