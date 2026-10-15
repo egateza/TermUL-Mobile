@@ -10,6 +10,7 @@ import 'core/storage/known_hosts_repository.dart';
 import 'core/vault/credential_vault.dart';
 import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
+import 'features/terminal/shell_channel.dart';
 import 'features/hosts/host_service.dart';
 
 /// Penyimpanan dan vault dibuat sekali di `bootstrap()` lalu disuntikkan lewat `overrides`.
@@ -33,6 +34,15 @@ final sshConnectorProvider = Provider<SshConnector>(
 
 /// Fungsi sambung yang dipakai alur sambung; diganti di tes.
 final connectFunctionProvider = Provider<ConnectFunction>((ref) => ref.watch(sshConnectorProvider).connect);
+
+/// Membuka shell pada sambungan; diganti di tes.
+typedef ShellOpenerFor = Future<ShellChannel> Function(
+  SshConnection connection, {
+  required int columns,
+  required int rows,
+});
+
+final shellOpenerProvider = Provider<ShellOpenerFor>((ref) => SshShellChannel.open);
 
 extension AppDependenciesOverrides on AppDependencies {
   /// Override provider untuk `ProviderScope`.

@@ -505,4 +505,32 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get quickKeysLabel => 'Tombol khusus terminal';
+
+  @override
+  String get reconnectLostTitle => 'Koneksi terputus';
+
+  @override
+  String get reconnectLostBody =>
+      'Riwayat layar tetap di sini. Program yang berjalan di server berhenti, kecuali yang berjalan di dalam tmux.';
+
+  @override
+  String get reconnectingTitle => 'Menyambung ulang…';
+
+  @override
+  String get reconnectingBody => 'Riwayat layar tetap terlihat.';
+
+  @override
+  String get reconnectNow => 'Sambung sekarang';
+
+  @override
+  String get reconnectFailedTitle => 'Gagal menyambung ulang';
+
+  @override
+  String get reconnectedMarker => '— tersambung ulang —';
+
+  @override
+  String get terminalStatusLost => 'Terputus';
+
+  @override
+  String get terminalStatusReconnecting => 'Menyambung ulang…';
 }

@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
@@ -5,6 +7,7 @@ import '../../app_providers.dart';
 import '../../core/keys/private_key_inspector.dart';
 import '../../core/models/auth_method.dart';
 import '../../core/models/host_profile.dart';
+import '../../core/ssh/ssh_connector.dart';
 import '../../core/ssh/ssh_failure.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -15,7 +18,9 @@ import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_text_field.dart';
+import '../terminal/shell_channel.dart';
 import '../terminal/terminal_screen.dart';
+import '../terminal/terminal_session.dart';
 import 'connect_flow.dart';
 import 'host_key_prompt.dart';
 
@@ -30,8 +35,24 @@ class ConnectScreen extends ConsumerStatefulWidget {
   ConsumerState<ConnectScreen> createState() => _ConnectScreenState();
 }
 
-class _ConnectScreenState extends ConsumerState<ConnectScreen> {
+class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindingObserver {
   ConnectFlow? _flow;
+
+  /// Sesi terminal, dibuat saat tersambung pertama kali. Dimiliki di sini (bukan oleh [TerminalScreen]) supaya
+  /// riwayat layar bertahan selama sambung ulang, ketika layar lain (host key, rahasia hilang) tampil.
+  TerminalSession? _session;
+
+  /// Sambungan yang sedang dipakai sesi.
+  SshConnection? _current;
+
+  /// Sambungan [_current] sudah putus dan sambung ulang belum berhasil.
+  bool _lost = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+  }
 
   @override
   void didChangeDependencies() {
@@ -45,19 +66,81 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       connect: ref.read(connectFunctionProvider),
       unlockReason: l.unlockReason(widget.profile.name),
     );
+    flow.addListener(_onFlow);
     _flow = flow;
     flow.start();
   }
 
   @override
   void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
     final flow = _flow;
     if (flow != null) {
+      flow.removeListener(_onFlow);
       final state = flow.state;
       if (state is ConnectDone) state.connection.close();
       flow.dispose();
     }
+    _current?.close();
+    _session?.dispose();
     super.dispose();
+  }
+
+  /// Tersambung (pertama kali atau setelah sambung ulang): pasang sambungan ke sesi terminal dan awasi putusnya.
+  void _onFlow() {
+    final state = _flow?.state;
+    if (state is! ConnectDone || identical(state.connection, _current)) return;
+    final connection = state.connection;
+    final previous = _current;
+    _current = connection;
+    _lost = false;
+    previous?.close();
+    unawaited(connection.closed.then((reason) => _onClosed(connection, reason)));
+    Future<ShellChannel> open({required int columns, required int rows}) =>
+        ref.read(shellOpenerProvider)(connection, columns: columns, rows: rows);
+    final session = _session;
+    if (session == null) {
+      _session = TerminalSession(open: open);
+    } else {
+      unawaited(session.restart(open, marker: AppLocalizations.of(context).reconnectedMarker));
+    }
+  }
+
+  void _onClosed(SshConnection connection, CloseReason reason) {
+    if (!mounted || !identical(connection, _current) || reason == CloseReason.userClosed || _lost) return;
+    setState(() => _lost = true);
+    // `null` = belum ada pesan siklus hidup (aplikasi baru mulai): anggap terlihat.
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    if (lifecycle == null || lifecycle == AppLifecycleState.resumed) _reconnect();
+  }
+
+  /// Menyambung ulang memakai alur yang sama dengan sambungan pertama (rahasia dari vault, host key diperiksa
+  /// lagi; host key yang berubah tetap memblokir dan butuh keputusan pengguna).
+  void _reconnect() {
+    final flow = _flow;
+    if (flow == null || !_lost) return;
+    final state = flow.state;
+    if (state is ConnectPreparing || state is ConnectConnecting || state is ConnectNeedsHostKey) return;
+    flow.start();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
+    if (lifecycle != AppLifecycleState.resumed) return;
+    final connection = _current;
+    if (connection == null) return;
+    if (_lost) {
+      _reconnect(); // putus selagi di latar belakang: sambung ulang sekarang aplikasi terlihat lagi
+      return;
+    }
+    // Android mematikan soket aplikasi di latar belakang tanpa memberi tahu; periksa sebelum dipakai (spike A4).
+    unawaited(
+      connection.checkAlive().then((alive) {
+        if (alive || !mounted || !identical(connection, _current) || _lost) return;
+        connection.close();
+        _onClosed(connection, CloseReason.error);
+      }),
+    );
   }
 
   void _leave() => Navigator.of(context).pop();
@@ -69,8 +152,29 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       listenable: flow,
       builder: (context, _) {
         final state = flow.state;
-        if (state is ConnectDone) {
-          return TerminalScreen(profile: widget.profile, connection: state.connection);
+        final session = _session;
+        final l = AppLocalizations.of(context);
+        if (session != null) {
+          if (state is ConnectDone) {
+            return TerminalScreen(
+              profile: widget.profile,
+              session: session,
+              link: _lost ? TerminalLink.lost : TerminalLink.up,
+              onReconnect: _reconnect,
+            );
+          }
+          if (state is ConnectPreparing || state is ConnectConnecting) {
+            return TerminalScreen(profile: widget.profile, session: session, link: TerminalLink.reconnecting);
+          }
+          if (state is ConnectFailed || state is ConnectAuthDenied) {
+            return TerminalScreen(
+              profile: widget.profile,
+              session: session,
+              link: TerminalLink.lost,
+              failureText: _failureSummary(l, state),
+              onReconnect: _reconnect,
+            );
+          }
         }
         if (state is ConnectNeedsHostKey) {
           return HostKeyPrompt(profile: widget.profile, challenge: state.challenge, onChoice: flow.answerHostKey);
@@ -88,6 +192,12 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       },
     );
   }
+
+  static String _failureSummary(AppLocalizations l, ConnectState state) => switch (state) {
+    ConnectAuthDenied(:final cancelled) => cancelled ? l.authDeniedTitle : l.authUnavailableTitle,
+    ConnectFailed(:final failure) => _failureText(l, failure).$1,
+    _ => l.failUnknownTitle,
+  };
 
   Widget _body(BuildContext context, ConnectFlow flow, ConnectState state) {
     final l = AppLocalizations.of(context);

@@ -695,5 +695,41 @@
   "quickKeysLabel": "Tombol khusus terminal",
   "@quickKeysLabel": {
     "description": "Nama semantik baris tombol cepat."
+  },
+  "reconnectLostTitle": "Koneksi terputus",
+  "@reconnectLostTitle": {
+    "description": "Judul banner saat sambungan ke server putus."
+  },
+  "reconnectLostBody": "Riwayat layar tetap di sini. Program yang berjalan di server berhenti, kecuali yang berjalan di dalam tmux.",
+  "@reconnectLostBody": {
+    "description": "Isi banner saat sambungan putus."
+  },
+  "reconnectingTitle": "Menyambung ulang…",
+  "@reconnectingTitle": {
+    "description": "Judul banner saat menyambung ulang."
+  },
+  "reconnectingBody": "Riwayat layar tetap terlihat.",
+  "@reconnectingBody": {
+    "description": "Isi banner saat menyambung ulang."
+  },
+  "reconnectNow": "Sambung sekarang",
+  "@reconnectNow": {
+    "description": "Tombol sambung ulang manual."
+  },
+  "reconnectFailedTitle": "Gagal menyambung ulang",
+  "@reconnectFailedTitle": {
+    "description": "Judul banner saat sambung ulang gagal."
+  },
+  "reconnectedMarker": "— tersambung ulang —",
+  "@reconnectedMarker": {
+    "description": "Pemisah yang ditulis di terminal setelah tersambung ulang."
+  },
+  "terminalStatusLost": "Terputus",
+  "@terminalStatusLost": {
+    "description": "Status header terminal saat sambungan putus."
+  },
+  "terminalStatusReconnecting": "Menyambung ulang…",
+  "@terminalStatusReconnecting": {
+    "description": "Status header terminal saat menyambung ulang."
   }
 }

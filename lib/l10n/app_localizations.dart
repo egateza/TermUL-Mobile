@@ -990,6 +990,60 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tombol khusus terminal'**
   String get quickKeysLabel;
+
+  /// Judul banner saat sambungan ke server putus.
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi terputus'**
+  String get reconnectLostTitle;
+
+  /// Isi banner saat sambungan putus.
+  ///
+  /// In id, this message translates to:
+  /// **'Riwayat layar tetap di sini. Program yang berjalan di server berhenti, kecuali yang berjalan di dalam tmux.'**
+  String get reconnectLostBody;
+
+  /// Judul banner saat menyambung ulang.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyambung ulang…'**
+  String get reconnectingTitle;
+
+  /// Isi banner saat menyambung ulang.
+  ///
+  /// In id, this message translates to:
+  /// **'Riwayat layar tetap terlihat.'**
+  String get reconnectingBody;
+
+  /// Tombol sambung ulang manual.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambung sekarang'**
+  String get reconnectNow;
+
+  /// Judul banner saat sambung ulang gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal menyambung ulang'**
+  String get reconnectFailedTitle;
+
+  /// Pemisah yang ditulis di terminal setelah tersambung ulang.
+  ///
+  /// In id, this message translates to:
+  /// **'— tersambung ulang —'**
+  String get reconnectedMarker;
+
+  /// Status header terminal saat sambungan putus.
+  ///
+  /// In id, this message translates to:
+  /// **'Terputus'**
+  String get terminalStatusLost;
+
+  /// Status header terminal saat menyambung ulang.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyambung ulang…'**
+  String get terminalStatusReconnecting;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

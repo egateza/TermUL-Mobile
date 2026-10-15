@@ -250,6 +250,46 @@ void main() {
       expect(shell.closed, isTrue);
     });
 
+    test('restart: riwayat layar tetap, pemisah ditulis, shell lama ditutup, shell baru dipakai', () async {
+      await session.start();
+      shell.emit(utf8.encode('riwayat-lama\r\n'));
+      await settle();
+      final baru = FakeShell();
+      await session.restart(({required columns, required rows}) async => baru, marker: '-- sambung ulang --');
+      expect(shell.closed, isTrue);
+      expect(session.state, TerminalSessionState.running);
+      final text = screenText(session.terminal);
+      expect(text, contains('riwayat-lama'));
+      expect(text, contains('-- sambung ulang --'));
+      session.terminal.textInput('ls\r');
+      expect(baru.sent, 'ls\r');
+      expect(shell.written, isEmpty);
+      baru.emit(utf8.encode('baru\r\n'));
+      await settle();
+      expect(screenText(session.terminal), contains('baru'));
+      shell.emit(utf8.encode('hantu')); // keluaran saluran lama diabaikan
+      await settle();
+      expect(screenText(session.terminal), isNot(contains('hantu')));
+    });
+
+    test('restart: saluran lama yang selesai belakangan tidak mengubah keadaan', () async {
+      await session.start();
+      final baru = FakeShell();
+      await session.restart(({required columns, required rows}) async => baru, marker: 'x');
+      shell.close();
+      await settle();
+      expect(session.state, TerminalSessionState.running);
+    });
+
+    test('restart membersihkan mode yang ditinggal program (layar alternatif, kursor)', () async {
+      await session.start();
+      session.terminal.write('\x1b[?1049h\x1b[?25l');
+      expect(session.terminal.isUsingAltBuffer, isTrue);
+      await session.restart(({required columns, required rows}) async => FakeShell(), marker: 'x');
+      expect(session.terminal.isUsingAltBuffer, isFalse);
+      expect(session.terminal.cursorVisibleMode, isTrue);
+    });
+
     test('start dua kali hanya membuka satu shell', () async {
       var opens = 0;
       final s = TerminalSession(

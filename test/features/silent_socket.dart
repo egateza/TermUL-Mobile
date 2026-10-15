@@ -18,9 +18,9 @@ class SilentSocket extends SSHSocket {
   @override
   Stream<Uint8List> get stream => _in.stream;
   @override
-  StreamSink<List<int>> get sink => _out.sink;
-  @override
   Future<void> get done => _done.future;
+  @override
+  StreamSink<List<int>> get sink => _out.sink;
   @override
   Future<void> close() async {
     await _out.close();
@@ -31,8 +31,16 @@ class SilentSocket extends SSHSocket {
   void destroy() {
     unawaited(close());
   }
+
+  /// Server menutup soket (seperti Android mematikan soket di latar belakang): sambungan dianggap putus.
+  void dropServer() => unawaited(_in.close());
 }
 
 /// Sambungan SSH palsu (belum terautentikasi) untuk tes layar.
-SshConnection fakeConnection(HostProfile profile) =>
-    SshConnection.forTest(SSHClient(SilentSocket(), username: 'x'), profile);
+SshConnection fakeConnection(HostProfile profile) => fakeLink(profile).connection;
+
+/// Sambungan palsu beserta soketnya, supaya tes bisa memutusnya.
+({SshConnection connection, SilentSocket socket}) fakeLink(HostProfile profile) {
+  final socket = SilentSocket();
+  return (connection: SshConnection.forTest(SSHClient(socket, username: 'x'), profile), socket: socket);
+}

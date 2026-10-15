@@ -2,30 +2,53 @@ import 'package:flutter/material.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../core/models/host_profile.dart';
-import '../../core/ssh/ssh_connector.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/pressable.dart';
 import '../../shared/widgets/status_dot.dart';
+import '../../shared/widgets/termul_banner.dart';
+import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import 'quick_key_bar.dart';
-import 'shell_channel.dart';
 import 'terminal_palette.dart';
 import 'terminal_session.dart';
 
-/// Layar terminal satu host. [connection] dimiliki pemanggil (yang menutupnya); layar ini hanya menutup shell-nya.
-/// Layar yang tingginya (di luar keyboard) kurang dari 480 dp memakai mode ringkas: tanpa header, satu baris
-/// status, dan tombol cepat 36 dp (landscape).
+/// Keadaan sambungan di bawah layar terminal.
+enum TerminalLink {
+  /// Tersambung (atau shell sedang dibuka di sambungan yang hidup).
+  up,
+
+  /// Sambungan putus dan sedang disambung ulang; riwayat layar tetap terlihat.
+  reconnecting,
+
+  /// Sambungan putus (atau sambung ulang gagal); menunggu pengguna menekan "Sambung sekarang".
+  lost,
+}
+
+/// Layar terminal satu host. [session] dimiliki pemanggil (supaya riwayat layar bertahan saat sambungan diganti)
+/// dan ditutup olehnya. Layar yang tingginya (di luar keyboard) kurang dari 480 dp memakai mode ringkas: tanpa
+/// header, satu baris status, dan tombol cepat 36 dp (landscape).
 class TerminalScreen extends StatefulWidget {
-  const TerminalScreen({super.key, required this.profile, required this.connection, this.openShell});
+  const TerminalScreen({
+    super.key,
+    required this.profile,
+    required this.session,
+    this.link = TerminalLink.up,
+    this.failureText,
+    this.onReconnect,
+  });
 
   final HostProfile profile;
-  final SshConnection connection;
+  final TerminalSession session;
+  final TerminalLink link;
 
-  /// Hanya untuk tes: pengganti pembuka shell.
-  final ShellOpener? openShell;
+  /// Alasan sambung ulang terakhir gagal (judul galat yang sudah dilokalkan), bila ada.
+  final String? failureText;
+
+  /// Dipanggil oleh tombol "Sambung sekarang".
+  final VoidCallback? onReconnect;
 
   static const compactBelowDp = 480.0;
 
@@ -34,11 +57,7 @@ class TerminalScreen extends StatefulWidget {
 }
 
 class _TerminalScreenState extends State<TerminalScreen> {
-  late final TerminalSession _session = TerminalSession(
-    open:
-        widget.openShell ??
-        ({required columns, required rows}) => SshShellChannel.open(widget.connection, columns: columns, rows: rows),
-  );
+  TerminalSession get _session => widget.session;
   final _controller = TerminalController();
 
   @override
@@ -53,12 +72,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
   @override
   void dispose() {
     _controller.dispose();
-    _session.dispose();
     super.dispose();
   }
 
   bool get _alive =>
-      !widget.connection.isClosed &&
+      widget.link == TerminalLink.up &&
       (_session.state == TerminalSessionState.opening || _session.state == TerminalSessionState.running);
 
   Future<void> _confirmLeave() async {
@@ -75,7 +93,39 @@ class _TerminalScreenState extends State<TerminalScreen> {
     );
   }
 
-  (HostStatus, String) _status(AppLocalizations l) => switch (_session.state) {
+  Widget _linkBanner(AppLocalizations l) {
+    if (widget.link == TerminalLink.reconnecting) {
+      return TermulBanner(
+        tone: BannerTone.warn,
+        title: l.reconnectingTitle,
+        icon: TermulIconName.refresh,
+        child: Text(l.reconnectingBody),
+      );
+    }
+    final failure = widget.failureText;
+    return TermulBanner(
+      tone: failure == null ? BannerTone.warn : BannerTone.risk,
+      title: failure == null ? l.reconnectLostTitle : l.reconnectFailedTitle,
+      action: widget.onReconnect == null
+          ? null
+          : TermulButton(
+              label: l.reconnectNow,
+              variant: TermulButtonVariant.primary,
+              size: TermulButtonSize.sm,
+              expand: false,
+              onPressed: widget.onReconnect,
+            ),
+      child: Text(failure ?? l.reconnectLostBody),
+    );
+  }
+
+  (HostStatus, String) _status(AppLocalizations l) => switch (widget.link) {
+    TerminalLink.reconnecting => (HostStatus.busy, l.terminalStatusReconnecting),
+    TerminalLink.lost => (HostStatus.offline, l.terminalStatusLost),
+    TerminalLink.up => _sessionStatus(l),
+  };
+
+  (HostStatus, String) _sessionStatus(AppLocalizations l) => switch (_session.state) {
     TerminalSessionState.opening => (HostStatus.busy, l.terminalStatusOpening),
     TerminalSessionState.running => (HostStatus.online, l.terminalStatusConnected),
     TerminalSessionState.ended => (HostStatus.offline, l.terminalStatusEnded),
@@ -111,6 +161,16 @@ class _TerminalScreenState extends State<TerminalScreen> {
                   )
                 else
                   _Header(profile: widget.profile, status: status, word: word, onBack: Navigator.of(context).maybePop),
+                if (widget.link != TerminalLink.up)
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      TermulSpacing.space5,
+                      0,
+                      TermulSpacing.space5,
+                      TermulSpacing.space3,
+                    ),
+                    child: _linkBanner(l),
+                  ),
                 Expanded(
                   // TerminalView mengurangi MediaQuery.padding dari tinggi barisnya; buang padding atas dan bawah
                   // supaya tidak terpotong dua kali (spike K5). Sisi kiri-kanan tetap dijaga (lekukan layar).

@@ -3,24 +3,51 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
-import 'package:termul_mobile/core/ssh/ssh_connector.dart';
 import 'package:termul_mobile/core/theme/termul_theme.dart';
 import 'package:termul_mobile/features/terminal/terminal_screen.dart';
+import 'package:termul_mobile/features/terminal/terminal_session.dart';
 import 'package:termul_mobile/shared/widgets/key_button.dart';
 import 'package:xterm/xterm.dart';
 
 import '../hosts_ui_harness.dart';
-import '../silent_socket.dart';
 import 'terminal_session_test.dart' show FakeShell;
+
+/// Meniru pemilik sesi di aplikasi (`ConnectScreen`): menutup sesi saat pohon widget dibuang.
+class _SessionOwner extends StatefulWidget {
+  const _SessionOwner({required this.session, required this.child});
+
+  final TerminalSession session;
+  final Widget child;
+
+  @override
+  State<_SessionOwner> createState() => _SessionOwnerState();
+}
+
+class _SessionOwnerState extends State<_SessionOwner> {
+  @override
+  void dispose() {
+    widget.session.dispose();
+    super.dispose();
+  }
+
+  @override
+  Widget build(BuildContext context) => widget.child;
+}
 
 class TermRig {
   TermRig() {
     profile = host(id1, name: 'app-01');
-    connection = fakeConnection(profile);
     shell = FakeShell();
+    session = TerminalSession(
+      open: ({required columns, required rows}) async {
+        openedCols = columns;
+        openedRows = rows;
+        return shell;
+      },
+    );
   }
 
-  late final SshConnection connection;
+  late final TerminalSession session;
   late final FakeShell shell;
   late final HostProfile profile;
   int? openedCols;
@@ -33,6 +60,9 @@ Future<TermRig> pumpTerminal(
   Size size = const Size(390, 844),
   double keyboard = 0,
   EdgeInsets padding = EdgeInsets.zero,
+  TerminalLink link = TerminalLink.up,
+  String? failureText,
+  VoidCallback? onReconnect,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -45,14 +75,15 @@ Future<TermRig> pumpTerminal(
       .state<NavigatorState>(find.byType(Navigator))
       .push(
         MaterialPageRoute<void>(
-          builder: (_) => TerminalScreen(
-            profile: rig.profile,
-            connection: rig.connection,
-            openShell: ({required columns, required rows}) async {
-              rig.openedCols = columns;
-              rig.openedRows = rows;
-              return rig.shell;
-            },
+          builder: (_) => _SessionOwner(
+            session: rig.session,
+            child: TerminalScreen(
+              profile: rig.profile,
+              session: rig.session,
+              link: link,
+              failureText: failureText,
+              onReconnect: onReconnect,
+            ),
           ),
         ),
       );
@@ -205,7 +236,7 @@ void main() {
   });
 
   testWidgets('kembali saat hidup meminta konfirmasi; Batal tetap di terminal; Putuskan menutup layar', (tester) async {
-    final rig = await pumpTerminal(tester);
+    await pumpTerminal(tester);
     await tester.tap(find.bySemanticsLabel('Kembali'));
     await tester.pumpAndSettle();
     expect(find.text('Putuskan sambungan?'), findsOneWidget);
@@ -220,7 +251,6 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(TerminalScreen), findsNothing);
     expect(find.text('daftar'), findsOneWidget);
-    expect(rig.shell.closed, isTrue); // shell ditutup saat layar dibuang
   });
 
   testWidgets('setelah shell selesai, status berkata "Sesi berakhir" dan kembali tanpa konfirmasi', (tester) async {
@@ -252,5 +282,42 @@ void main() {
     await tester.sendKeyEvent(LogicalKeyboardKey.enter);
     await tester.pump();
     expect(rig.shell.sent, contains('\r'));
+  });
+
+  testWidgets('sambungan putus: banner dengan kata, status Terputus, tombol Sambung sekarang memanggil callback', (
+    tester,
+  ) async {
+    var calls = 0;
+    await pumpTerminal(tester, link: TerminalLink.lost, onReconnect: () => calls++);
+    expect(find.text('Koneksi terputus'), findsOneWidget);
+    expect(find.text('Terputus'), findsOneWidget);
+    expect(find.textContaining('tmux'), findsOneWidget);
+    await tester.tap(find.text('Sambung sekarang'));
+    expect(calls, 1);
+    // Riwayat layar tetap ada dan kembali tidak meminta konfirmasi (shell sudah mati).
+    await tester.tap(find.bySemanticsLabel('Kembali'));
+    await tester.pumpAndSettle();
+    expect(find.text('daftar'), findsOneWidget);
+  });
+
+  testWidgets('menyambung ulang: banner dan status berkata, tanpa tombol', (tester) async {
+    await pumpTerminal(tester, link: TerminalLink.reconnecting);
+    expect(find.text('Menyambung ulang…'), findsNWidgets(2)); // banner dan status
+    expect(find.text('Sambung sekarang'), findsNothing);
+  });
+
+  testWidgets('sambung ulang gagal: banner galat memuat alasan dan tombol Sambung sekarang', (tester) async {
+    await pumpTerminal(tester, link: TerminalLink.lost, failureText: 'Tidak bisa tersambung', onReconnect: () {});
+    expect(find.text('Gagal menyambung ulang'), findsOneWidget);
+    expect(find.text('Tidak bisa tersambung'), findsOneWidget);
+    expect(find.text('Sambung sekarang'), findsOneWidget);
+  });
+
+  testWidgets('riwayat layar tetap terlihat di bawah banner', (tester) async {
+    final rig = await pumpTerminal(tester, link: TerminalLink.lost, onReconnect: () {});
+    rig.session.terminal.write('riwayat-lama\r\n');
+    await tester.pump();
+    expect(rig.session.terminal.buffer.getText(), contains('riwayat-lama'));
+    expectRowsFit(tester);
   });
 }

@@ -25,13 +25,13 @@ enum TerminalSessionState {
 /// Ctrl dan Alt sekali pakai, dan pengiriman ukuran setelah tampilan diam. Semua sumber daya ditutup di
 /// [dispose]. Tanpa UI sehingga bisa dites.
 class TerminalSession extends ChangeNotifier {
-  TerminalSession({required this.open, this.maxLines = 10000, this.resizeDebounce = const Duration(milliseconds: 150)})
+  TerminalSession({required this._open, this.maxLines = 10000, this.resizeDebounce = const Duration(milliseconds: 150)})
     : terminal = Terminal(maxLines: maxLines) {
     terminal.onOutput = _onOutput;
     terminal.onResize = (width, height, pixelWidth, pixelHeight) => _scheduleResize();
   }
 
-  final ShellOpener open;
+  ShellOpener _open;
   final int maxLines;
   final Duration resizeDebounce;
   final Terminal terminal;
@@ -58,7 +58,7 @@ class TerminalSession extends ChangeNotifier {
     _setState(TerminalSessionState.opening);
     final ShellChannel channel;
     try {
-      channel = await open(columns: terminal.viewWidth, rows: terminal.viewHeight);
+      channel = await _open(columns: terminal.viewWidth, rows: terminal.viewHeight);
     } on Object {
       _setState(TerminalSessionState.failed);
       return;
@@ -74,6 +74,27 @@ class TerminalSession extends ChangeNotifier {
     _setState(TerminalSessionState.running);
     _scheduleResize(); // ukuran bisa berubah selama shell dibuka
   }
+
+  /// Mengganti saluran dengan shell baru pada sambungan baru (sambung ulang) **tanpa** membuang riwayat layar.
+  /// Mode terminal yang mungkin tertinggal dari program sebelumnya (layar alternatif, kursor tersembunyi,
+  /// tetikus, bracketed paste) dibersihkan, lalu [marker] ditulis sebagai pemisah.
+  Future<void> restart(ShellOpener opener, {required String marker}) async {
+    if (_disposed) return;
+    _open = opener;
+    _resizeTimer?.cancel();
+    final old = _channel;
+    _channel = null;
+    unawaited(_stdout?.cancel()); // otomatis berhenti seketika; menunggunya tidak perlu
+    unawaited(_stderr?.cancel());
+    _stdout = null;
+    _stderr = null;
+    old?.close();
+    terminal.write(_resetModes(marker));
+    await start();
+  }
+
+  static String _resetModes(String marker) =>
+      '\x1b[?1049l\x1b[0m\x1b[?25h\x1b[?1000l\x1b[?1006l\x1b[?2004l\r\n\x1b[2m$marker\x1b[0m\r\n';
 
   /// UTF-8 streaming: karakter multibyte yang terpotong di antara dua paket tidak rusak.
   static Stream<String> _decode(Stream<Uint8List> s) =>
