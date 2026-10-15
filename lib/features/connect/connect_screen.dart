@@ -1,0 +1,496 @@
+import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+
+import '../../app_providers.dart';
+import '../../core/keys/private_key_inspector.dart';
+import '../../core/models/auth_method.dart';
+import '../../core/models/host_profile.dart';
+import '../../core/ssh/ssh_failure.dart';
+import '../../core/theme/termul_theme.dart';
+import '../../l10n/app_localizations.dart';
+import '../../shared/key_import_text.dart';
+import '../../shared/widgets/status_dot.dart';
+import '../../shared/widgets/termul_banner.dart';
+import '../../shared/widgets/termul_button.dart';
+import '../../shared/widgets/termul_icon.dart';
+import '../../shared/widgets/termul_icon_button.dart';
+import '../../shared/widgets/termul_text_field.dart';
+import 'connect_flow.dart';
+import 'host_key_prompt.dart';
+
+/// Layar alur sambung ke satu host: membuka rahasia, menyambung, meminta keputusan host key, dan menampilkan
+/// kegagalan. Setelah tersambung sementara menampilkan keterangan; layar terminal menggantikannya di langkah 7.
+class ConnectScreen extends ConsumerStatefulWidget {
+  const ConnectScreen({super.key, required this.profile});
+
+  final HostProfile profile;
+
+  @override
+  ConsumerState<ConnectScreen> createState() => _ConnectScreenState();
+}
+
+class _ConnectScreenState extends ConsumerState<ConnectScreen> {
+  ConnectFlow? _flow;
+
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+    if (_flow != null) return;
+    final l = AppLocalizations.of(context);
+    final flow = ConnectFlow(
+      profile: widget.profile,
+      vault: ref.read(credentialVaultProvider),
+      hosts: ref.read(hostRepositoryProvider),
+      connect: ref.read(connectFunctionProvider),
+      unlockReason: l.unlockReason(widget.profile.name),
+    );
+    _flow = flow;
+    flow.start();
+  }
+
+  @override
+  void dispose() {
+    final flow = _flow;
+    if (flow != null) {
+      final state = flow.state;
+      if (state is ConnectDone) state.connection.close();
+      flow.dispose();
+    }
+    super.dispose();
+  }
+
+  void _leave() => Navigator.of(context).pop();
+
+  @override
+  Widget build(BuildContext context) {
+    final flow = _flow!;
+    return ListenableBuilder(
+      listenable: flow,
+      builder: (context, _) {
+        final state = flow.state;
+        if (state is ConnectNeedsHostKey) {
+          return HostKeyPrompt(profile: widget.profile, challenge: state.challenge, onChoice: flow.answerHostKey);
+        }
+        return Scaffold(
+          body: SafeArea(
+            child: Column(
+              children: [
+                _Header(profile: widget.profile, onBack: _leave),
+                Expanded(child: _body(context, flow, state)),
+              ],
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  Widget _body(BuildContext context, ConnectFlow flow, ConnectState state) {
+    final l = AppLocalizations.of(context);
+    final name = widget.profile.name;
+    switch (state) {
+      case ConnectPreparing():
+        return _Progress(label: l.connectPreparing, abortLabel: l.actionAbort, onAbort: _leave);
+      case ConnectConnecting():
+        return _Progress(label: l.connectConnecting(name), abortLabel: l.actionAbort, onAbort: _leave);
+      case ConnectNeedsHostKey():
+        return const SizedBox.shrink(); // ditangani di build
+      case ConnectAuthDenied(:final cancelled):
+        return _Message(
+          title: cancelled ? l.authDeniedTitle : l.authUnavailableTitle,
+          body: cancelled ? l.authDeniedBody : l.authUnavailableBody,
+          icon: TermulIconName.lock,
+          actions: [
+            TermulButton(
+              label: l.actionRetry,
+              variant: TermulButtonVariant.primary,
+              size: TermulButtonSize.lg,
+              onPressed: flow.start,
+            ),
+            TermulButton(label: l.actionBack, variant: TermulButtonVariant.ghost, onPressed: _leave),
+          ],
+        );
+      case ConnectNeedsSecret():
+        return _SecretForm(profile: widget.profile, state: state, flow: flow, onBack: _leave);
+      case ConnectFailed(:final failure):
+        final (title, body) = _failureText(l, failure);
+        return _Message(
+          title: title,
+          body: body,
+          icon: TermulIconName.warning,
+          risk: true,
+          actions: [
+            TermulButton(
+              label: l.actionRetry,
+              variant: TermulButtonVariant.primary,
+              size: TermulButtonSize.lg,
+              onPressed: flow.start,
+            ),
+            TermulButton(label: l.actionBack, variant: TermulButtonVariant.ghost, onPressed: _leave),
+          ],
+        );
+      case ConnectDone():
+        return _Message(
+          title: l.connectedTitle(name),
+          body: l.connectedPlaceholder,
+          icon: TermulIconName.terminal,
+          actions: [
+            TermulButton(
+              label: l.actionDisconnect,
+              variant: TermulButtonVariant.primary,
+              size: TermulButtonSize.lg,
+              onPressed: _leave,
+            ),
+          ],
+        );
+    }
+  }
+
+  static (String, String) _failureText(AppLocalizations l, SshFailure f) => switch (f) {
+    SshNetworkFailure() => (l.failNetworkTitle, l.failNetworkBody),
+    SshHandshakeFailure() => (l.failHandshakeTitle, l.failHandshakeBody),
+    SshAuthFailure() => (l.failAuthTitle, l.failAuthBody),
+    SshHostKeyRejected(changed: true) => (l.failRejectedChangedTitle, l.failRejectedChangedBody),
+    SshHostKeyRejected() => (l.failRejectedTitle, l.failRejectedBody),
+    SshHostKeyStoreFailure() => (l.failStoreTitle, l.failStoreBody),
+    SshKeyUnusable() || SshUnknownFailure() => (l.failUnknownTitle, l.failUnknownBody),
+  };
+}
+
+class _Header extends StatelessWidget {
+  const _Header({required this.profile, required this.onBack});
+
+  final HostProfile profile;
+  final VoidCallback onBack;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Padding(
+      padding: const EdgeInsets.fromLTRB(
+        TermulSpacing.space3,
+        TermulSpacing.space5,
+        TermulSpacing.space8,
+        TermulSpacing.space3,
+      ),
+      child: Row(
+        children: [
+          TermulIconButton(icon: TermulIconName.chevronLeft, label: l.actionBack, onPressed: onBack),
+          const SizedBox(width: TermulSpacing.space3),
+          Expanded(
+            child: Text(
+              '${profile.name} · ${profile.username}@${profile.host}:${profile.port}',
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              style: TermulText.terminalSm.copyWith(color: TermulPalette.inkMuted),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
+
+class _Progress extends StatelessWidget {
+  const _Progress({required this.label, required this.abortLabel, required this.onAbort});
+
+  final String label;
+  final String abortLabel;
+  final VoidCallback onAbort;
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.all(TermulSpacing.space8),
+      child: Column(
+        children: [
+          Expanded(
+            child: Center(
+              child: Semantics(
+                liveRegion: true,
+                child: StatusDot(status: HostStatus.busy, label: label),
+              ),
+            ),
+          ),
+          TermulButton(label: abortLabel, onPressed: onAbort),
+        ],
+      ),
+    );
+  }
+}
+
+class _Message extends StatelessWidget {
+  const _Message({
+    required this.title,
+    required this.body,
+    required this.icon,
+    required this.actions,
+    this.risk = false,
+  });
+
+  final String title;
+  final String body;
+  final TermulIconName icon;
+  final List<Widget> actions;
+  final bool risk;
+
+  @override
+  Widget build(BuildContext context) {
+    final tone = risk ? TermulPalette.bad : TermulPalette.accent;
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              TermulSpacing.space8,
+              TermulSpacing.space5,
+              TermulSpacing.space8,
+              TermulSpacing.space9,
+            ),
+            children: [
+              Container(
+                width: 56,
+                height: 56,
+                alignment: Alignment.center,
+                decoration: BoxDecoration(
+                  color: risk ? TermulPalette.badBg : TermulPalette.accentBg,
+                  borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
+                  border: Border.all(color: risk ? TermulPalette.badLine : TermulPalette.accentLine),
+                ),
+                child: TermulIcon(icon, size: 28, color: tone),
+              ),
+              const SizedBox(height: TermulSpacing.space7),
+              Semantics(
+                header: true,
+                liveRegion: true,
+                child: Text(title, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
+              ),
+              const SizedBox(height: TermulSpacing.space3),
+              Text(body, style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
+            ],
+          ),
+        ),
+        _Footer(children: actions),
+      ],
+    );
+  }
+}
+
+class _Footer extends StatelessWidget {
+  const _Footer({required this.children});
+
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        TermulSpacing.space8,
+        TermulSpacing.space5,
+        TermulSpacing.space8,
+        TermulSpacing.space8,
+      ),
+      decoration: const BoxDecoration(
+        color: TermulPalette.ground,
+        border: Border(top: BorderSide(color: TermulPalette.line)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          for (var i = 0; i < children.length; i++) ...[
+            if (i > 0) const SizedBox(height: TermulSpacing.space3),
+            children[i],
+          ],
+        ],
+      ),
+    );
+  }
+}
+
+/// Layar "Rahasia hilang": memasukkan ulang password, atau mengimpor ulang kunci beserta passphrase-nya.
+/// Hasilnya langsung ke vault lewat [ConnectFlow.submitSecret] lalu sambungan diulang.
+class _SecretForm extends ConsumerStatefulWidget {
+  const _SecretForm({required this.profile, required this.state, required this.flow, required this.onBack});
+
+  final HostProfile profile;
+  final ConnectNeedsSecret state;
+  final ConnectFlow flow;
+  final VoidCallback onBack;
+
+  @override
+  ConsumerState<_SecretForm> createState() => _SecretFormState();
+}
+
+class _SecretFormState extends ConsumerState<_SecretForm> {
+  final _password = TextEditingController();
+  final _passphrase = TextEditingController();
+  InspectedKey? _picked;
+  String? _keyError;
+  String? _fieldError;
+  bool _busy = false;
+
+  bool get _isKey => widget.state.method == AuthMethod.key;
+
+  @override
+  void dispose() {
+    _password.dispose();
+    _passphrase.dispose();
+    super.dispose();
+  }
+
+  Future<void> _pickKey() async {
+    try {
+      final bytes = await ref.read(keyFilePickerProvider).pick();
+      if (bytes == null) return;
+      final key = PrivateKeyInspector.inspect(bytes);
+      setState(() {
+        _picked = key;
+        _keyError = null;
+        _fieldError = null;
+        _passphrase.clear();
+      });
+    } on KeyImportException catch (e) {
+      setState(() {
+        _picked = null;
+        _keyError = keyErrorText(AppLocalizations.of(context), e);
+      });
+    }
+  }
+
+  Future<void> _submit() async {
+    final l = AppLocalizations.of(context);
+    if (_isKey) {
+      final key = _picked;
+      if (key == null) {
+        setState(() => _fieldError = l.errKeyRequired);
+        return;
+      }
+      if (key.encrypted) {
+        setState(() => _busy = true);
+        await Future<void>.delayed(const Duration(milliseconds: 16)); // beri layar kesempatan menggambar
+        try {
+          PrivateKeyInspector.verifyPassphrase(key.pem, _passphrase.text);
+        } on KeyImportException {
+          if (mounted) {
+            setState(() {
+              _busy = false;
+              _fieldError = l.errPassphraseWrong;
+            });
+          }
+          return;
+        }
+      }
+      setState(() => _busy = true);
+      await widget.flow.submitSecret(privateKeyPem: key.pem, passphrase: _passphrase.text);
+    } else {
+      if (_password.text.isEmpty) {
+        setState(() => _fieldError = l.errPasswordRequired);
+        return;
+      }
+      setState(() => _busy = true);
+      await widget.flow.submitSecret(password: _password.text);
+    }
+    if (mounted) setState(() => _busy = false);
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final name = widget.profile.name;
+    final picked = _picked;
+    return Column(
+      children: [
+        Expanded(
+          child: ListView(
+            padding: const EdgeInsets.fromLTRB(
+              TermulSpacing.space8,
+              TermulSpacing.space5,
+              TermulSpacing.space8,
+              TermulSpacing.space9,
+            ),
+            children: [
+              Semantics(
+                header: true,
+                child: Text(l.secretMissingTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
+              ),
+              const SizedBox(height: TermulSpacing.space3),
+              Text(
+                widget.state.wrongPassphrase
+                    ? l.secretWrongPassphraseBody
+                    : (_isKey ? l.secretMissingKeyBody(name) : l.secretMissingPasswordBody(name)),
+                style: TermulText.body.copyWith(color: TermulPalette.inkSoft),
+              ),
+              const SizedBox(height: TermulSpacing.space8),
+              if (!_isKey)
+                TermulTextField(
+                  label: l.fieldPassword,
+                  controller: _password,
+                  obscure: true,
+                  mono: true,
+                  autofocus: true,
+                  error: _fieldError,
+                  enabled: !_busy,
+                  textInputAction: TextInputAction.done,
+                  onSubmitted: (_) => _submit(),
+                )
+              else ...[
+                TermulButton(
+                  label: picked == null ? l.keyImport : l.keyReplace,
+                  icon: TermulIconName.key,
+                  onPressed: _busy ? null : _pickKey,
+                ),
+                if (picked != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: TermulSpacing.space3),
+                    child: Text(
+                      l.keyReady(keyTypeLabel(picked.type)),
+                      style: TermulText.caption.copyWith(color: TermulPalette.ok),
+                    ),
+                  ),
+                if (_fieldError != null && (picked == null || !picked.encrypted))
+                  Padding(
+                    padding: const EdgeInsets.only(top: TermulSpacing.space3),
+                    child: Text(_fieldError!, style: TermulText.caption.copyWith(color: TermulPalette.bad)),
+                  ),
+                if (_keyError != null)
+                  Padding(
+                    padding: const EdgeInsets.only(top: TermulSpacing.space5),
+                    child: TermulBanner(tone: BannerTone.risk, child: Text(_keyError!)),
+                  ),
+                if (picked != null && picked.encrypted) ...[
+                  const SizedBox(height: TermulSpacing.space6),
+                  Text(l.keyPassphraseEncrypted, style: TermulText.bodySm.copyWith(color: TermulPalette.inkSoft)),
+                  const SizedBox(height: TermulSpacing.space3),
+                  TermulTextField(
+                    label: l.fieldPassphrase,
+                    controller: _passphrase,
+                    obscure: true,
+                    mono: true,
+                    error: _fieldError,
+                    enabled: !_busy,
+                  ),
+                ],
+              ],
+            ],
+          ),
+        ),
+        _Footer(
+          children: [
+            TermulButton(
+              label: l.actionSaveAndConnect,
+              variant: TermulButtonVariant.primary,
+              size: TermulButtonSize.lg,
+              onPressed: _busy ? null : _submit,
+            ),
+            TermulButton(
+              label: l.actionBack,
+              variant: TermulButtonVariant.ghost,
+              onPressed: _busy ? null : widget.onBack,
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}

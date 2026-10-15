@@ -3,6 +3,7 @@ import 'dart:typed_data';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app.dart';
 import 'package:termul_mobile/app_providers.dart';
@@ -72,14 +73,19 @@ class Harness {
     }
   }
 
-  Future<void> pump(WidgetTester tester, {Size size = const Size(390, 844)}) async {
+  Future<void> pump(
+    WidgetTester tester, {
+    Size size = const Size(390, 844),
+    List<Override> overrides = const [],
+    bool realConnect = false,
+  }) async {
     tester.view.devicePixelRatio = 1;
     tester.view.physicalSize = size;
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [...deps.overrides, keyFilePickerProvider.overrideWithValue(picker)],
-        child: TermulApp(onConnect: (context, profile) => connected.add(profile)),
+        overrides: [...deps.overrides, keyFilePickerProvider.overrideWithValue(picker), ...overrides],
+        child: TermulApp(onConnect: realConnect ? null : (context, profile) => connected.add(profile)),
       ),
     );
     await tester.pumpAndSettle();

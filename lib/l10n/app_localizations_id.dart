@@ -266,9 +266,6 @@ class AppLocalizationsId extends AppLocalizations {
       'Data Anda tidak diubah. Mulai ulang aplikasi; bila berulang, periksa ruang penyimpanan HP.';
 
   @override
-  String get connectNotAvailable => 'Sambungan belum tersedia di versi ini';
-
-  @override
   String get actionAbort => 'Batalkan';
 
   @override
@@ -416,4 +413,12 @@ class AppLocalizationsId extends AppLocalizations {
   String connectedTitle(String name) {
     return 'Tersambung ke $name';
   }
+
+  @override
+  String unlockReason(String name) {
+    return 'Buka kredensial untuk $name';
+  }
+
+  @override
+  String get connectedPlaceholder => 'Layar terminal belum tersedia di versi ini.';
 }

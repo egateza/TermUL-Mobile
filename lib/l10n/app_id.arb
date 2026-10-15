@@ -361,10 +361,6 @@
   "@bootErrorBody": {
     "description": "Isi layar galat saat aplikasi mulai."
   },
-  "connectNotAvailable": "Sambungan belum tersedia di versi ini",
-  "@connectNotAvailable": {
-    "description": "Toast sementara saat host ditekan sebelum alur sambung dibuat."
-  },
   "actionAbort": "Batalkan",
   "@actionAbort": {
     "description": "Tombol membatalkan sambungan yang sedang berjalan."
@@ -570,5 +566,18 @@
         "type": "String"
       }
     }
+  },
+  "unlockReason": "Buka kredensial untuk {name}",
+  "@unlockReason": {
+    "description": "Alasan yang tampil di prompt sidik jari atau PIN saat kredensial dibuka.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "connectedPlaceholder": "Layar terminal belum tersedia di versi ini.",
+  "@connectedPlaceholder": {
+    "description": "Keterangan sementara setelah tersambung, sampai layar terminal ada."
   }
 }

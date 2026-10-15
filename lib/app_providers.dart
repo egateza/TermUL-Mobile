@@ -4,9 +4,11 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'bootstrap.dart';
 import 'core/keys/key_file_picker.dart';
 import 'core/models/profile_snapshot.dart';
+import 'core/ssh/ssh_connector.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/vault/credential_vault.dart';
+import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
 import 'features/hosts/host_service.dart';
 
@@ -23,6 +25,14 @@ final bootReportProvider = Provider<BootReport>((ref) => const BootReport());
 
 /// Pemilih berkas kunci; diganti di test.
 final keyFilePickerProvider = Provider<KeyFilePicker>((ref) => const FileSelectorKeyPicker());
+
+/// Konektor SSH; memakai penyimpanan sidik jari yang sama dengan seluruh aplikasi.
+final sshConnectorProvider = Provider<SshConnector>(
+  (ref) => SshConnector(knownHosts: ref.watch(knownHostsRepositoryProvider)),
+);
+
+/// Fungsi sambung yang dipakai alur sambung; diganti di tes.
+final connectFunctionProvider = Provider<ConnectFunction>((ref) => ref.watch(sshConnectorProvider).connect);
 
 extension AppDependenciesOverrides on AppDependencies {
   /// Override provider untuk `ProviderScope`.

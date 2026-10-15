@@ -4,6 +4,7 @@ import 'dart:io';
 import 'dart:typed_data';
 
 import 'package:dartssh2/dartssh2.dart';
+import 'package:flutter/foundation.dart' show visibleForTesting;
 
 import '../models/host_profile.dart';
 import '../models/known_host.dart';
@@ -82,6 +83,10 @@ enum CloseReason { userClosed, serverClosed, keepAliveTimeout, error }
 
 /// Sambungan SSH yang sudah terautentikasi. Menutup sendiri bila keepalive tidak dibalas.
 class SshConnection {
+  /// Hanya untuk tes: membungkus [client] tanpa melewati [SshConnector.connect].
+  @visibleForTesting
+  SshConnection.forTest(SSHClient client, HostProfile profile) : this._(client, profile);
+
   SshConnection._(this.client, this.profile) {
     client.done.then<void>((_) => _finish(CloseReason.serverClosed), onError: (Object _) => _finish(CloseReason.error));
   }

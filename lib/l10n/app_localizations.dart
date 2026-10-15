@@ -553,12 +553,6 @@ abstract class AppLocalizations {
   /// **'Data Anda tidak diubah. Mulai ulang aplikasi; bila berulang, periksa ruang penyimpanan HP.'**
   String get bootErrorBody;
 
-  /// Toast sementara saat host ditekan sebelum alur sambung dibuat.
-  ///
-  /// In id, this message translates to:
-  /// **'Sambungan belum tersedia di versi ini'**
-  String get connectNotAvailable;
-
   /// Tombol membatalkan sambungan yang sedang berjalan.
   ///
   /// In id, this message translates to:
@@ -822,6 +816,18 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tersambung ke {name}'**
   String connectedTitle(String name);
+
+  /// Alasan yang tampil di prompt sidik jari atau PIN saat kredensial dibuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka kredensial untuk {name}'**
+  String unlockReason(String name);
+
+  /// Keterangan sementara setelah tersambung, sampai layar terminal ada.
+  ///
+  /// In id, this message translates to:
+  /// **'Layar terminal belum tersedia di versi ini.'**
+  String get connectedPlaceholder;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

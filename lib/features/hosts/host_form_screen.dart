@@ -10,6 +10,7 @@ import '../../core/theme/termul_theme.dart';
 import '../../core/vault/credential_vault.dart';
 import '../../core/vault/secret_type.dart';
 import '../../l10n/app_localizations.dart';
+import '../../shared/key_import_text.dart';
 import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
@@ -93,26 +94,10 @@ class _HostFormScreenState extends ConsumerState<HostFormScreen> {
     } on KeyImportException catch (e) {
       setState(() {
         _picked = null;
-        _keyError = _keyErrorText(AppLocalizations.of(context), e);
+        _keyError = keyErrorText(AppLocalizations.of(context), e);
       });
     }
   }
-
-  static String _keyErrorText(AppLocalizations l, KeyImportException e) => switch (e.problem) {
-    KeyProblem.notAKey => l.keyErrNotAKey,
-    KeyProblem.notPem => l.keyErrNotPem,
-    KeyProblem.pkcs8Unsupported => l.keyErrPkcs8,
-    KeyProblem.unsupportedType => l.keyErrType(e.detail ?? ''),
-    KeyProblem.malformed => l.keyErrMalformed,
-    KeyProblem.wrongPassphrase => l.errPassphraseWrong,
-  };
-
-  static String _typeLabel(String pemType) => switch (pemType) {
-    'OPENSSH PRIVATE KEY' => 'OpenSSH',
-    'RSA PRIVATE KEY' => 'RSA',
-    'EC PRIVATE KEY' => 'EC',
-    _ => pemType,
-  };
 
   Future<void> _save() async {
     final l = AppLocalizations.of(context);
@@ -373,7 +358,7 @@ class _HostFormScreenState extends ConsumerState<HostFormScreen> {
   Widget _keySection(AppLocalizations l) {
     final picked = _picked;
     final hasKey = picked != null || _hasStoredKey;
-    final status = picked != null ? l.keyReady(_typeLabel(picked.type)) : (_hasStoredKey ? l.keyStored : null);
+    final status = picked != null ? l.keyReady(keyTypeLabel(picked.type)) : (_hasStoredKey ? l.keyStored : null);
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
