@@ -399,7 +399,7 @@ Usulan: **ARB sejak awal**, dengan satu bahasa (`id`).
 ### Langkah 0 (selesai, commit `0087831`)
 
 - Terbukti otomatis: `flutter analyze` bersih, `flutter test` lulus, `flutter build apk --debug` berhasil (sekitar 166 detik). Isi APK diperiksa dengan `aapt2`: paket `io.github.egateza.termul`, `minSdk` 24, izin `INTERNET`, `USE_BIOMETRIC`, `allowBackup=false`, aktivitas `MainActivity`.
-- **Belum dilakukan:** memasang dan membuka APK di HP. Tidak ada perangkat yang terhubung lewat adb saat dikerjakan. Uji manual: pasang dan buka; layar yang muncul kosong gelap.
+- **Dipasang dan dibuka di emulator** (Android 14, x86_64; build `--target-platform android-x64`): proses hidup, tidak ada crash di logcat, layar gelap kosong sesuai harapan. **HP fisik belum.** APK arm64 yang dibangun lebih dulu tidak bisa dipakai di emulator x86_64.
 - **Temuan di luar rencana:** izin `INTERNET` hanya ada di manifest debug/profile bawaan Flutter, jadi build rilis tidak bisa SSH. Ditambahkan ke manifest utama.
 - Jendela awal aplikasi memakai warna token `ground` (`#0F1316`) lewat `values/colors.xml`; `values-night/styles.xml` dihapus karena identik. Tema `LaunchTheme` dan `NormalTheme` berinduk `Theme.AppCompat.DayNight.NoActionBar`; apakah `local_auth` menarik AppCompat sampai tidak crash di Android 8 ke bawah belum diuji (build berhasil).
 - `docs/licenses.md` dihasilkan dari `pubspec.lock`: 89 paket hosted, 89 cocok dengan tag pub.dev, 0 copyleft. Skrip pembuatnya ada di luar repo; hasil perlu dibuat ulang bila `pubspec.lock` berubah.
@@ -418,4 +418,6 @@ Keputusan kecil yang dibuat saat implementasi:
 - `known_hosts.json` rusak berarti semua host kembali "baru" sampai dipercaya lagi; UI wajib menampilkan `LoadResult.hadCorruptFile`.
 - Tes menemukan satu bug nyata: UTF-8 tidak sah muncul sebagai `FileSystemException`, bukan `FormatException`, sehingga berkas tidak dikarantina. Diperbaiki dengan decode sendiri (`utf8.decode`).
 
-Belum teruji (tetap berlaku dari bagian 9): `rename` dan `flush` di Android, folder `path_provider` di HP, ketahanan terhadap mati daya sungguhan, dan alur di HP sungguhan.
+Uji di Android: `integration_test/storage_test.dart` (7 tes, dependensi dev `integration_test` dari SDK) lulus di **emulator** Android 14 x86_64, memakai folder `path_provider` asli: tulis atomik, timpa, galat sebelum rename, 50 simpanan serentak lalu muat ulang, karantina, kegagalan tulis, dan `known_hosts`. Jalankan dengan `flutter test integration_test -d <perangkat>`.
+
+Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `flush` benar-benar `fsync` di Android; ketahanan terhadap mati daya atau proses dimatikan paksa (tes hanya memeriksa kegagalan yang disuntik, bukan kematian proses); emulator memakai disk virtual, jadi bukan bukti untuk penyimpanan flash HP.

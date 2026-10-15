@@ -2,9 +2,9 @@
 
 Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa dua arah: (1) berkas `LICENSE` di arsip paket, dan (2) tag `license:` dari API pub.dev (`/api/packages/<nama>/score`). Kolom "Cocok" bernilai ya bila keduanya sama. Klasifikasi `LICENSE` memakai pencocokan teks; ini bukan pembacaan hukum.
 
-- Paket hosted diperiksa: **89**; cocok: **89**; tidak cocok atau gagal diambil: **0**.
+- Paket hosted diperiksa: **93**; cocok: **93**; tidak cocok atau gagal diambil: **0**.
 - Paket berlisensi copyleft (GPL, LGPL, AGPL, MPL): **0**.
-- Paket SDK (flutter, flutter_localizations, flutter_test, flutter_web_plugins, sky_engine) mengikuti lisensi Flutter SDK (BSD-3-Clause); `sky_engine` memuat Apache-2.0.
+- Paket SDK (flutter, flutter_driver, flutter_localizations, flutter_test, flutter_web_plugins, fuchsia_remote_debug_protocol, integration_test, sky_engine) mengikuti lisensi Flutter SDK (BSD-3-Clause); `sky_engine` memuat Apache-2.0.
 - `xterm` 4.0.0 (MIT) dipakai, bukan `xterm3` (AGPL-3.0).
 - Belum diverifikasi: lisensi font (IBM Plex Sans, JetBrains Mono), paket yang belum ditambahkan, dan apakah paket platform non-Android ikut masuk APK.
 - Perbarui berkas ini setiap `pubspec.lock` berubah.
@@ -36,6 +36,7 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 | `fake_async` | 1.3.3 | transitive | apache-2.0 | apache-2.0 | ya |
 | `ffi` | 2.2.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `ffi_leak_tracker` | 0.1.2 | transitive | bsd-3-clause | bsd-3-clause | ya |
+| `file` | 7.0.1 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `file_selector_android` | 0.5.2+11 | transitive | bsd-3-clause, apache-2.0 | apache-2.0, bsd-3-clause | ya |
 | `file_selector_ios` | 0.5.3+6 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `file_selector_linux` | 0.9.4+1 | transitive | bsd-3-clause | bsd-3-clause | ya |
@@ -81,6 +82,7 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 | `platform` | 3.2.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `plugin_platform_interface` | 2.1.8 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `pointycastle` | 4.0.0 | transitive | mit | mit | ya |
+| `process` | 5.0.6 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `pub_semver` | 2.2.1 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `quiver` | 3.2.2 | transitive | apache-2.0 | apache-2.0 | ya |
 | `record_use` | 0.6.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
@@ -90,12 +92,14 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 | `state_notifier` | 1.0.0 | transitive | mit | mit | ya |
 | `stream_channel` | 2.1.4 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `string_scanner` | 1.4.1 | transitive | bsd-3-clause | bsd-3-clause | ya |
+| `sync_http` | 0.3.1 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `term_glyph` | 1.2.2 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `test_api` | 0.7.12 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `typed_data` | 1.4.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `vector_math` | 2.4.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `vm_service` | 15.3.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `web` | 1.1.1 | transitive | bsd-3-clause | bsd-3-clause | ya |
+| `webdriver` | 3.2.0 | transitive | apache-2.0 | apache-2.0 | ya |
 | `win32` | 6.4.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `xdg_directories` | 1.1.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `yaml` | 3.1.4 | transitive | mit | mit | ya |
