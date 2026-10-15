@@ -15,11 +15,12 @@ import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_text_field.dart';
+import '../terminal/terminal_screen.dart';
 import 'connect_flow.dart';
 import 'host_key_prompt.dart';
 
 /// Layar alur sambung ke satu host: membuka rahasia, menyambung, meminta keputusan host key, dan menampilkan
-/// kegagalan. Setelah tersambung sementara menampilkan keterangan; layar terminal menggantikannya di langkah 7.
+/// kegagalan. Setelah tersambung, layar ini menampilkan [TerminalScreen] dan menutup sambungannya saat layar ditutup.
 class ConnectScreen extends ConsumerStatefulWidget {
   const ConnectScreen({super.key, required this.profile});
 
@@ -68,6 +69,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       listenable: flow,
       builder: (context, _) {
         final state = flow.state;
+        if (state is ConnectDone) {
+          return TerminalScreen(profile: widget.profile, connection: state.connection);
+        }
         if (state is ConnectNeedsHostKey) {
           return HostKeyPrompt(profile: widget.profile, challenge: state.challenge, onChoice: flow.answerHostKey);
         }
@@ -130,19 +134,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
           ],
         );
       case ConnectDone():
-        return _Message(
-          title: l.connectedTitle(name),
-          body: l.connectedPlaceholder,
-          icon: TermulIconName.terminal,
-          actions: [
-            TermulButton(
-              label: l.actionDisconnect,
-              variant: TermulButtonVariant.primary,
-              size: TermulButtonSize.lg,
-              onPressed: _leave,
-            ),
-          ],
-        );
+        return const SizedBox.shrink(); // ditangani di build
     }
   }
 

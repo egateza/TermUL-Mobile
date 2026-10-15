@@ -2,7 +2,6 @@ import 'dart:async';
 import 'dart:io';
 import 'dart:typed_data';
 
-import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter/material.dart' show ListView;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app_providers.dart';
@@ -13,36 +12,11 @@ import 'package:termul_mobile/core/ssh/ssh_connector.dart';
 import 'package:termul_mobile/core/ssh/ssh_failure.dart';
 import 'package:termul_mobile/core/vault/secret_type.dart';
 import 'package:termul_mobile/features/connect/connect_flow.dart';
+import 'package:termul_mobile/features/terminal/terminal_screen.dart';
 import 'package:termul_mobile/shared/widgets/host_row.dart';
 
 import 'hosts_ui_harness.dart';
-
-class _SilentSocket extends SSHSocket {
-  _SilentSocket() {
-    _out.stream.listen((_) {}, onDone: () => _done.isCompleted ? null : _done.complete());
-  }
-
-  final _in = StreamController<Uint8List>();
-  final _out = StreamController<List<int>>();
-  final _done = Completer<void>();
-
-  @override
-  Stream<Uint8List> get stream => _in.stream;
-  @override
-  StreamSink<List<int>> get sink => _out.sink;
-  @override
-  Future<void> get done => _done.future;
-  @override
-  Future<void> close() async {
-    await _out.close();
-    await _in.close();
-  }
-
-  @override
-  void destroy() {
-    unawaited(close());
-  }
-}
+import 'silent_socket.dart';
 
 /// Fungsi sambung palsu: tiap panggilan dicatat dan dijalankan oleh [script].
 class _Net {
@@ -57,7 +31,7 @@ class _Net {
       };
 
   SshConnection open(HostProfile profile) {
-    final c = SshConnection.forTest(SSHClient(_SilentSocket(), username: 'x'), profile);
+    final c = fakeConnection(profile);
     connections.add(c);
     return c;
   }
@@ -80,6 +54,13 @@ Future<void> _openConnect(WidgetTester tester, Harness h, _Net net) async {
   await tester.tap(find.widgetWithText(HostRow, 'app-01'));
   await tester.pump();
   await tester.pump(const Duration(milliseconds: 50));
+}
+
+Future<void> leaveTerminal(WidgetTester tester) async {
+  await tester.tap(find.bySemanticsLabel('Kembali'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Putuskan'));
+  await tester.pumpAndSettle();
 }
 
 Future<void> reopen(WidgetTester tester) async {
@@ -114,11 +95,10 @@ void main() {
     net.script = (_) async => net.open(h.hosts.snapshot.profiles.single);
     await _openConnect(tester, h, net);
     await tester.pumpAndSettle();
-    expect(find.text('Tersambung ke app-01'), findsOneWidget);
+    expect(find.byType(TerminalScreen), findsOneWidget);
     expect((net.calls.single as PasswordCredentials).password, 'rahasia');
-    await tester.tap(find.text('Putuskan'));
-    await tester.pumpAndSettle();
-    expect(find.text('Tersambung ke app-01'), findsNothing);
+    await leaveTerminal(tester);
+    expect(find.byType(TerminalScreen), findsNothing);
     expect(net.connections.single.isClosed, isTrue);
   });
 
@@ -142,7 +122,7 @@ void main() {
     await tester.tap(find.text('Percayai dan sambung'));
     await tester.pumpAndSettle();
     expect(got, HostKeyChoice.trustAndSave);
-    expect(find.text('Tersambung ke app-01'), findsOneWidget);
+    expect(find.byType(TerminalScreen), findsOneWidget);
   });
 
   testWidgets('host baru: "Sambung sekali saja" dan "Batalkan" memberi pilihan yang sesuai', (tester) async {
@@ -160,8 +140,7 @@ void main() {
     await tester.tap(find.text('Sambung sekali saja'));
     await tester.pumpAndSettle();
     expect(got, HostKeyChoice.connectOnce);
-    await tester.tap(find.text('Putuskan'));
-    await tester.pumpAndSettle();
+    await leaveTerminal(tester);
 
     await reopen(tester);
     await tester.tap(find.text('Batalkan'));
@@ -253,7 +232,7 @@ void main() {
     await tester.tap(find.text('Simpan dan sambung'));
     await tester.pumpAndSettle();
     expect((net.calls.single as PasswordCredentials).password, 'baru123');
-    expect(find.text('Tersambung ke app-01'), findsOneWidget);
+    expect(find.byType(TerminalScreen), findsOneWidget);
     expect(await h.vault.has(id1, SecretType.loginPassword), isTrue);
   });
 
@@ -280,7 +259,7 @@ void main() {
     await tester.tap(find.text('Simpan dan sambung'));
     await tester.pumpAndSettle();
     expect(net.calls.single, isA<KeyCredentials>());
-    expect(find.text('Tersambung ke app-01'), findsOneWidget);
+    expect(find.byType(TerminalScreen), findsOneWidget);
   });
 
   testWidgets('galat jaringan: judul sesuai; Coba lagi mengulang', (tester) async {
@@ -298,7 +277,7 @@ void main() {
     expect(find.text('Tidak bisa tersambung'), findsOneWidget);
     await tester.tap(find.text('Coba lagi'));
     await tester.pumpAndSettle();
-    expect(find.text('Tersambung ke app-01'), findsOneWidget);
+    expect(find.byType(TerminalScreen), findsOneWidget);
   });
 
   testWidgets('tiap jenis kegagalan punya judul sendiri', (tester) async {
@@ -337,7 +316,7 @@ void main() {
     h.auth.result = true;
     await tester.tap(find.text('Coba lagi'));
     await tester.pumpAndSettle();
-    expect(find.text('Tersambung ke app-01'), findsOneWidget);
+    expect(find.byType(TerminalScreen), findsOneWidget);
   });
 
   testWidgets('menyambung: status dengan kata; Batalkan menutup layar dan sambungan yang terlambat ditutup', (

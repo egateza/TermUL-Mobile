@@ -558,15 +558,6 @@
   "@hostKeyReplaceAndConnect": {
     "description": "Tombol berisiko mengganti host key lalu menyambung."
   },
-  "connectedTitle": "Tersambung ke {name}",
-  "@connectedTitle": {
-    "description": "Judul sementara setelah tersambung.",
-    "placeholders": {
-      "name": {
-        "type": "String"
-      }
-    }
-  },
   "unlockReason": "Buka kredensial untuk {name}",
   "@unlockReason": {
     "description": "Alasan yang tampil di prompt sidik jari atau PIN saat kredensial dibuka.",
@@ -576,8 +567,133 @@
       }
     }
   },
-  "connectedPlaceholder": "Layar terminal belum tersedia di versi ini.",
-  "@connectedPlaceholder": {
-    "description": "Keterangan sementara setelah tersambung, sampai layar terminal ada."
+  "terminalStatusOpening": "Membuka shell…",
+  "@terminalStatusOpening": {
+    "description": "Status di layar terminal saat shell dibuka."
+  },
+  "terminalStatusConnected": "Tersambung",
+  "@terminalStatusConnected": {
+    "description": "Status di layar terminal saat shell berjalan."
+  },
+  "terminalStatusEnded": "Sesi berakhir",
+  "@terminalStatusEnded": {
+    "description": "Status di layar terminal saat shell selesai."
+  },
+  "terminalStatusFailed": "Shell tidak terbuka",
+  "@terminalStatusFailed": {
+    "description": "Status di layar terminal saat shell gagal dibuka."
+  },
+  "terminalLeaveTitle": "Putuskan sambungan?",
+  "@terminalLeaveTitle": {
+    "description": "Judul konfirmasi keluar dari layar terminal."
+  },
+  "terminalLeaveBody": "Shell di server ikut berakhir dan program yang sedang berjalan berhenti. Gunakan tmux bila sesi harus tetap hidup.",
+  "@terminalLeaveBody": {
+    "description": "Isi konfirmasi keluar dari layar terminal."
+  },
+  "terminalHostLabel": "{name}, {status}",
+  "@terminalHostLabel": {
+    "description": "Nama semantik header terminal.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "keyEsc": "Tombol Escape",
+  "@keyEsc": {
+    "description": "Label aksesibilitas tombol Esc."
+  },
+  "keyTab": "Tombol Tab",
+  "@keyTab": {
+    "description": "Label aksesibilitas tombol Tab."
+  },
+  "keyCtrl": "Ctrl, berlaku untuk satu ketukan berikutnya",
+  "@keyCtrl": {
+    "description": "Label aksesibilitas tombol Ctrl."
+  },
+  "keyAlt": "Alt, berlaku untuk satu ketukan berikutnya",
+  "@keyAlt": {
+    "description": "Label aksesibilitas tombol Alt."
+  },
+  "keyCtrlC": "Ctrl C, hentikan program",
+  "@keyCtrlC": {
+    "description": "Label aksesibilitas tombol ^C."
+  },
+  "keyCtrlD": "Ctrl D, akhir masukan",
+  "@keyCtrlD": {
+    "description": "Label aksesibilitas tombol ^D."
+  },
+  "keyArrowUp": "Panah atas",
+  "@keyArrowUp": {
+    "description": "Label aksesibilitas."
+  },
+  "keyArrowDown": "Panah bawah",
+  "@keyArrowDown": {
+    "description": "Label aksesibilitas."
+  },
+  "keyArrowLeft": "Panah kiri",
+  "@keyArrowLeft": {
+    "description": "Label aksesibilitas."
+  },
+  "keyArrowRight": "Panah kanan",
+  "@keyArrowRight": {
+    "description": "Label aksesibilitas."
+  },
+  "keyHome": "Home",
+  "@keyHome": {
+    "description": "Label aksesibilitas."
+  },
+  "keyEnd": "End",
+  "@keyEnd": {
+    "description": "Label aksesibilitas."
+  },
+  "keyPageUp": "Page Up",
+  "@keyPageUp": {
+    "description": "Label aksesibilitas."
+  },
+  "keyPageDown": "Page Down",
+  "@keyPageDown": {
+    "description": "Label aksesibilitas."
+  },
+  "keyPipe": "Garis tegak",
+  "@keyPipe": {
+    "description": "Label aksesibilitas tombol |."
+  },
+  "keyTilde": "Tilde",
+  "@keyTilde": {
+    "description": "Label aksesibilitas tombol ~."
+  },
+  "keySlash": "Garis miring",
+  "@keySlash": {
+    "description": "Label aksesibilitas tombol /."
+  },
+  "keyDash": "Tanda hubung",
+  "@keyDash": {
+    "description": "Label aksesibilitas tombol -."
+  },
+  "keyFunctionToggle": "Tombol F1 sampai F12",
+  "@keyFunctionToggle": {
+    "description": "Label aksesibilitas tombol Fn."
+  },
+  "keyFunctionBack": "Kembali ke tombol biasa",
+  "@keyFunctionBack": {
+    "description": "Label aksesibilitas tombol untuk menutup baris F1 sampai F12."
+  },
+  "keyFunction": "F{n}",
+  "@keyFunction": {
+    "description": "Label aksesibilitas tombol F.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "quickKeysLabel": "Tombol khusus terminal",
+  "@quickKeysLabel": {
+    "description": "Nama semantik baris tombol cepat."
   }
 }

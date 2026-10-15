@@ -410,15 +410,99 @@ class AppLocalizationsId extends AppLocalizations {
   String get hostKeyReplaceAndConnect => 'Ganti key dan sambung';
 
   @override
-  String connectedTitle(String name) {
-    return 'Tersambung ke $name';
-  }
-
-  @override
   String unlockReason(String name) {
     return 'Buka kredensial untuk $name';
   }
 
   @override
-  String get connectedPlaceholder => 'Layar terminal belum tersedia di versi ini.';
+  String get terminalStatusOpening => 'Membuka shell…';
+
+  @override
+  String get terminalStatusConnected => 'Tersambung';
+
+  @override
+  String get terminalStatusEnded => 'Sesi berakhir';
+
+  @override
+  String get terminalStatusFailed => 'Shell tidak terbuka';
+
+  @override
+  String get terminalLeaveTitle => 'Putuskan sambungan?';
+
+  @override
+  String get terminalLeaveBody =>
+      'Shell di server ikut berakhir dan program yang sedang berjalan berhenti. Gunakan tmux bila sesi harus tetap hidup.';
+
+  @override
+  String terminalHostLabel(String name, String status) {
+    return '$name, $status';
+  }
+
+  @override
+  String get keyEsc => 'Tombol Escape';
+
+  @override
+  String get keyTab => 'Tombol Tab';
+
+  @override
+  String get keyCtrl => 'Ctrl, berlaku untuk satu ketukan berikutnya';
+
+  @override
+  String get keyAlt => 'Alt, berlaku untuk satu ketukan berikutnya';
+
+  @override
+  String get keyCtrlC => 'Ctrl C, hentikan program';
+
+  @override
+  String get keyCtrlD => 'Ctrl D, akhir masukan';
+
+  @override
+  String get keyArrowUp => 'Panah atas';
+
+  @override
+  String get keyArrowDown => 'Panah bawah';
+
+  @override
+  String get keyArrowLeft => 'Panah kiri';
+
+  @override
+  String get keyArrowRight => 'Panah kanan';
+
+  @override
+  String get keyHome => 'Home';
+
+  @override
+  String get keyEnd => 'End';
+
+  @override
+  String get keyPageUp => 'Page Up';
+
+  @override
+  String get keyPageDown => 'Page Down';
+
+  @override
+  String get keyPipe => 'Garis tegak';
+
+  @override
+  String get keyTilde => 'Tilde';
+
+  @override
+  String get keySlash => 'Garis miring';
+
+  @override
+  String get keyDash => 'Tanda hubung';
+
+  @override
+  String get keyFunctionToggle => 'Tombol F1 sampai F12';
+
+  @override
+  String get keyFunctionBack => 'Kembali ke tombol biasa';
+
+  @override
+  String keyFunction(int n) {
+    return 'F$n';
+  }
+
+  @override
+  String get quickKeysLabel => 'Tombol khusus terminal';
 }

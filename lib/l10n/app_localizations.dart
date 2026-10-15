@@ -811,23 +811,185 @@ abstract class AppLocalizations {
   /// **'Ganti key dan sambung'**
   String get hostKeyReplaceAndConnect;
 
-  /// Judul sementara setelah tersambung.
-  ///
-  /// In id, this message translates to:
-  /// **'Tersambung ke {name}'**
-  String connectedTitle(String name);
-
   /// Alasan yang tampil di prompt sidik jari atau PIN saat kredensial dibuka.
   ///
   /// In id, this message translates to:
   /// **'Buka kredensial untuk {name}'**
   String unlockReason(String name);
 
-  /// Keterangan sementara setelah tersambung, sampai layar terminal ada.
+  /// Status di layar terminal saat shell dibuka.
   ///
   /// In id, this message translates to:
-  /// **'Layar terminal belum tersedia di versi ini.'**
-  String get connectedPlaceholder;
+  /// **'Membuka shell…'**
+  String get terminalStatusOpening;
+
+  /// Status di layar terminal saat shell berjalan.
+  ///
+  /// In id, this message translates to:
+  /// **'Tersambung'**
+  String get terminalStatusConnected;
+
+  /// Status di layar terminal saat shell selesai.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi berakhir'**
+  String get terminalStatusEnded;
+
+  /// Status di layar terminal saat shell gagal dibuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Shell tidak terbuka'**
+  String get terminalStatusFailed;
+
+  /// Judul konfirmasi keluar dari layar terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan sambungan?'**
+  String get terminalLeaveTitle;
+
+  /// Isi konfirmasi keluar dari layar terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Shell di server ikut berakhir dan program yang sedang berjalan berhenti. Gunakan tmux bila sesi harus tetap hidup.'**
+  String get terminalLeaveBody;
+
+  /// Nama semantik header terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'{name}, {status}'**
+  String terminalHostLabel(String name, String status);
+
+  /// Label aksesibilitas tombol Esc.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol Escape'**
+  String get keyEsc;
+
+  /// Label aksesibilitas tombol Tab.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol Tab'**
+  String get keyTab;
+
+  /// Label aksesibilitas tombol Ctrl.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl, berlaku untuk satu ketukan berikutnya'**
+  String get keyCtrl;
+
+  /// Label aksesibilitas tombol Alt.
+  ///
+  /// In id, this message translates to:
+  /// **'Alt, berlaku untuk satu ketukan berikutnya'**
+  String get keyAlt;
+
+  /// Label aksesibilitas tombol ^C.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl C, hentikan program'**
+  String get keyCtrlC;
+
+  /// Label aksesibilitas tombol ^D.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl D, akhir masukan'**
+  String get keyCtrlD;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'Panah atas'**
+  String get keyArrowUp;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'Panah bawah'**
+  String get keyArrowDown;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'Panah kiri'**
+  String get keyArrowLeft;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'Panah kanan'**
+  String get keyArrowRight;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'Home'**
+  String get keyHome;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'End'**
+  String get keyEnd;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'Page Up'**
+  String get keyPageUp;
+
+  /// Label aksesibilitas.
+  ///
+  /// In id, this message translates to:
+  /// **'Page Down'**
+  String get keyPageDown;
+
+  /// Label aksesibilitas tombol |.
+  ///
+  /// In id, this message translates to:
+  /// **'Garis tegak'**
+  String get keyPipe;
+
+  /// Label aksesibilitas tombol ~.
+  ///
+  /// In id, this message translates to:
+  /// **'Tilde'**
+  String get keyTilde;
+
+  /// Label aksesibilitas tombol /.
+  ///
+  /// In id, this message translates to:
+  /// **'Garis miring'**
+  String get keySlash;
+
+  /// Label aksesibilitas tombol -.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanda hubung'**
+  String get keyDash;
+
+  /// Label aksesibilitas tombol Fn.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol F1 sampai F12'**
+  String get keyFunctionToggle;
+
+  /// Label aksesibilitas tombol untuk menutup baris F1 sampai F12.
+  ///
+  /// In id, this message translates to:
+  /// **'Kembali ke tombol biasa'**
+  String get keyFunctionBack;
+
+  /// Label aksesibilitas tombol F.
+  ///
+  /// In id, this message translates to:
+  /// **'F{n}'**
+  String keyFunction(int n);
+
+  /// Nama semantik baris tombol cepat.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol khusus terminal'**
+  String get quickKeysLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

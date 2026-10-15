@@ -1,8 +1,6 @@
 import 'dart:async';
 import 'dart:io';
-import 'dart:typed_data';
 
-import 'package:dartssh2/dartssh2.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/core/models/auth_method.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
@@ -18,39 +16,9 @@ import 'package:termul_mobile/features/connect/connect_flow.dart';
 
 import '../core/vault/fakes.dart';
 import 'hosts_ui_harness.dart';
+import 'silent_socket.dart';
 
-/// Soket yang tidak pernah menjawab: cukup untuk membangun `SSHClient` tanpa jaringan.
-class _SilentSocket extends SSHSocket {
-  final _in = StreamController<Uint8List>();
-  final _out = StreamController<List<int>>();
-  final _done = Completer<void>();
-
-  _SilentSocket() {
-    _out.stream.listen((_) {}, onDone: () => _done.isCompleted ? null : _done.complete());
-  }
-
-  @override
-  Stream<Uint8List> get stream => _in.stream;
-
-  @override
-  StreamSink<List<int>> get sink => _out.sink;
-
-  @override
-  Future<void> get done => _done.future;
-
-  @override
-  Future<void> close() async {
-    await _out.close();
-    await _in.close();
-  }
-
-  @override
-  void destroy() {
-    unawaited(close());
-  }
-}
-
-SshConnection _fakeConnection(HostProfile p) => SshConnection.forTest(SSHClient(_SilentSocket(), username: 'x'), p);
+SshConnection _fakeConnection(HostProfile p) => fakeConnection(p);
 
 class _Rig {
   _Rig({AuthMethod method = AuthMethod.password, AuthLevel level = AuthLevel.biometric}) {
