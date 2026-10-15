@@ -51,6 +51,42 @@ class _AlwaysAuth implements DeviceAuth {
   Future<bool> authenticate(String reason) async => true;
 }
 
+/// Mengisi kolom form. Daftar form hanya membangun kolom yang terlihat; bila keyboard menyempitkan layar,
+/// kolom di bawah belum ada, jadi gulir dulu sampai terlihat.
+Future<void> enter(WidgetTester tester, String label, String text) async {
+  final field = input(label);
+  if (field.evaluate().isEmpty) {
+    final scrollable = find.descendant(of: find.byType(ListView).last, matching: find.byType(Scrollable)).first;
+    await tester.scrollUntilVisible(field, 80, scrollable: scrollable);
+  }
+  await tester.enterText(field, text);
+}
+
+/// Menunggu [needle] muncul di layar terminal (server bisa lambat, mis. skrip MOTD saat login pertama).
+Future<void> waitTerminal(
+  WidgetTester tester,
+  Terminal terminal,
+  String needle, {
+  Duration timeout = const Duration(seconds: 60),
+}) async {
+  final end = DateTime.now().add(timeout);
+  while (DateTime.now().isBefore(end)) {
+    await tester.pump(const Duration(milliseconds: 200));
+    if (terminal.buffer.getText().contains(needle)) return;
+  }
+  fail('tidak muncul di terminal dalam ${timeout.inSeconds} detik: $needle; layar: ${terminal.buffer.getText()}');
+}
+
+/// Menunggu prompt shell (baris yang berakhir dengan "$ ").
+Future<void> waitPrompt(WidgetTester tester, Terminal terminal) async {
+  final end = DateTime.now().add(const Duration(seconds: 60));
+  while (DateTime.now().isBefore(end)) {
+    await tester.pump(const Duration(milliseconds: 200));
+    if (terminal.buffer.getText().trimRight().endsWith(r'$')) return;
+  }
+  fail('prompt tidak muncul; layar: ${terminal.buffer.getText()}');
+}
+
 void main() {
   IntegrationTestWidgetsFlutterBinding.ensureInitialized();
 
@@ -74,13 +110,14 @@ void main() {
     await tester.pumpWidget(ProviderScope(overrides: deps.overrides, child: const TermulApp()));
     await tester.pumpAndSettle();
 
+    await tester.pump(const Duration(seconds: 2)); // keyboard dari tes sebelumnya sempat menutup
     await tester.tap(find.text('Tambah host'));
     await tester.pumpAndSettle();
-    await tester.enterText(input('Nama'), 'server-uji');
-    await tester.enterText(input('Host'), e2eHost);
-    await tester.enterText(input('Port'), e2ePort);
-    await tester.enterText(input('User'), e2eUser);
-    await tester.enterText(input('Password'), e2ePassword);
+    await enter(tester, 'Nama', 'server-uji');
+    await enter(tester, 'Host', e2eHost);
+    await enter(tester, 'Port', e2ePort);
+    await enter(tester, 'User', e2eUser);
+    await enter(tester, 'Password', e2ePassword);
     await tester.pumpAndSettle();
     await tester.tap(find.text('Simpan'));
     await waitFor(tester, find.widgetWithText(HostRow, 'server-uji'));
@@ -98,11 +135,11 @@ void main() {
     // Terminal sungguhan: ukuran PTY di server cocok dengan layar, dan keluaran deras tidak membuat UI macet.
     await waitFor(tester, find.byType(TerminalView));
     final terminal = tester.widget<TerminalView>(find.byType(TerminalView)).terminal;
-    await tester.pump(const Duration(seconds: 2));
+    await waitPrompt(tester, terminal);
+    await tester.pump(const Duration(seconds: 2)); // keyboard selesai membuka dan ukuran PTY terkirim
     terminal.textInput('stty size\r');
-    await tester.pump(const Duration(seconds: 2));
     final size = '${terminal.viewHeight} ${terminal.viewWidth}';
-    expect(terminal.buffer.getText(), contains(size), reason: 'stty size seharusnya $size');
+    await waitTerminal(tester, terminal, size);
     terminal.textInput('yes | head -n 200000 | tail -n 1; echo SELE""SAI\r');
     final end = DateTime.now().add(const Duration(seconds: 30));
     while (!terminal.buffer.getText().contains('SELESAI\n') && DateTime.now().isBefore(end)) {
@@ -142,17 +179,60 @@ void main() {
     await tester.pumpAndSettle();
   });
 
+  testWidgets('server menutup sambungan: sambung ulang otomatis, riwayat tetap, shell baru berfungsi', (tester) async {
+    final deps = await bootstrap(directory: dir, auth: _AlwaysAuth());
+    await tester.pumpWidget(ProviderScope(overrides: deps.overrides, child: const TermulApp()));
+    await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2)); // keyboard dari tes sebelumnya sempat menutup
+    await tester.tap(find.text('Tambah host'));
+    await tester.pumpAndSettle();
+    await enter(tester, 'Nama', 'server-uji');
+    await enter(tester, 'Host', e2eHost);
+    await enter(tester, 'Port', e2ePort);
+    await enter(tester, 'User', e2eUser);
+    await enter(tester, 'Password', e2ePassword);
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Simpan'));
+    await waitFor(tester, find.widgetWithText(HostRow, 'server-uji'));
+    await tester.pumpAndSettle();
+
+    await tester.tap(find.widgetWithText(HostRow, 'server-uji'));
+    await waitFor(tester, find.text('Host baru'));
+    await tester.tap(find.text('Percayai dan sambung'));
+    await waitFor(tester, find.text('Tersambung'));
+    final terminal = tester.widget<TerminalView>(find.byType(TerminalView)).terminal;
+    await waitPrompt(tester, terminal);
+    terminal.textInput('echo SEBELUM""PUTUS\r');
+    await waitTerminal(tester, terminal, 'SEBELUMPUTUS\n');
+
+    // Mematikan proses sshd sesi ini: server menutup sambungan, seperti soket yang dimatikan Android.
+    terminal.textInput('kill -9 \$PPID\r');
+    await waitFor(tester, find.text('Menyambung ulang…'));
+    await waitFor(tester, find.text('Tersambung'));
+    expect(find.text('Menyambung ulang…'), findsNothing);
+    await waitTerminal(tester, terminal, '— tersambung ulang —');
+    await tester.pump(const Duration(seconds: 3));
+    terminal.textInput('echo SESUDAH""PUTUS\r');
+    await waitTerminal(tester, terminal, 'SESUDAHPUTUS\n');
+    final text = terminal.buffer.getText();
+    expect(text, contains('SEBELUMPUTUS'), reason: 'riwayat layar tetap');
+    expect(text, contains('— tersambung ulang —'));
+    expect(text, contains('SESUDAHPUTUS'), reason: 'shell baru berfungsi');
+    expect(deps.knownHosts.entriesFor(e2eHost, int.parse(e2ePort)), hasLength(1));
+  });
+
   testWidgets('password salah: setelah host key dipercayai, galat "Login ditolak"', (tester) async {
     final deps = await bootstrap(directory: dir, auth: _AlwaysAuth());
     await tester.pumpWidget(ProviderScope(overrides: deps.overrides, child: const TermulApp()));
     await tester.pumpAndSettle();
+    await tester.pump(const Duration(seconds: 2)); // keyboard dari tes sebelumnya sempat menutup
     await tester.tap(find.text('Tambah host'));
     await tester.pumpAndSettle();
-    await tester.enterText(input('Nama'), 'salah');
-    await tester.enterText(input('Host'), e2eHost);
-    await tester.enterText(input('Port'), e2ePort);
-    await tester.enterText(input('User'), e2eUser);
-    await tester.enterText(input('Password'), 'bukan-password-yang-benar');
+    await enter(tester, 'Nama', 'salah');
+    await enter(tester, 'Host', e2eHost);
+    await enter(tester, 'Port', e2ePort);
+    await enter(tester, 'User', e2eUser);
+    await enter(tester, 'Password', 'bukan-password-yang-benar');
     await tester.pumpAndSettle();
     await tester.tap(find.text('Simpan'));
     await waitFor(tester, find.widgetWithText(HostRow, 'salah'));

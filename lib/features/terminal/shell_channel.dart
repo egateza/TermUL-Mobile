@@ -50,7 +50,11 @@ class SshShellChannel implements ShellChannel {
   void write(Uint8List data) => _session.write(data);
 
   @override
-  void resize(int columns, int rows) => _session.resizeTerminal(columns, rows);
+  void resize(int columns, int rows) {
+    // `resizeTerminal` mengirim permintaan tanpa menunggu balasan; bila sambungan tertutup sebelum dibalas,
+    // `dartssh2` melempar `SSHStateError` ke zona (tanpa penampung). Itu wajar saat memutus, jadi ditelan di sini.
+    runZonedGuarded(() => _session.resizeTerminal(columns, rows), (_, _) {});
+  }
 
   @override
   void close() => _session.close();
