@@ -741,4 +741,85 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsHandleDot => 'Bulatan';
+
+  @override
+  String get terminalLeaveChoiceBody =>
+      'Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari Sesi aktif di daftar host. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.';
+
+  @override
+  String get terminalLeaveKeep => 'Tetap terhubung di latar belakang';
+
+  @override
+  String get terminalLeaveKeepAliveOff =>
+      'Pengaturan \"Pertahankan koneksi di latar belakang\" mati, jadi Android bisa memutus sambungan saat aplikasi tidak terlihat.';
+
+  @override
+  String get terminalLeaveOpenSettings => 'Buka Pengaturan';
+
+  @override
+  String get sessionsTitle => 'Sesi aktif';
+
+  @override
+  String hostsOpenSessions(int count) {
+    return 'Sesi aktif, $count';
+  }
+
+  @override
+  String get sessionsEmptyTitle => 'Tidak ada sesi di latar belakang';
+
+  @override
+  String get sessionsEmptyBody =>
+      'Tekan kembali di terminal lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.';
+
+  @override
+  String get sessionsHint => 'Ketuk sesi untuk melanjutkannya.';
+
+  @override
+  String sessionsNumber(int n) {
+    return 'sesi $n';
+  }
+
+  @override
+  String sessionsStarted(String time) {
+    return 'mulai $time';
+  }
+
+  @override
+  String get sessionsStatusConnecting => 'menyambung';
+
+  @override
+  String get sessionsStatusAttention => 'perlu tindakan';
+
+  @override
+  String sessionsOpenLabel(String name, String status) {
+    return '$name, $status. Ketuk untuk melanjutkan.';
+  }
+
+  @override
+  String sessionsDisconnectLabel(String name) {
+    return 'Putuskan $name';
+  }
+
+  @override
+  String get sessionsDisconnectTitle => 'Putuskan sesi?';
+
+  @override
+  String sessionsDisconnectBody(String name) {
+    return 'Shell di $name ikut berakhir dan program yang sedang berjalan berhenti.';
+  }
+
+  @override
+  String get sessionsDisconnectAll => 'Putuskan semua';
+
+  @override
+  String sessionsDisconnectAllTitle(int count) {
+    return 'Putuskan $count sesi?';
+  }
+
+  @override
+  String get sessionsDisconnectAllBody =>
+      'Semua shell di server ikut berakhir dan program yang sedang berjalan berhenti.';
+
+  @override
+  String get terminalLeaveChoiceTitle => 'Keluar dari terminal?';
 }

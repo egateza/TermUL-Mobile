@@ -94,3 +94,7 @@ Aturan pemilik (dicatat di `CLAUDE.md` butir 8): desain sistem dan prototipe har
 - Ujung gagang dibuat dinamis atas permintaan pemilik (miring ke titik seleksi di tepi layar, dibalik di baris paling bawah); dicatat di `README.md` design system versi 29 (`1792134879-4374`). Prototipe tidak diubah (pratinjau `Settings` menggambar gagang tegak lurus).
 - Ujung gagang yang miring diperbaiki supaya bentuknya tidak memanjang (berputar utuh, sudut paling 45 derajat); README design system versi 30 (`1792135132-6f35`) memperbarui catatannya.
 
+## Perubahan lokal lanjutan (2026-10-16, sesi di latar belakang)
+
+- Tambahan atas permintaan pemilik: pilihan "Tetap terhubung di latar belakang" saat keluar dari terminal dan layar Sesi aktif. Di artifact: `prototype/Sessions.dc.html` (12, baru), `prototype/TerminalLeave.dc.html` (2j, baru), `prototype/canvas.json` (dua papan baru: x 3290 y 964 dan x 2940 y 5732), dan `README.md` design system (dua butir: perilaku sesi di latar belakang dan catatan "belum bisa diterapkan" untuk `NavBar` dan tab sesi). Dirender di Chrome tanpa galat. **Sudah di-publish:** prototipe versi 38 (`1792136358-c0f1`) dan design system versi 31 (`1792136361-50f1`).
+

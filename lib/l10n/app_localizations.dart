@@ -1392,6 +1392,132 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Bulatan'**
   String get settingsHandleDot;
+
+  /// Penjelasan di dialog keluar dari terminal dengan pilihan tetap terhubung.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari Sesi aktif di daftar host. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.'**
+  String get terminalLeaveChoiceBody;
+
+  /// Tombol keluar dari terminal tanpa memutus sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap terhubung di latar belakang'**
+  String get terminalLeaveKeep;
+
+  /// Catatan di dialog keluar bila foreground service mati.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan \"Pertahankan koneksi di latar belakang\" mati, jadi Android bisa memutus sambungan saat aplikasi tidak terlihat.'**
+  String get terminalLeaveKeepAliveOff;
+
+  /// Tombol di catatan dialog keluar untuk membuka Pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka Pengaturan'**
+  String get terminalLeaveOpenSettings;
+
+  /// Judul layar daftar sesi yang masih hidup di latar belakang.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi aktif'**
+  String get sessionsTitle;
+
+  /// Nama aksesibilitas ikon sesi aktif di header daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi aktif, {count}'**
+  String hostsOpenSessions(int count);
+
+  /// Judul keadaan kosong daftar sesi aktif.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada sesi di latar belakang'**
+  String get sessionsEmptyTitle;
+
+  /// Isi keadaan kosong daftar sesi aktif.
+  ///
+  /// In id, this message translates to:
+  /// **'Tekan kembali di terminal lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.'**
+  String get sessionsEmptyBody;
+
+  /// Petunjuk di atas daftar sesi aktif.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk sesi untuk melanjutkannya.'**
+  String get sessionsHint;
+
+  /// Nomor sesi untuk membedakan beberapa sesi ke host yang sama.
+  ///
+  /// In id, this message translates to:
+  /// **'sesi {n}'**
+  String sessionsNumber(int n);
+
+  /// Jam sesi dimulai.
+  ///
+  /// In id, this message translates to:
+  /// **'mulai {time}'**
+  String sessionsStarted(String time);
+
+  /// Status sesi yang sedang menyambung pertama kali.
+  ///
+  /// In id, this message translates to:
+  /// **'menyambung'**
+  String get sessionsStatusConnecting;
+
+  /// Status sesi yang butuh keputusan pengguna.
+  ///
+  /// In id, this message translates to:
+  /// **'perlu tindakan'**
+  String get sessionsStatusAttention;
+
+  /// Nama aksesibilitas baris sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'{name}, {status}. Ketuk untuk melanjutkan.'**
+  String sessionsOpenLabel(String name, String status);
+
+  /// Nama aksesibilitas tombol putuskan di baris sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan {name}'**
+  String sessionsDisconnectLabel(String name);
+
+  /// Judul konfirmasi memutus satu sesi di latar belakang.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan sesi?'**
+  String get sessionsDisconnectTitle;
+
+  /// Isi konfirmasi memutus satu sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Shell di {name} ikut berakhir dan program yang sedang berjalan berhenti.'**
+  String sessionsDisconnectBody(String name);
+
+  /// Tombol memutus semua sesi di latar belakang.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan semua'**
+  String get sessionsDisconnectAll;
+
+  /// Judul konfirmasi memutus semua sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan {count} sesi?'**
+  String sessionsDisconnectAllTitle(int count);
+
+  /// Isi konfirmasi memutus semua sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua shell di server ikut berakhir dan program yang sedang berjalan berhenti.'**
+  String get sessionsDisconnectAllBody;
+
+  /// Judul dialog keluar dari terminal dengan pilihan tetap terhubung.
+  ///
+  /// In id, this message translates to:
+  /// **'Keluar dari terminal?'**
+  String get terminalLeaveChoiceTitle;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

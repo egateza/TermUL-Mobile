@@ -5,17 +5,33 @@ import 'termul_button.dart';
 import 'termul_icon.dart';
 
 class SheetAction {
-  const SheetAction({required this.label, required this.onSelected, this.icon, this.danger = false});
+  const SheetAction({
+    required this.label,
+    required this.onSelected,
+    this.icon,
+    this.danger = false,
+    this.primary = false,
+  });
 
   final String label;
   final VoidCallback onSelected;
   final TermulIconName? icon;
   final bool danger;
+
+  /// Tombol utama (isian `accent`); satu per sheet.
+  final bool primary;
 }
 
 /// Sheet berisi daftar aksi (satu tombol per aksi, penuh lebar). Menutup sheet lalu menjalankan aksinya.
 /// Aksi berisiko memakai varian `danger` dan sebaiknya dikonfirmasi lagi oleh pemanggil.
-Future<void> showTermulActions(BuildContext context, {required String title, required List<SheetAction> actions}) {
+Future<void> showTermulActions(
+  BuildContext context, {
+  required String title,
+  required List<SheetAction> actions,
+
+  /// Penjelasan di bawah judul (teks, banner, dan sejenisnya).
+  Widget? child,
+}) {
   return showModalBottomSheet<void>(
     context: context,
     isScrollControlled: true,
@@ -54,12 +70,15 @@ Future<void> showTermulActions(BuildContext context, {required String title, req
                 overflow: TextOverflow.ellipsis,
               ),
             ),
+            if (child != null) ...[const SizedBox(height: TermulSpacing.space5), child],
             const SizedBox(height: TermulSpacing.space6),
             for (final a in actions) ...[
               TermulButton(
                 label: a.label,
                 icon: a.icon,
-                variant: a.danger ? TermulButtonVariant.danger : TermulButtonVariant.secondary,
+                variant: a.danger
+                    ? TermulButtonVariant.danger
+                    : (a.primary ? TermulButtonVariant.primary : TermulButtonVariant.secondary),
                 size: TermulButtonSize.lg,
                 onPressed: () {
                   Navigator.of(sheetContext).pop();

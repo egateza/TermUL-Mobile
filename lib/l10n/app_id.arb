@@ -1018,5 +1018,127 @@
   "settingsHandleDot": "Bulatan",
   "@settingsHandleDot": {
     "description": "Bentuk gagang: bulatan polos."
+  },
+  "terminalLeaveChoiceBody": "Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari Sesi aktif di daftar host. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.",
+  "@terminalLeaveChoiceBody": {
+    "description": "Penjelasan di dialog keluar dari terminal dengan pilihan tetap terhubung."
+  },
+  "terminalLeaveKeep": "Tetap terhubung di latar belakang",
+  "@terminalLeaveKeep": {
+    "description": "Tombol keluar dari terminal tanpa memutus sesi."
+  },
+  "terminalLeaveKeepAliveOff": "Pengaturan \"Pertahankan koneksi di latar belakang\" mati, jadi Android bisa memutus sambungan saat aplikasi tidak terlihat.",
+  "@terminalLeaveKeepAliveOff": {
+    "description": "Catatan di dialog keluar bila foreground service mati."
+  },
+  "terminalLeaveOpenSettings": "Buka Pengaturan",
+  "@terminalLeaveOpenSettings": {
+    "description": "Tombol di catatan dialog keluar untuk membuka Pengaturan."
+  },
+  "sessionsTitle": "Sesi aktif",
+  "@sessionsTitle": {
+    "description": "Judul layar daftar sesi yang masih hidup di latar belakang."
+  },
+  "hostsOpenSessions": "Sesi aktif, {count}",
+  "@hostsOpenSessions": {
+    "description": "Nama aksesibilitas ikon sesi aktif di header daftar host.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionsEmptyTitle": "Tidak ada sesi di latar belakang",
+  "@sessionsEmptyTitle": {
+    "description": "Judul keadaan kosong daftar sesi aktif."
+  },
+  "sessionsEmptyBody": "Tekan kembali di terminal lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.",
+  "@sessionsEmptyBody": {
+    "description": "Isi keadaan kosong daftar sesi aktif."
+  },
+  "sessionsHint": "Ketuk sesi untuk melanjutkannya.",
+  "@sessionsHint": {
+    "description": "Petunjuk di atas daftar sesi aktif."
+  },
+  "sessionsNumber": "sesi {n}",
+  "@sessionsNumber": {
+    "description": "Nomor sesi untuk membedakan beberapa sesi ke host yang sama.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionsStarted": "mulai {time}",
+  "@sessionsStarted": {
+    "description": "Jam sesi dimulai.",
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionsStatusConnecting": "menyambung",
+  "@sessionsStatusConnecting": {
+    "description": "Status sesi yang sedang menyambung pertama kali."
+  },
+  "sessionsStatusAttention": "perlu tindakan",
+  "@sessionsStatusAttention": {
+    "description": "Status sesi yang butuh keputusan pengguna."
+  },
+  "sessionsOpenLabel": "{name}, {status}. Ketuk untuk melanjutkan.",
+  "@sessionsOpenLabel": {
+    "description": "Nama aksesibilitas baris sesi.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "status": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionsDisconnectLabel": "Putuskan {name}",
+  "@sessionsDisconnectLabel": {
+    "description": "Nama aksesibilitas tombol putuskan di baris sesi.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionsDisconnectTitle": "Putuskan sesi?",
+  "@sessionsDisconnectTitle": {
+    "description": "Judul konfirmasi memutus satu sesi di latar belakang."
+  },
+  "sessionsDisconnectBody": "Shell di {name} ikut berakhir dan program yang sedang berjalan berhenti.",
+  "@sessionsDisconnectBody": {
+    "description": "Isi konfirmasi memutus satu sesi.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sessionsDisconnectAll": "Putuskan semua",
+  "@sessionsDisconnectAll": {
+    "description": "Tombol memutus semua sesi di latar belakang."
+  },
+  "sessionsDisconnectAllTitle": "Putuskan {count} sesi?",
+  "@sessionsDisconnectAllTitle": {
+    "description": "Judul konfirmasi memutus semua sesi.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionsDisconnectAllBody": "Semua shell di server ikut berakhir dan program yang sedang berjalan berhenti.",
+  "@sessionsDisconnectAllBody": {
+    "description": "Isi konfirmasi memutus semua sesi."
+  },
+  "terminalLeaveChoiceTitle": "Keluar dari terminal?",
+  "@terminalLeaveChoiceTitle": {
+    "description": "Judul dialog keluar dari terminal dengan pilihan tetap terhubung."
   }
 }

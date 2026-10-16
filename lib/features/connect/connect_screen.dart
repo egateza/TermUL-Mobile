@@ -7,8 +7,6 @@ import '../../app_providers.dart';
 import '../../core/keys/private_key_inspector.dart';
 import '../../core/models/auth_method.dart';
 import '../../core/models/host_profile.dart';
-import '../../core/ssh/connection_log.dart';
-import '../../core/ssh/ssh_connector.dart';
 import '../../core/ssh/ssh_failure.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -19,124 +17,94 @@ import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_text_field.dart';
-import '../terminal/shell_channel.dart';
 import '../terminal/terminal_palette.dart';
 import '../terminal/terminal_screen.dart';
-import '../terminal/terminal_session.dart';
+import '../settings/settings_screen.dart';
 import 'connect_flow.dart';
-import 'keepalive_sync.dart';
 import 'host_key_prompt.dart';
+import 'session_controller.dart';
+import 'session_manager.dart';
 
 /// Layar alur sambung ke satu host: membuka rahasia, menyambung, meminta keputusan host key, dan menampilkan
-/// kegagalan. Setelah tersambung, layar ini menampilkan [TerminalScreen] dan menutup sambungannya saat layar ditutup.
+/// kegagalan. Setelah tersambung, layar ini menampilkan [TerminalScreen]. Sesinya dimiliki [SessionController]:
+/// layar yang ditutup biasa menutup sesinya, tetapi lewat "Tetap terhubung" sesi dibiarkan hidup di latar belakang
+/// dan dibuka lagi dengan [controller].
 class ConnectScreen extends ConsumerStatefulWidget {
-  const ConnectScreen({super.key, required this.profile});
+  const ConnectScreen({super.key, required this.profile, this.controller});
 
   final HostProfile profile;
+
+  /// Sesi yang sudah ada (dibuka lagi dari "Sesi aktif"); kosong = sesi baru.
+  final SessionController? controller;
 
   @override
   ConsumerState<ConnectScreen> createState() => _ConnectScreenState();
 }
 
-class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindingObserver {
-  ConnectFlow? _flow;
+class _ConnectScreenState extends ConsumerState<ConnectScreen> {
+  late final SessionManager _manager;
+  SessionController? _c;
 
-  /// Sesi terminal, dibuat saat tersambung pertama kali. Dimiliki di sini (bukan oleh [TerminalScreen]) supaya
-  /// riwayat layar bertahan selama sambung ulang, ketika layar lain (host key, rahasia hilang) tampil.
-  TerminalSession? _session;
-
-  /// Sambungan yang sedang dipakai sesi.
-  SshConnection? _current;
-
-  /// Sambungan [_current] sudah putus dan sambung ulang belum berhasil.
-  bool _lost = false;
-
-  static int _nextSessionId = 0;
-  final int _sessionId = _nextSessionId++;
-
-  /// Daftar sesi aktif (untuk notifikasi foreground service). Sesi terdaftar selama tersambung; putus
-  /// mencabutnya, tersambung ulang mendaftarkannya lagi.
-  late final ActiveSessionsNotifier _registry;
-  bool _registered = false;
-
-  /// Waktu terakhir aplikasi meninggalkan layar, untuk log diagnosis (tanpa data sensitif).
-  DateTime? _backgroundSince;
+  /// Pengguna memilih "Tetap terhubung": sesi dibiarkan hidup saat layar ditutup.
+  bool _keep = false;
 
   @override
   void initState() {
     super.initState();
-    _registry = ref.read(activeSessionsProvider.notifier);
-    WidgetsBinding.instance.addObserver(this);
+    _manager = ref.read(sessionManagerProvider.notifier);
   }
 
   @override
   void didChangeDependencies() {
     super.didChangeDependencies();
-    if (_flow != null) return;
-    final l = AppLocalizations.of(context);
-    final flow = ConnectFlow(
-      profile: widget.profile,
-      vault: ref.read(credentialVaultProvider),
-      hosts: ref.read(hostRepositoryProvider),
-      connect: ref.read(connectFunctionProvider),
-      unlockReason: l.unlockReason(widget.profile.name),
-    );
-    flow.addListener(_onFlow);
-    _flow = flow;
-    unawaited(_reloadSettings());
-    flow.start();
-  }
-
-  void _register() {
-    if (_registered) return;
-    _registered = true;
-    _registry.register(
-      ActiveSession(id: _sessionId, name: widget.profile.name, disconnect: _disconnectFromNotification),
-    );
-  }
-
-  /// Mencabut pendaftaran. Saat dipanggil dari [dispose], perubahan state provider ditunda ke microtask supaya tidak
-  /// terjadi di tengah pembongkaran pohon widget (dan diabaikan bila kontainer sudah dibuang).
-  void _unregister({bool defer = false}) {
-    if (!_registered) return;
-    _registered = false;
-    if (!defer) {
-      _registry.unregister(_sessionId);
-      return;
+    if (_c != null) return;
+    final existing = widget.controller;
+    final SessionController controller;
+    if (existing != null) {
+      controller = existing;
+      _manager.take(existing);
+    } else {
+      final l = AppLocalizations.of(context);
+      controller = _manager.create(
+        widget.profile,
+        unlockReason: l.unlockReason(widget.profile.name),
+        reconnectedMarker: l.reconnectedMarker,
+      );
     }
-    scheduleMicrotask(() {
-      try {
-        _registry.unregister(_sessionId);
-      } on Object {
-        // Kontainer provider sudah dibuang (aplikasi ditutup): tidak ada yang perlu dicabut.
-      }
-    });
+    _c = controller;
+    controller.addListener(_onController);
+    controller.attach();
+    // Sesi yang putus di latar belakang disambung ulang setelah frame ini, bukan di tengah penyusunan widget
+    // (pendengar lain, mis. daftar sesi aktif, tidak boleh dibangun ulang saat itu).
+    if (existing != null) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) controller.reconnect();
+      });
+    }
+    unawaited(_reloadSettings());
+    if (existing == null) controller.start();
   }
 
-  /// "Putuskan semua" di notifikasi: menutup sambungan segera (juga saat aplikasi di latar belakang, jadi tidak
-  /// bergantung pada penggambaran layar), lalu menutup layar ini.
-  void _disconnectFromNotification() {
-    connLog('putus atas permintaan notifikasi');
-    _current?.close();
-    _unregister();
-    if (!mounted) return;
+  /// Sesi ditutup dari luar (mis. "Putuskan semua" di notifikasi) selagi layar ini tampil: tutup layar.
+  void _onController() {
+    final c = _c;
+    if (c == null || !c.ended || !mounted) return;
     final route = ModalRoute.of(context);
     if (route != null) Navigator.of(context).removeRoute(route);
   }
 
   @override
   void dispose() {
-    _unregister(defer: true);
-    WidgetsBinding.instance.removeObserver(this);
-    final flow = _flow;
-    if (flow != null) {
-      flow.removeListener(_onFlow);
-      final state = flow.state;
-      if (state is ConnectDone) state.connection.close();
-      flow.dispose();
+    final c = _c;
+    if (c != null) {
+      c.removeListener(_onController);
+      c.detach();
+      if (_keep && !c.ended && c.session != null) {
+        _manager.keep(c);
+      } else {
+        _manager.release(c);
+      }
     }
-    _current?.close();
-    _session?.dispose();
     super.dispose();
   }
 
@@ -149,104 +117,42 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
     }
   }
 
-  /// Tersambung (pertama kali atau setelah sambung ulang): pasang sambungan ke sesi terminal dan awasi putusnya.
-  void _onFlow() {
-    final state = _flow?.state;
-    if (state is! ConnectDone || identical(state.connection, _current)) return;
-    final connection = state.connection;
-    final previous = _current;
-    _current = connection;
-    _lost = false;
-    _register();
-    previous?.close();
-    unawaited(connection.closed.then((reason) => _onClosed(connection, reason)));
-    Future<ShellChannel> open({required int columns, required int rows}) =>
-        ref.read(shellOpenerProvider)(connection, columns: columns, rows: rows);
-    final session = _session;
-    if (session == null) {
-      _session = TerminalSession(open: open);
-    } else {
-      unawaited(session.restart(open, marker: AppLocalizations.of(context).reconnectedMarker));
-    }
-  }
-
-  void _onClosed(SshConnection connection, CloseReason reason) {
-    if (!mounted || !identical(connection, _current) || reason == CloseReason.userClosed || _lost) return;
-    final lifecycle = WidgetsBinding.instance.lifecycleState;
-    final since = _backgroundSince;
-    connLog(
-      'sambungan putus: alasan=${reason.name}, siklus=${lifecycle?.name}, '
-      'di latar belakang ${since == null ? '-' : '${DateTime.now().difference(since).inSeconds} dtk'}',
-    );
-    _unregister();
-    setState(() => _lost = true);
-    // `null` = belum ada pesan siklus hidup (aplikasi baru mulai): anggap terlihat.
-    if (lifecycle == null || lifecycle == AppLifecycleState.resumed) _reconnect();
-  }
-
-  /// Menyambung ulang memakai alur yang sama dengan sambungan pertama (rahasia dari vault, host key diperiksa
-  /// lagi; host key yang berubah tetap memblokir dan butuh keputusan pengguna).
-  void _reconnect() {
-    final flow = _flow;
-    if (flow == null || !_lost) return;
-    final state = flow.state;
-    if (state is ConnectPreparing || state is ConnectConnecting || state is ConnectNeedsHostKey) return;
-    flow.start();
-  }
-
-  @override
-  void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
-    if (lifecycle != AppLifecycleState.resumed) {
-      _backgroundSince ??= DateTime.now();
-      connLog('siklus: ${lifecycle.name}');
-      return;
-    }
-    final since = _backgroundSince;
-    _backgroundSince = null;
-    connLog(
-      'siklus: resumed setelah ${since == null ? '-' : '${DateTime.now().difference(since).inSeconds} dtk'}, '
-      'sambungan ${_lost ? 'sudah putus' : 'dianggap hidup'}',
-    );
-    final connection = _current;
-    if (connection == null) return;
-    if (_lost) {
-      _reconnect(); // putus selagi di latar belakang: sambung ulang sekarang aplikasi terlihat lagi
-      return;
-    }
-    // Android mematikan soket aplikasi di latar belakang tanpa memberi tahu; periksa sebelum dipakai (spike A4).
-    unawaited(
-      connection.checkAlive().then((alive) {
-        connLog('pemeriksaan sambungan setelah kembali: ${alive ? 'hidup' : 'mati'}');
-        if (alive || !mounted || !identical(connection, _current) || _lost) return;
-        connection.close();
-        _onClosed(connection, CloseReason.error);
-      }),
-    );
-  }
-
   void _leave() => Navigator.of(context).pop();
+
+  /// "Tetap terhubung": tutup layar tanpa menutup sesi.
+  void _keepInBackground() {
+    _keep = true;
+    Navigator.of(context).pop();
+  }
+
+  void _openSettings() => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SettingsScreen()));
 
   @override
   Widget build(BuildContext context) {
-    final flow = _flow!;
+    final c = _c!;
+    final flow = c.flow;
     return ListenableBuilder(
-      listenable: flow,
+      listenable: c,
       builder: (context, _) {
         final state = flow.state;
-        final session = _session;
+        final session = c.session;
         final l = AppLocalizations.of(context);
-        final terminalSettings = ref.watch(appSettingsProvider).terminal;
-        final style = terminalStyleFor(terminalSettings);
-        final handle = terminalSettings.handleStyle;
+        final settings = ref.watch(appSettingsProvider);
+        final style = terminalStyleFor(settings.terminal);
+        final handle = settings.terminal.handleStyle;
+        final keepAlive = settings.connection.keepAlive;
         if (session != null) {
           if (state is ConnectDone) {
             return TerminalScreen(
               profile: widget.profile,
               session: session,
-              link: _lost ? TerminalLink.lost : TerminalLink.up,
-              onReconnect: _reconnect,
+              link: c.lost ? TerminalLink.lost : TerminalLink.up,
+              onReconnect: c.reconnect,
               textStyle: style,
               handleStyle: handle,
+              onKeepInBackground: _keepInBackground,
+              keepAliveEnabled: keepAlive,
+              onOpenSettings: _openSettings,
             );
           }
           if (state is ConnectPreparing || state is ConnectConnecting) {
@@ -264,7 +170,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
               session: session,
               link: TerminalLink.lost,
               failureText: _failureSummary(l, state),
-              onReconnect: _reconnect,
+              onReconnect: c.reconnect,
               textStyle: style,
               handleStyle: handle,
             );

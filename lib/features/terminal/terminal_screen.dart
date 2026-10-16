@@ -12,6 +12,7 @@ import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
+import '../../shared/widgets/termul_action_sheet.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_toast.dart';
 import 'paste_analysis.dart';
@@ -46,6 +47,9 @@ class TerminalScreen extends StatefulWidget {
     this.onReconnect,
     this.textStyle,
     this.handleStyle = SelectionHandleStyle.drop,
+    this.onKeepInBackground,
+    this.keepAliveEnabled = true,
+    this.onOpenSettings,
   });
 
   final HostProfile profile;
@@ -63,6 +67,17 @@ class TerminalScreen extends StatefulWidget {
 
   /// Bentuk gagang seleksi teks (pengaturan Terminal).
   final SelectionHandleStyle handleStyle;
+
+  /// Dipanggil bila pengguna memilih "Tetap terhubung" saat keluar: layar ditutup tanpa menutup sesi. Kosong =
+  /// pilihan itu tidak ditawarkan (hanya Putuskan atau Batal).
+  final VoidCallback? onKeepInBackground;
+
+  /// Pengaturan "Pertahankan koneksi di latar belakang" menyala. Bila mati, dialog keluar memberi catatan bahwa
+  /// Android bisa memutus sambungan di latar belakang.
+  final bool keepAliveEnabled;
+
+  /// Membuka Pengaturan (dari catatan di dialog keluar).
+  final VoidCallback? onOpenSettings;
 
   static const compactBelowDp = 480.0;
 
@@ -192,14 +207,51 @@ class _TerminalScreenState extends State<TerminalScreen> {
   Future<void> _confirmLeave() async {
     final l = AppLocalizations.of(context);
     final navigator = Navigator.of(context);
-    await showTermulSheet<void>(
+    final keep = widget.onKeepInBackground;
+    if (keep == null) {
+      await showTermulSheet<void>(
+        context,
+        title: l.terminalLeaveTitle,
+        child: Text(l.terminalLeaveBody, style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
+        cancelLabel: l.actionCancel,
+        confirmLabel: l.actionDisconnect,
+        confirmIsDanger: true,
+        onConfirm: navigator.pop,
+      );
+      return;
+    }
+    await showTermulActions(
       context,
-      title: l.terminalLeaveTitle,
-      child: Text(l.terminalLeaveBody, style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
-      cancelLabel: l.actionCancel,
-      confirmLabel: l.actionDisconnect,
-      confirmIsDanger: true,
-      onConfirm: navigator.pop,
+      title: l.terminalLeaveChoiceTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: TermulSpacing.space4,
+        children: [
+          Text(l.terminalLeaveChoiceBody, style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
+          if (!widget.keepAliveEnabled)
+            TermulBanner(
+              tone: BannerTone.warn,
+              action: widget.onOpenSettings == null
+                  ? null
+                  : TermulButton(
+                      label: l.terminalLeaveOpenSettings,
+                      size: TermulButtonSize.sm,
+                      expand: false,
+                      onPressed: () {
+                        // Tutup sheet lalu buka Pengaturan; sheet ada di atas layar ini.
+                        navigator.pop();
+                        widget.onOpenSettings!();
+                      },
+                    ),
+              child: Text(l.terminalLeaveKeepAliveOff),
+            ),
+        ],
+      ),
+      actions: [
+        SheetAction(label: l.terminalLeaveKeep, primary: true, onSelected: keep),
+        SheetAction(label: l.actionDisconnect, danger: true, onSelected: navigator.pop),
+        SheetAction(label: l.actionCancel, onSelected: () {}),
+      ],
     );
   }
 

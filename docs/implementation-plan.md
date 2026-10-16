@@ -564,6 +564,18 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 - **Belum teruji (butuh HP):** tekan lama dan seret gagang dengan jari (area sentuh 44 dp), seleksi lintas baris dan di scrollback, posisi gagang saat keyboard terbuka dan saat terminal bergulir, tempel hasil salin di aplikasi lain, seleksi di `vim` dan `tmux` (mouse mode bisa mengambil alih sentuhan).
 - **Sinkron desain:** bilah berbeda dari prototipe (tanpa Cari, Kirim, Snippet, Bagikan; ditambah gagang dari spike). Catatan sudah di-publish ke design system versi 23 (prototipe `Terminal` belum diubah).
 
+## 11e. Sesi di latar belakang: "Tetap terhubung" dan Sesi aktif (2026-10-16)
+
+- **Latar belakang:** sebelumnya keluar dari terminal selalu menutup sambungan, jadi tmux seolah satu-satunya cara menjaga sesi. Sekarang menekan kembali di terminal membuka sheet "Keluar dari terminal?" dengan Tetap terhubung di latar belakang (utama), Putuskan, dan Batal; ada catatan dan tombol "Buka Pengaturan" bila pengaturan foreground service mati (tanpa itu Android tetap bisa memutus soket; lihat 11b).
+- **Arsitektur:** kepemilikan sambungan pindah dari `ConnectScreen` ke `SessionController` (`session_controller.dart`: alur sambung, sambungan, `TerminalSession`, pengawas putus, sambung ulang, pendaftaran ke daftar sesi aktif untuk notifikasi) yang dikelola `SessionManager` (`session_manager.dart`, provider `sessionManagerProvider`: daftar sesi yang dibiarkan hidup). Layar hanya menampilkan sesi; ditutup biasa = sesi dilepas (seperti sebelumnya), lewat "Tetap terhubung" = sesi tinggal di manajer.
+- **Sesi aktif:** `lib/features/sessions/sessions_screen.dart`, dibuka dari ikon terminal bertanda jumlah di header daftar host (sementara `NavBar` belum ada; keputusan pemilik: lewat menu, bukan mengetuk host, karena bisa ada lebih dari satu sesi ke profil yang sama). Satu kartu per sesi (nama, nomor sesi bila lebih dari satu ke profil yang sama, `user@host:port`, jam mulai, status dengan kata), ketuk membuka lagi terminal yang sama dengan riwayat utuh, tombol Putuskan per sesi dan Putuskan semua (dengan konfirmasi). "Putuskan semua" di notifikasi foreground service juga menutup sesi di latar belakang.
+- **Sesi putus di latar belakang:** tidak disambung ulang otomatis (alur sambung bisa memunculkan prompt biometrik saat pengguna sedang di layar lain); ditandai Terputus dan disambung ulang saat dibuka lagi.
+- **Dua pelajaran saat membangun:** (1) perubahan state provider saat widget dibongkar ditolak Riverpod padahal nilainya sudah tersimpan, jadi pendengar tidak diberi tahu; diulang di microtask dengan salinan daftar. (2) Sambung ulang saat layar dibuka tidak boleh memberi tahu pendengar di tengah penyusunan widget; dijalankan setelah frame pertama.
+- **Tes:** `test/features/sessions_test.dart` (10 tes: tiga pilihan dan catatan, catatan hilang bila pengaturan menyala, Tetap terhubung dan buka lagi dengan riwayat utuh tanpa sambungan baru, Putuskan menutup sesi, keadaan kosong, Putuskan dari daftar, dua sesi ke profil yang sama dengan sambungan dan riwayat sendiri, Putuskan semua, putus di latar belakang tanpa sambung ulang otomatis lalu sambung ulang saat dibuka, "Putuskan semua" notifikasi). 356 tes seluruhnya lulus, `flutter analyze` bersih.
+- **Belum teruji (butuh HP):** sesi benar-benar bertahan di latar belakang (dengan dan tanpa foreground service menyala), beberapa sesi sekaligus, buka lagi setelah Android membekukan proses, notifikasi dengan banyak sesi, keyboard dan ukuran terminal saat sesi dibuka lagi.
+- **Belum dibuat:** `NavBar` lima tab dengan tab Sesi, beberapa sesi dalam satu layar terminal (tab di prototipe `Terminal`).
+- **Sinkron desain:** prototipe `Sessions` (12) dan `TerminalLeave` (2j) dan README design system diperbarui sebagai tambahan; ketidaksesuaian dengan `NavBar` dicatat di README.
+
 ### Pengujian tertunda di HP (dicatat 2026-10-16, menunggu pengguna)
 
 Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang dicabut). Urutan uji saat HP tersedia:
@@ -575,6 +587,14 @@ Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang d
 5. Ketuk "Putuskan semua" di notifikasi saat aplikasi di latar belakang: sambungan tertutup, layar sesi tertutup, tidak menyambung ulang.
 6. Bila sambungan tetap putus: atur penghemat baterai TermUL ke "Tanpa batasan" dan aktifkan Mulai otomatis (HyperOS), ulangi 3 dan 4.
 7. Catat hasil di sini, dan di `docs/design/android.md` (bagian Implementasi, "Belum teruji").
+
+Uji sesi di latar belakang (11e) di HP:
+
+1. Nyalakan "Pertahankan koneksi di latar belakang", sambung ke host, tekan kembali, pilih "Tetap terhubung di latar belakang". Ikon sesi di header daftar host menunjukkan 1.
+2. Tekan Home, tunggu 30 detik dan 5 menit, buka aplikasi lalu Sesi aktif: status Tersambung dan riwayat layar utuh; `echo $$` sama dengan sebelumnya.
+3. Ulangi dengan pengaturan mati: catat apakah Android memutus sambungan (status Terputus) dan apakah dibuka lagi menyambung ulang.
+4. Buka dua sesi ke profil yang sama (sesi 2 muncul), lanjutkan masing-masing, dan Putuskan satu lalu Putuskan semua.
+5. "Putuskan semua" di notifikasi dengan sesi di latar belakang: semua sesi tertutup, daftar kosong.
 
 Uji seleksi dan salin (11d) di HP, kunjungan yang sama:
 

@@ -293,6 +293,24 @@
    "title": "2i · Contoh: seleksi dengan kaca pembesar",
    "is_interactive": true,
    "radius": 28
+  },
+  "Sessions.dc.html": {
+   "x": 3290,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "12 · Sesi aktif (sesi di latar belakang)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalLeave.dc.html": {
+   "x": 2940,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2j · Keluar dari terminal: tetap terhubung di latar belakang",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -327,7 +345,9 @@
   "TerminalLandscapeKb.dc.html",
   "SettingsFg.dc.html",
   "TerminalPasteUnsafe.dc.html",
-  "TerminalSelectLens.dc.html"
+  "TerminalSelectLens.dc.html",
+  "Sessions.dc.html",
+  "TerminalLeave.dc.html"
  ],
  "notes": {
   "judul": {
