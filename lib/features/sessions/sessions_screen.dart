@@ -73,6 +73,7 @@ class SessionsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final sessions = ref.watch(sessionManagerProvider);
+    final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -80,7 +81,8 @@ class SessionsScreen extends ConsumerWidget {
             Padding(
               padding: EdgeInsets.fromLTRB(
                 showBack ? TermulSpacing.space3 : TermulSpacing.space8,
-                TermulSpacing.space5,
+                // Landscape: header lebih rendah supaya isi mendapat tinggi layar.
+                landscape ? TermulSpacing.space1 : TermulSpacing.space5,
                 TermulSpacing.space8,
                 TermulSpacing.space3,
               ),
@@ -97,7 +99,10 @@ class SessionsScreen extends ConsumerWidget {
                   Expanded(
                     child: Semantics(
                       header: true,
-                      child: Text(l.sessionsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
+                      child: Text(
+                        l.sessionsTitle,
+                        style: (landscape ? TermulText.h2 : TermulText.h1).copyWith(color: TermulPalette.ink),
+                      ),
                     ),
                   ),
                 ],

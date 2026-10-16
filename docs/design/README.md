@@ -45,7 +45,7 @@ Sebelum UI penuh dibangun, tumpukan Flutter (`dartssh2`, `xterm`) diuji ke serve
 
 ## Batasan yang berlaku
 
-- Hanya tema Gelap dan orientasi potret yang didefinisikan.
+- Hanya tema Gelap dan orientasi potret yang didefinisikan, kecuali terminal landscape (contoh 2f dan 2g) dan layar utama landscape (contoh 1b, lihat catatan implementasi).
 - Sembilan tier api, ambang harinya dan palet warnanya mengambil nilai dari artifact desktop "Streak Api TermUL"; jika `StreakTier` di kode desktop berbeda, kode itulah yang benar.
 - Tepi `line` pada input dan chip di prototipe tidak mencapai 3:1; sistem ini mencatatnya dan menyediakan `line-strong`.
 
@@ -70,3 +70,4 @@ Keputusan yang muncul saat aplikasi dibangun dan menyimpang atau menambah dari d
 - `NavBar` (diperbarui 2026-10-16): bar lima tab sudah dibangun sesuai desain: Host, Sesi (lencana jumlah sesi di latar belakang), SFTP, Snippet, Pengaturan. Tab dibangun saat pertama dibuka lalu dipertahankan (pencarian Host tidak hilang); tombol kembali dari tab lain menuju Host dulu; bar disembunyikan saat keyboard sistem terbuka; layar terminal dan form tidak memakainya. Ikon sesi dan pengaturan di header daftar host dihapus karena pindah ke bar. Tab Sesi di prototipe `Terminal` (beberapa sesi dalam satu layar terminal) belum dibuat; di aplikasi satu layar terminal menampilkan satu sesi.
 - SFTP dan Snippet (tambahan sementara): fiturnya belum ada, jadi tab-nya membuka layar sederhana berisi judul dan banner `info` "Belum tersedia" dengan satu kalimat keterangan (prototipe 13). Desain layar SFTP dan Snippet yang sebenarnya (prototipe 4 dan 7) tetap berlaku.
 - Layar pemuatan (tambahan): selagi penyimpanan dibuka saat aplikasi mulai, tampil latar `ground` dengan satu baris "Memuat…" berwarna `ink-muted`, tanpa animasi (prototipe 14).
+- Layar utama di landscape (tambahan, 2026-10-16): tinggi layar hanya sekitar 393 dp, jadi bar navigasi bawah dan header bertingkat memakai hampir seluruh tinggi dan daftar nyaris tak terlihat. Di landscape tab pindah ke **rel di sisi kiri** (varian `NavBar`: lima tab yang sama disusun vertikal, lebar 76 dp, tiap tab minimal 44 dp, lencana Sesi sama, tepi kanan 1 px `line`; tetap tampil saat keyboard terbuka) dan bar bawah hanya dipakai di potret. Layar **Host** memakai satu baris header: judul "Host" (`h2`), kolom pencarian, chip Semua dan Favorit, dan tombol tambah, lalu daftar satu kolom sampai tepi layar; wordmark "termul_" tidak ditampilkan di landscape. Judul layar Sesi, Pengaturan, SFTP, dan Snippet memakai `h2` dengan jarak atas lebih kecil. Potret tidak berubah. Digambar di prototipe 1b. Layar lain (form host, host key, dialog) belum dirancang khusus untuk landscape.

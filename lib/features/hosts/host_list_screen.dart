@@ -122,6 +122,7 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
     final report = ref.watch(bootReportProvider);
     final groups = buildHostGroups(snapshot, query: listState.query, filter: listState.filter);
     final searching = listState.query.trim().isNotEmpty;
+    final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
 
     final banners = <Widget>[
       if (report.hosts.hadCorruptFile && !_hideHostsBanner)
@@ -166,83 +167,130 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                TermulSpacing.space8,
-                TermulSpacing.space8,
-                TermulSpacing.space8,
-                TermulSpacing.space1,
-              ),
-              child: Semantics(
-                label: 'termul',
-                excludeSemantics: true,
-                child: Text.rich(
-                  TextSpan(
-                    style: TermulText.wordmark.copyWith(color: TermulPalette.ink),
-                    children: const [
-                      TextSpan(text: 'termul'),
-                      TextSpan(
-                        text: '_',
-                        style: TextStyle(color: TermulPalette.accent),
+            if (landscape)
+              // Landscape: judul, pencarian, filter, dan tombol tambah dalam satu baris supaya daftar mendapat tinggi.
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  TermulSpacing.space8,
+                  TermulSpacing.space3,
+                  TermulSpacing.space8,
+                  TermulSpacing.space3,
+                ),
+                child: Row(
+                  spacing: TermulSpacing.space4,
+                  children: [
+                    Semantics(
+                      header: true,
+                      child: Text(l.hostsTitle, style: TermulText.h2.copyWith(color: TermulPalette.ink)),
+                    ),
+                    Expanded(
+                      child: TermulTextField(
+                        label: l.hostsSearchLabel,
+                        hideLabel: true,
+                        icon: TermulIconName.search,
+                        placeholder: l.hostsSearchPlaceholder,
+                        controller: _search,
+                        onChanged: ref.read(hostListProvider.notifier).setQuery,
                       ),
-                    ],
+                    ),
+                    FilterChipButton(
+                      label: l.filterAll,
+                      selected: listState.filter == HostFilter.all,
+                      onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.all),
+                    ),
+                    FilterChipButton(
+                      label: l.filterFavorites,
+                      selected: listState.filter == HostFilter.favorites,
+                      onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.favorites),
+                    ),
+                    TermulIconButton(
+                      icon: TermulIconName.plus,
+                      label: l.hostsAddHost,
+                      tone: IconButtonTone.accent,
+                      onPressed: _openForm,
+                    ),
+                  ],
+                ),
+              )
+            else ...[
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  TermulSpacing.space8,
+                  TermulSpacing.space8,
+                  TermulSpacing.space8,
+                  TermulSpacing.space1,
+                ),
+                child: Semantics(
+                  label: 'termul',
+                  excludeSemantics: true,
+                  child: Text.rich(
+                    TextSpan(
+                      style: TermulText.wordmark.copyWith(color: TermulPalette.ink),
+                      children: const [
+                        TextSpan(text: 'termul'),
+                        TextSpan(
+                          text: '_',
+                          style: TextStyle(color: TermulPalette.accent),
+                        ),
+                      ],
+                    ),
                   ),
                 ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(
-                TermulSpacing.space8,
-                TermulSpacing.space3,
-                TermulSpacing.space8,
-                TermulSpacing.space5,
-              ),
-              child: Row(
-                children: [
-                  Expanded(
-                    child: Semantics(
-                      header: true,
-                      child: Text(l.hostsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
+              Padding(
+                padding: const EdgeInsets.fromLTRB(
+                  TermulSpacing.space8,
+                  TermulSpacing.space3,
+                  TermulSpacing.space8,
+                  TermulSpacing.space5,
+                ),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Semantics(
+                        header: true,
+                        child: Text(l.hostsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
+                      ),
                     ),
-                  ),
-                  TermulIconButton(
-                    icon: TermulIconName.plus,
-                    label: l.hostsAddHost,
-                    tone: IconButtonTone.accent,
-                    onPressed: _openForm,
-                  ),
-                ],
+                    TermulIconButton(
+                      icon: TermulIconName.plus,
+                      label: l.hostsAddHost,
+                      tone: IconButtonTone.accent,
+                      onPressed: _openForm,
+                    ),
+                  ],
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(TermulSpacing.space8, 0, TermulSpacing.space8, TermulSpacing.space5),
-              child: TermulTextField(
-                label: l.hostsSearchLabel,
-                hideLabel: true,
-                icon: TermulIconName.search,
-                placeholder: l.hostsSearchPlaceholder,
-                controller: _search,
-                onChanged: ref.read(hostListProvider.notifier).setQuery,
+              Padding(
+                padding: const EdgeInsets.fromLTRB(TermulSpacing.space8, 0, TermulSpacing.space8, TermulSpacing.space5),
+                child: TermulTextField(
+                  label: l.hostsSearchLabel,
+                  hideLabel: true,
+                  icon: TermulIconName.search,
+                  placeholder: l.hostsSearchPlaceholder,
+                  controller: _search,
+                  onChanged: ref.read(hostListProvider.notifier).setQuery,
+                ),
               ),
-            ),
-            Padding(
-              padding: const EdgeInsets.fromLTRB(TermulSpacing.space8, 0, TermulSpacing.space8, TermulSpacing.space3),
-              child: Row(
-                spacing: TermulSpacing.space3,
-                children: [
-                  FilterChipButton(
-                    label: l.filterAll,
-                    selected: listState.filter == HostFilter.all,
-                    onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.all),
-                  ),
-                  FilterChipButton(
-                    label: l.filterFavorites,
-                    selected: listState.filter == HostFilter.favorites,
-                    onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.favorites),
-                  ),
-                ],
+              Padding(
+                padding: const EdgeInsets.fromLTRB(TermulSpacing.space8, 0, TermulSpacing.space8, TermulSpacing.space3),
+                child: Row(
+                  spacing: TermulSpacing.space3,
+                  children: [
+                    FilterChipButton(
+                      label: l.filterAll,
+                      selected: listState.filter == HostFilter.all,
+                      onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.all),
+                    ),
+                    FilterChipButton(
+                      label: l.filterFavorites,
+                      selected: listState.filter == HostFilter.favorites,
+                      onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.favorites),
+                    ),
+                  ],
+                ),
               ),
-            ),
+            ],
             Expanded(
               child: snapshot.profiles.isEmpty
                   ? _Empty(banners: banners, onAdd: _openForm)

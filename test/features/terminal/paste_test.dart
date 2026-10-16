@@ -271,6 +271,35 @@ void main() {
       expect(popover, findsNothing);
     });
 
+    testWidgets('landscape ringkas dengan keyboard (area terminal sempit): popover tetap tampil utuh di dalam layar', (
+      tester,
+    ) async {
+      setClipboard(tester, 'ls -la');
+      await pumpTerminal(tester, size: const Size(853, 393), keyboard: 209);
+      terminalView(tester).terminal.write('user@host:~\$ ');
+      await tester.pump();
+      final cursor = tester.state<TerminalViewState>(find.byType(TerminalView)).globalCursorRect;
+
+      // Dari tombol Tempel dan dari tekan-tahan di sisa baris prompt.
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
+      var box = tester.getRect(popover);
+      expect(box.top, greaterThanOrEqualTo(0));
+      expect(box.bottom, lessThanOrEqualTo(393));
+      expect(box.left, greaterThanOrEqualTo(8));
+      expect(box.right, lessThanOrEqualTo(853 - 8));
+      await tester.tapAt(const Offset(600, 200)); // ketukan di luar menutup
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
+      expect(popover, findsNothing);
+
+      await holdAt(tester, Offset(600, cursor.center.dy));
+      expect(popover, findsOneWidget);
+      box = tester.getRect(popover);
+      expect(box.top, greaterThanOrEqualTo(0));
+      expect(box.bottom, lessThanOrEqualTo(393));
+    });
+
     testWidgets('layar alternatif (tmux, vim): tekan-tahan di sel kosong membuka popover', (tester) async {
       await open(tester, 'ls');
       terminalView(tester).terminal.write('\x1b[?1049h');

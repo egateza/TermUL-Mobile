@@ -2,7 +2,7 @@
 
 Tanggal salin: 2026-10-15
 
-**Versi terkini (dicek 2026-10-16):** design system versi 35 (`1792164891-6272`, hanya `README.md` yang berubah dari versi 34), prototipe versi 40 (`1792164108-c1dd`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
+**Versi terkini (dicek 2026-10-16):** design system versi 36 (`1792166030-cba5`, `README.md` dan `components/NavBar/README.md` yang berubah dari versi 35), prototipe versi 41 (`1792166021-e467`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
 
 ## Design system
 
@@ -116,3 +116,10 @@ Berkas artifact dibaca dulu dan hash-nya sama dengan salinan lokal sebelum diuba
 - **Design system versi 34 (`1792164121-e56d`):** `README.md`, "Catatan dari implementasi Flutter": butir Tempel ditulis ulang (popover, dua pemicu: tombol Tempel dan tekan-tahan di area kosong, ambang 40 karakter, saklar), butir Pengaturan menyebut saklar "Konfirmasi tempel satu baris" dan "Sambung ulang otomatis", dan warna seleksi dicatat sebagai diterima pemilik (xterm tidak ditambal).
 - Pemicu tekan-tahan di area kosong hanya ada di aplikasi; prototipe memicunya lewat ketukan di kursor (tidak bisa meniru tekan-tahan di area kosong tanpa kursor). Dicatat di README.
 - **Design system versi 35 (`1792164891-6272`):** `README.md`, butir Tempel: pemicu tekan-tahan juga aktif di layar alternatif dan mouse mode (`tmux`, `vim`, `htop`) selama yang ditekan sel kosong (sebelumnya dinyatakan tidak aktif); ketukan di mana saja di luar popover (terminal, bar atas, tombol cepat) menutupnya. Prototipe tidak diubah (tetap versi 40).
+
+## Landscape layar utama (2026-10-16)
+
+Berkas artifact dibaca dulu dan hash-nya sama dengan salinan lokal (`README.md` dan `components/NavBar/README.md`; `canvas.json` dari versi 40 yang baru dipublish). Contoh baru dirender di Chrome (844 x 390) sebelum dipublish.
+
+- **Prototipe versi 41 (`1792166021-e467`):** berkas baru `MainLandscape.dc.html` (contoh 1b, 844 x 390): rel navigasi di kiri, header satu baris (judul Host, pencarian, chip Semua dan Favorit, tombol tambah), dan daftar host satu kolom. `canvas.json` mendapat papan baru di akhir `order`.
+- **Design system versi 36 (`1792166030-cba5`):** `README.md` bagian Batasan (landscape kini juga untuk layar utama) dan butir baru "Layar utama di landscape" di catatan implementasi; `components/NavBar/README.md` mendapat varian rel.

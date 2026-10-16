@@ -63,18 +63,72 @@ class TermulNavBar extends StatelessWidget {
   }
 }
 
+/// Rel navigasi di sisi kiri untuk landscape: lima tab yang sama dengan [TermulNavBar] disusun vertikal supaya tidak
+/// memakai tinggi layar (hanya sekitar 393 dp). Lebar 76 dp, tiap tab minimal 44 dp, tab aktif `accent`, tepi kanan
+/// 1 px `line`, tanpa bayangan. Menangani sendiri area aman di kiri, atas, dan bawah.
+class TermulNavRail extends StatelessWidget {
+  const TermulNavRail({super.key, required this.items, required this.active, required this.onSelect, this.label});
+
+  final List<NavItem> items;
+  final String active;
+  final ValueChanged<String> onSelect;
+
+  /// Nama landmark untuk pembaca layar.
+  final String? label;
+
+  static const width = 76.0;
+
+  @override
+  Widget build(BuildContext context) {
+    return Semantics(
+      container: true,
+      explicitChildNodes: true,
+      label: label,
+      child: DecoratedBox(
+        decoration: const BoxDecoration(
+          color: TermulPalette.ground,
+          border: Border(right: BorderSide(color: TermulPalette.line)),
+        ),
+        child: SafeArea(
+          right: false,
+          child: SizedBox(
+            width: width,
+            // Gulir bila layar sangat pendek (jaga-jaga): tab tidak pernah terpotong.
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  for (final item in items)
+                    _NavTab(
+                      item: item,
+                      selected: item.id == active,
+                      onPressed: () => onSelect(item.id),
+                      minHeight: TermulSize.tapMin,
+                    ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+}
+
 class _NavTab extends StatelessWidget {
-  const _NavTab({required this.item, required this.selected, required this.onPressed});
+  const _NavTab({required this.item, required this.selected, required this.onPressed, this.minHeight = 56});
 
   final NavItem item;
   final bool selected;
   final VoidCallback onPressed;
+  final double minHeight;
 
   @override
   Widget build(BuildContext context) {
     final color = selected ? TermulPalette.accent : TermulPalette.inkMuted;
     return Pressable(
-      minHeight: 56,
+      minHeight: minHeight,
       toggled: selected,
       semanticLabel: item.semanticLabel ?? item.label,
       onPressed: onPressed,

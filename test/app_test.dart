@@ -11,6 +11,10 @@ import 'features/hosts_ui_harness.dart';
 void main() {
   testWidgets('aplikasi menyala dengan bahasa Indonesia, judul dari ARB, dan layar daftar host', (tester) async {
     final h = Harness();
+    // Potret (bar bawah); ukuran bawaan flutter test 800 x 600 adalah landscape (rel di kiri).
+    tester.view.devicePixelRatio = 1;
+    tester.view.physicalSize = const Size(390, 844);
+    addTearDown(tester.view.reset);
     await tester.pumpWidget(ProviderScope(overrides: h.deps.overrides, child: const TermulApp()));
     await tester.pumpAndSettle();
 

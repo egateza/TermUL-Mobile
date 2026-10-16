@@ -52,6 +52,24 @@ class _MainShellState extends ConsumerState<MainShell> {
     final l = AppLocalizations.of(context);
     final sessions = ref.watch(sessionManagerProvider).length;
     final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
+    final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+    final items = [
+      NavItem(id: 'hosts', label: l.navHosts, icon: TermulIconName.hosts),
+      NavItem(
+        id: 'sessions',
+        label: l.navSessions,
+        icon: TermulIconName.terminal,
+        badge: sessions,
+        semanticLabel: sessions > 0 ? l.hostsOpenSessions(sessions) : null,
+      ),
+      NavItem(id: 'sftp', label: l.navSftp, icon: TermulIconName.folder),
+      NavItem(id: 'snippets', label: l.navSnippets, icon: TermulIconName.snippets),
+      NavItem(id: 'settings', label: l.navSettings, icon: TermulIconName.settings),
+    ];
+    final pages = IndexedStack(
+      index: _index,
+      children: [for (var i = 0; i < _ids.length; i++) _visited.contains(i) ? _page(i, l) : const SizedBox.shrink()],
+    );
     return PopScope(
       // Tombol kembali dari tab lain menuju tab Host dulu, baru keluar.
       canPop: _index == 0,
@@ -59,32 +77,22 @@ class _MainShellState extends ConsumerState<MainShell> {
         if (!didPop) _select(_ids.first);
       },
       child: Scaffold(
-        body: IndexedStack(
-          index: _index,
-          children: [
-            for (var i = 0; i < _ids.length; i++) _visited.contains(i) ? _page(i, l) : const SizedBox.shrink(),
-          ],
-        ),
-        bottomNavigationBar: keyboardOpen
-            ? null
-            : TermulNavBar(
-                label: l.navLabel,
-                active: _ids[_index],
-                onSelect: _select,
-                items: [
-                  NavItem(id: 'hosts', label: l.navHosts, icon: TermulIconName.hosts),
-                  NavItem(
-                    id: 'sessions',
-                    label: l.navSessions,
-                    icon: TermulIconName.terminal,
-                    badge: sessions,
-                    semanticLabel: sessions > 0 ? l.hostsOpenSessions(sessions) : null,
+        // Landscape: rel di sisi kiri (tidak memakai tinggi layar) dan tetap ada saat keyboard terbuka. Potret: bar
+        // bawah, disembunyikan selagi keyboard terbuka.
+        body: landscape
+            ? Row(
+                children: [
+                  TermulNavRail(label: l.navLabel, active: _ids[_index], onSelect: _select, items: items),
+                  // Rel sudah menjaga lekukan kiri; halaman tidak perlu menjaganya lagi.
+                  Expanded(
+                    child: MediaQuery.removePadding(context: context, removeLeft: true, child: pages),
                   ),
-                  NavItem(id: 'sftp', label: l.navSftp, icon: TermulIconName.folder),
-                  NavItem(id: 'snippets', label: l.navSnippets, icon: TermulIconName.snippets),
-                  NavItem(id: 'settings', label: l.navSettings, icon: TermulIconName.settings),
                 ],
-              ),
+              )
+            : pages,
+        bottomNavigationBar: landscape || keyboardOpen
+            ? null
+            : TermulNavBar(label: l.navLabel, active: _ids[_index], onSelect: _select, items: items),
       ),
     );
   }

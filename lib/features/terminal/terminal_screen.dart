@@ -107,7 +107,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   final _controller = TerminalController();
   final _scrollController = ScrollController();
   final _viewKey = GlobalKey<TerminalViewState>();
-  final _areaKey = GlobalKey();
+  final _bodyKey = GlobalKey();
 
   /// Popover Tempel di kursor prompt; null bila tertutup.
   _PasteMenu? _pasteMenu;
@@ -223,7 +223,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
   /// Menampilkan popover berisi [text] di atas [anchorGlobal] (koordinat layar); [onPaste] menempel.
   void _showPasteMenu(Rect anchorGlobal, String text, VoidCallback onPaste) {
-    final area = _areaKey.currentContext?.findRenderObject();
+    final area = _bodyKey.currentContext?.findRenderObject();
     if (area is! RenderBox || !area.attached) return;
     final b = _session.terminal.buffer;
     setState(
@@ -481,103 +481,110 @@ class _TerminalScreenState extends State<TerminalScreen> {
             onPointerDown: _onAnyPointerDown,
             child: Scaffold(
               backgroundColor: TermulPalette.ground,
-              body: Column(
+              // Popover digambar di atas seluruh isi layar (bukan hanya area terminal): di landscape dengan keyboard
+              // terbuka area terminal hanya sekitar 65 dp, lebih rendah daripada popover.
+              body: Stack(
+                key: _bodyKey,
+                fit: StackFit.expand,
                 children: [
-                  if (compact)
-                    _CompactBar(
-                      profile: widget.profile,
-                      status: status,
-                      word: word,
-                      showBack: !keyboardOpen,
-                      onBack: Navigator.of(context).maybePop,
-                    )
-                  else
-                    _Header(
-                      profile: widget.profile,
-                      status: status,
-                      word: word,
-                      onBack: Navigator.of(context).maybePop,
-                    ),
-                  if (widget.link != TerminalLink.up)
-                    Padding(
-                      padding: const EdgeInsets.fromLTRB(
-                        TermulSpacing.space5,
-                        0,
-                        TermulSpacing.space5,
-                        TermulSpacing.space3,
-                      ),
-                      child: _linkBanner(l),
-                    ),
-                  Expanded(
-                    // TerminalView mengurangi MediaQuery.padding dari tinggi barisnya; buang padding atas dan bawah
-                    // supaya tidak terpotong dua kali (spike K5). Sisi kiri-kanan tetap dijaga (lekukan layar).
-                    child: SafeArea(
-                      top: false,
-                      bottom: false,
-                      child: MediaQuery.removePadding(
-                        context: context,
-                        removeTop: true,
-                        removeBottom: true,
-                        child: Stack(
-                          key: _areaKey,
-                          fit: StackFit.expand,
-                          children: [
-                            // Tekan-tahan dibaca dari pointer mentah: tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi
-                            // xterm tidak terganggu (`TerminalView.onTapUp` juga tidak pernah dipanggil di xterm 4.0.0).
-                            Listener(
-                              behavior: HitTestBehavior.translucent,
-                              onPointerDown: _onPointerDown,
-                              onPointerMove: _onPointerMove,
-                              onPointerCancel: _onPointerEnd,
-                              onPointerUp: _onPointerEnd,
-                              child: TerminalView(
-                                _session.terminal,
-                                key: _viewKey,
-                                controller: _controller,
-                                scrollController: _scrollController,
-                                theme: termulTerminalTheme,
-                                textStyle: widget.textStyle ?? termulTerminalStyle,
-                                padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
-                                autofocus: true,
-                                backgroundOpacity: 1,
-                              ),
+                  Column(
+                    children: [
+                      if (compact)
+                        _CompactBar(
+                          profile: widget.profile,
+                          status: status,
+                          word: word,
+                          showBack: !keyboardOpen,
+                          onBack: Navigator.of(context).maybePop,
+                        )
+                      else
+                        _Header(
+                          profile: widget.profile,
+                          status: status,
+                          word: word,
+                          onBack: Navigator.of(context).maybePop,
+                        ),
+                      if (widget.link != TerminalLink.up)
+                        Padding(
+                          padding: const EdgeInsets.fromLTRB(
+                            TermulSpacing.space5,
+                            0,
+                            TermulSpacing.space5,
+                            TermulSpacing.space3,
+                          ),
+                          child: _linkBanner(l),
+                        ),
+                      Expanded(
+                        // TerminalView mengurangi MediaQuery.padding dari tinggi barisnya; buang padding atas dan bawah
+                        // supaya tidak terpotong dua kali (spike K5). Sisi kiri-kanan tetap dijaga (lekukan layar).
+                        child: SafeArea(
+                          top: false,
+                          bottom: false,
+                          child: MediaQuery.removePadding(
+                            context: context,
+                            removeTop: true,
+                            removeBottom: true,
+                            child: Stack(
+                              fit: StackFit.expand,
+                              children: [
+                                // Tekan-tahan dibaca dari pointer mentah: tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi
+                                // xterm tidak terganggu (`TerminalView.onTapUp` juga tidak pernah dipanggil di xterm 4.0.0).
+                                Listener(
+                                  behavior: HitTestBehavior.translucent,
+                                  onPointerDown: _onPointerDown,
+                                  onPointerMove: _onPointerMove,
+                                  onPointerCancel: _onPointerEnd,
+                                  onPointerUp: _onPointerEnd,
+                                  child: TerminalView(
+                                    _session.terminal,
+                                    key: _viewKey,
+                                    controller: _controller,
+                                    scrollController: _scrollController,
+                                    theme: termulTerminalTheme,
+                                    textStyle: widget.textStyle ?? termulTerminalStyle,
+                                    padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
+                                    autofocus: true,
+                                    backgroundOpacity: 1,
+                                  ),
+                                ),
+                                SelectionHandles(
+                                  terminal: _session.terminal,
+                                  controller: _controller,
+                                  scrollController: _scrollController,
+                                  viewKey: _viewKey,
+                                  style: widget.handleStyle,
+                                ),
+                              ],
                             ),
-                            SelectionHandles(
-                              terminal: _session.terminal,
-                              controller: _controller,
-                              scrollController: _scrollController,
-                              viewKey: _viewKey,
-                              style: widget.handleStyle,
-                            ),
-                            if (_pasteMenu != null) _pasteMenuOverlay(context),
-                          ],
+                          ),
                         ),
                       ),
-                    ),
+                      SafeArea(
+                        top: false,
+                        child: ListenableBuilder(
+                          listenable: _controller,
+                          builder: (context, _) {
+                            final range = _controller.selection?.normalized;
+                            if (range == null || range.isCollapsed) {
+                              return QuickKeyBar(
+                                session: _session,
+                                compact: compact,
+                                onPaste: widget.link == TerminalLink.up ? _paste : null,
+                              );
+                            }
+                            return SelectionBar(
+                              count: _session.terminal.buffer.getText(range).length,
+                              compact: compact,
+                              onCopy: _copySelection,
+                              onSelectAll: _selectAll,
+                              onCancel: _controller.clearSelection,
+                            );
+                          },
+                        ),
+                      ),
+                    ],
                   ),
-                  SafeArea(
-                    top: false,
-                    child: ListenableBuilder(
-                      listenable: _controller,
-                      builder: (context, _) {
-                        final range = _controller.selection?.normalized;
-                        if (range == null || range.isCollapsed) {
-                          return QuickKeyBar(
-                            session: _session,
-                            compact: compact,
-                            onPaste: widget.link == TerminalLink.up ? _paste : null,
-                          );
-                        }
-                        return SelectionBar(
-                          count: _session.terminal.buffer.getText(range).length,
-                          compact: compact,
-                          onCopy: _copySelection,
-                          onSelectAll: _selectAll,
-                          onCancel: _controller.clearSelection,
-                        );
-                      },
-                    ),
-                  ),
+                  if (_pasteMenu != null) _pasteMenuOverlay(context),
                 ],
               ),
             ),

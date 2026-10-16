@@ -142,6 +142,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
         );
 
     final showBack = widget.showBack;
+    final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -149,7 +150,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
             Padding(
               padding: EdgeInsets.fromLTRB(
                 showBack ? TermulSpacing.space3 : TermulSpacing.space8,
-                TermulSpacing.space5,
+                // Landscape: header lebih rendah supaya isi mendapat tinggi layar.
+                landscape ? TermulSpacing.space1 : TermulSpacing.space5,
                 TermulSpacing.space8,
                 TermulSpacing.space3,
               ),
@@ -166,7 +168,10 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                   Expanded(
                     child: Semantics(
                       header: true,
-                      child: Text(l.settingsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
+                      child: Text(
+                        l.settingsTitle,
+                        style: (landscape ? TermulText.h2 : TermulText.h1).copyWith(color: TermulPalette.ink),
+                      ),
                     ),
                   ),
                 ],

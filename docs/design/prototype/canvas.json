@@ -339,6 +339,15 @@
    "is_interactive": true,
    "radius": 28
   },
+  "MainLandscape.dc.html": {
+   "x": 2000,
+   "y": 6202,
+   "w": 844,
+   "h": 390,
+   "title": "1b · Daftar host landscape (rel navigasi di kiri)",
+   "is_interactive": true,
+   "radius": 28
+  },
   "Boot.dc.html": {
    "x": 4230,
    "y": 964,
@@ -387,7 +396,8 @@
   "TerminalWaiting.dc.html",
   "TerminalNeedsAuth.dc.html",
   "ComingSoon.dc.html",
-  "Boot.dc.html"
+  "Boot.dc.html",
+  "MainLandscape.dc.html"
  ],
  "notes": {
   "judul": {

@@ -14,21 +14,25 @@ class ComingSoonScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     return Scaffold(
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
+              padding: EdgeInsets.fromLTRB(
                 TermulSpacing.space8,
+                landscape ? TermulSpacing.space3 : TermulSpacing.space8,
                 TermulSpacing.space8,
-                TermulSpacing.space8,
-                TermulSpacing.space5,
+                landscape ? TermulSpacing.space3 : TermulSpacing.space5,
               ),
               child: Semantics(
                 header: true,
-                child: Text(title, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
+                child: Text(
+                  title,
+                  style: (landscape ? TermulText.h2 : TermulText.h1).copyWith(color: TermulPalette.ink),
+                ),
               ),
             ),
             Padding(

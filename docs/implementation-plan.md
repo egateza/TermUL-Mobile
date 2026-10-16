@@ -709,9 +709,23 @@ Usulan dan keputusan pemilik, bertahap: popover di kursor (prototipe `TerminalPa
 - **Teruji di HP setelah temuan pemilik [T]:** di `tmux` dengan `mouse on`, tekan-tahan di area kosong memunculkan popover; ketukan di terminal atau di bar atas, di luar popover, menutupnya (ketukan di dalam popover tidak menutup).
 - **Belum diuji di HP:** landscape dan keyboard tertutup, tempel isi papan klip panjang (45 baris milik pemilik sengaja tidak ditempel saat uji), dan kenyamanan ambang 40 karakter.
 
+## 11k. Tampilan landscape untuk layar utama (2026-10-16)
+
+**Selesai di PC (403 tes, `flutter analyze` bersih). Dicoba di HP lewat adb (Xiaomi 25053PC47G, landscape 2772 x 1280 px) [T] untuk Host, Sesi, dan Pengaturan. Artifact sudah diperbarui: prototipe versi 41 (contoh 1b), design system versi 36.**
+
+Temuan pemilik: di landscape bar navigasi bawah dan header bertingkat (wordmark, judul, pencarian, filter) memakai hampir seluruh tinggi layar (sekitar 393 dp), sehingga daftar host nyaris tak terlihat. Prototipe hanya mendefinisikan landscape untuk terminal (2f, 2g), jadi ini **tambahan desain**. Pilihan pemilik: rel di sisi kiri, satu baris header, satu kolom.
+
+- **Rel navigasi** (`TermulNavRail` di `termul_nav_bar.dart`, dipakai `MainShell` saat `MediaQuery.orientation == landscape`): lima tab yang sama dengan bar bawah (lencana Sesi sama) disusun vertikal, lebar 76 dp, tiap tab minimal 44 dp, tepi kanan 1 px `line`, area aman kiri, atas, dan bawah dijaga sendiri; halaman di sebelahnya tidak menjaga lekukan kiri lagi. Rel **tetap tampil saat keyboard terbuka** (tidak memakai tinggi). Bar bawah hanya di potret.
+- **Host** (`host_list_screen.dart`): satu baris berisi judul "Host" (`h2`), kolom pencarian, chip Semua dan Favorit, dan tombol tambah; wordmark "termul_" tidak ditampilkan di landscape; daftar satu kolom sampai tepi layar. Pencarian dan filter bekerja seperti di potret.
+- **Sesi, Pengaturan, SFTP, Snippet:** judul `h2` dengan jarak atas lebih kecil di landscape.
+- **Teruji di HP [T]:** daftar host menampilkan dua kartu penuh dan sebagian kartu ketiga (sebelumnya kurang dari satu kartu); tab berpindah lewat rel; layar Sesi dan Pengaturan tidak terhalang header.
+- **Desain:** prototipe 1b (`MainLandscape.dc.html`, 844 x 390), catatan di README design system ("Layar utama di landscape") dan README komponen `NavBar` (varian rel). Layar lain (form host, host key, dialog, Sesi dengan banyak kartu) belum dirancang khusus untuk landscape.
+- **Perbaikan sampingan:** popover Tempel kini digambar di atas seluruh isi layar, bukan hanya area terminal. Di landscape dengan keyboard terbuka area terminal hanya sekitar 65 dp, lebih rendah daripada popover (sekitar 100 dp), sehingga popover terpotong dan tidak terlihat. Tes `landscape ringkas` gagal sebelum perbaikan dan lulus sesudahnya.
+- **Belum diuji di HP:** popover Tempel di landscape setelah perbaikan itu, form host di landscape, dan landscape dengan keyboard terbuka di layar Host (pencarian).
+
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 397 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 403 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
 **Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Belum diuji di HP:** tempel (11c), layar mati 30 menit atau lebih, tanpa kabel, efek HyperOS, "Putuskan semua" dari notifikasi. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
@@ -727,7 +741,7 @@ Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 397 tes otomatis, tanpa jaringan
+flutter test                                   # 403 tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]
