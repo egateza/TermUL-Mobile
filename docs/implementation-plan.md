@@ -478,9 +478,9 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 ### Uji di HP fisik (dilaporkan pengguna, 2026-10-16)
 
 - Perangkat: Xiaomi 25053PC47G, Android 16 (API 36), arm64, build debug lewat `flutter run`.
-- Berhasil: aplikasi terpasang dan berjalan; tambah host dan sambung ke server Ubuntu 14.04.6 (OpenSSH 6.6, **menutup pertanyaan tentang server lama**) dan Ubuntu 18.04; terminal tampil dengan keyboard terbuka dan tertutup, tombol cepat tampil; banner "Menyambung ulang" dengan riwayat layar tetap terlihat muncul pada pemakaian nyata.
+- Berhasil: aplikasi terpasang dan berjalan; tambah host dan sambung ke server Ubuntu 14.04.6 (OpenSSH 6.6, **menutup pertanyaan tentang server lama**) dan Ubuntu 18.04; terminal tampil dengan keyboard terbuka dan tertutup, tombol cepat tampil; banner "Menyambung ulang" dengan riwayat layar tetap terlihat muncul pada pemakaian nyata. `htop` di Ubuntu 18.04 (24 inti, 46 kolom di potret) tampil benar: warna meter, baris terpilih, bilah F1 sampai F7; bilah fungsi terpotong di F8 ke kanan karena lebar layar, F10 dijangkau lewat tombol Fn.
 - Kejadian di jalan: sekali aplikasi hanya menampilkan layar hitam saat peluncuran pertama dari VSCode (bersama galat alat "log reader stopped unexpectedly"); tidak bisa direproduksi pada start dingin berikutnya (1,7 detik). Dugaan: `main()` menunggu `bootstrap()` sebelum menggambar apa pun. Belum ada perubahan; layar pemuatan awal bisa ditambahkan bila terulang.
-- **Belum dikonfirmasi:** apakah sambung ulang yang terlihat di tangkapan layar berhasil dan apa pemicunya; biometrik di HP; impor kunci lewat pemilih berkas; `htop`, `vim`, `tmux`; Home 13 detik dan 5 menit; Wi-Fi ke seluler.
+- **Belum dikonfirmasi:** apakah sambung ulang yang terlihat di tangkapan layar berhasil dan apa pemicunya; biometrik di HP; impor kunci lewat pemilih berkas; `vim`, `tmux`, Ctrl dan F di program itu; Home 13 detik dan 5 menit; Wi-Fi ke seluler.
 
 ## 12. Status terkini dan cara melanjutkan
 
