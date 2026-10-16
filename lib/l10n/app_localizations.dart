@@ -1261,6 +1261,18 @@ abstract class AppLocalizations {
   /// **'Saat jaringan berpindah atau aplikasi kembali aktif'**
   String get settingsAutoReconnectDesc;
 
+  /// Label saklar konfirmasi tempel satu baris.
+  ///
+  /// In id, this message translates to:
+  /// **'Konfirmasi tempel satu baris'**
+  String get settingsConfirmPasteLabel;
+
+  /// Keterangan saklar konfirmasi tempel satu baris.
+  ///
+  /// In id, this message translates to:
+  /// **'Teks pendek tampil di popover sebelum ditempel. Teks panjang, banyak baris, atau berisiko selalu ditanya.'**
+  String get settingsConfirmPasteDesc;
+
   /// Label saklar foreground service.
   ///
   /// In id, this message translates to:
@@ -1339,23 +1351,11 @@ abstract class AppLocalizations {
   /// **'Tempel dari papan klip'**
   String get keyPasteAria;
 
-  /// Ringkasan isi papan klip di popover Tempel.
+  /// Keterangan di popover Tempel untuk satu baris pendek.
   ///
   /// In id, this message translates to:
-  /// **'Papan klip: {summary}'**
-  String pasteMenuClipboard(String summary);
-
-  /// Jumlah baris di papan klip (popover Tempel).
-  ///
-  /// In id, this message translates to:
-  /// **'{count} baris'**
-  String pasteMenuLines(int count);
-
-  /// Papan klip kosong (popover Tempel).
-  ///
-  /// In id, this message translates to:
-  /// **'kosong'**
-  String get pasteMenuClipboardEmpty;
+  /// **'Masuk ke prompt, belum dijalankan'**
+  String get pasteMenuHint;
 
   /// Toast bila papan klip kosong.
   ///

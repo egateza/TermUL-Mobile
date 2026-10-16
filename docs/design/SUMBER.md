@@ -2,7 +2,7 @@
 
 Tanggal salin: 2026-10-15
 
-**Versi terkini (dicek 2026-10-16):** design system versi 33 (`1792156945-0858`, hanya `README.md` yang berubah dari versi 32), prototipe versi 39 (`1792156922-600e`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
+**Versi terkini (dicek 2026-10-16):** design system versi 34 (`1792164121-e56d`, hanya `README.md` yang berubah dari versi 33), prototipe versi 40 (`1792164108-c1dd`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
 
 ## Design system
 
@@ -107,3 +107,11 @@ Berkas artifact dibaca dulu lewat `read` dan hash-nya sama dengan salinan lokal 
 - **Prototipe versi 39 (`1792156922-600e`):** `Terminal.dc.html` mendapat dua nilai `connection` baru, `menunggu` (banner `warn` dengan hitungan mundur dan tombol "Sambung sekarang") dan `verifikasi` (banner "Perlu verifikasi" dengan tombol "Tampilkan prompt"); berkas baru `TerminalWaiting` (2k), `TerminalNeedsAuth` (2l), `ComingSoon` (13, tab SFTP dan Snippet yang belum tersedia, dengan `NavBar` lima tab) dan `Boot` (14, layar "Memuat…"); `canvas.json` memuat empat papan baru (x 3410 y 5732, x 3880 y 5732, x 3760 y 964, x 4230 y 964). Papan lama tidak diubah.
 - **Design system versi 33 (`1792156945-0858`):** `README.md` bagian "Catatan dari implementasi Flutter": catatan Pengaturan (kini tab di `NavBar`), butir sambung ulang diganti (jeda bertingkat, banner menunggu, rahasia dipegang selama layar menyala dan dilepas saat layar mati, banner "Perlu verifikasi", gerbang prompt), butir gulir otomatis seleksi dipindah dari "belum dibuat" menjadi tambahan, butir `NavBar` lima tab (menggantikan "belum bisa mengikuti desain"), butir layar sementara SFTP dan Snippet, dan butir layar pemuatan.
 - Komponen `NavBar` (README komponen) tidak diubah: bar di aplikasi mengikuti spesifikasinya dan prototipe `Main`.
+
+## Popover Tempel, saklar konfirmasi, warna seleksi (2026-10-16)
+
+Berkas artifact dibaca dulu dan hash-nya sama dengan salinan lokal sebelum diubah (`README.md`, `Terminal`, `Settings`, `canvas.json`). Diedit di folder staging, `Terminal` dan `Settings` dirender di Chrome (popover terpotong di tepi kiri pada render pertama, lalu dipusatkan pada kursor), lalu dipublish.
+
+- **Prototipe versi 40 (`1792164108-c1dd`):** `Terminal.dc.html`: popover Tempel kini menampilkan teks yang akan ditempel (mono, satu baris, dipotong dengan elipsis), keterangan "Masuk ke prompt, belum dijalankan", dan tombol Tempel; dipusatkan pada kursor, bukan rata kanan. Alurnya: satu baris pendek (sampai 40 karakter) yang aman tampil di popover; lebih panjang dari 40 karakter, banyak baris, atau berisiko masuk dialog. `Settings.dc.html`: saklar baru "Konfirmasi tempel satu baris" (bawaan nyala) di bawah kartu Terminal. `TerminalPasteMenu.dc.html` memakai papan klip `aman` (contoh 2b); judul 2b di `canvas.json` menjadi "Contoh: popover Tempel (satu baris pendek)".
+- **Design system versi 34 (`1792164121-e56d`):** `README.md`, "Catatan dari implementasi Flutter": butir Tempel ditulis ulang (popover, dua pemicu: tombol Tempel dan tekan-tahan di area kosong, ambang 40 karakter, saklar), butir Pengaturan menyebut saklar "Konfirmasi tempel satu baris" dan "Sambung ulang otomatis", dan warna seleksi dicatat sebagai diterima pemilik (xterm tidak ditambal).
+- Pemicu tekan-tahan di area kosong hanya ada di aplikasi; prototipe memicunya lewat ketukan di kursor (tidak bisa meniru tekan-tahan di area kosong tanpa kursor). Dicatat di README.

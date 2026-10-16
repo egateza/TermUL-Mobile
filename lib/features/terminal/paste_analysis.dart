@@ -45,14 +45,21 @@ class PasteAnalysis {
 
   bool get isEmpty => text.isEmpty;
 
-  /// Perlu konfirmasi sebelum ditempel.
-  bool get needsConfirm => hasNewline || hasRisk || removedControls > 0;
+  /// Teks lebih panjang dari [popoverMaxChars]: tidak muat di popover dan lebih mungkin salah tempel.
+  bool get isLong => text.length > popoverMaxChars;
+
+  /// Perlu dialog konfirmasi sebelum ditempel (apa pun pengaturan). Satu baris pendek yang aman tidak perlu:
+  /// tampil di popover atau langsung masuk ke prompt, sesuai pengaturan.
+  bool get needsConfirm => hasNewline || hasRisk || removedControls > 0 || isLong;
 
   /// Pilihan aman (Batal) jadi tombol utama bila ada akibat yang merugikan.
   bool get cancelIsPrimary => hasRisk || runsImmediately;
 
   /// Teks yang dikirim ke terminal: baris baru sebagai `\r` seperti Enter di terminal sungguhan.
   String get outgoing => text.replaceAll('\n', '\r');
+
+  /// Batas panjang teks satu baris yang masih tampil di popover. Nilai awal untuk dicoba pemilik di HP.
+  static const popoverMaxChars = 40;
 
   /// Batas ukuran yang masih ditempel (mencegah UI macet oleh isi papan klip yang sangat besar).
   static const maxChars = 100000;

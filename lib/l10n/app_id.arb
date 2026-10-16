@@ -896,6 +896,14 @@
   "@settingsAutoReconnectDesc": {
     "description": "Keterangan saklar sambung ulang otomatis."
   },
+  "settingsConfirmPasteLabel": "Konfirmasi tempel satu baris",
+  "@settingsConfirmPasteLabel": {
+    "description": "Label saklar konfirmasi tempel satu baris."
+  },
+  "settingsConfirmPasteDesc": "Teks pendek tampil di popover sebelum ditempel. Teks panjang, banyak baris, atau berisiko selalu ditanya.",
+  "@settingsConfirmPasteDesc": {
+    "description": "Keterangan saklar konfirmasi tempel satu baris."
+  },
   "settingsKeepAliveLabel": "Pertahankan koneksi di latar belakang",
   "@settingsKeepAliveLabel": {
     "description": "Label saklar foreground service."
@@ -948,19 +956,9 @@
   "@keyPasteAria": {
     "description": "Nama aksesibilitas tombol tempel."
   },
-  "pasteMenuClipboard": "Papan klip: {summary}",
-  "@pasteMenuClipboard": {
-    "description": "Ringkasan isi papan klip di popover Tempel.",
-    "placeholders": { "summary": { "type": "String" } }
-  },
-  "pasteMenuLines": "{count} baris",
-  "@pasteMenuLines": {
-    "description": "Jumlah baris di papan klip (popover Tempel).",
-    "placeholders": { "count": { "type": "int" } }
-  },
-  "pasteMenuClipboardEmpty": "kosong",
-  "@pasteMenuClipboardEmpty": {
-    "description": "Papan klip kosong (popover Tempel)."
+  "pasteMenuHint": "Masuk ke prompt, belum dijalankan",
+  "@pasteMenuHint": {
+    "description": "Keterangan di popover Tempel untuk satu baris pendek."
   },
   "pasteEmpty": "Papan klip kosong",
   "@pasteEmpty": {

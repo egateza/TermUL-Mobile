@@ -67,6 +67,7 @@ Future<TermRig> pumpTerminal(
   VoidCallback? onReconnect,
   bool needsAuth = false,
   TerminalStyle? textStyle,
+  bool confirmSingleLinePaste = true,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -89,6 +90,7 @@ Future<TermRig> pumpTerminal(
               onReconnect: onReconnect,
               needsAuth: needsAuth,
               textStyle: textStyle,
+              confirmSingleLinePaste: confirmSingleLinePaste,
             ),
           ),
         ),

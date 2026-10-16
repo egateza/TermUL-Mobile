@@ -659,6 +659,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsAutoReconnectDesc => 'Saat jaringan berpindah atau aplikasi kembali aktif';
 
   @override
+  String get settingsConfirmPasteLabel => 'Konfirmasi tempel satu baris';
+
+  @override
+  String get settingsConfirmPasteDesc =>
+      'Teks pendek tampil di popover sebelum ditempel. Teks panjang, banyak baris, atau berisiko selalu ditanya.';
+
+  @override
   String get settingsKeepAliveLabel => 'Pertahankan koneksi di latar belakang';
 
   @override
@@ -701,17 +708,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get keyPasteAria => 'Tempel dari papan klip';
 
   @override
-  String pasteMenuClipboard(String summary) {
-    return 'Papan klip: $summary';
-  }
-
-  @override
-  String pasteMenuLines(int count) {
-    return '$count baris';
-  }
-
-  @override
-  String get pasteMenuClipboardEmpty => 'kosong';
+  String get pasteMenuHint => 'Masuk ke prompt, belum dijalankan';
 
   @override
   String get pasteEmpty => 'Papan klip kosong';

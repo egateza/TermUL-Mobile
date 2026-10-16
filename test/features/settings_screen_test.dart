@@ -71,6 +71,20 @@ void main() {
     expect(setup.saved.last.terminal.fontSize, 12);
   });
 
+  testWidgets('saklar konfirmasi tempel satu baris: bawaan nyala, mematikan tersimpan tanpa mengubah yang lain', (
+    tester,
+  ) async {
+    final setup = _Setup();
+    await setup.open(tester);
+    expect(_current(tester).terminal.confirmSingleLinePaste, isTrue);
+    await tester.ensureVisible(find.text('Konfirmasi tempel satu baris'));
+    await tester.tap(find.text('Konfirmasi tempel satu baris'));
+    await tester.pumpAndSettle();
+    expect(setup.saved.last.terminal.confirmSingleLinePaste, isFalse);
+    expect(setup.saved.last.terminal.fontSize, 13);
+    expect(setup.saved.last.connection.autoReconnect, isTrue);
+  });
+
   testWidgets(
     'bentuk gagang seleksi: bawaan tetesan; memilih Segitiga dan Bulatan menyimpan; ukuran huruf tidak mengubahnya',
     (tester) async {
@@ -124,10 +138,13 @@ void main() {
   testWidgets('Kembalikan bawaan menulis nilai bawaan dan nonaktif bila sudah bawaan', (tester) async {
     final setup = _Setup();
     await setup.open(tester, initial: const AppSettings(terminal: TerminalSettings(fontSize: 18, lineHeight: 1.8)));
+    await tester.scrollUntilVisible(find.text('Kembalikan bawaan'), 200);
     await tester.tap(find.text('Kembalikan bawaan'));
     await tester.pumpAndSettle();
     expect(setup.saved.single.terminal, const TerminalSettings());
+    await tester.scrollUntilVisible(find.text('13 px'), -200);
     expect(find.text('13 px'), findsOneWidget);
+    await tester.scrollUntilVisible(find.text('Kembalikan bawaan'), 200);
     await tester.tap(find.text('Kembalikan bawaan'));
     await tester.pumpAndSettle();
     expect(setup.saved, hasLength(1));

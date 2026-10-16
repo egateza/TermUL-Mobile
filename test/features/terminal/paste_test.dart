@@ -6,7 +6,7 @@ import 'package:termul_mobile/features/terminal/paste_analysis.dart';
 import 'package:termul_mobile/features/terminal/terminal_screen.dart' show TerminalLink;
 import 'package:termul_mobile/shared/widgets/termul_button.dart';
 
-import 'terminal_screen_test.dart' show pumpTerminal, terminalView;
+import 'terminal_screen_test.dart' show TermRig, pumpTerminal, terminalView;
 
 PasteAnalysis analyze(String s, {bool bracketed = true}) => PasteAnalysis.of(s, bracketed: bracketed);
 
@@ -108,97 +108,141 @@ void main() {
     });
   });
 
-  group('popover Tempel di kursor prompt', () {
-    Future<void> tapCursor(WidgetTester tester) async {
-      final state = tester.state<TerminalViewState>(find.byType(TerminalView));
-      await tester.tapAt(state.globalCursorRect.center);
-      await tester.pumpAndSettle();
-      await tester.pump(const Duration(milliseconds: 400)); // timer ketuk-ganda xterm
+  group('popover Tempel (satu baris pendek)', () {
+    final popover = find.byKey(const ValueKey('paste-popover'));
+
+    Future<TermRig> open(WidgetTester tester, String? clip, {bool confirm = true}) async {
+      setClipboard(tester, clip);
+      final rig = await pumpTerminal(tester, confirmSingleLinePaste: confirm);
+      terminalView(tester).terminal.write('\r\n\r\n\r\n\r\nuser@host:~\$ ');
+      await tester.pump();
+      return rig;
     }
 
-    testWidgets('mengetuk kursor membuka popover dengan ringkasan papan klip; Tempel menempel dan menutupnya', (
+    Future<void> holdAt(WidgetTester tester, Offset at) async {
+      await tester.longPressAt(at);
+      await tester.pumpAndSettle();
+    }
+
+    Rect cursorRect(WidgetTester tester) => tester.state<TerminalViewState>(find.byType(TerminalView)).globalCursorRect;
+
+    testWidgets('tombol Tempel: teks pendek tampil di popover, belum masuk; Tempel di popover mengirimnya', (
       tester,
     ) async {
-      setClipboard(tester, 'systemctl status nginx');
-      final rig = await pumpTerminal(tester);
-      terminalView(tester).terminal.write(r'user@host:~$ ');
-      await tester.pump();
-      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
-
-      await tapCursor(tester);
-      expect(find.byKey(const ValueKey('paste-popover')), findsOneWidget);
-      expect(find.text('Papan klip: 1 baris'), findsOneWidget);
+      final rig = await open(tester, 'systemctl status');
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
+      expect(find.byKey(const ValueKey('paste-popover-text')), findsOneWidget);
+      expect(find.text('systemctl status'), findsOneWidget);
+      expect(find.text('Masuk ke prompt, belum dijalankan'), findsOneWidget);
       expect(rig.shell.sent, isEmpty);
+      expect(find.text('Tempel 1 baris?'), findsNothing);
 
-      await tester.tap(find.descendant(of: find.byKey(const ValueKey('paste-popover')), matching: find.text('Tempel')));
+      await tester.tap(find.descendant(of: popover, matching: find.text('Tempel')));
       await tester.pumpAndSettle();
-      expect(rig.shell.sent, 'systemctl status nginx');
-      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+      expect(rig.shell.sent, 'systemctl status');
+      expect(popover, findsNothing);
+      expect(find.text('Ditempel · 1 baris · belum dijalankan'), findsOneWidget);
     });
 
-    testWidgets('ketukan kedua di kursor menutup; papan klip kosong tampil "kosong"', (tester) async {
-      setClipboard(tester, null);
-      await pumpTerminal(tester);
-      terminalView(tester).terminal.write(r'user@host:~$ ');
+    testWidgets('tombol Tempel: popover tepat di atas baris kursor, baris prompt tetap terlihat, dalam layar', (
+      tester,
+    ) async {
+      await open(tester, 'ls');
+      terminalView(tester).terminal.write('\r\n' * 8);
       await tester.pump();
-      await tapCursor(tester);
-      expect(find.text('Papan klip: kosong'), findsOneWidget);
-      await tapCursor(tester);
-      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+      await tapPaste(tester);
+      final box = tester.getRect(popover);
+      final cursor = cursorRect(tester);
+      expect(box.bottom, lessThanOrEqualTo(cursor.top));
+      expect(box.left, greaterThanOrEqualTo(8));
+      expect(box.right, lessThanOrEqualTo(390 - 8));
     });
 
-    testWidgets('mengetik atau keluaran yang menggeser kursor menutup popover', (tester) async {
-      setClipboard(tester, 'ls');
-      await pumpTerminal(tester);
-      terminalView(tester).terminal.write(r'user@host:~$ ');
-      await tester.pump();
-      await tapCursor(tester);
-      expect(find.byKey(const ValueKey('paste-popover')), findsOneWidget);
+    testWidgets('saklar mati: teks pendek langsung masuk tanpa popover', (tester) async {
+      final rig = await open(tester, 'systemctl status', confirm: false);
+      await tapPaste(tester);
+      expect(popover, findsNothing);
+      expect(rig.shell.sent, 'systemctl status');
+    });
+
+    testWidgets('lebih panjang dari ${PasteAnalysis.popoverMaxChars} karakter: dialog, juga bila saklar mati', (
+      tester,
+    ) async {
+      final long = 'a' * (PasteAnalysis.popoverMaxChars + 1);
+      for (final confirm in [true, false]) {
+        final rig = await open(tester, long, confirm: confirm);
+        await tapPaste(tester);
+        expect(popover, findsNothing, reason: 'confirm=$confirm');
+        expect(find.text('Tempel 1 baris?'), findsOneWidget, reason: 'confirm=$confirm');
+        expect(rig.shell.sent, isEmpty);
+        await tester.tap(find.text('Batal'));
+        await tester.pumpAndSettle();
+      }
+    });
+
+    testWidgets('tepat di batas ${PasteAnalysis.popoverMaxChars} karakter masih popover', (tester) async {
+      await open(tester, 'b' * PasteAnalysis.popoverMaxChars);
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
+    });
+
+    testWidgets('banyak baris atau berisiko: dialog, bukan popover', (tester) async {
+      await open(tester, 'ls\nls');
+      await tapPaste(tester);
+      expect(popover, findsNothing);
+      expect(find.text('Tempel 2 baris?'), findsOneWidget);
+    });
+
+    testWidgets('tekan-tahan di area kosong menjalankan alur yang sama, popover di atas jari dan dalam layar', (
+      tester,
+    ) async {
+      await open(tester, 'ls -la');
+      final finger = Offset(14, cursorRect(tester).center.dy + 90);
+      await holdAt(tester, finger);
+      expect(popover, findsOneWidget);
+      final box = tester.getRect(popover);
+      expect(box.left, greaterThanOrEqualTo(8));
+      expect(box.right, lessThanOrEqualTo(390 - 8));
+      expect(box.bottom, lessThan(finger.dy));
+    });
+
+    testWidgets('tekan-tahan di area kosong dengan papan klip kosong: toast, tanpa popover', (tester) async {
+      await open(tester, null);
+      await holdAt(tester, Offset(14, cursorRect(tester).center.dy + 90));
+      expect(popover, findsNothing);
+      expect(find.text('Papan klip kosong'), findsOneWidget);
+    });
+
+    testWidgets('tekan-tahan di atas teks memilih kata dan tidak membuka popover', (tester) async {
+      await open(tester, 'ls');
+      await holdAt(tester, Offset(cursorRect(tester).left - 40, cursorRect(tester).center.dy));
+      expect(popover, findsNothing);
+      expect(terminalView(tester).controller!.selection, isNotNull);
+    });
+
+    testWidgets('ketukan di tempat lain, tombol Tempel lagi, atau keluaran yang menggeser kursor menutup popover', (
+      tester,
+    ) async {
+      await open(tester, 'ls');
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
+      await tapPaste(tester); // tombol Tempel lagi menutup
+      expect(popover, findsNothing);
+
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
       terminalView(tester).terminal.write('x');
       await tester.pump();
-      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+      expect(popover, findsNothing);
     });
 
-    testWidgets(
-      'zona ketuk lebar: di kanan kursor dan beberapa dp di atas atau bawah baris tetap membuka; jauh tidak',
-      (tester) async {
-        setClipboard(tester, 'ls');
-        await pumpTerminal(tester);
-        terminalView(tester).terminal.write('\r\n\r\n\r\n\r\nuser@host:~\$ ');
-        await tester.pump();
-        final rect = tester.state<TerminalViewState>(find.byType(TerminalView)).globalCursorRect;
-
-        Future<bool> openedAt(Offset at) async {
-          await tester.tapAt(at);
-          await tester.pump(const Duration(milliseconds: 400));
-          await tester.pumpAndSettle();
-          final opened = find.byKey(const ValueKey('paste-popover')).evaluate().isNotEmpty;
-          if (opened) {
-            await tester.tapAt(Offset(at.dx, at.dy + 250)); // ketukan di mana saja menutup
-            await tester.pump(const Duration(milliseconds: 400));
-            await tester.pumpAndSettle();
-          }
-          return opened;
-        }
-
-        expect(
-          await openedAt(Offset(rect.center.dx + 150, rect.center.dy)),
-          isTrue,
-          reason: 'jauh di kanan, baris sama',
-        );
-        expect(await openedAt(Offset(rect.center.dx, rect.top - 8)), isTrue, reason: '8 dp di atas kursor');
-        expect(await openedAt(Offset(rect.center.dx, rect.bottom + 8)), isTrue, reason: '8 dp di bawah kursor');
-        expect(await openedAt(Offset(rect.center.dx, rect.bottom + 60)), isFalse, reason: 'baris jauh di bawah');
-      },
-    );
-
-    testWidgets('layar alternatif (vim, htop): ketukan di kursor tidak membuka popover', (tester) async {
-      setClipboard(tester, 'ls');
-      await pumpTerminal(tester);
-      terminalView(tester).terminal.write('[?1049h');
+    testWidgets('layar alternatif (vim, htop): tekan-tahan tidak membuka popover', (tester) async {
+      await open(tester, 'ls');
+      terminalView(tester).terminal.write('\x1b[?1049h');
       await tester.pump();
-      await tapCursor(tester);
-      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+      await holdAt(tester, Offset(14, 400));
+      expect(popover, findsNothing);
     });
   });
 
@@ -211,9 +255,11 @@ void main() {
       expect(rig.shell.sent, isEmpty);
     });
 
-    testWidgets('satu baris aman: langsung ke prompt tanpa Enter, toast menyebut belum dijalankan', (tester) async {
+    testWidgets('saklar mati, satu baris aman: langsung ke prompt tanpa Enter, toast menyebut belum dijalankan', (
+      tester,
+    ) async {
       setClipboard(tester, 'systemctl status nginx');
-      final rig = await pumpTerminal(tester);
+      final rig = await pumpTerminal(tester, confirmSingleLinePaste: false);
       await tapPaste(tester);
       expect(rig.shell.sent, 'systemctl status nginx');
       expect(find.text('Ditempel · 1 baris · belum dijalankan'), findsOneWidget);

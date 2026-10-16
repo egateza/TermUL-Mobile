@@ -281,6 +281,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                       ),
                     ),
                   ),
+                  const SizedBox(height: TermulSpacing.space3),
+                  SwitchRow(
+                    label: l.settingsConfirmPasteLabel,
+                    description: l.settingsConfirmPasteDesc,
+                    value: t.confirmSingleLinePaste,
+                    onChanged: (on) => _apply((c) => c.copyWith(confirmSingleLinePaste: on)),
+                  ),
                   const SizedBox(height: TermulSpacing.space5),
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3),

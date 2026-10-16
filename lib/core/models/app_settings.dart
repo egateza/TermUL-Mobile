@@ -22,6 +22,7 @@ class TerminalSettings {
     this.fontSize = defaultFontSize,
     this.lineHeight = defaultLineHeight,
     this.handleStyle = SelectionHandleStyle.drop,
+    this.confirmSingleLinePaste = true,
   });
 
   static const defaultFontSize = 13.0;
@@ -41,17 +42,27 @@ class TerminalSettings {
   /// Bentuk gagang seleksi teks.
   final SelectionHandleStyle handleStyle;
 
-  TerminalSettings copyWith({double? fontSize, double? lineHeight, SelectionHandleStyle? handleStyle}) =>
-      TerminalSettings(
-        fontSize: fontSize ?? this.fontSize,
-        lineHeight: lineHeight ?? this.lineHeight,
-        handleStyle: handleStyle ?? this.handleStyle,
-      );
+  /// Tempel satu baris pendek yang aman ditampilkan di popover dulu (nyala) atau langsung masuk ke prompt (mati).
+  /// Teks panjang, banyak baris, atau berisiko selalu lewat dialog konfirmasi, apa pun nilainya.
+  final bool confirmSingleLinePaste;
+
+  TerminalSettings copyWith({
+    double? fontSize,
+    double? lineHeight,
+    SelectionHandleStyle? handleStyle,
+    bool? confirmSingleLinePaste,
+  }) => TerminalSettings(
+    fontSize: fontSize ?? this.fontSize,
+    lineHeight: lineHeight ?? this.lineHeight,
+    handleStyle: handleStyle ?? this.handleStyle,
+    confirmSingleLinePaste: confirmSingleLinePaste ?? this.confirmSingleLinePaste,
+  );
 
   factory TerminalSettings.fromJson(Map<String, Object?> json) => TerminalSettings(
     fontSize: _clamp(optNum(json, 'fontSize'), defaultFontSize, minFontSize, maxFontSize),
     lineHeight: _clamp(optNum(json, 'lineHeight'), defaultLineHeight, minLineHeight, maxLineHeight),
     handleStyle: SelectionHandleStyle.parse(optString(json, 'handleStyle')),
+    confirmSingleLinePaste: optBool(json, 'confirmSingleLinePaste') ?? true,
   );
 
   static double _clamp(double? v, double fallback, double min, double max) {
@@ -59,17 +70,23 @@ class TerminalSettings {
     return v.clamp(min, max);
   }
 
-  Map<String, Object?> toJson() => {'fontSize': fontSize, 'lineHeight': lineHeight, 'handleStyle': handleStyle.name};
+  Map<String, Object?> toJson() => {
+    'fontSize': fontSize,
+    'lineHeight': lineHeight,
+    'handleStyle': handleStyle.name,
+    'confirmSingleLinePaste': confirmSingleLinePaste,
+  };
 
   @override
   bool operator ==(Object other) =>
       other is TerminalSettings &&
       other.fontSize == fontSize &&
       other.lineHeight == lineHeight &&
-      other.handleStyle == handleStyle;
+      other.handleStyle == handleStyle &&
+      other.confirmSingleLinePaste == confirmSingleLinePaste;
 
   @override
-  int get hashCode => Object.hash(fontSize, lineHeight, handleStyle);
+  int get hashCode => Object.hash(fontSize, lineHeight, handleStyle, confirmSingleLinePaste);
 }
 
 /// Pengaturan koneksi. [keepAlive]: foreground service yang menjaga proses tidak dibekukan Android selama ada sesi

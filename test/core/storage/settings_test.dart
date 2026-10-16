@@ -89,6 +89,26 @@ void main() {
       expect(AppSettings.fromJson(s.toJson()).terminal, s.terminal);
     });
 
+    test('konfirmasi tempel satu baris: bawaan nyala; nilai dibaca dan ditulis; tipe salah dianggap rusak', () {
+      expect(const AppSettings().terminal.confirmSingleLinePaste, isTrue);
+      expect(AppSettings.fromJson({'terminal': <String, Object?>{}}).terminal.confirmSingleLinePaste, isTrue);
+      expect(
+        AppSettings.fromJson({
+          'terminal': {'confirmSingleLinePaste': false},
+        }).terminal.confirmSingleLinePaste,
+        isFalse,
+      );
+      expect(
+        () => AppSettings.fromJson({
+          'terminal': {'confirmSingleLinePaste': 'ya'},
+        }),
+        throwsFormatException,
+      );
+      const s = AppSettings(terminal: TerminalSettings(confirmSingleLinePaste: false));
+      expect((s.toJson()['terminal']! as Map)['confirmSingleLinePaste'], false);
+      expect(AppSettings.fromJson(s.toJson()).terminal, s.terminal);
+    });
+
     test('toJson lalu fromJson menghasilkan nilai yang sama', () {
       const s = AppSettings(terminal: TerminalSettings(fontSize: 11.5, lineHeight: 1.1));
       expect(AppSettings.fromJson(s.toJson()).terminal, s.terminal);

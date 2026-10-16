@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:flutter/gestures.dart' show kTouchSlop;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -51,6 +53,7 @@ class TerminalScreen extends StatefulWidget {
     this.needsAuth = false,
     this.textStyle,
     this.handleStyle = SelectionHandleStyle.drop,
+    this.confirmSingleLinePaste = true,
     this.onKeepInBackground,
     this.keepAliveEnabled = true,
     this.onOpenSettings,
@@ -77,6 +80,10 @@ class TerminalScreen extends StatefulWidget {
 
   /// Bentuk gagang seleksi teks (pengaturan Terminal).
   final SelectionHandleStyle handleStyle;
+
+  /// Satu baris pendek yang aman tampil di popover dulu (true) atau langsung masuk ke prompt (false). Teks panjang,
+  /// banyak baris, atau berisiko selalu lewat dialog konfirmasi.
+  final bool confirmSingleLinePaste;
 
   /// Dipanggil bila pengguna memilih "Tetap terhubung" saat keluar: layar ditutup tanpa menutup sesi. Kosong =
   /// pilihan itu tidak ditawarkan (hanya Putuskan atau Batal).
@@ -111,6 +118,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
     _session.onInput = _clearSelectionOnInput;
     _session.terminal.addListener(_closeMenuIfCursorMoved);
     _scrollController.addListener(_closePasteMenu);
+    _controller.addListener(_dropSelectionWhileMenuOpen);
     // Buka shell setelah layout pertama supaya PTY langsung berukuran layar sebenarnya, bukan 80x24.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _session.start();
@@ -121,6 +129,8 @@ class _TerminalScreenState extends State<TerminalScreen> {
   void dispose() {
     _session.terminal.removeListener(_closeMenuIfCursorMoved);
     _scrollController.removeListener(_closePasteMenu);
+    _controller.removeListener(_dropSelectionWhileMenuOpen);
+    _longPressTimer?.cancel();
     if (_session.onInput == _clearSelectionOnInput) _session.onInput = null;
     _controller.dispose();
     _scrollController.dispose();
@@ -146,66 +156,88 @@ class _TerminalScreenState extends State<TerminalScreen> {
   }
 
   Offset? _downAt;
-  Duration? _downTime;
+  Timer? _longPressTimer;
+
+  /// Tekan-tahan di area kosong membuka popover Tempel; ditunggu sedikit lebih singkat dari tekan lama xterm
+  /// (500 ms) supaya seleksi bawaannya bisa dibatalkan.
+  static const _emptyHold = Duration(milliseconds: 450);
 
   void _onPointerDown(PointerDownEvent e) {
     _downAt = e.position;
-    _downTime = e.timeStamp;
+    _longPressTimer?.cancel();
+    final at = e.position;
+    _longPressTimer = Timer(_emptyHold, () => _onHoldAt(at));
   }
 
-  /// Ketukan singkat tanpa geser (bukan gulir, tekan lama, atau seret gagang) dibaca sebagai ketuk.
-  void _onPointerUp(PointerUpEvent e) {
+  void _onPointerMove(PointerMoveEvent e) {
     final at = _downAt;
-    final time = _downTime;
-    _downAt = null;
-    _downTime = null;
-    final view = _viewKey.currentState;
-    if (at == null || time == null || view == null || !view.renderTerminal.attached) return;
-    if ((e.position - at).distance > kTouchSlop || e.timeStamp - time > const Duration(milliseconds: 350)) return;
-    _onTerminalTap(e.position);
+    if (at != null && (e.position - at).distance > kTouchSlop) _longPressTimer?.cancel();
   }
 
-  /// Ketukan di baris kursor prompt membuka popover Tempel; ketukan lain (atau di baris itu lagi) menutupnya.
-  /// Kursor hanya satu sel (sekitar 8 x 17 dp), terlalu kecil untuk jari: zona ketuk selebar layar dan setinggi
-  /// minimal [TermulSize.tapMin] di sekitar kursor.
-  Future<void> _onTerminalTap(Offset tapAt) async {
-    if (_pasteMenu != null) {
-      _closePasteMenu();
-      return;
-    }
+  void _onPointerEnd(PointerEvent e) {
+    _longPressTimer?.cancel();
+    _downAt = null;
+  }
+
+  /// Pemicu popover lewat sentuhan. Tidak dipakai di layar alternatif (`vim`, `htop`), saat program memakai mouse
+  /// mode (`tmux`), atau saat sesi belum berjalan.
+  bool get _canHoldToPaste {
     final terminal = _session.terminal;
-    final b = terminal.buffer;
-    final cursor = _viewKey.currentState?.globalCursorRect;
-    final pad = cursor == null ? 0.0 : ((TermulSize.tapMin - cursor.height) / 2).clamp(0.0, TermulSize.tapMin);
-    final atCursor = cursor != null && tapAt.dy >= cursor.top - pad && tapAt.dy <= cursor.bottom + pad;
-    if (!atCursor || !_alive || terminal.isUsingAltBuffer || _session.state != TerminalSessionState.running) return;
-    var lines = 0;
-    try {
-      final text = (await Clipboard.getData(Clipboard.kTextPlain))?.text ?? '';
-      if (text.isNotEmpty) lines = text.replaceFirst(RegExp(r'\n+$'), '').split('\n').length;
-    } on Object {
-      lines = 0;
-    }
-    if (!mounted || _pasteMenu != null) return;
-    final area = _areaKey.currentContext?.findRenderObject();
+    return _alive &&
+        _session.state == TerminalSessionState.running &&
+        !terminal.isUsingAltBuffer &&
+        terminal.mouseMode == MouseMode.none;
+  }
+
+  /// Tekan-tahan di area kosong (sisa baris di kanan teks, baris kosong, atau ruang di bawah prompt) menjalankan
+  /// alur tempel dengan popover di dekat jari. Di atas teks, tekan lama tetap memilih kata (xterm).
+  Future<void> _onHoldAt(Offset global) async {
+    if (!mounted || _downAt == null || _pasteMenu != null || !_canHoldToPaste) return;
     final view = _viewKey.currentState;
-    if (area is! RenderBox || !area.attached || view == null) return;
-    final global = view.globalCursorRect;
-    final topLeft = area.globalToLocal(global.topLeft);
+    if (view == null || !view.renderTerminal.attached) return;
+    final render = view.renderTerminal;
+    final cell = render.getCellOffset(render.globalToLocal(global));
+    final buffer = _session.terminal.buffer;
+    final empty = cell.y >= buffer.lines.length || cell.x >= buffer.lines[cell.y].getTrimmedLength();
+    if (!empty) return;
+    _downAt = null;
+    HapticFeedback.selectionClick();
+    // Tekan lama xterm bisa sempat memilih kata kosong: buang supaya bilah seleksi tidak menggantikan tombol cepat.
+    if (_controller.selection != null) _controller.clearSelection();
+    // Area jari: popover muncul di atasnya, tidak tertutup jari.
+    await _paste(anchor: Rect.fromCenter(center: global, width: 1, height: 40));
+  }
+
+  /// Titik tempat popover muncul bila dipicu tombol Tempel di panel: di atas baris prompt (kursor), supaya baris
+  /// itu tetap terlihat dan teks yang akan masuk bisa dibandingkan dengan konteksnya.
+  Rect? _defaultPasteAnchor() {
+    final view = _viewKey.currentState;
+    if (view == null || !view.renderTerminal.attached) return null;
+    return view.globalCursorRect;
+  }
+
+  /// Menampilkan popover berisi [text] di atas [anchorGlobal] (koordinat layar); [onPaste] menempel.
+  void _showPasteMenu(Rect anchorGlobal, String text, VoidCallback onPaste) {
+    final area = _areaKey.currentContext?.findRenderObject();
+    if (area is! RenderBox || !area.attached) return;
+    final b = _session.terminal.buffer;
     setState(
       () => _pasteMenu = _PasteMenu(
         cursorX: b.cursorX,
         cursorY: b.absoluteCursorY,
-        anchor: topLeft & global.size,
-        areaSize: area.size,
-        lines: lines,
+        anchor: area.globalToLocal(anchorGlobal.topLeft) & anchorGlobal.size,
+        text: text,
+        onPaste: () {
+          _closePasteMenu();
+          onPaste();
+        },
       ),
     );
   }
 
-  void _pasteFromMenu() {
-    _closePasteMenu();
-    _paste();
+  /// Seleksi kosong dari tekan lama xterm yang terlambat datang saat popover terbuka dibuang.
+  void _dropSelectionWhileMenuOpen() {
+    if (_pasteMenu != null && _controller.selection != null) _controller.clearSelection();
   }
 
   Widget _pasteMenuOverlay(BuildContext context) {
@@ -214,12 +246,10 @@ class _TerminalScreenState extends State<TerminalScreen> {
       WidgetsBinding.instance.addPostFrameCallback((_) => _closePasteMenu());
       return const SizedBox.shrink();
     }
-    final right = (menu.areaSize.width - menu.anchor.right - 6).clamp(4.0, menu.areaSize.width);
-    final popover = PastePopover(clipLines: menu.lines, onPaste: _pasteFromMenu);
-    // Di atas kursor; di baris paling atas layar (tidak muat) di bawahnya.
-    return menu.anchor.top > 100
-        ? Positioned(right: right, bottom: menu.areaSize.height - menu.anchor.top + 6, child: popover)
-        : Positioned(right: right, top: menu.anchor.bottom + 6, child: popover);
+    return CustomSingleChildLayout(
+      delegate: _PopoverLayout(menu.anchor),
+      child: PastePopover(text: menu.text, onPaste: menu.onPaste),
+    );
   }
 
   bool get _alive =>
@@ -228,7 +258,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
   /// Tempel dari papan klip. Satu baris tanpa tanda bahaya langsung masuk ke prompt; selain itu isi dan akibatnya
   /// ditampilkan dulu (layar 2b dan 2c di desain).
-  Future<void> _paste() async {
+  Future<void> _paste({Rect? anchor}) async {
+    if (_pasteMenu != null) {
+      _closePasteMenu();
+      return;
+    }
     final l = AppLocalizations.of(context);
     final messenger = ScaffoldMessenger.of(context);
     final offset = TermulSize.tapMin + TermulSpacing.space3 * 2 + TermulSpacing.space3;
@@ -263,7 +297,12 @@ class _TerminalScreenState extends State<TerminalScreen> {
     }
 
     if (!analysis.needsConfirm) {
-      send();
+      final at = anchor ?? _defaultPasteAnchor();
+      if (!widget.confirmSingleLinePaste || at == null) {
+        send();
+      } else {
+        _showPasteMenu(at, analysis.text, send);
+      }
       return;
     }
     await showTermulSheet<void>(
@@ -474,12 +513,14 @@ class _TerminalScreenState extends State<TerminalScreen> {
                         key: _areaKey,
                         fit: StackFit.expand,
                         children: [
-                          // `onTapUp` milik TerminalView tidak pernah dipanggil di xterm 4.0.0, jadi ketukan dibaca dari
-                          // pointer mentah (tidak ikut arena gestur: ketuk, gulir, dan seleksi xterm tidak terganggu).
+                          // Tekan-tahan dibaca dari pointer mentah: tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi
+                          // xterm tidak terganggu (`TerminalView.onTapUp` juga tidak pernah dipanggil di xterm 4.0.0).
                           Listener(
                             behavior: HitTestBehavior.translucent,
                             onPointerDown: _onPointerDown,
-                            onPointerUp: _onPointerUp,
+                            onPointerMove: _onPointerMove,
+                            onPointerCancel: _onPointerEnd,
+                            onPointerUp: _onPointerEnd,
                             child: TerminalView(
                               _session.terminal,
                               key: _viewKey,
@@ -734,15 +775,15 @@ class _PasteDetails extends StatelessWidget {
   }
 }
 
-/// Keadaan popover Tempel: posisi kursor saat dibuka (untuk menutupnya bila kursor pindah), kotak kursor di
-/// koordinat area terminal, dan isi papan klip.
+/// Keadaan popover Tempel: posisi kursor saat dibuka (untuk menutupnya bila kursor pindah), area jangkar di
+/// koordinat area terminal (jari atau tombol Tempel), teks yang akan ditempel, dan aksi menempel.
 class _PasteMenu {
   _PasteMenu({
     required this.cursorX,
     required this.cursorY,
     required this.anchor,
-    required this.areaSize,
-    required this.lines,
+    required this.text,
+    required this.onPaste,
   }) : screenSize =
            WidgetsBinding.instance.platformDispatcher.views.first.physicalSize /
            WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
@@ -750,9 +791,35 @@ class _PasteMenu {
   final int cursorX;
   final int cursorY;
   final Rect anchor;
-  final Size areaSize;
-  final int lines;
+  final String text;
+  final VoidCallback onPaste;
 
   /// Ukuran layar saat dibuka; berubah (putar layar, keyboard) menutup popover karena posisinya usang.
   final Size screenSize;
+}
+
+/// Menaruh popover di atas [anchor], dipusatkan pada jangkar dan dibatasi 8 dp dari tepi area; bila tidak muat di
+/// atas, di bawahnya.
+class _PopoverLayout extends SingleChildLayoutDelegate {
+  const _PopoverLayout(this.anchor);
+
+  final Rect anchor;
+
+  static const _margin = 8.0;
+  static const _gap = 6.0;
+
+  @override
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) => constraints.loosen();
+
+  @override
+  Offset getPositionForChild(Size size, Size childSize) {
+    final maxX = size.width - childSize.width - _margin;
+    final x = (anchor.center.dx - childSize.width / 2).clamp(_margin, maxX < _margin ? _margin : maxX);
+    final above = anchor.top - childSize.height - _gap;
+    final y = above >= _margin ? above : anchor.bottom + _gap;
+    return Offset(x, y);
+  }
+
+  @override
+  bool shouldRelayout(_PopoverLayout old) => old.anchor != anchor;
 }

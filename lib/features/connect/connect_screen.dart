@@ -140,6 +140,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
         final settings = ref.watch(appSettingsProvider);
         final style = terminalStyleFor(settings.terminal);
         final handle = settings.terminal.handleStyle;
+        final confirmPaste = settings.terminal.confirmSingleLinePaste;
         final keepAlive = settings.connection.keepAlive;
         if (session != null) {
           if (state is ConnectDone) {
@@ -152,6 +153,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               needsAuth: c.needsAuth,
               textStyle: style,
               handleStyle: handle,
+              confirmSingleLinePaste: confirmPaste,
               onKeepInBackground: _keepInBackground,
               keepAliveEnabled: keepAlive,
               onOpenSettings: _openSettings,
@@ -164,6 +166,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               link: TerminalLink.reconnecting,
               textStyle: style,
               handleStyle: handle,
+              confirmSingleLinePaste: confirmPaste,
             );
           }
           if (state is ConnectFailed || state is ConnectAuthDenied) {
@@ -177,6 +180,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               needsAuth: c.needsAuth,
               textStyle: style,
               handleStyle: handle,
+              confirmSingleLinePaste: confirmPaste,
             );
           }
         }
