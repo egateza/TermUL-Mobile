@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:xterm/xterm.dart';
 
+import '../../core/models/app_settings.dart' show SelectionHandleStyle;
 import '../../core/models/host_profile.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -44,6 +45,7 @@ class TerminalScreen extends StatefulWidget {
     this.failureText,
     this.onReconnect,
     this.textStyle,
+    this.handleStyle = SelectionHandleStyle.drop,
   });
 
   final HostProfile profile;
@@ -58,6 +60,9 @@ class TerminalScreen extends StatefulWidget {
 
   /// Gaya huruf terminal; bawaan [termulTerminalStyle].
   final TerminalStyle? textStyle;
+
+  /// Bentuk gagang seleksi teks (pengaturan Terminal).
+  final SelectionHandleStyle handleStyle;
 
   static const compactBelowDp = 480.0;
 
@@ -305,6 +310,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                             controller: _controller,
                             scrollController: _scrollController,
                             viewKey: _viewKey,
+                            style: widget.handleStyle,
                           ),
                         ],
                       ),

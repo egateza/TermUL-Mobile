@@ -7,6 +7,7 @@ import 'package:xterm/xterm.dart';
 // ignore: implementation_imports
 import 'package:xterm/src/ui/render.dart' show RenderTerminal;
 
+import '../../core/models/app_settings.dart' show SelectionHandleStyle;
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -26,12 +27,16 @@ class SelectionHandles extends StatefulWidget {
     required this.controller,
     required this.scrollController,
     required this.viewKey,
+    this.style = SelectionHandleStyle.drop,
   });
 
   final Terminal terminal;
   final TerminalController controller;
   final ScrollController scrollController;
   final GlobalKey<TerminalViewState> viewKey;
+
+  /// Bentuk gagang (pengaturan Terminal).
+  final SelectionHandleStyle style;
 
   /// Jarak pusat bulatan dari bawah sel, supaya jari tidak menutupi huruf yang dipilih.
   static const _gap = 14.0;
@@ -196,17 +201,11 @@ class _SelectionHandlesState extends State<SelectionHandles> {
           onPanUpdate: (d) => _updateDrag(d.globalPosition),
           onPanEnd: (_) => _endDrag(),
           onPanCancel: _endDrag,
-          // Pilihan pemilik: tetesan `accent` bertepi `ground` dengan ujung runcing ke teks, bukan bulatan `info`
-          // bertangkai seperti prototipe.
+          // Bentuk gagang pilihan pemilik (bawaan tetesan `accent` bertepi `ground`, bisa diganti di Pengaturan),
+          // bukan bulatan `info` bertangkai seperti prototipe.
           child: Align(
             alignment: Alignment.topCenter,
-            child: CustomPaint(
-              size: const Size(
-                2 * SelectionHandles._dropRadius + 2,
-                SelectionHandles._dropTop + SelectionHandles._dropReach + SelectionHandles._dropRadius + 2,
-              ),
-              painter: const _DropPainter(),
-            ),
+            child: SelectionHandleShape(style: widget.style),
           ),
         ),
       ),
@@ -313,16 +312,65 @@ class _LensMarkerPainter extends CustomPainter {
   bool shouldRepaint(_LensMarkerPainter old) => old.at != at || old.height != height;
 }
 
-/// Gagang berbentuk tetesan air: bulatan dengan ujung runcing di atas yang sisinya sedikit melengkung ke dalam,
-/// bersambung halus ke bulatan. Ujungnya menunjuk batas seleksi.
-class _DropPainter extends CustomPainter {
-  const _DropPainter();
+/// Gambar satu gagang seleksi dalam salah satu bentuk [SelectionHandleStyle]; dipakai oleh gagang di terminal dan
+/// pratinjau di Pengaturan. Ujung atas (titik yang menunjuk batas seleksi) ada [SelectionHandles._dropTop] dari tepi
+/// atas gambar.
+class SelectionHandleShape extends StatelessWidget {
+  const SelectionHandleShape({super.key, required this.style});
+
+  final SelectionHandleStyle style;
+
+  static const _size = Size(
+    2 * SelectionHandles._dropRadius + 2,
+    SelectionHandles._dropTop + 18 + SelectionHandles._dropRadius + 2,
+  );
+
+  @override
+  Widget build(BuildContext context) => ExcludeSemantics(
+    child: CustomPaint(size: _size, painter: _HandlePainter(style)),
+  );
+}
+
+/// Bentuk:
+/// - tetesan: bulatan dengan ujung runcing di atas yang sisinya sedikit melengkung ke dalam, bersambung halus ke
+///   bulatan;
+/// - segitiga: bulatan dengan segitiga terpisah di atasnya, sisi bawah segitiga melengkung mengikuti bulatan;
+/// - bulatan: bulatan polos.
+class _HandlePainter extends CustomPainter {
+  const _HandlePainter(this.style);
+
+  final SelectionHandleStyle style;
+
+  static const _ring = 3.0;
+
+  void _paint(Canvas canvas, Path path) {
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = TermulPalette.ground
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = _ring
+        ..strokeJoin = StrokeJoin.round,
+    );
+    canvas.drawPath(path, Paint()..color = TermulPalette.accent);
+  }
 
   @override
   void paint(Canvas canvas, Size size) {
+    final tip = Offset(size.width / 2, SelectionHandles._dropTop);
+    switch (style) {
+      case SelectionHandleStyle.drop:
+        _drop(canvas, tip);
+      case SelectionHandleStyle.triangle:
+        _triangle(canvas, tip);
+      case SelectionHandleStyle.dot:
+        _paint(canvas, Path()..addOval(Rect.fromCircle(center: tip.translate(0, 13), radius: 7)));
+    }
+  }
+
+  void _drop(Canvas canvas, Offset tip) {
     const r = SelectionHandles._dropRadius;
     const reach = SelectionHandles._dropReach;
-    final tip = Offset(size.width / 2, SelectionHandles._dropTop);
     final center = tip.translate(0, reach);
     // Titik singgung garis dari ujung ke bulatan.
     final alpha = math.acos(r / reach);
@@ -338,17 +386,26 @@ class _DropPainter extends CustomPainter {
       ..arcTo(Rect.fromCircle(center: center, radius: r), start, -(2 * math.pi - 2 * alpha), false)
       ..quadraticBezierTo(control(right).dx, control(right).dy, tip.dx, tip.dy)
       ..close();
-    canvas.drawPath(
-      path,
-      Paint()
-        ..color = TermulPalette.ground
-        ..style = PaintingStyle.stroke
-        ..strokeWidth = 3
-        ..strokeJoin = StrokeJoin.round,
-    );
-    canvas.drawPath(path, Paint()..color = TermulPalette.accent);
+    _paint(canvas, path);
+  }
+
+  void _triangle(Canvas canvas, Offset tip) {
+    const r = 7.0;
+    const gap = 4.0;
+    const halfAngle = 36 * math.pi / 180;
+    final center = tip.translate(0, 18);
+    _paint(canvas, Path()..addOval(Rect.fromCircle(center: center, radius: r)));
+    // Segitiga: ujung di atas, alas berupa busur yang sepusat dengan bulatan (melengkung mengikuti bulatan).
+    const outer = r + gap;
+    final corner = center + Offset(math.sin(halfAngle), -math.cos(halfAngle)) * outer;
+    final path = Path()
+      ..moveTo(tip.dx, tip.dy)
+      ..lineTo(corner.dx, corner.dy)
+      ..arcTo(Rect.fromCircle(center: center, radius: outer), -math.pi / 2 + halfAngle, -2 * halfAngle, false)
+      ..close();
+    _paint(canvas, path);
   }
 
   @override
-  bool shouldRepaint(_DropPainter old) => false;
+  bool shouldRepaint(_HandlePainter old) => old.style != style;
 }

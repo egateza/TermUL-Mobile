@@ -1002,5 +1002,21 @@
   "selectionHandleEnd": "Gagang akhir pilihan",
   "@selectionHandleEnd": {
     "description": "Nama aksesibilitas gagang akhir seleksi."
+  },
+  "settingsHandleStyle": "Bentuk gagang seleksi",
+  "@settingsHandleStyle": {
+    "description": "Label pilihan bentuk gagang seleksi teks di terminal."
+  },
+  "settingsHandleDrop": "Tetesan",
+  "@settingsHandleDrop": {
+    "description": "Bentuk gagang: tetesan air."
+  },
+  "settingsHandleTriangle": "Segitiga",
+  "@settingsHandleTriangle": {
+    "description": "Bentuk gagang: bulatan dengan segitiga di atasnya."
+  },
+  "settingsHandleDot": "Bulatan",
+  "@settingsHandleDot": {
+    "description": "Bentuk gagang: bulatan polos."
   }
 }

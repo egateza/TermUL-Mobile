@@ -1368,6 +1368,30 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Gagang akhir pilihan'**
   String get selectionHandleEnd;
+
+  /// Label pilihan bentuk gagang seleksi teks di terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Bentuk gagang seleksi'**
+  String get settingsHandleStyle;
+
+  /// Bentuk gagang: tetesan air.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetesan'**
+  String get settingsHandleDrop;
+
+  /// Bentuk gagang: bulatan dengan segitiga di atasnya.
+  ///
+  /// In id, this message translates to:
+  /// **'Segitiga'**
+  String get settingsHandleTriangle;
+
+  /// Bentuk gagang: bulatan polos.
+  ///
+  /// In id, this message translates to:
+  /// **'Bulatan'**
+  String get settingsHandleDot;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -11,7 +11,9 @@ import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_card.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
+import '../../shared/widgets/termul_segmented.dart';
 import '../../shared/widgets/termul_stepper.dart';
+import '../terminal/selection_overlay.dart' show SelectionHandleShape;
 import '../terminal/terminal_palette.dart';
 
 /// Layar Pengaturan. Sekarang hanya bagian Terminal (ukuran huruf dan tinggi baris, dengan pratinjau); perubahan
@@ -117,13 +119,9 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     final keepAlive = ref.watch(appSettingsProvider).connection.keepAlive;
 
     TerminalSettings Function(TerminalSettings) fontBy(double d) =>
-        (c) => TerminalSettings(
-          fontSize: (c.fontSize + d).clamp(TerminalSettings.minFontSize, TerminalSettings.maxFontSize),
-          lineHeight: c.lineHeight,
-        );
+        (c) => c.copyWith(fontSize: (c.fontSize + d).clamp(TerminalSettings.minFontSize, TerminalSettings.maxFontSize));
     TerminalSettings Function(TerminalSettings) lineBy(double d) =>
-        (c) => TerminalSettings(
-          fontSize: c.fontSize,
+        (c) => c.copyWith(
           lineHeight: _round1(c.lineHeight + d).clamp(TerminalSettings.minLineHeight, TerminalSettings.maxLineHeight),
         );
 
@@ -226,6 +224,39 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                             onIncrement: t.lineHeight >= TerminalSettings.maxLineHeight
                                 ? null
                                 : () => _apply(lineBy(_lineStep)),
+                          ),
+                          Padding(
+                            padding: const EdgeInsets.all(TermulSpacing.space6),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.stretch,
+                              spacing: TermulSpacing.space4,
+                              children: [
+                                Row(
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        l.settingsHandleStyle,
+                                        style: TermulText.body.copyWith(color: TermulPalette.ink),
+                                      ),
+                                    ),
+                                    SelectionHandleShape(style: t.handleStyle),
+                                  ],
+                                ),
+                                TermulSegmented<SelectionHandleStyle>(
+                                  label: l.settingsHandleStyle,
+                                  value: t.handleStyle,
+                                  onChanged: (v) => _apply((c) => c.copyWith(handleStyle: v)),
+                                  options: [
+                                    SegmentOption(value: SelectionHandleStyle.drop, label: l.settingsHandleDrop),
+                                    SegmentOption(
+                                      value: SelectionHandleStyle.triangle,
+                                      label: l.settingsHandleTriangle,
+                                    ),
+                                    SegmentOption(value: SelectionHandleStyle.dot, label: l.settingsHandleDot),
+                                  ],
+                                ),
+                              ],
+                            ),
                           ),
                         ],
                       ),

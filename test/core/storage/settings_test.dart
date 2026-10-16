@@ -57,6 +57,38 @@ void main() {
       );
     });
 
+    test('bentuk gagang seleksi: bawaan tetesan; nama dikenal dibaca; nama asing kembali ke bawaan', () {
+      expect(const AppSettings().terminal.handleStyle, SelectionHandleStyle.drop);
+      expect(
+        AppSettings.fromJson({
+          'terminal': {'handleStyle': 'triangle'},
+        }).terminal.handleStyle,
+        SelectionHandleStyle.triangle,
+      );
+      expect(
+        AppSettings.fromJson({
+          'terminal': {'handleStyle': 'dot'},
+        }).terminal.handleStyle,
+        SelectionHandleStyle.dot,
+      );
+      expect(
+        AppSettings.fromJson({
+          'terminal': {'handleStyle': 'bintang'},
+        }).terminal.handleStyle,
+        SelectionHandleStyle.drop,
+      );
+      expect(
+        () => AppSettings.fromJson({
+          'terminal': {'handleStyle': 5},
+        }),
+        throwsFormatException,
+        reason: 'tipe salah dianggap rusak, seperti field lain',
+      );
+      const s = AppSettings(terminal: TerminalSettings(handleStyle: SelectionHandleStyle.triangle));
+      expect((s.toJson()['terminal']! as Map)['handleStyle'], 'triangle');
+      expect(AppSettings.fromJson(s.toJson()).terminal, s.terminal);
+    });
+
     test('toJson lalu fromJson menghasilkan nilai yang sama', () {
       const s = AppSettings(terminal: TerminalSettings(fontSize: 11.5, lineHeight: 1.1));
       expect(AppSettings.fromJson(s.toJson()).terminal, s.terminal);

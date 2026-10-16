@@ -235,7 +235,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
         final state = flow.state;
         final session = _session;
         final l = AppLocalizations.of(context);
-        final style = terminalStyleFor(ref.watch(appSettingsProvider).terminal);
+        final terminalSettings = ref.watch(appSettingsProvider).terminal;
+        final style = terminalStyleFor(terminalSettings);
+        final handle = terminalSettings.handleStyle;
         if (session != null) {
           if (state is ConnectDone) {
             return TerminalScreen(
@@ -244,6 +246,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
               link: _lost ? TerminalLink.lost : TerminalLink.up,
               onReconnect: _reconnect,
               textStyle: style,
+              handleStyle: handle,
             );
           }
           if (state is ConnectPreparing || state is ConnectConnecting) {
@@ -252,6 +255,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
               session: session,
               link: TerminalLink.reconnecting,
               textStyle: style,
+              handleStyle: handle,
             );
           }
           if (state is ConnectFailed || state is ConnectAuthDenied) {
@@ -262,6 +266,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
               failureText: _failureSummary(l, state),
               onReconnect: _reconnect,
               textStyle: style,
+              handleStyle: handle,
             );
           }
         }

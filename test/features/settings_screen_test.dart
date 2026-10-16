@@ -71,6 +71,28 @@ void main() {
     expect(setup.saved.last.terminal.fontSize, 12);
   });
 
+  testWidgets(
+    'bentuk gagang seleksi: bawaan tetesan; memilih Segitiga dan Bulatan menyimpan; ukuran huruf tidak mengubahnya',
+    (tester) async {
+      final setup = _Setup();
+      await setup.open(tester);
+      expect(find.text('Bentuk gagang seleksi'), findsOneWidget);
+      expect(_current(tester).terminal.handleStyle, SelectionHandleStyle.drop);
+      await tester.ensureVisible(find.text('Segitiga'));
+      await tester.tap(find.text('Segitiga'));
+      await tester.pumpAndSettle();
+      expect(setup.saved.last.terminal.handleStyle, SelectionHandleStyle.triangle);
+      await tester.tap(find.bySemanticsLabel('Besarkan font'));
+      await tester.pumpAndSettle();
+      expect(setup.saved.last.terminal.handleStyle, SelectionHandleStyle.triangle);
+      expect(setup.saved.last.terminal.fontSize, 14);
+      await tester.ensureVisible(find.text('Bulatan'));
+      await tester.tap(find.text('Bulatan'));
+      await tester.pumpAndSettle();
+      expect(setup.saved.last.terminal.handleStyle, SelectionHandleStyle.dot);
+    },
+  );
+
   testWidgets('tinggi baris bergerak 0,1 tanpa sisa desimal', (tester) async {
     final setup = _Setup();
     await setup.open(tester);

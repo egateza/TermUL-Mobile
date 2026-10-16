@@ -729,4 +729,16 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get selectionHandleEnd => 'Gagang akhir pilihan';
+
+  @override
+  String get settingsHandleStyle => 'Bentuk gagang seleksi';
+
+  @override
+  String get settingsHandleDrop => 'Tetesan';
+
+  @override
+  String get settingsHandleTriangle => 'Segitiga';
+
+  @override
+  String get settingsHandleDot => 'Bulatan';
 }

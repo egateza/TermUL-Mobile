@@ -50,6 +50,26 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </div>
 
 <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px 14px; border-top: 1px solid #2A343A">
+<div style="display: flex; align-items: center; gap: 12px">
+<span style="flex: 1; font-size: 15px">Bentuk gagang seleksi</span>
+<sc-if value="{{hsDrop}}" hint-placeholder-val="{{ true }}">
+<svg width="18" height="33" viewBox="0 0 18 33" aria-hidden="true" stroke="#0F1316" stroke-width="3" stroke-linejoin="round" paint-order="stroke" fill="#F0B34A"><path d="M9 5Q7.22 8.33 3.04 11.67A8 8 0 1 0 14.96 11.67Q10.78 8.33 9 5Z"/></svg>
+</sc-if>
+<sc-if value="{{hsTriangle}}" hint-placeholder-val="{{ false }}">
+<svg width="18" height="33" viewBox="0 0 18 33" aria-hidden="true" stroke="#0F1316" stroke-width="3" stroke-linejoin="round" paint-order="stroke" fill="#F0B34A"><circle cx="9" cy="23" r="7"/><path d="M9 5L15.47 14.1A11 11 0 0 0 2.53 14.1Z"/></svg>
+</sc-if>
+<sc-if value="{{hsDot}}" hint-placeholder-val="{{ false }}">
+<svg width="18" height="33" viewBox="0 0 18 33" aria-hidden="true" stroke="#0F1316" stroke-width="3" stroke-linejoin="round" paint-order="stroke" fill="#F0B34A"><circle cx="9" cy="18" r="7"/></svg>
+</sc-if>
+</div>
+<div role="group" aria-label="Bentuk gagang seleksi" style="display: flex; gap: 3px; padding: 3px; border-radius: 12px; border: 1px solid #5C6A71; background: #161C20">
+<sc-for list="{{handleOpts}}" as="h" hint-placeholder-count="3">
+<button type="button" onClick="{{h.pick}}" aria-pressed="{{h.on}}" style="flex: 1; min-height: 44px; border-radius: 9px; border: none; background: {{h.bg}}; color: {{h.fg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">{{h.label}}</button>
+</sc-for>
+</div>
+</div>
+
+<div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px 14px; border-top: 1px solid #2A343A">
 <span style="font-size: 15px">Tema</span>
 <div style="display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px">
 <sc-for list="{{themes}}" as="t" hint-placeholder-count="3">
@@ -265,6 +285,7 @@ class Component extends DCLogic {
     const font = s.font || 13;
     const lh = s.lh || 13; // tinggi baris dalam persepuluhan (13 = 1,3); bawaan aplikasi 1,3
     const theme = s.theme || 'ops';
+    const handle = s.handle || 'drop';
     const lock = s.lock || '60';
     const ka = s.ka || '30';
     const fgDefault = this.props.fgOn === true || this.props.fgOn === 'true';
@@ -287,6 +308,17 @@ class Component extends DCLogic {
         fg: t.fg,
         bd: on ? '#F0B34A' : '#2A343A',
         pick: () => this.setState({ theme: id })
+      };
+    });
+
+    const handleOpts = [['drop', 'Tetesan'], ['triangle', 'Segitiga'], ['dot', 'Bulatan']].map((d) => {
+      const on = handle === d[0];
+      return {
+        label: d[1],
+        on: on,
+        bg: on ? '#F0B34A' : 'transparent',
+        fg: on ? '#1B1406' : '#E8EEF0',
+        pick: () => this.setState({ handle: d[0] })
       };
     });
 
@@ -334,6 +366,10 @@ class Component extends DCLogic {
       lhDec: () => this.setState({ lh: Math.max(10, lh - 1) }),
       lhInc: () => this.setState({ lh: Math.min(20, lh + 1) }),
       themes: themes,
+      handleOpts: handleOpts,
+      hsDrop: handle === 'drop',
+      hsTriangle: handle === 'triangle',
+      hsDot: handle === 'dot',
       secSwitches: [
         mkSwitch('bio', 'Biometrik untuk membuka vault', 'Sidik jari atau wajah'),
         mkSwitch('sudo', 'Isi sudo otomatis', 'Hanya setelah konfirmasi pertama di tiap sesi'),
