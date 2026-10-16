@@ -533,6 +533,20 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 - **Belum dikerjakan (usulan berikutnya):** auto-attach tmux per host (setelah sambung ulang langsung masuk ke sesi tmux yang sama).
 - **Sinkron desain:** `docs/design/android.md` diperbarui (bagian Implementasi).
 
+### Pengujian tertunda di HP (dicatat 2026-10-16, menunggu pengguna)
+
+Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang dicabut). Urutan uji saat HP tersedia:
+
+1. Pasang build baru (`flutter run -d <HP>`) dan mulai rekam log: `adb logcat -c` lalu simpan `adb logcat -v time` ke berkas.
+2. Pengaturan, Koneksi: nyalakan saklar, izinkan notifikasi. Periksa status "Diizinkan" dan tombol "Buka pengaturan".
+3. Sambung ke host, tekan Home, tunggu 30 detik, 5 menit, lalu buka lagi. Catat apakah sesi (`echo $$`) sama.
+4. Di log: apakah `Destroyed live tcp sockets for uids={<uid TermUL>}` masih muncul dengan saklar menyala, dan baris `[termul]` (alasan putus, lama di latar belakang).
+5. Ketuk "Putuskan semua" di notifikasi saat aplikasi di latar belakang: sambungan tertutup, layar sesi tertutup, tidak menyambung ulang.
+6. Bila sambungan tetap putus: atur penghemat baterai TermUL ke "Tanpa batasan" dan aktifkan Mulai otomatis (HyperOS), ulangi 3 dan 4.
+7. Catat hasil di sini, dan di `docs/design/android.md` (bagian Implementasi, "Belum teruji").
+
+Hasil sementara: belum ada. Yang sudah terbukti hanya di emulator Android 14 (lihat 11b).
+
 ## 12. Status terkini dan cara melanjutkan
 
 Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` (bagian 11a). Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. **Belum:** sisa uji HP (Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP), HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur). **Menu setting** (ukuran huruf dan tinggi baris) selesai dan dicoba di HP. **Di luar irisan pertama:** seleksi dan salin teks, tempel, status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1), foreground service. **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna) dan sinkron desain: salinan lokal `docs/design/` dan kedua artifact sudah memuat penguncian tiga tingkat, warna ANSI magenta dan sian, konfirmasi memutus, sambung ulang otomatis sekali, tinggi baris terminal 1,3, komponen `Stepper`, dan layar Pengaturan (prototipe `Settings`), (lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
