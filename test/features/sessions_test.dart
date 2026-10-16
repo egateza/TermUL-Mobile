@@ -21,7 +21,7 @@ Future<void> chooseKeep(WidgetTester tester) async {
 }
 
 Future<void> openSessions(WidgetTester tester) async {
-  await tester.tap(find.bySemanticsLabel(RegExp(r'^Sesi aktif, \d+$')));
+  await tester.tap(find.bySemanticsLabel(RegExp(r'^Sesi( aktif, \d+)?$')));
   await tester.pumpAndSettle();
   expect(find.byType(SessionsScreen), findsOneWidget);
 }
@@ -83,7 +83,7 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.byType(TerminalScreen), findsNothing);
     expect(net.shells[0].closed, isTrue);
-    expect(find.bySemanticsLabel('Sesi aktif, 0'), findsOneWidget);
+    expect(find.bySemanticsLabel('Sesi'), findsOneWidget);
     expect(containerOf(tester).read(sessionManagerProvider), isEmpty);
   });
 
@@ -188,6 +188,6 @@ void main() {
     expect(net.shells[0].closed, isTrue);
     expect(containerOf(tester).read(sessionManagerProvider), isEmpty);
     expect(containerOf(tester).read(activeSessionsProvider), isEmpty);
-    expect(find.bySemanticsLabel('Sesi aktif, 0'), findsOneWidget);
+    expect(find.bySemanticsLabel('Sesi'), findsOneWidget);
   });
 }

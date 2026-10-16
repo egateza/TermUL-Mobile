@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app.dart';
 import 'package:termul_mobile/app_providers.dart';
 import 'package:termul_mobile/l10n/app_localizations.dart';
+import 'package:termul_mobile/shared/widgets/termul_nav_bar.dart';
 
 import 'features/hosts_ui_harness.dart';
 
@@ -17,6 +18,10 @@ void main() {
     expect(app.supportedLocales, const [Locale('id')]);
     final context = tester.element(find.byType(Scaffold).first);
     expect(AppLocalizations.of(context).appTitle, 'TermUL');
-    expect(find.text('Host'), findsOneWidget);
+    expect(find.byType(TermulNavBar), findsOneWidget);
+    for (final tab in ['Host', 'Sesi', 'SFTP', 'Snippet', 'Pengaturan']) {
+      expect(find.descendant(of: find.byType(TermulNavBar), matching: find.text(tab)), findsOneWidget, reason: tab);
+    }
+    expect(find.text('Host'), findsNWidgets(2)); // judul layar dan tab
   });
 }

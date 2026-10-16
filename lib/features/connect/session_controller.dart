@@ -4,8 +4,11 @@ import 'package:flutter/widgets.dart';
 
 import '../../app_providers.dart' show ShellOpenerFor;
 import '../../core/models/host_profile.dart';
+import '../../core/platform/screen_monitor.dart';
 import '../../core/ssh/connection_log.dart';
+import '../../core/ssh/reconnect_backoff.dart';
 import '../../core/ssh/ssh_connector.dart';
+import '../../core/ssh/ssh_failure.dart';
 import '../terminal/shell_channel.dart';
 import '../terminal/terminal_session.dart';
 import 'connect_flow.dart';
@@ -40,8 +43,12 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
     required this.reconnectedMarker,
     this.onEndedWhileDetached,
     DateTime? startedAt,
+    this._probe = tcpProbe,
+    this._backoff = const ReconnectBackoff(),
+    this._screenMonitor = const NoopScreenMonitor(),
   }) : startedAt = startedAt ?? DateTime.now() {
     flow.addListener(_onFlow);
+    _screenOffSub = _screenMonitor.onScreenOff.listen((_) => flow.releaseCredentials());
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -61,6 +68,22 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
 
   final ActiveSessionsNotifier _registry;
   final ShellOpenerFor _shellOpener;
+  final HostProbe _probe;
+  final ReconnectBackoff _backoff;
+  final ScreenMonitor _screenMonitor;
+  StreamSubscription<void>? _screenOffSub;
+
+  /// Nilai [ScreenMonitor.screenOffCount] saat rahasia terakhir dibaca atau diperiksa. Bila sekarang berbeda, layar
+  /// pernah mati sejak itu dan rahasia yang dipegang harus dibuang.
+  int _screenOffBaseline = 0;
+
+  // Rangkaian sambung ulang: probe jaringan, lalu sambung dengan rahasia yang dipegang (satu prompt biometrik).
+  Timer? _retryTimer;
+  Timer? _ticker;
+  DateTime? _nextAttemptAt;
+  int _attempts = 0;
+  int _epoch = 0;
+  bool _probing = false;
 
   TerminalSession? _session;
   SshConnection? _current;
@@ -96,14 +119,51 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
     };
   }
 
-  void start() => flow.start();
+  /// Sambungan pertama: satu prompt biometrik, lalu rahasia dipegang di memori selama layar tidak pernah mati
+  /// (lihat [reconnect]).
+  Future<void> start() async {
+    _screenOffBaseline = await _readScreenOffCount();
+    if (_disposed) return;
+    await flow.start(holdCredentials: true);
+  }
+
+  Future<int> _readScreenOffCount() async {
+    try {
+      return await _screenMonitor.screenOffCount();
+    } on Object {
+      return _screenOffBaseline;
+    }
+  }
+
+  /// Membuang rahasia yang dipegang bila layar pernah mati sejak terakhir diperiksa. Sambung ulang berikutnya lalu
+  /// membaca vault lagi (prompt biometrik).
+  Future<void> _dropCredentialsIfScreenWasOff() async {
+    final count = await _readScreenOffCount();
+    if (count == _screenOffBaseline) return;
+    _screenOffBaseline = count;
+    flow.releaseCredentials();
+  }
 
   /// Layar mulai atau berhenti menampilkan sesi ini. Selama tidak ada layar, sambungan yang putus tidak disambung
   /// ulang otomatis (alurnya bisa memunculkan prompt biometrik di layar lain); sambung ulang terjadi saat sesi
   /// dibuka lagi (lihat [reconnect], dipanggil layar setelah frame pertama).
   void attach() => _attached = true;
 
-  void detach() => _attached = false;
+  void detach() {
+    _attached = false;
+    _endSeries();
+  }
+
+  /// Sedang memeriksa apakah host terjangkau sebelum menyambung ulang.
+  bool get probing => _probing;
+
+  /// Detik sampai percobaan sambung ulang berikutnya, atau null bila tidak sedang menunggu.
+  int? get secondsUntilRetry {
+    final at = _nextAttemptAt;
+    if (at == null) return null;
+    final ms = at.difference(DateTime.now()).inMilliseconds;
+    return ms <= 0 ? 0 : (ms / 1000).ceil();
+  }
 
   void _register() {
     if (_registered) return;
@@ -134,6 +194,8 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
   void disconnectFromNotification() {
     if (_ended) return;
     connLog('putus atas permintaan pengguna');
+    _endSeries();
+    flow.releaseCredentials();
     _current?.close();
     _unregister();
     _ended = true;
@@ -180,13 +242,98 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
     if (_attached && (lifecycle == null || lifecycle == AppLifecycleState.resumed)) reconnect();
   }
 
-  /// Menyambung ulang memakai alur yang sama dengan sambungan pertama (rahasia dari vault, host key diperiksa
-  /// lagi; host key yang berubah tetap memblokir dan butuh keputusan pengguna).
-  void reconnect() {
-    if (_disposed || !_lost) return;
+  /// Menyambung ulang memakai alur yang sama dengan sambungan pertama (host key diperiksa lagi; host key yang
+  /// berubah tetap memblokir dan butuh keputusan pengguna).
+  ///
+  /// Rahasia: dibaca dari vault (prompt biometrik) saat sambungan pertama lalu dipegang di memori. Selama layar tidak
+  /// pernah mati sejak itu (pengguna masih memakai aplikasi), sambung ulang memakainya tanpa prompt. Layar mati
+  /// melepas rahasia ([ScreenMonitor]), jadi sambung ulang berikutnya minta biometrik lagi.
+  ///
+  /// Sebelum menyambung, host diperiksa lewat probe TCP. Bila belum terjangkau (mis. mode pesawat), percobaan diulang
+  /// dengan jeda bertingkat ([ReconnectBackoff]) dan tidak ada prompt. Dipanggil juga oleh tombol "Sambung
+  /// sekarang": menggantikan hitungan mundur yang sedang jalan.
+  ///
+  /// [manual] true untuk tombol "Sambung sekarang" / "Tampilkan prompt". Pemicu otomatis (sambungan putus, aplikasi
+  /// terlihat lagi) tidak memunculkan prompt lagi setelah prompt dibatalkan atau gagal ([needsAuth]): pengguna yang
+  /// memintanya lewat tombol, supaya mengetuk di luar prompt tidak membuat prompt muncul berulang.
+  void reconnect({bool manual = false}) {
+    if (_disposed || _ended || !_lost) return;
     final state = flow.state;
     if (state is ConnectPreparing || state is ConnectConnecting || state is ConnectNeedsHostKey) return;
-    flow.start();
+    if (_probing) return;
+    if (!manual && state is ConnectAuthDenied) return;
+    _stopTimers();
+    unawaited(_attempt(++_epoch, manual: manual));
+  }
+
+  /// Sambung ulang menunggu pengguna menampilkan prompt biometrik (prompt sebelumnya dibatalkan atau gagal).
+  bool get needsAuth => _lost && flow.state is ConnectAuthDenied;
+
+  bool _stale(int epoch) => _disposed || _ended || !_attached || epoch != _epoch;
+
+  Future<void> _attempt(int epoch, {bool manual = false}) async {
+    _probing = true;
+    notifyListeners();
+    final reachable = await _probe(profile.host, profile.port);
+    _probing = false;
+    if (_stale(epoch)) {
+      notifyListeners();
+      return;
+    }
+    if (!reachable) {
+      connLog('sambung ulang: host belum terjangkau (percobaan ${_attempts + 1})');
+      _scheduleRetry(epoch);
+      return;
+    }
+    // Layar pernah mati sejak rahasia dibaca: buang, sehingga alur di bawah membaca vault lagi (prompt biometrik).
+    await _dropCredentialsIfScreenWasOff();
+    if (_stale(epoch)) return;
+    await flow.start(holdCredentials: true, manual: manual);
+    if (_stale(epoch)) return;
+    final state = flow.state;
+    if (state is ConnectFailed && state.failure is SshNetworkFailure) {
+      connLog('sambung ulang: gagal jaringan (percobaan ${_attempts + 1})');
+      _scheduleRetry(epoch);
+      return;
+    }
+    // Tersambung (rahasia tetap dipegang untuk putus berikutnya), atau butuh keputusan pengguna, atau galat yang
+    // tidak akan sembuh dengan rahasia yang sama (login ditolak, kunci rusak, host key ditolak): buang rahasia.
+    if (state is! ConnectDone) flow.releaseCredentials();
+    _endSeries();
+  }
+
+  void _scheduleRetry(int epoch) {
+    final delay = _backoff.delayAfter(_attempts++);
+    _nextAttemptAt = DateTime.now().add(delay);
+    _ticker = Timer.periodic(const Duration(seconds: 1), (_) => notifyListeners());
+    _retryTimer = Timer(delay, () {
+      _stopTimers();
+      if (_stale(epoch)) return;
+      // Di latar belakang tidak menyambung (bisa memunculkan prompt biometrik); dilanjutkan saat aplikasi terlihat.
+      final lifecycle = WidgetsBinding.instance.lifecycleState;
+      if (lifecycle != null && lifecycle != AppLifecycleState.resumed) {
+        notifyListeners();
+        return;
+      }
+      unawaited(_attempt(epoch));
+    });
+    notifyListeners();
+  }
+
+  void _stopTimers() {
+    _retryTimer?.cancel();
+    _retryTimer = null;
+    _ticker?.cancel();
+    _ticker = null;
+    _nextAttemptAt = null;
+  }
+
+  /// Mengakhiri rangkaian sambung ulang: menghentikan hitungan dan membatalkan percobaan yang sedang menunggu.
+  /// Rahasia yang dipegang tidak disentuh (dilepas oleh layar mati, galat yang tidak sembuh sendiri, atau sesi ditutup).
+  void _endSeries() {
+    _epoch++;
+    _stopTimers();
+    _attempts = 0;
   }
 
   @override
@@ -199,6 +346,7 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
     }
     final since = _backgroundSince;
     _backgroundSince = null;
+    unawaited(_dropCredentialsIfScreenWasOff());
     connLog(
       'siklus: resumed setelah ${since == null ? '-' : '${DateTime.now().difference(since).inSeconds} dtk'}, '
       'sambungan ${_lost ? 'sudah putus' : 'dianggap hidup'}',
@@ -224,6 +372,8 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
   void dispose() {
     if (_disposed) return;
     _disposed = true;
+    _stopTimers();
+    unawaited(_screenOffSub?.cancel());
     _unregister(defer: true);
     WidgetsBinding.instance.removeObserver(this);
     flow.removeListener(_onFlow);

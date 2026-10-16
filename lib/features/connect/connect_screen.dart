@@ -82,7 +82,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
       });
     }
     unawaited(_reloadSettings());
-    if (existing == null) controller.start();
+    if (existing == null) unawaited(controller.start());
   }
 
   /// Sesi ditutup dari luar (mis. "Putuskan semua" di notifikasi) selagi layar ini tampil: tutup layar.
@@ -146,8 +146,10 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
             return TerminalScreen(
               profile: widget.profile,
               session: session,
-              link: c.lost ? TerminalLink.lost : TerminalLink.up,
-              onReconnect: c.reconnect,
+              link: c.lost ? (c.probing ? TerminalLink.reconnecting : TerminalLink.lost) : TerminalLink.up,
+              onReconnect: () => c.reconnect(manual: true),
+              retryInSeconds: c.secondsUntilRetry,
+              needsAuth: c.needsAuth,
               textStyle: style,
               handleStyle: handle,
               onKeepInBackground: _keepInBackground,
@@ -170,7 +172,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               session: session,
               link: TerminalLink.lost,
               failureText: _failureSummary(l, state),
-              onReconnect: c.reconnect,
+              onReconnect: () => c.reconnect(manual: true),
+              retryInSeconds: c.secondsUntilRetry,
+              needsAuth: c.needsAuth,
               textStyle: style,
               handleStyle: handle,
             );
@@ -219,7 +223,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               label: l.actionRetry,
               variant: TermulButtonVariant.primary,
               size: TermulButtonSize.lg,
-              onPressed: flow.start,
+              onPressed: () => unawaited(_c!.start()),
             ),
             TermulButton(label: l.actionBack, variant: TermulButtonVariant.ghost, onPressed: _leave),
           ],
@@ -238,7 +242,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               label: l.actionRetry,
               variant: TermulButtonVariant.primary,
               size: TermulButtonSize.lg,
-              onPressed: flow.start,
+              onPressed: () => unawaited(_c!.start()),
             ),
             TermulButton(label: l.actionBack, variant: TermulButtonVariant.ghost, onPressed: _leave),
           ],

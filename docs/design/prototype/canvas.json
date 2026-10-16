@@ -311,6 +311,42 @@
    "title": "2j · Keluar dari terminal: tetap terhubung di latar belakang",
    "is_interactive": true,
    "radius": 28
+  },
+  "TerminalWaiting.dc.html": {
+   "x": 3410,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2k · Terputus: menunggu server terjangkau (hitungan mundur)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalNeedsAuth.dc.html": {
+   "x": 3880,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2l · Terputus: sambung ulang menunggu verifikasi",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "ComingSoon.dc.html": {
+   "x": 3760,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "13 · SFTP dan Snippet: belum tersedia (layar sementara)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "Boot.dc.html": {
+   "x": 4230,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "14 · Memuat aplikasi",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -347,7 +383,11 @@
   "TerminalPasteUnsafe.dc.html",
   "TerminalSelectLens.dc.html",
   "Sessions.dc.html",
-  "TerminalLeave.dc.html"
+  "TerminalLeave.dc.html",
+  "TerminalWaiting.dc.html",
+  "TerminalNeedsAuth.dc.html",
+  "ComingSoon.dc.html",
+  "Boot.dc.html"
  ],
  "notes": {
   "judul": {

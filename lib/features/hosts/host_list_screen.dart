@@ -17,9 +17,6 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../../shared/widgets/termul_toast.dart';
-import '../connect/session_manager.dart';
-import '../sessions/sessions_screen.dart';
-import '../settings/settings_screen.dart';
 import 'host_form_screen.dart';
 import 'host_list_model.dart';
 
@@ -48,14 +45,6 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
 
   void _openForm([HostProfile? existing]) {
     Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => HostFormScreen(existing: existing)));
-  }
-
-  void _openSessions() {
-    Navigator.of(context).push<void>(MaterialPageRoute(builder: (_) => const SessionsScreen()));
-  }
-
-  void _openSettings() {
-    Navigator.of(context).push<void>(MaterialPageRoute(builder: (_) => const SettingsScreen()));
   }
 
   void _open(HostProfile p) {
@@ -216,8 +205,6 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                       child: Text(l.hostsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
                     ),
                   ),
-                  _SessionsButton(onPressed: _openSessions),
-                  TermulIconButton(icon: TermulIconName.settings, label: l.hostsOpenSettings, onPressed: _openSettings),
                   TermulIconButton(
                     icon: TermulIconName.plus,
                     label: l.hostsAddHost,
@@ -412,43 +399,6 @@ class _Empty extends StatelessWidget {
           size: TermulButtonSize.lg,
           onPressed: onAdd,
         ),
-      ],
-    );
-  }
-}
-
-/// Ikon sesi aktif di header daftar host, dengan lencana jumlah sesi di latar belakang (kata untuk pembaca layar
-/// ada di labelnya).
-class _SessionsButton extends ConsumerWidget {
-  const _SessionsButton({required this.onPressed});
-
-  final VoidCallback onPressed;
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
-    final count = ref.watch(sessionManagerProvider).length;
-    return Stack(
-      clipBehavior: Clip.none,
-      children: [
-        TermulIconButton(icon: TermulIconName.terminal, label: l.hostsOpenSessions(count), onPressed: onPressed),
-        if (count > 0)
-          Positioned(
-            top: 4,
-            right: 2,
-            child: IgnorePointer(
-              child: ExcludeSemantics(
-                child: Container(
-                  constraints: const BoxConstraints(minWidth: 18),
-                  height: 18,
-                  padding: const EdgeInsets.symmetric(horizontal: 5),
-                  alignment: Alignment.center,
-                  decoration: BoxDecoration(color: TermulPalette.accent, borderRadius: BorderRadius.circular(9)),
-                  child: Text('$count', style: TermulText.caption.copyWith(color: TermulPalette.onAccent, height: 1)),
-                ),
-              ),
-            ),
-          ),
       ],
     );
   }

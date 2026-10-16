@@ -65,6 +65,7 @@ Future<TermRig> pumpTerminal(
   TerminalLink link = TerminalLink.up,
   String? failureText,
   VoidCallback? onReconnect,
+  bool needsAuth = false,
   TerminalStyle? textStyle,
 }) async {
   tester.view.devicePixelRatio = 1;
@@ -86,6 +87,7 @@ Future<TermRig> pumpTerminal(
               link: link,
               failureText: failureText,
               onReconnect: onReconnect,
+              needsAuth: needsAuth,
               textStyle: textStyle,
             ),
           ),
@@ -302,6 +304,17 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Kembali'));
     await tester.pumpAndSettle();
     expect(find.text('daftar'), findsOneWidget);
+  });
+
+  testWidgets('sambung ulang butuh verifikasi: peringatan dengan kata dan tombol Tampilkan prompt', (tester) async {
+    var calls = 0;
+    await pumpTerminal(tester, link: TerminalLink.lost, needsAuth: true, onReconnect: () => calls++);
+    expect(find.text('Perlu verifikasi'), findsOneWidget);
+    expect(find.textContaining('sidik jari, PIN, atau pola'), findsOneWidget);
+    expect(find.text('Terputus'), findsOneWidget);
+    expect(find.text('Sambung sekarang'), findsNothing);
+    await tester.tap(find.text('Tampilkan prompt'));
+    expect(calls, 1);
   });
 
   testWidgets('menyambung ulang: banner dan status berkata, tanpa tombol', (tester) async {

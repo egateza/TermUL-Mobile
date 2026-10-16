@@ -83,6 +83,7 @@ Future<(Harness, FakeNet, HostProfile)> start(
     tester,
     overrides: [
       connectFunctionProvider.overrideWithValue(net.fn),
+      hostProbeProvider.overrideWithValue((_, _) async => true),
       shellOpenerProvider.overrideWithValue(net.shellOpener),
       ...overrides,
     ],
@@ -128,26 +129,40 @@ void main() {
     terminalOf(tester).textInput('ls\r');
     expect(net.shells[1].sent, 'ls\r');
     expect(net.shells[0].sent, isEmpty);
-    expect(h.auth.reasons, hasLength(2)); // vault dibuka lagi untuk sambung ulang
+    expect(h.auth.reasons, hasLength(1)); // rahasia dipegang selama layar tidak mati: tanpa prompt untuk sambung ulang
   });
 
-  testWidgets('sambung ulang gagal: banner galat dengan alasan; Sambung sekarang mencoba lagi sampai berhasil', (
+  testWidgets('sambung ulang gagal di jaringan: banner menunggu dengan hitungan mundur; Sambung sekarang berhasil', (
     tester,
   ) async {
     final (_, net, profile) = await start(tester);
     net.queue.add((_) async => throw const SshNetworkFailure('putus'));
     await drop(tester, net);
-    await tester.pumpAndSettle();
-    expect(find.text('Gagal menyambung ulang'), findsOneWidget);
-    expect(find.text('Tidak bisa tersambung'), findsOneWidget);
+    await tester.pump(const Duration(milliseconds: 100));
+    await tester.pump(const Duration(milliseconds: 100));
+    expect(find.text('Menunggu server terjangkau…'), findsOneWidget);
+    expect(find.textContaining('Mencoba lagi dalam'), findsOneWidget);
     expect(find.text('Terputus'), findsOneWidget);
 
     net.succeed(profile);
     await tester.tap(find.text('Sambung sekarang'));
     await tester.pumpAndSettle();
-    expect(find.text('Gagal menyambung ulang'), findsNothing);
+    expect(find.text('Menunggu server terjangkau…'), findsNothing);
     expect(find.text('Tersambung'), findsOneWidget);
     expect(net.calls, 3);
+  });
+
+  testWidgets('sambung ulang ditolak server (bukan jaringan): banner galat dengan alasan, tanpa percobaan otomatis', (
+    tester,
+  ) async {
+    final (_, net, _) = await start(tester);
+    net.queue.add((_) async => throw const SshAuthFailure());
+    await drop(tester, net);
+    await tester.pumpAndSettle();
+    expect(find.text('Gagal menyambung ulang'), findsOneWidget);
+    expect(find.text('Menunggu server terjangkau…'), findsNothing);
+    expect(find.text('Terputus'), findsOneWidget);
+    expect(net.calls, 2);
   });
 
   testWidgets('host key berubah saat sambung ulang: layar host key muncul; menolak kembali ke terminal dengan galat', (
@@ -259,6 +274,7 @@ void main() {
       tester,
       overrides: [
         connectFunctionProvider.overrideWithValue(net.fn),
+        hostProbeProvider.overrideWithValue((_, _) async => true),
         shellOpenerProvider.overrideWithValue(net.shellOpener),
         settingsLoaderProvider.overrideWithValue(() async {
           loads++;

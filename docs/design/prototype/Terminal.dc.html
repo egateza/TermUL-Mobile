@@ -243,14 +243,18 @@ Lainnya
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"connection":{"editor":"enum","default":"connected","options":["connected","reconnecting"],"section":"Status"},"session":{"editor":"enum","default":"tmux","options":["tmux","biasa"],"section":"Status"},"showKeyboard":{"editor":"boolean","default":true,"section":"Tampilan"},"preselect":{"editor":"boolean","default":true,"section":"Tampilan"},"startAt":{"editor":"enum","default":"normal","options":["normal","menu","dialog"],"section":"Papan klip"},"clipboard":{"editor":"enum","default":"berisiko","options":["berisiko","aman","kosong"],"section":"Papan klip"},"bracketed":{"editor":"enum","default":"aktif","options":["aktif","mati"],"section":"Papan klip"},"lens":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
+<script type="text/x-dc" data-dc-script data-props='{"connection":{"editor":"enum","default":"connected","options":["connected","reconnecting","menunggu","verifikasi"],"section":"Status"},"session":{"editor":"enum","default":"tmux","options":["tmux","biasa"],"section":"Status"},"showKeyboard":{"editor":"boolean","default":true,"section":"Tampilan"},"preselect":{"editor":"boolean","default":true,"section":"Tampilan"},"startAt":{"editor":"enum","default":"normal","options":["normal","menu","dialog"],"section":"Papan klip"},"clipboard":{"editor":"enum","default":"berisiko","options":["berisiko","aman","kosong"],"section":"Papan klip"},"bracketed":{"editor":"enum","default":"aktif","options":["aktif","mati"],"section":"Papan klip"},"lens":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
   renderVals() {
     const s = this.state || {};
     const startAt = this.props.startAt || 'normal';
     const tab = s.tab || (startAt === 'normal' ? 'app' : 'db');
     const ctrl = !!s.ctrl;
-    const reconnecting = this.props.connection === 'reconnecting';
+    const conn = this.props.connection;
+    // 'menunggu': host belum terjangkau, hitungan mundur; 'verifikasi': prompt biometrik dibatalkan, menunggu tombol.
+    const waiting = conn === 'menunggu';
+    const needsAuth = conn === 'verifikasi';
+    const reconnecting = conn === 'reconnecting' || waiting || needsAuth;
     const inTmux = this.props.session !== 'biasa';
     const showKeyboard = this.props.showKeyboard !== false;
 
@@ -564,11 +568,11 @@ class Component extends DCLogic {
 
     return {
       hostName: tab === 'db' ? 'db-01' : (tab === 'top' ? 'app-01 \u00b7 htop' : 'app-01'),
-      statusColor: reconnecting ? '#F0B34A' : '#5ED3A6',
-      statusText: reconnecting ? 'menyambung ulang · percobaan 2/5' : (tab === 'db' ? 'terhubung · 21 ms' : 'terhubung · 18 ms'),
+      statusColor: (waiting || needsAuth) ? '#FF7F70' : (reconnecting ? '#F0B34A' : '#5ED3A6'),
+      statusText: waiting ? 'terputus · mencoba lagi 5 dtk' : (needsAuth ? 'terputus · perlu verifikasi' : reconnecting ? 'menyambung ulang · percobaan 2/5' : (tab === 'db' ? 'terhubung · 21 ms' : 'terhubung · 18 ms')),
       reconnecting: reconnecting,
-      reconnectText: inTmux ? 'Koneksi terputus. Sambung ulang akan melanjutkan sesi tmux di server.' : 'Koneksi terputus. Sambung ulang membuka sesi baru; proses di sesi lama tidak ikut.',
-      reconnectBtn: 'Sambung ulang',
+      reconnectText: waiting ? 'Menunggu server terjangkau. Mencoba lagi dalam 5 detik.' : needsAuth ? 'Perlu verifikasi. Menyambung ulang membutuhkan sidik jari, PIN, atau pola perangkat.' : inTmux ? 'Koneksi terputus. Sambung ulang akan melanjutkan sesi tmux di server.' : 'Koneksi terputus. Sambung ulang membuka sesi baru; proses di sesi lama tidak ikut.',
+      reconnectBtn: waiting ? 'Sambung sekarang' : needsAuth ? 'Tampilkan prompt' : 'Sambung ulang',
       termOpacity: reconnecting ? '0.55' : '1',
       isApp: tab === 'app',
       isDb: tab === 'db',

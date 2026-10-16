@@ -30,10 +30,13 @@ class SessionManager extends Notifier<List<SessionController>> {
         hosts: ref.read(hostRepositoryProvider),
         connect: ref.read(connectFunctionProvider),
         unlockReason: unlockReason,
+        gate: ref.read(authGateProvider),
       ),
       registry: ref.read(activeSessionsProvider.notifier),
       shellOpener: ref.read(shellOpenerProvider),
       reconnectedMarker: reconnectedMarker,
+      probe: ref.read(hostProbeProvider),
+      screenMonitor: ref.read(screenMonitorProvider),
       onEndedWhileDetached: () => release(controller),
     );
     _all.add(controller);

@@ -279,10 +279,10 @@ Status per 2026-10-16. "Emulator" = Android 14 dengan Keystore dan server SSH su
 | 7 | A4, A5, A6 | integrasi, test A10 di project baru | selesai (PC, emulator, HP: `htop`, F10, landscape) |
 | 8 | pemeriksaan sambungan A4 | sambung ulang otomatis | selesai (PC, emulator); di HP baru banner terlihat, hasilnya belum dikonfirmasi |
 | tambahan | – | `settings.json` (ukuran huruf, tinggi baris) | selesai, diuji di HP; menu setting selesai (PC, HP) |
-| tambahan (11b) | log logcat HP: soket dihancurkan OS (`Destroyed live tcp sockets`) | foreground service opsional, pengaturan Koneksi | selesai (PC, emulator); **belum dicoba di HP**, efektivitas di HyperOS belum terbukti |
+| tambahan (11b) | log logcat HP: soket dihancurkan OS (`Destroyed live tcp sockets`) | foreground service opsional, pengaturan Koneksi | selesai (PC, emulator, HP); di HP sambungan bertahan di latar belakang sekitar 9 menit dengan saklar menyala (lihat "Hasil uji HP" di 11e); layar mati 30 menit dan HyperOS belum diuji |
 | tambahan (11c) | K11: bash di bawah 5.1 tanpa tempel aman | tombol Tempel, dialog konfirmasi, karakter kontrol dibuang | selesai (PC); **belum dicoba di HP** |
 | tambahan (11d) | K13: gagang dan bilah Salin (hasil di HP sesuai) | gagang berbentuk tetesan, segitiga, atau bulatan (pilihan di Pengaturan) dengan ujung dinamis, kaca pembesar, bilah Salin dan Semua, seleksi berakhir saat mengetik | selesai (PC, HP: gagang, kaca pembesar, tepi layar, mengetik); **belum dicoba di HP:** tempel hasil salin di aplikasi lain, `vim` dan `tmux` |
-| tambahan (11e) | log logcat HP: soket dihancurkan OS | "Tetap terhubung di latar belakang", layar Sesi aktif, `SessionController` dan `SessionManager` | selesai (PC, 356 tes); **belum dicoba di HP**, bergantung pada hasil uji foreground service (11b) |
+| tambahan (11e) | log logcat HP: soket dihancurkan OS | "Tetap terhubung di latar belakang", layar Sesi aktif, `SessionController` dan `SessionManager` | selesai (PC, 356 tes, HP); di HP: multi sesi, Tetap terhubung, Putuskan semua, dan putus/pulih saat mode pesawat teruji; layar mati lama belum |
 
 ## 6. Dependensi
 
@@ -578,6 +578,19 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 - **Belum dibuat:** `NavBar` lima tab dengan tab Sesi, beberapa sesi dalam satu layar terminal (tab di prototipe `Terminal`).
 - **Sinkron desain:** prototipe `Sessions` (12) dan `TerminalLeave` (2j) dan README design system diperbarui sebagai tambahan; ketidaksesuaian dengan `NavBar` dicatat di README.
 
+### Hasil uji HP: foreground service dan sesi di latar belakang (2026-10-16)
+
+Perangkat Xiaomi 25053PC47G, Android 16, build debug lewat `flutter run`, kabel USB terpasang, server OpenSSH di LAN. Sumber: `adb logcat`, `dumpsys`, `/proc/net/tcp` di HP, dan `who`/`ss` yang ditempel pengguna dari server. Sisi server hanya diketahui dari keluaran yang ditempel pengguna.
+
+- **Foreground service menahan sambungan [T].** Sebelum saklar menyala, `Destroyed live tcp sockets for uids={10493}` muncul tiga kali (14:26, 14:42, 14:42). Setelah service menyala (14:43:14) tidak muncul lagi. Empat sesi di latar belakang 531 detik: `checkAlive` melaporkan hidup untuk keempatnya, empat soket `ESTABLISHED` ke port 22, shell di server utuh. Notifikasi dan service tipe `specialUse` benar (`dumpsys`).
+- **Multi sesi ke profil yang sama [T]:** 4 sesi (jumlah di service 1 sampai 4, 4 shell di server) dan 2 sesi. Belum dikonfirmasi rinci: nomor sesi di kartu dan riwayat layar per sesi.
+- **Putuskan semua [T]:** service mati, notifikasi hilang, soket ke port 22 nol, dan sesi hilang dari server sekitar 8 detik kemudian (diamati dua kali). Satu shell (pts/7) tetap tinggal di server setelah "Putuskan semua" pada 14:58:51, tidak lama setelah jaringan pulih dari mode pesawat; penyebab belum terbukti (dugaan: paket penutupan jatuh saat jaringan belum stabil). Uji terkendali dengan Wi-Fi stabil tidak mengulanginya.
+- **Mode pesawat (dua kali) [T]:** putus terdeteksi sekitar 2 detik dengan alasan `error`, service mati saat tidak ada sesi tersambung, sesi pulih setelah jaringan kembali dan aplikasi terlihat. **Sambung ulang membuka shell baru, shell lama menjadi yatim di server** (5 yatim dari putaran pertama bertahan sampai `pkill`, 13 sampai 27 menit). Tidak bisa dicegah dari aplikasi; penangkalnya `ClientAliveInterval` di server.
+- **Kunci layar [T, singkat]:** 86 detik di latar belakang, sambungan hidup. Uji terpanjang sekitar 9 menit.
+- **Belum dikonfirmasi:** selama mode pesawat log memperlihatkan `inactive`/`resumed` bergantian tiap sekitar 2 detik, diduga prompt biometrik berulang tiap percobaan sambung ulang (belum dikonfirmasi pengguna). Sambung ulang tidak menunggu jaringan kembali.
+- **Belum teruji:** layar mati 30 menit atau lebih; tanpa kabel (`adb tcpip`); pembanding saklar mati yang tercatat di log; efek penghemat baterai HyperOS; aksi "Putuskan semua" dari notifikasi; tempel (11c); `NavBar`.
+- **Kandidat perbaikan:** sambung ulang menunggu jaringan kembali (tidak mencoba berulang saat mode pesawat), satu prompt biometrik untuk semua sesi yang perlu sambung ulang.
+
 ### Pengujian tertunda di HP (dicatat 2026-10-16, menunggu pengguna)
 
 Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang dicabut). Urutan uji saat HP tersedia:
@@ -613,25 +626,75 @@ Uji tempel (11c) di HP, bisa dilakukan pada kunjungan yang sama:
 4. Tempel di `vim` (mode insert) dan di `tmux`; catat hasilnya.
 5. Papan klip kosong: toast "Papan klip kosong". Tempelan besar (beberapa ratus baris): dialog tetap responsif.
 
-Hasil sementara: belum ada untuk foreground service (11b), tempel (11c), dan sesi di latar belakang (11e). Yang sudah terbukti hanya di emulator Android 14 (lihat 11b). Seleksi (11d) sudah dicoba di HP dan sesuai (lihat catatannya).
+Hasil: foreground service (11b) dan sesi di latar belakang (11e) sudah diuji di HP pada 2026-10-16 (lihat "Hasil uji HP" di atas), dengan batasan yang tertulis di sana. Tempel (11c) belum dicoba di HP. Seleksi (11d) sudah dicoba di HP dan sesuai (lihat catatannya).
+
+## 11f. Sambung ulang yang menunggu jaringan, dan rahasia dipegang selama layar menyala (2026-10-16)
+
+Menjawab temuan uji HP 1 (sambung ulang tidak menunggu jaringan, prompt biometrik berulang). **Selesai di PC (377 tes, build debug Android berhasil); belum diuji di HP.**
+
+**Sambung ulang (`SessionController.reconnect()`):**
+- Host diperiksa lewat probe TCP dulu (`core/ssh/reconnect_backoff.dart`, `hostProbeProvider`, tanpa dependensi baru). Belum terjangkau: ulangi dengan jeda 2, 5, 10, 30 detik (tetap di 30), tanpa prompt. "Sambung sekarang" menggantikan hitungan mundur.
+- Hanya berjalan saat layar menampilkan sesi dan aplikasi terlihat; di latar belakang dijeda.
+- UI: banner "Menunggu server terjangkau…" dengan hitungan mundur (ARB `reconnectWaitingTitle`, `reconnectWaitingBody`).
+
+**Keputusan pemilik (2026-10-16): rahasia dipegang di memori selama pengguna masih memakai aplikasi.** Ini melonggarkan butir "pembacaan dijaga biometrik" di CLAUDE.md untuk sambung ulang; alasannya dari pemilik: layar terbuka berarti pengguna masih memakai aplikasi, layar terkunci berarti sudah tidak dipakai.
+- Sambungan pertama: satu prompt biometrik, rahasia dipegang (`ConnectFlow.start(holdCredentials: true)`). Putus selagi layar tidak pernah mati: sambung ulang tanpa prompt.
+- **Layar mati melepas rahasia**; sambung ulang berikutnya minta biometrik lagi (promptnya muncul saat aplikasi dibuka). Deteksi: `ScreenOffTracker.kt` (receiver `ACTION_SCREEN_OFF` di konteks aplikasi, penghitung di sisi Kotlin) lewat kanal `io.github.egateza.termul/screen` (`core/platform/screen_monitor.dart`). Penghitung dibandingkan sebelum tiap sambung ulang dan saat resume, jadi tetap benar walau Dart dibekukan saat layar mati dan peristiwa tidak sampai; peristiwa langsung hanya mempercepat pelepasan.
+- Rahasia juga dilepas saat sesi ditutup atau "Putuskan semua", dan saat galat yang tidak sembuh dengan rahasia yang sama (login ditolak, kunci rusak, host key ditolak, rahasia dimasukkan ulang). String Dart tidak bisa ditimpa, jadi yang dilakukan hanya melepas rujukan.
+- Risiko yang diterima: rahasia ada di memori proses selama sesi hidup dan layar menyala, termasuk sesi "Tetap terhubung" di latar belakang. Layar mati dianggap terkunci walau HP punya jeda kunci (lebih ketat).
+
+**Prompt biometrik tidak berulang (temuan log HP 17:31, dikerjakan 2026-10-16):** mengetuk di luar prompt membatalkannya, aplikasi `resumed`, lalu sambung ulang otomatis memunculkan prompt lagi (lima kali dalam 10 detik). Perbaikan: (1) `AuthGate` (`core/vault/auth_gate.dart`, `authGateProvider`) memberi giliran satu prompt pada satu waktu antar sesi dan mengingat pembatalan selama 30 detik; (2) setelah prompt dibatalkan atau gagal, pemicu otomatis (putus, resume) tidak menyambung ulang; sesi menampilkan banner "Perlu verifikasi" (sidik jari, PIN, atau pola perangkat) dengan tombol "Tampilkan prompt" (`reconnect(manual: true)`); (3) sambungan pertama dan tombol selalu manual, jadi jeda 30 detik tidak menghalangi sesi baru. Belum diuji di HP.
+
+**Hasil uji HP (2026-10-16, Xiaomi 25053PC47G, lewat adb dengan izin pemilik; prompt sidik jari disentuh pemilik) [T]:**
+- Wi-Fi dimatikan saat layar menyala: putus terdeteksi sekitar 2 detik, banner menunggu dengan hitungan mundur, percobaan berulang tanpa prompt; Wi-Fi dinyalakan: tersambung lagi **tanpa prompt** (rahasia dipegang), shell baru, penanda "— tersambung ulang —".
+- Layar dimatikan lalu putus lalu layar dinyalakan dan dibuka kuncinya: **satu prompt** setelah aplikasi terlihat, lalu tersambung.
+- Prompt dibatalkan dengan tombol Back: aplikasi `resumed` dan **tidak ada prompt baru**; banner "Perlu verifikasi"; "Tampilkan prompt" memunculkan satu prompt dan tersambung.
+- Gulir otomatis seleksi: gagang awal ditahan di tepi atas, isi bergeser dari baris 257 sampai 300 ke 10 sampai 54 dalam sekitar 2 detik, seleksi tumbuh ke 1060 karakter, berhenti saat dilepas. Kecepatan (900 px/detik) terasa cepat untuk scrollback pendek; perlu dinilai pemilik.
+- Teks banner menunggu semula menyebut sidik jari akan diminta; salah untuk layar menyala, sudah diganti menjadi "Mencoba lagi dalam N detik."
+- Server ditutup dari sisi server (`pkill` sshd di WSL, layar menyala): putus `serverClosed`, tersambung ulang sekitar 1 detik, **tanpa prompt**, penanda "— tersambung ulang —" [T]. Server uji: sshd di WSL (`tool/ssh_test_server/setup.sh`) dijangkau HP lewat `adb reverse tcp:2222 tcp:2222` karena server LAN pemilik tidak terjangkau saat itu.
+- Belum diuji: dua sesi bersamaan (AuthGate), `SCREEN_OFF` saat proses dibekukan lama (layar mati puluhan menit) di HyperOS, mode pesawat sungguhan, pindah Wi-Fi ke seluler, `vim`/`tmux`. Catatan: dengan Wi-Fi mati, probe TCP ke host LAN sempat lolos (percobaan 2 tercatat "gagal jaringan", artinya probe berhasil lalu sambung gagal); penyebabnya belum diketahui, perilaku keseluruhan tetap benar.
+
+**Belum dikerjakan:** saklar "Sambung ulang otomatis" di Pengaturan. **Artifact desain sudah diperbarui** (prototipe 39, design system 33; `SUMBER.md`). `docs/design/android.md` dan CLAUDE.md (butir Rahasia) perlu menyebut keputusan rahasia dipegang selama layar menyala.
+
+**Belum teruji di HP:** mode pesawat (tanpa prompt selama menunggu), sambung ulang tanpa prompt saat layar menyala, prompt muncul setelah layar mati lalu dibuka, pengiriman `SCREEN_OFF` di HyperOS saat proses dibekukan, pindah Wi-Fi ke seluler.
+
+## 11g. Irisan B: layar pemuatan dan gulir otomatis seleksi (2026-10-16)
+
+**Selesai di PC (377 tes); belum diuji di HP.**
+
+- **Layar pemuatan** (`lib/boot_app.dart`, `main.dart`): `runApp(BootApp())` dipanggil segera; `bootstrap()` berjalan di belakangnya. Selama itu tampil latar `ground` dengan satu baris "Memuat…" (tanpa animasi, jadi tidak ada urusan reduce motion). Gagal membuka penyimpanan tetap menampilkan `BootErrorApp`. Menjawab catatan "layar hitam saat peluncuran pertama" (11, uji HP); penyebabnya tidak pernah terbukti, jadi ini perbaikan terhadap dugaan, bukan terhadap penyebab yang terkonfirmasi. **Tambahan di luar desain:** sudah masuk ke artifact (prototipe 14, README design system versi 33).
+- **Gulir otomatis seleksi** (`selection_overlay.dart`): selama gagang diseret, jari dalam 56 dp dari tepi atas atau bawah area terminal menggulir isi (sampai 900 px/detik, makin dekat tepi makin cepat) dan seleksi dihitung ulang tiap frame; berhenti saat jari menjauh dari tepi atau dilepas. Tidak ada perubahan visual, jadi tidak menyentuh artifact desain. Kecepatan dan lebar zona perlu dirasakan di HP.
+- Belum diuji di HP: kenyamanan kecepatan gulir, perilaku saat keyboard terbuka, dan di `vim`/`tmux` (layar alternatif tanpa scrollback: seharusnya tidak menggulir).
+
+## 11h. `NavBar` lima tab (2026-10-16)
+
+**Selesai di PC (377 tes) dan dicoba di HP lewat adb [T]:** bar tampil, berpindah tab, lencana "1" di tab Sesi setelah "Tetap terhubung".
+
+- `TermulNavBar` (`shared/widgets/termul_nav_bar.dart`) mengikuti `components/NavBar` dan prototipe `Main` (tepi atas 1 px `line`, item minimal 56 dp, ikon 22, label `navLabel`, tab aktif `accent`, lencana jumlah). `MainShell` (`features/shell/main_shell.dart`) memegang lima tab: Host, Sesi, SFTP, Snippet, Pengaturan. Tab dibangun saat pertama dibuka lalu dipertahankan (pencarian dan gulir Host tidak hilang). Tombol kembali dari tab lain menuju Host dulu. Bar disembunyikan saat keyboard terbuka; layar terminal dan form dibuka di atas kerangka sehingga tanpa bar (sesuai desain).
+- Ikon sesi dan pengaturan di header Host dihapus (pindah ke bar). `SessionsScreen` dan `SettingsScreen` punya `showBack` (false sebagai tab; Pengaturan dari terminal tetap dengan tombol kembali).
+- **SFTP dan Snippet** belum punya fitur: tab-nya ada (sesuai desain) dan membuka layar sementara berbunyi "Belum tersedia" (`ComingSoonScreen`). Pilihan pemilik (2026-10-16).
+- **Artifact desain sudah diperbarui (2026-10-16):** prototipe versi 39 (`1792156922-600e`) dan design system versi 33 (`1792156945-0858`); lihat `docs/design/SUMBER.md`. Berisi juga banner sambung ulang "menunggu" dan "Perlu verifikasi", layar sementara SFTP dan Snippet, dan layar "Memuat…" (11f dan 11g).
+- Belum diuji di HP: perilaku tombol kembali sistem dari tab lain, bar saat keyboard terbuka (pencarian Host), landscape.
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 356 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 377 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
-**Belum diuji di HP (menunggu pengguna, daftar langkah di "Pengujian tertunda di HP"):** foreground service (yang paling penting: apakah `Destroyed live tcp sockets` masih muncul dengan saklar menyala), tempel, dan sesi di latar belakang (11e, bergantung pada hasil foreground service). Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
+**Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Belum diuji di HP:** tempel (11c), layar mati 30 menit atau lebih, tanpa kabel, efek HyperOS, "Putuskan semua" dari notifikasi. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
-**Keputusan yang berlaku:** sesi persisten `tmux` otomatis tidak dibuat (di luar kebiasaan klien SSH; penangkalnya foreground service dan sekarang "Tetap terhubung"). Desain sistem dan prototipe diikuti, tidak diubah agar cocok dengan kode: tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan di README (`CLAUDE.md` butir 8). Belum bisa sesuai desain, dicatat di README: warna seleksi terminal dan petunjuk bilah seleksi (xterm 4.0.0 menggambar seleksi di atas teks dan menghapusnya saat diketuk), serta tab Sesi pada `NavBar` (Sesi aktif sementara dibuka dari ikon di header daftar host).
+**Keputusan yang berlaku:** sesi persisten `tmux` otomatis tidak dibuat (di luar kebiasaan klien SSH; penangkalnya foreground service dan sekarang "Tetap terhubung"). Desain sistem dan prototipe diikuti, tidak diubah agar cocok dengan kode: tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan di README (`CLAUDE.md` butir 8). Belum bisa sesuai desain, dicatat di README: warna seleksi terminal dan petunjuk bilah seleksi (xterm 4.0.0 menggambar seleksi di atas teks dan menghapusnya saat diketuk), serta tab Sesi di prototipe `Terminal` (beberapa sesi dalam satu layar terminal). `NavBar` lima tab sudah dibangun (11h); catatan README tentang `NavBar` belum dibangun sudah usang sampai artifact diperbarui.
 
-**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan pengaturannya, gulir otomatis saat gagang seleksi diseret ke tepi, layar pemuatan awal (layar hitam saat peluncuran pertama), warna seleksi sesuai desain (menambal penggambar xterm), popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya), `NavBar` lima tab dengan tab Sesi. **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
+**Temuan uji HP 2026-10-16 yang belum dikerjakan (menunggu persetujuan rencana):** (1) [sudah dikerjakan di 11f, belum diuji di HP] sambung ulang tidak menunggu jaringan kembali: saat mode pesawat sesi terus mencoba menyambung, dan diduga memunculkan prompt biometrik berulang (belum dikonfirmasi pengguna); usulan: tunda sambung ulang sampai ada jaringan, dan satu prompt untuk semua sesi yang perlu sambung ulang. (2) Setiap sambung ulang membuka shell baru dan meninggalkan shell lama yatim di server (terlihat di `who`; bertahan sampai dibersihkan `pkill`); tidak bisa dicegah dari aplikasi, penangkalnya `ClientAliveInterval` di `sshd_config` (keputusan pemilik server); pertimbangkan catatan di layar atau dokumentasi pengguna. (3) Satu shell (pts/7) tetap tinggal setelah "Putuskan semua" pada 14:58:51, penyebab belum terbukti.
 
-**Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 32, prototipe versi 38; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
+**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan pengaturannya (termasuk temuan 1 di atas), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] warna seleksi sesuai desain (menambal penggambar xterm), popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
+
+**Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 33, prototipe versi 39; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
 Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 356 tes otomatis, tanpa jaringan
+flutter test                                   # 377 tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]

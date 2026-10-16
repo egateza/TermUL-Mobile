@@ -541,6 +541,12 @@ abstract class AppLocalizations {
   /// **'Belum tersimpan. Penyimpanan perangkat bermasalah; coba lagi.'**
   String get saveFailed;
 
+  /// Teks layar pemuatan saat penyimpanan dibuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Memuat…'**
+  String get bootLoading;
+
   /// Judul layar galat saat aplikasi mulai.
   ///
   /// In id, this message translates to:
@@ -1015,6 +1021,36 @@ abstract class AppLocalizations {
   /// **'Riwayat layar tetap terlihat.'**
   String get reconnectingBody;
 
+  /// Judul banner saat host belum terjangkau dan sambung ulang menunggu giliran berikutnya.
+  ///
+  /// In id, this message translates to:
+  /// **'Menunggu server terjangkau…'**
+  String get reconnectWaitingTitle;
+
+  /// Isi banner saat menunggu percobaan sambung ulang berikutnya.
+  ///
+  /// In id, this message translates to:
+  /// **'Mencoba lagi dalam {seconds} detik.'**
+  String reconnectWaitingBody(int seconds);
+
+  /// Judul banner saat sambung ulang menunggu pengguna menampilkan prompt biometrik.
+  ///
+  /// In id, this message translates to:
+  /// **'Perlu verifikasi'**
+  String get reconnectAuthTitle;
+
+  /// Isi banner saat sambung ulang butuh autentikasi perangkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyambung ulang membutuhkan sidik jari, PIN, atau pola perangkat.'**
+  String get reconnectAuthBody;
+
+  /// Tombol untuk menampilkan prompt biometrik atau kunci layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Tampilkan prompt'**
+  String get reconnectShowPrompt;
+
   /// Tombol sambung ulang manual.
   ///
   /// In id, this message translates to:
@@ -1045,11 +1081,59 @@ abstract class AppLocalizations {
   /// **'Menyambung ulang…'**
   String get terminalStatusReconnecting;
 
-  /// Nama aksesibilitas tombol pengaturan di header daftar host.
+  /// Nama landmark bar navigasi bawah.
+  ///
+  /// In id, this message translates to:
+  /// **'Navigasi utama'**
+  String get navLabel;
+
+  /// Tab Host di bar navigasi.
+  ///
+  /// In id, this message translates to:
+  /// **'Host'**
+  String get navHosts;
+
+  /// Tab Sesi di bar navigasi (satu kata).
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi'**
+  String get navSessions;
+
+  /// Tab SFTP di bar navigasi.
+  ///
+  /// In id, this message translates to:
+  /// **'SFTP'**
+  String get navSftp;
+
+  /// Tab Snippet di bar navigasi.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet'**
+  String get navSnippets;
+
+  /// Tab Pengaturan di bar navigasi.
   ///
   /// In id, this message translates to:
   /// **'Pengaturan'**
-  String get hostsOpenSettings;
+  String get navSettings;
+
+  /// Judul banner di tab yang fiturnya belum dibuat.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum tersedia'**
+  String get comingSoonHeading;
+
+  /// Keterangan tab SFTP yang belum dibuat.
+  ///
+  /// In id, this message translates to:
+  /// **'Menjelajah dan memindahkan berkas lewat SFTP belum ada di versi ini.'**
+  String get comingSoonSftp;
+
+  /// Keterangan tab Snippet yang belum dibuat.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyimpan perintah yang sering dipakai belum ada di versi ini.'**
+  String get comingSoonSnippets;
 
   /// Judul layar pengaturan.
   ///
@@ -1396,7 +1480,7 @@ abstract class AppLocalizations {
   /// Penjelasan di dialog keluar dari terminal dengan pilihan tetap terhubung.
   ///
   /// In id, this message translates to:
-  /// **'Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari Sesi aktif di daftar host. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.'**
+  /// **'Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari tab Sesi. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.'**
   String get terminalLeaveChoiceBody;
 
   /// Tombol keluar dari terminal tanpa memutus sesi.
@@ -1423,7 +1507,7 @@ abstract class AppLocalizations {
   /// **'Sesi aktif'**
   String get sessionsTitle;
 
-  /// Nama aksesibilitas ikon sesi aktif di header daftar host.
+  /// Nama aksesibilitas tab Sesi di bar navigasi bila ada sesi di latar belakang.
   ///
   /// In id, this message translates to:
   /// **'Sesi aktif, {count}'**

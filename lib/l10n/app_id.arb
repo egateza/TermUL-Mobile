@@ -353,6 +353,10 @@
   "@saveFailed": {
     "description": "Pesan bila simpan host gagal."
   },
+  "bootLoading": "Memuat…",
+  "@bootLoading": {
+    "description": "Teks layar pemuatan saat penyimpanan dibuka."
+  },
   "bootErrorTitle": "Penyimpanan tidak bisa dibuka",
   "@bootErrorTitle": {
     "description": "Judul layar galat saat aplikasi mulai."
@@ -712,6 +716,31 @@
   "@reconnectingBody": {
     "description": "Isi banner saat menyambung ulang."
   },
+  "reconnectWaitingTitle": "Menunggu server terjangkau…",
+  "@reconnectWaitingTitle": {
+    "description": "Judul banner saat host belum terjangkau dan sambung ulang menunggu giliran berikutnya."
+  },
+  "reconnectWaitingBody": "Mencoba lagi dalam {seconds} detik.",
+  "@reconnectWaitingBody": {
+    "description": "Isi banner saat menunggu percobaan sambung ulang berikutnya.",
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "reconnectAuthTitle": "Perlu verifikasi",
+  "@reconnectAuthTitle": {
+    "description": "Judul banner saat sambung ulang menunggu pengguna menampilkan prompt biometrik."
+  },
+  "reconnectAuthBody": "Menyambung ulang membutuhkan sidik jari, PIN, atau pola perangkat.",
+  "@reconnectAuthBody": {
+    "description": "Isi banner saat sambung ulang butuh autentikasi perangkat."
+  },
+  "reconnectShowPrompt": "Tampilkan prompt",
+  "@reconnectShowPrompt": {
+    "description": "Tombol untuk menampilkan prompt biometrik atau kunci layar."
+  },
   "reconnectNow": "Sambung sekarang",
   "@reconnectNow": {
     "description": "Tombol sambung ulang manual."
@@ -732,9 +761,41 @@
   "@terminalStatusReconnecting": {
     "description": "Status header terminal saat menyambung ulang."
   },
-  "hostsOpenSettings": "Pengaturan",
-  "@hostsOpenSettings": {
-    "description": "Nama aksesibilitas tombol pengaturan di header daftar host."
+  "navLabel": "Navigasi utama",
+  "@navLabel": {
+    "description": "Nama landmark bar navigasi bawah."
+  },
+  "navHosts": "Host",
+  "@navHosts": {
+    "description": "Tab Host di bar navigasi."
+  },
+  "navSessions": "Sesi",
+  "@navSessions": {
+    "description": "Tab Sesi di bar navigasi (satu kata)."
+  },
+  "navSftp": "SFTP",
+  "@navSftp": {
+    "description": "Tab SFTP di bar navigasi."
+  },
+  "navSnippets": "Snippet",
+  "@navSnippets": {
+    "description": "Tab Snippet di bar navigasi."
+  },
+  "navSettings": "Pengaturan",
+  "@navSettings": {
+    "description": "Tab Pengaturan di bar navigasi."
+  },
+  "comingSoonHeading": "Belum tersedia",
+  "@comingSoonHeading": {
+    "description": "Judul banner di tab yang fiturnya belum dibuat."
+  },
+  "comingSoonSftp": "Menjelajah dan memindahkan berkas lewat SFTP belum ada di versi ini.",
+  "@comingSoonSftp": {
+    "description": "Keterangan tab SFTP yang belum dibuat."
+  },
+  "comingSoonSnippets": "Menyimpan perintah yang sering dipakai belum ada di versi ini.",
+  "@comingSoonSnippets": {
+    "description": "Keterangan tab Snippet yang belum dibuat."
   },
   "settingsTitle": "Pengaturan",
   "@settingsTitle": {
@@ -1019,7 +1080,7 @@
   "@settingsHandleDot": {
     "description": "Bentuk gagang: bulatan polos."
   },
-  "terminalLeaveChoiceBody": "Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari Sesi aktif di daftar host. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.",
+  "terminalLeaveChoiceBody": "Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari tab Sesi. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.",
   "@terminalLeaveChoiceBody": {
     "description": "Penjelasan di dialog keluar dari terminal dengan pilihan tetap terhubung."
   },
@@ -1041,7 +1102,7 @@
   },
   "hostsOpenSessions": "Sesi aktif, {count}",
   "@hostsOpenSessions": {
-    "description": "Nama aksesibilitas ikon sesi aktif di header daftar host.",
+    "description": "Nama aksesibilitas tab Sesi di bar navigasi bila ada sesi di latar belakang.",
     "placeholders": {
       "count": {
         "type": "int"

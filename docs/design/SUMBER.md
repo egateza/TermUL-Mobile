@@ -2,7 +2,7 @@
 
 Tanggal salin: 2026-10-15
 
-**Versi terkini (dicek 2026-10-16):** design system versi 32 (`1792136738-d2c2`, hanya `design-system.json` yang berubah dari versi 31), prototipe versi 38 (`1792136358-c0f1`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
+**Versi terkini (dicek 2026-10-16):** design system versi 33 (`1792156945-0858`, hanya `README.md` yang berubah dari versi 32), prototipe versi 39 (`1792156922-600e`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
 
 ## Design system
 
@@ -100,3 +100,10 @@ Aturan pemilik (dicatat di `CLAUDE.md` butir 8): desain sistem dan prototipe har
 
 - Tambahan atas permintaan pemilik: pilihan "Tetap terhubung di latar belakang" saat keluar dari terminal dan layar Sesi aktif. Di artifact: `prototype/Sessions.dc.html` (12, baru), `prototype/TerminalLeave.dc.html` (2j, baru), `prototype/canvas.json` (dua papan baru: x 3290 y 964 dan x 2940 y 5732), dan `README.md` design system (dua butir: perilaku sesi di latar belakang dan catatan "belum bisa diterapkan" untuk `NavBar` dan tab sesi). Dirender di Chrome tanpa galat. **Sudah di-publish:** prototipe versi 38 (`1792136358-c0f1`) dan design system versi 31 (`1792136361-50f1`).
 
+## Perubahan lokal lanjutan (2026-10-16, sambung ulang, NavBar lima tab, layar sementara)
+
+Berkas artifact dibaca dulu lewat `read` dan hash-nya sama dengan salinan lokal sebelum diubah. Diedit di folder staging, dirender di Chrome (`ComingSoon`, `Boot`, dan `Terminal` dengan dua nilai `connection` baru tanpa galat), lalu dipublish.
+
+- **Prototipe versi 39 (`1792156922-600e`):** `Terminal.dc.html` mendapat dua nilai `connection` baru, `menunggu` (banner `warn` dengan hitungan mundur dan tombol "Sambung sekarang") dan `verifikasi` (banner "Perlu verifikasi" dengan tombol "Tampilkan prompt"); berkas baru `TerminalWaiting` (2k), `TerminalNeedsAuth` (2l), `ComingSoon` (13, tab SFTP dan Snippet yang belum tersedia, dengan `NavBar` lima tab) dan `Boot` (14, layar "Memuat…"); `canvas.json` memuat empat papan baru (x 3410 y 5732, x 3880 y 5732, x 3760 y 964, x 4230 y 964). Papan lama tidak diubah.
+- **Design system versi 33 (`1792156945-0858`):** `README.md` bagian "Catatan dari implementasi Flutter": catatan Pengaturan (kini tab di `NavBar`), butir sambung ulang diganti (jeda bertingkat, banner menunggu, rahasia dipegang selama layar menyala dan dilepas saat layar mati, banner "Perlu verifikasi", gerbang prompt), butir gulir otomatis seleksi dipindah dari "belum dibuat" menjadi tambahan, butir `NavBar` lima tab (menggantikan "belum bisa mengikuti desain"), butir layar sementara SFTP dan Snippet, dan butir layar pemuatan.
+- Komponen `NavBar` (README komponen) tidak diubah: bar di aplikasi mengikuti spesifikasinya dan prototipe `Main`.

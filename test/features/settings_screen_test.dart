@@ -145,16 +145,14 @@ void main() {
     expect(setup.saved.single.terminal.fontSize, 15);
   });
 
-  testWidgets('target sentuh tombol langkah minimal 44 px dan Kembali menutup layar', (tester) async {
+  testWidgets('target sentuh tombol langkah minimal 44 px; sebagai tab tanpa tombol Kembali', (tester) async {
     await _Setup().open(tester);
     for (final label in ['Kecilkan font', 'Besarkan font', 'Rapatkan baris', 'Renggangkan baris']) {
       final size = tester.getSize(find.bySemanticsLabel(label));
       expect(size.width, greaterThanOrEqualTo(TermulSize.tapMin), reason: label);
       expect(size.height, greaterThanOrEqualTo(TermulSize.tapMin), reason: label);
     }
-    await tester.tap(find.bySemanticsLabel('Kembali'));
-    await tester.pumpAndSettle();
-    expect(find.byType(SettingsScreen), findsNothing);
+    expect(find.bySemanticsLabel('Kembali'), findsNothing);
   });
 
   group('bagian Koneksi', () {

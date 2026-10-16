@@ -15,6 +15,7 @@ import io.flutter.plugin.common.MethodChannel
 // FlutterFragmentActivity (bukan FlutterActivity) dibutuhkan local_auth untuk prompt biometrik.
 class MainActivity : FlutterFragmentActivity() {
     private var channel: MethodChannel? = null
+    private var screenChannel: MethodChannel? = null
     private var pendingNotificationResult: MethodChannel.Result? = null
 
     // Harus didaftarkan sebelum Activity mencapai STARTED, jadi sebagai properti.
@@ -31,6 +32,13 @@ class MainActivity : FlutterFragmentActivity() {
         KeepAliveService.onDisconnectAll = {
             runOnUiThread { ch.invokeMethod("disconnectAll", null) }
         }
+        ScreenOffTracker.register(this)
+        val screen = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/screen")
+        screenChannel = screen
+        screen.setMethodCallHandler { call, result ->
+            if (call.method == "screenOffCount") result.success(ScreenOffTracker.count) else result.notImplemented()
+        }
+        ScreenOffTracker.onScreenOff = { runOnUiThread { screen.invokeMethod("screenOff", null) } }
         ch.setMethodCallHandler { call, result ->
             when (call.method) {
                 "update" -> {
@@ -78,6 +86,9 @@ class MainActivity : FlutterFragmentActivity() {
 
     override fun cleanUpFlutterEngine(flutterEngine: FlutterEngine) {
         KeepAliveService.onDisconnectAll = null
+        ScreenOffTracker.onScreenOff = null
+        screenChannel?.setMethodCallHandler(null)
+        screenChannel = null
         channel?.setMethodCallHandler(null)
         channel = null
         super.cleanUpFlutterEngine(flutterEngine)

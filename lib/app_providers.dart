@@ -5,10 +5,13 @@ import 'bootstrap.dart';
 import 'core/keys/key_file_picker.dart';
 import 'core/models/app_settings.dart';
 import 'core/platform/keepalive_platform.dart';
+import 'core/platform/screen_monitor.dart';
 import 'core/models/profile_snapshot.dart';
+import 'core/ssh/reconnect_backoff.dart';
 import 'core/ssh/ssh_connector.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
+import 'core/vault/auth_gate.dart';
 import 'core/vault/credential_vault.dart';
 import 'features/connect/keepalive_sync.dart';
 import 'features/connect/connect_flow.dart' show ConnectFunction;
@@ -60,6 +63,12 @@ final settingsLoaderProvider = Provider<Future<AppSettings> Function()>((ref) {
 /// Jembatan ke foreground service Android; diganti `NoopKeepAlive` di tes (bootstrap memasang yang nyata).
 final keepAlivePlatformProvider = Provider<KeepAlivePlatform>((ref) => const NoopKeepAlive());
 
+/// Gerbang prompt biometrik bersama semua sesi (satu prompt pada satu waktu, jeda setelah dibatalkan).
+final authGateProvider = Provider<AuthGate>((ref) => AuthGate());
+
+/// Pemantau layar mati; diganti `NoopScreenMonitor` di tes (bootstrap memasang yang nyata).
+final screenMonitorProvider = Provider<ScreenMonitor>((ref) => const NoopScreenMonitor());
+
 /// Sesi terminal yang sedang aktif; dipakai untuk isi notifikasi dan "Putuskan semua".
 final activeSessionsProvider = NotifierProvider<ActiveSessionsNotifier, List<ActiveSession>>(
   ActiveSessionsNotifier.new,
@@ -77,6 +86,9 @@ final sshConnectorProvider = Provider<SshConnector>(
 
 /// Fungsi sambung yang dipakai alur sambung; diganti di tes.
 final connectFunctionProvider = Provider<ConnectFunction>((ref) => ref.watch(sshConnectorProvider).connect);
+
+/// Pemeriksa keterjangkauan host sebelum sambung ulang; diganti di tes.
+final hostProbeProvider = Provider<HostProbe>((ref) => tcpProbe);
 
 /// Membuka shell pada sambungan; diganti di tes.
 typedef ShellOpenerFor = Future<ShellChannel> Function(
@@ -98,6 +110,7 @@ extension AppDependenciesOverrides on AppDependencies {
     initialSettingsProvider.overrideWithValue(settings),
     if (saveSettings != null) settingsSaverProvider.overrideWithValue(saveSettings!),
     if (keepAlive != null) keepAlivePlatformProvider.overrideWithValue(keepAlive!),
+    if (screenMonitor != null) screenMonitorProvider.overrideWithValue(screenMonitor!),
     if (reloadSettings != null) settingsLoaderProvider.overrideWithValue(reloadSettings!),
   ];
 }

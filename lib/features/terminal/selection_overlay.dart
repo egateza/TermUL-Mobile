@@ -50,6 +50,11 @@ class SelectionHandles extends StatefulWidget {
   /// Jarak minimum pusat gagang dari tepi kiri dan kanan (zona gestur kembali Android sekitar 24 dp).
   static const _edgeMargin = 36.0;
 
+  /// Gulir otomatis: jari dalam jarak [_autoScrollZone] dari tepi atas atau bawah area terminal menggulir isi, makin
+  /// dekat makin cepat sampai [_autoScrollMaxSpeed] (px/detik).
+  static const _autoScrollZone = 56.0;
+  static const _autoScrollMaxSpeed = 900.0;
+
   static const _lensSize = Size(120, 56);
   static const _zoom = 1.6;
 
@@ -72,8 +77,13 @@ class _Drag {
   Offset? focal;
 }
 
-class _SelectionHandlesState extends State<SelectionHandles> {
+class _SelectionHandlesState extends State<SelectionHandles> with SingleTickerProviderStateMixin {
   _Drag? _drag;
+
+  /// Posisi jari terakhir (global) selama seretan; dipakai gulir otomatis untuk memperbarui seleksi tanpa gerakan jari.
+  Offset? _lastGlobal;
+  Ticker? _scroller;
+  Duration _lastTick = Duration.zero;
 
   @override
   void initState() {
@@ -94,6 +104,7 @@ class _SelectionHandlesState extends State<SelectionHandles> {
 
   @override
   void dispose() {
+    _scroller?.dispose();
     _unlisten(widget);
     super.dispose();
   }
@@ -155,6 +166,61 @@ class _SelectionHandlesState extends State<SelectionHandles> {
   }
 
   void _updateDrag(Offset global) {
+    _lastGlobal = global;
+    _applyDrag(global);
+    _syncAutoScroll();
+  }
+
+  /// Kecepatan gulir (px/detik, negatif ke atas) bagi jari di [localY]: nol di luar zona tepi, makin cepat makin
+  /// dekat ke tepi (dan di luar tepi).
+  static double scrollVelocity(double localY, double height) {
+    const zone = SelectionHandles._autoScrollZone;
+    const maxSpeed = SelectionHandles._autoScrollMaxSpeed;
+    if (height <= zone * 2) return 0;
+    if (localY < zone) return -maxSpeed * ((zone - localY) / zone).clamp(0.0, 1.0);
+    if (localY > height - zone) return maxSpeed * ((localY - (height - zone)) / zone).clamp(0.0, 1.0);
+    return 0;
+  }
+
+  double _velocity() {
+    final global = _lastGlobal;
+    final box = _box;
+    if (global == null || box == null) return 0;
+    return scrollVelocity(box.globalToLocal(global).dy, box.size.height);
+  }
+
+  /// Menyalakan atau mematikan gulir otomatis sesuai posisi jari.
+  void _syncAutoScroll() {
+    final moving = _drag != null && _velocity() != 0 && widget.scrollController.hasClients;
+    final ticker = _scroller ??= createTicker(_onScrollTick);
+    if (moving && !ticker.isActive) {
+      _lastTick = Duration.zero;
+      ticker.start();
+    } else if (!moving && ticker.isActive) {
+      ticker.stop();
+    }
+  }
+
+  void _onScrollTick(Duration elapsed) {
+    final dt = (elapsed - _lastTick).inMicroseconds / Duration.microsecondsPerSecond;
+    _lastTick = elapsed;
+    final v = _velocity();
+    final scroll = widget.scrollController;
+    final global = _lastGlobal;
+    if (_drag == null || global == null || v == 0 || !scroll.hasClients) {
+      _scroller?.stop();
+      return;
+    }
+    final position = scroll.position;
+    final target = (position.pixels + v * dt).clamp(position.minScrollExtent, position.maxScrollExtent);
+    if (target != position.pixels) {
+      scroll.jumpTo(target);
+      // Isi bergeser di bawah jari: hitung ulang sel yang ditunjuk.
+      _applyDrag(global);
+    }
+  }
+
+  void _applyDrag(Offset global) {
     final drag = _drag;
     final render = _render;
     final box = _box;
@@ -174,6 +240,8 @@ class _SelectionHandlesState extends State<SelectionHandles> {
   }
 
   void _endDrag() {
+    _scroller?.stop();
+    _lastGlobal = null;
     if (_drag == null) return;
     setState(() => _drag = null);
   }

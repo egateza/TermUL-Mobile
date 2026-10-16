@@ -19,7 +19,10 @@ import '../terminal/terminal_palette.dart';
 /// Layar Pengaturan. Sekarang hanya bagian Terminal (ukuran huruf dan tinggi baris, dengan pratinjau); perubahan
 /// langsung berlaku di sesi terminal yang sedang terbuka dan disimpan ke `settings.json`.
 class SettingsScreen extends ConsumerStatefulWidget {
-  const SettingsScreen({super.key});
+  const SettingsScreen({super.key, this.showBack = true});
+
+  /// Tombol kembali: true bila dibuka sebagai layar tersendiri (dari terminal), false sebagai tab di `NavBar`.
+  final bool showBack;
 
   @override
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
@@ -125,25 +128,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
           lineHeight: _round1(c.lineHeight + d).clamp(TerminalSettings.minLineHeight, TerminalSettings.maxLineHeight),
         );
 
+    final showBack = widget.showBack;
     return Scaffold(
       body: SafeArea(
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                TermulSpacing.space3,
+              padding: EdgeInsets.fromLTRB(
+                showBack ? TermulSpacing.space3 : TermulSpacing.space8,
                 TermulSpacing.space5,
                 TermulSpacing.space8,
                 TermulSpacing.space3,
               ),
               child: Row(
                 children: [
-                  TermulIconButton(
-                    icon: TermulIconName.chevronLeft,
-                    label: l.actionBack,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  const SizedBox(width: TermulSpacing.space3),
+                  if (showBack) ...[
+                    TermulIconButton(
+                      icon: TermulIconName.chevronLeft,
+                      label: l.actionBack,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: TermulSpacing.space3),
+                  ],
                   Expanded(
                     child: Semantics(
                       header: true,

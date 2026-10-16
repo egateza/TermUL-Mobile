@@ -15,10 +15,12 @@ import '../connect/session_controller.dart';
 import '../connect/session_manager.dart';
 
 /// Daftar sesi yang dibiarkan hidup di latar belakang ("Tetap terhubung"). Mengetuk sesi membukanya lagi untuk
-/// dilanjutkan; beberapa sesi ke profil yang sama dibedakan nomor dan jam mulainya. Sementara `NavBar` belum ada,
-/// layar ini dibuka dari ikon di header daftar host.
+/// dilanjutkan; beberapa sesi ke profil yang sama dibedakan nomor dan jam mulainya. Tab "Sesi" di `NavBar`
+/// ([showBack] false); tombol kembali hanya bila dibuka sebagai layar tersendiri.
 class SessionsScreen extends ConsumerWidget {
-  const SessionsScreen({super.key});
+  const SessionsScreen({super.key, this.showBack = true});
+
+  final bool showBack;
 
   static (HostStatus, String) statusOf(AppLocalizations l, SessionPhase phase) => switch (phase) {
     SessionPhase.connected => (HostStatus.online, l.terminalStatusConnected),
@@ -76,20 +78,22 @@ class SessionsScreen extends ConsumerWidget {
         child: Column(
           children: [
             Padding(
-              padding: const EdgeInsets.fromLTRB(
-                TermulSpacing.space3,
+              padding: EdgeInsets.fromLTRB(
+                showBack ? TermulSpacing.space3 : TermulSpacing.space8,
                 TermulSpacing.space5,
                 TermulSpacing.space8,
                 TermulSpacing.space3,
               ),
               child: Row(
                 children: [
-                  TermulIconButton(
-                    icon: TermulIconName.chevronLeft,
-                    label: l.actionBack,
-                    onPressed: () => Navigator.of(context).pop(),
-                  ),
-                  const SizedBox(width: TermulSpacing.space3),
+                  if (showBack) ...[
+                    TermulIconButton(
+                      icon: TermulIconName.chevronLeft,
+                      label: l.actionBack,
+                      onPressed: () => Navigator.of(context).pop(),
+                    ),
+                    const SizedBox(width: TermulSpacing.space3),
+                  ],
                   Expanded(
                     child: Semantics(
                       header: true,

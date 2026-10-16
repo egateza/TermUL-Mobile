@@ -259,6 +259,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get saveFailed => 'Belum tersimpan. Penyimpanan perangkat bermasalah; coba lagi.';
 
   @override
+  String get bootLoading => 'Memuat…';
+
+  @override
   String get bootErrorTitle => 'Penyimpanan tidak bisa dibuka';
 
   @override
@@ -520,6 +523,23 @@ class AppLocalizationsId extends AppLocalizations {
   String get reconnectingBody => 'Riwayat layar tetap terlihat.';
 
   @override
+  String get reconnectWaitingTitle => 'Menunggu server terjangkau…';
+
+  @override
+  String reconnectWaitingBody(int seconds) {
+    return 'Mencoba lagi dalam $seconds detik.';
+  }
+
+  @override
+  String get reconnectAuthTitle => 'Perlu verifikasi';
+
+  @override
+  String get reconnectAuthBody => 'Menyambung ulang membutuhkan sidik jari, PIN, atau pola perangkat.';
+
+  @override
+  String get reconnectShowPrompt => 'Tampilkan prompt';
+
+  @override
   String get reconnectNow => 'Sambung sekarang';
 
   @override
@@ -535,7 +555,31 @@ class AppLocalizationsId extends AppLocalizations {
   String get terminalStatusReconnecting => 'Menyambung ulang…';
 
   @override
-  String get hostsOpenSettings => 'Pengaturan';
+  String get navLabel => 'Navigasi utama';
+
+  @override
+  String get navHosts => 'Host';
+
+  @override
+  String get navSessions => 'Sesi';
+
+  @override
+  String get navSftp => 'SFTP';
+
+  @override
+  String get navSnippets => 'Snippet';
+
+  @override
+  String get navSettings => 'Pengaturan';
+
+  @override
+  String get comingSoonHeading => 'Belum tersedia';
+
+  @override
+  String get comingSoonSftp => 'Menjelajah dan memindahkan berkas lewat SFTP belum ada di versi ini.';
+
+  @override
+  String get comingSoonSnippets => 'Menyimpan perintah yang sering dipakai belum ada di versi ini.';
 
   @override
   String get settingsTitle => 'Pengaturan';
@@ -744,7 +788,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get terminalLeaveChoiceBody =>
-      'Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari Sesi aktif di daftar host. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.';
+      'Tetap terhubung membiarkan sesi berjalan di latar belakang; buka lagi dari tab Sesi. Putuskan menutup shell di server dan menghentikan program yang sedang berjalan.';
 
   @override
   String get terminalLeaveKeep => 'Tetap terhubung di latar belakang';

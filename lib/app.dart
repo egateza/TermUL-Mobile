@@ -7,7 +7,7 @@ import 'core/theme/termul_theme.dart';
 import 'debug/widget_gallery.dart';
 import 'features/connect/connect_screen.dart';
 import 'features/connect/keepalive_sync.dart';
-import 'features/hosts/host_list_screen.dart';
+import 'features/shell/main_shell.dart';
 import 'l10n/app_localizations.dart';
 
 /// Konfigurasi MaterialApp bersama (tema, bahasa), dipakai aplikasi utama dan layar galat saat mulai.
@@ -39,7 +39,7 @@ class TermulApp extends ConsumerWidget {
     return termulMaterialApp(
       home: WidgetGallery.enabled
           ? const WidgetGallery()
-          : HostListScreen(
+          : MainShell(
               onConnect:
                   onConnect ??
                   (context, profile) =>

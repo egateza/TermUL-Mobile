@@ -192,6 +192,57 @@ void main() {
     expect(view.controller!.selection!.normalized.end.x, greaterThan(5));
   });
 
+  testWidgets('gagang diseret ke tepi atas: isi menggulir ke scrollback dan seleksi ikut memanjang, berhenti saat dilepas', (
+    tester,
+  ) async {
+    await pumpTerminal(tester);
+    final view = terminalView(tester);
+    final rows = view.terminal.viewHeight;
+    view.terminal.write(List.generate(rows * 4, (i) => 'baris $i').join('\r\n'));
+    await tester.pump();
+    final last = view.terminal.buffer.lines.length - 1;
+    select(tester, CellOffset(0, last - 1), CellOffset(5, last));
+    await tester.pump();
+    final area = tester.getRect(find.byType(SelectionHandles));
+    final gesture = await tester.startGesture(tester.getCenter(find.bySemanticsLabel('Gagang awal pilihan')));
+    await gesture.moveTo(Offset(area.center.dx, area.top + 4));
+    await tester.pump();
+    final before = view.controller!.selection!.normalized.begin.y;
+    for (var i = 0; i < 20; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    final during = view.controller!.selection!.normalized.begin.y;
+    expect(during, lessThan(before - 3), reason: 'gulir otomatis menarik seleksi ke atas');
+    expect(view.controller!.selection!.normalized.end.y, last, reason: 'sisi yang tidak digeser tetap');
+
+    await gesture.up();
+    await tester.pump();
+    final after = view.controller!.selection!.normalized.begin.y;
+    await tester.pump(const Duration(seconds: 1));
+    expect(view.controller!.selection!.normalized.begin.y, after, reason: 'tidak menggulir lagi setelah dilepas');
+  });
+
+  testWidgets('gagang diseret di tengah area: tidak menggulir', (tester) async {
+    await pumpTerminal(tester);
+    final view = terminalView(tester);
+    final rows = view.terminal.viewHeight;
+    view.terminal.write(List.generate(rows * 4, (i) => 'baris $i').join('\r\n'));
+    await tester.pump();
+    final last = view.terminal.buffer.lines.length - 1;
+    select(tester, CellOffset(0, last - 6), CellOffset(5, last - 6));
+    await tester.pump();
+    final area = tester.getRect(find.byType(SelectionHandles));
+    final gesture = await tester.startGesture(tester.getCenter(find.bySemanticsLabel('Gagang awal pilihan')));
+    await gesture.moveTo(Offset(area.center.dx, area.center.dy));
+    await tester.pump();
+    final before = view.controller!.selection!.normalized.begin.y;
+    for (var i = 0; i < 10; i++) {
+      await tester.pump(const Duration(milliseconds: 50));
+    }
+    expect(view.controller!.selection!.normalized.begin.y, before);
+    await gesture.up();
+  });
+
   testWidgets('kaca pembesar muncul selama gagang diseret dan hilang saat dilepas', (tester) async {
     await pumpTerminal(tester);
     terminalView(tester).terminal.write('halo dunia');

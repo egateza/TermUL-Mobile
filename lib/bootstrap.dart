@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'core/models/app_settings.dart';
 import 'core/platform/keepalive_platform.dart';
+import 'core/platform/screen_monitor.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/json/json_host_repository.dart';
 import 'core/storage/json/json_known_hosts_repository.dart';
@@ -49,6 +50,7 @@ class AppDependencies {
     this.reloadSettings,
     this.saveSettings,
     this.keepAlive,
+    this.screenMonitor,
   });
 
   final HostRepository hosts;
@@ -66,6 +68,9 @@ class AppDependencies {
 
   /// Foreground service Android. `null` di tes (memakai `NoopKeepAlive`).
   final KeepAlivePlatform? keepAlive;
+
+  /// Pemantau layar mati. `null` di tes (memakai `NoopScreenMonitor`).
+  final ScreenMonitor? screenMonitor;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -104,6 +109,7 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     },
     saveSettings: settingsRepo.save,
     keepAlive: MethodChannelKeepAlive(),
+    screenMonitor: MethodChannelScreenMonitor(),
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,

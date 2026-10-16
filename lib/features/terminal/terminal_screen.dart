@@ -45,6 +45,8 @@ class TerminalScreen extends StatefulWidget {
     this.link = TerminalLink.up,
     this.failureText,
     this.onReconnect,
+    this.retryInSeconds,
+    this.needsAuth = false,
     this.textStyle,
     this.handleStyle = SelectionHandleStyle.drop,
     this.onKeepInBackground,
@@ -61,6 +63,12 @@ class TerminalScreen extends StatefulWidget {
 
   /// Dipanggil oleh tombol "Sambung sekarang".
   final VoidCallback? onReconnect;
+
+  /// Detik sampai sambung ulang otomatis berikutnya; null bila tidak sedang menunggu.
+  final int? retryInSeconds;
+
+  /// Sambung ulang menunggu pengguna menampilkan prompt biometrik; [onReconnect] menampilkannya.
+  final bool needsAuth;
 
   /// Gaya huruf terminal; bawaan [termulTerminalStyle].
   final TerminalStyle? textStyle;
@@ -264,10 +272,29 @@ class _TerminalScreenState extends State<TerminalScreen> {
         child: Text(l.reconnectingBody),
       );
     }
+    if (widget.needsAuth) {
+      return TermulBanner(
+        tone: BannerTone.warn,
+        title: l.reconnectAuthTitle,
+        action: widget.onReconnect == null
+            ? null
+            : TermulButton(
+                label: l.reconnectShowPrompt,
+                variant: TermulButtonVariant.primary,
+                size: TermulButtonSize.sm,
+                expand: false,
+                onPressed: widget.onReconnect,
+              ),
+        child: Text(l.reconnectAuthBody),
+      );
+    }
     final failure = widget.failureText;
+    final retry = widget.retryInSeconds;
     return TermulBanner(
-      tone: failure == null ? BannerTone.warn : BannerTone.risk,
-      title: failure == null ? l.reconnectLostTitle : l.reconnectFailedTitle,
+      tone: failure == null || retry != null ? BannerTone.warn : BannerTone.risk,
+      title: retry != null
+          ? l.reconnectWaitingTitle
+          : (failure == null ? l.reconnectLostTitle : l.reconnectFailedTitle),
       action: widget.onReconnect == null
           ? null
           : TermulButton(
@@ -277,7 +304,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
               expand: false,
               onPressed: widget.onReconnect,
             ),
-      child: Text(failure ?? l.reconnectLostBody),
+      child: Text(retry != null ? l.reconnectWaitingBody(retry) : (failure ?? l.reconnectLostBody)),
     );
   }
 

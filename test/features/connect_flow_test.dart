@@ -85,6 +85,37 @@ void main() {
     flow.dispose();
   });
 
+  test('holdCredentials: percobaan ulang tidak membaca vault lagi (satu prompt)', () async {
+    await rig.vault.put(id1, SecretType.loginPassword, 'rahasia');
+    final conn = _fakeConnection(rig.profile);
+    var n = 0;
+    rig.behavior = (_) async => ++n == 1 ? throw const SshNetworkFailure('putus') : conn;
+    final flow = rig.flow();
+    await flow.start(holdCredentials: true);
+    expect(flow.state, isA<ConnectFailed>());
+    await flow.start(holdCredentials: true);
+    expect(flow.state, isA<ConnectDone>());
+    expect(rig.auth.reasons, ['buka']);
+    expect(rig.calls.map((c) => (c as PasswordCredentials).password), ['rahasia', 'rahasia']);
+    conn.close();
+    flow.dispose();
+  });
+
+  test('tanpa holdCredentials, atau setelah releaseCredentials: vault dibaca lagi', () async {
+    await rig.vault.put(id1, SecretType.loginPassword, 'rahasia');
+    rig.behavior = (_) async => throw const SshNetworkFailure('putus');
+    final flow = rig.flow();
+    await flow.start();
+    await flow.start();
+    expect(rig.auth.reasons, hasLength(2));
+    await flow.start(holdCredentials: true);
+    expect(rig.auth.reasons, hasLength(3));
+    flow.releaseCredentials();
+    await flow.start(holdCredentials: true);
+    expect(rig.auth.reasons, hasLength(4));
+    flow.dispose();
+  });
+
   test('tanpa rahasia di vault: minta rahasia, tidak menyambung', () async {
     rig.behavior = (_) async => throw StateError('tidak boleh dipanggil');
     final flow = rig.flow();
