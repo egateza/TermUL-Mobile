@@ -4,6 +4,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:xterm/xterm.dart';
 import 'package:termul_mobile/features/terminal/paste_analysis.dart';
 import 'package:termul_mobile/features/terminal/terminal_screen.dart' show TerminalLink;
+import 'package:termul_mobile/shared/widgets/key_button.dart';
 import 'package:termul_mobile/shared/widgets/termul_button.dart';
 
 import 'terminal_screen_test.dart' show TermRig, pumpTerminal, terminalView;
@@ -221,15 +222,48 @@ void main() {
       expect(terminalView(tester).controller!.selection, isNotNull);
     });
 
-    testWidgets('ketukan di tempat lain, tombol Tempel lagi, atau keluaran yang menggeser kursor menutup popover', (
-      tester,
-    ) async {
+    testWidgets('ketukan di luar popover menutupnya: di terminal, di bar atas, atau di tombol cepat', (tester) async {
       await open(tester, 'ls');
+
       await tapPaste(tester);
       expect(popover, findsOneWidget);
-      await tapPaste(tester); // tombol Tempel lagi menutup
+      await tester.tapAt(const Offset(200, 500)); // terminal
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
       expect(popover, findsNothing);
 
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
+      await tester.tapAt(const Offset(200, 30)); // bar atas
+      await tester.pump(const Duration(milliseconds: 400));
+      await tester.pumpAndSettle();
+      expect(popover, findsNothing);
+
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
+      await tester.tap(find.byType(KeyButton).at(1)); // tombol cepat (tanpa Esc)
+      await tester.pumpAndSettle();
+      expect(popover, findsNothing);
+    });
+
+    testWidgets('ketukan di dalam popover (di luar tombol Tempel) tidak menutupnya', (tester) async {
+      await open(tester, 'ls');
+      await tapPaste(tester);
+      final box = tester.getRect(find.byKey(const ValueKey('paste-popover-text')));
+      await tester.tapAt(box.center);
+      await tester.pumpAndSettle();
+      expect(popover, findsOneWidget);
+    });
+
+    testWidgets('tombol Tempel saat popover terbuka: tetap ada satu popover', (tester) async {
+      await open(tester, 'ls');
+      await tapPaste(tester);
+      await tapPaste(tester);
+      expect(popover, findsOneWidget);
+    });
+
+    testWidgets('keluaran yang menggeser kursor menutup popover', (tester) async {
+      await open(tester, 'ls');
       await tapPaste(tester);
       expect(popover, findsOneWidget);
       terminalView(tester).terminal.write('x');
@@ -237,12 +271,20 @@ void main() {
       expect(popover, findsNothing);
     });
 
-    testWidgets('layar alternatif (vim, htop): tekan-tahan tidak membuka popover', (tester) async {
+    testWidgets('layar alternatif (tmux, vim): tekan-tahan di sel kosong membuka popover', (tester) async {
       await open(tester, 'ls');
       terminalView(tester).terminal.write('\x1b[?1049h');
       await tester.pump();
-      await holdAt(tester, Offset(14, 400));
-      expect(popover, findsNothing);
+      await holdAt(tester, const Offset(14, 400));
+      expect(popover, findsOneWidget);
+    });
+
+    testWidgets('mouse mode (tmux -mouse): tekan-tahan di sel kosong tetap membuka popover', (tester) async {
+      await open(tester, 'ls');
+      terminalView(tester).terminal.write('\x1b[?1000h\x1b[?1006h');
+      await tester.pump();
+      await holdAt(tester, const Offset(14, 400));
+      expect(popover, findsOneWidget);
     });
   });
 

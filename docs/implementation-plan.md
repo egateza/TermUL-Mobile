@@ -687,7 +687,7 @@ Saklar "Sambung ulang otomatis" sudah dikerjakan di 11i. **Artifact desain sudah
 
 ## 11j. Popover Tempel dan saklar konfirmasi tempel satu baris (2026-10-16)
 
-**Selesai di PC (393 tes, `flutter analyze` bersih). Dicoba di HP lewat adb (Xiaomi 25053PC47G, server uji WSL) [T], termasuk build akhir. Artifact sudah diperbarui: prototipe versi 40, design system versi 34.**
+**Selesai di PC (397 tes, `flutter analyze` bersih). Dicoba di HP lewat adb (Xiaomi 25053PC47G, server uji WSL) [T], termasuk build akhir. Artifact sudah diperbarui: prototipe versi 40, design system versi 35.**
 
 Usulan dan keputusan pemilik, bertahap: popover di kursor (prototipe `TerminalPasteMenu`) ternyata sulit dikenai jari, dan pemilik sudah memakai tombol Tempel di panel. Yang dipilih: tempel selalu divalidasi, dengan popover ringan untuk teks pendek dan dialog untuk sisanya.
 
@@ -700,17 +700,18 @@ Usulan dan keputusan pemilik, bertahap: popover di kursor (prototipe `TerminalPa
 
 - **Saklar** "Konfirmasi tempel satu baris" di Pengaturan, bagian Terminal (kunci `terminal.confirmSingleLinePaste`, bawaan nyala; berkas lama tanpa kunci ini tetap termuat). Mematikannya hanya memengaruhi satu baris pendek yang aman; teks panjang, banyak baris, atau berisiko selalu lewat dialog.
 - **Ambang 40 karakter** (`PasteAnalysis.popoverMaxChars`) adalah nilai awal untuk dicoba pemilik di HP (80 dianggap terlalu panjang); mudah diubah.
-- **Pemicu popover:** tombol Tempel di panel (popover di atas baris kursor, supaya baris prompt tetap terlihat) dan **tekan-tahan (450 ms) di area kosong** terminal (sisa baris di kanan teks, baris kosong, atau ruang di bawah prompt; popover di atas jari). Di atas teks, tekan lama tetap memilih kata (xterm). Tidak aktif di layar alternatif (`vim`, `htop`), dengan mouse mode (`tmux`), atau saat sesi belum berjalan atau putus. Ketuk kursor sebagai pemicu **dibuang** (kursor satu sel, sekitar 8 x 17 dp, terlalu kecil untuk jari).
-- **Popover** (`PastePopover`): teks yang akan ditempel (mono, paling 2 baris), "Masuk ke prompt, belum dijalankan", tombol Tempel (44 dp). Dipusatkan pada titik asal dan dibatasi 8 dp dari tepi (`_PopoverLayout`), di atas titik itu (di bawahnya bila tidak muat). Menutup: ketukan di tempat lain, tombol Tempel lagi, mengetik, keluaran yang menggeser kursor, gulir, ukuran layar berubah. Tekan lama xterm yang sempat memilih sel kosong dibuang supaya bilah seleksi tidak menggantikan tombol cepat.
+- **Pemicu popover:** tombol Tempel di panel (popover di atas baris kursor, supaya baris prompt tetap terlihat) dan **tekan-tahan (450 ms) di area kosong** terminal (sisa baris di kanan teks, baris kosong, atau ruang di bawah prompt; popover di atas jari). Di atas teks, tekan lama tetap memilih kata (xterm). Hanya aktif saat sesi berjalan. **Tetap aktif di layar alternatif dan mouse mode (`tmux`, `vim`, `htop`)** karena yang dicari sel kosong (temuan pemilik di HP: sebelumnya mati di tmux, hanya tombol Tempel yang bekerja). Ketuk kursor sebagai pemicu **dibuang** (kursor satu sel, sekitar 8 x 17 dp, terlalu kecil untuk jari).
+- **Popover** (`PastePopover`): teks yang akan ditempel (mono, paling 2 baris), "Masuk ke prompt, belum dijalankan", tombol Tempel (44 dp). Dipusatkan pada titik asal dan dibatasi 8 dp dari tepi (`_PopoverLayout`), di atas titik itu (di bawahnya bila tidak muat). Menutup: **ketukan di mana saja di luar popover** (terminal, bar atas, tombol cepat; dibaca lewat `Listener` pointer mentah di tingkat layar, `_onAnyPointerDown`; temuan pemilik: sebelumnya hanya Esc di panel yang menutup, regresi saat popover dipindah ke jalur tekan-tahan), mengetik, keluaran yang menggeser kursor, gulir, ukuran layar berubah. Tekan lama xterm yang sempat memilih sel kosong dibuang supaya bilah seleksi tidak menggantikan tombol cepat.
 - **Temuan xterm 4.0.0:** `TerminalView.onTapUp` tidak pernah dipanggil (detektor gestur hanya meneruskan `onSingleTapUp`, yang tidak dipasang `TerminalView`). Tekan-tahan dibaca lewat `Listener` pointer mentah yang tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi xterm tidak terganggu.
 - **Hasil uji HP [T]:** tekan-tahan di area kosong dekat tepi kiri memunculkan popover berisi teks ("Fri", disalin lewat seleksi) di atas jari, dalam layar; Tempel di popover menempelkan dan toast "Ditempel · 1 baris · belum dijalankan" tampil; tombol Tempel di panel memunculkan popover yang sama; ketukan di tempat lain menutup; tekan lama di atas teks tetap memilih kata (bilah Salin/Semua). Versi pertama (popover rata kanan di kursor) menempel ke tepi kiri layar, dan zona ketuk kursor terlalu kecil; keduanya sudah diganti seperti di atas.
 - **Desain:** popover dan saklar sudah di artifact (prototipe versi 40, README versi 34; lihat `docs/design/SUMBER.md`). Penyimpangan dari prototipe asli dicatat di README: popover dipusatkan pada titik asal (bukan rata kanan), dan pemicu tekan-tahan hanya ada di aplikasi.
 - **Build akhir [T]:** tombol Tempel memunculkan popover tepat di atas baris prompt (baris prompt tetap terlihat); Tempel di popover memasukkan teks ke prompt tanpa menjalankannya (bash 5.1 menyorot teks hasil tempel aman).
-- **Belum diuji di HP:** tekan-tahan di `tmux` (mouse mode: seharusnya tidak muncul), landscape dan keyboard tertutup, tempel isi papan klip panjang (45 baris milik pemilik sengaja tidak ditempel saat uji), dan kenyamanan ambang 40 karakter.
+- **Teruji di HP setelah temuan pemilik [T]:** di `tmux` dengan `mouse on`, tekan-tahan di area kosong memunculkan popover; ketukan di terminal atau di bar atas, di luar popover, menutupnya (ketukan di dalam popover tidak menutup).
+- **Belum diuji di HP:** landscape dan keyboard tertutup, tempel isi papan klip panjang (45 baris milik pemilik sengaja tidak ditempel saat uji), dan kenyamanan ambang 40 karakter.
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 393 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 397 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
 **Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Belum diuji di HP:** tempel (11c), layar mati 30 menit atau lebih, tanpa kabel, efek HyperOS, "Putuskan semua" dari notifikasi. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
@@ -726,7 +727,7 @@ Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 393 tes otomatis, tanpa jaringan
+flutter test                                   # 397 tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]
