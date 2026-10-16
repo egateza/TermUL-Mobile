@@ -678,12 +678,12 @@ Saklar "Sambung ulang otomatis" sudah dikerjakan di 11i. **Artifact desain sudah
 
 ## 11i. Saklar "Sambung ulang otomatis" (2026-10-16)
 
-**Selesai di PC (380 tes, `flutter analyze` bersih); belum diuji di HP.**
+**Selesai di PC (380 tes, `flutter analyze` bersih). Di HP: pemilik mencoba dan melaporkan saklar bekerja dengan baik (2026-10-16, rincian skenario tidak dicatat).**
 
 - `ConnectionSettings.autoReconnect` (bawaan **nyala**, kunci `connection.autoReconnect` di `settings.json`; berkas lama tanpa kunci ini tetap termuat). Saklar di Pengaturan, bagian Koneksi, di atas "Pertahankan koneksi di latar belakang", teks mengikuti prototipe `Settings` ("Saat jaringan berpindah atau aplikasi kembali aktif"). Perbaikan sampingan: menyalakan "Pertahankan koneksi" tidak lagi menimpa `autoReconnect` (memakai `copyWith`).
 - `SessionController` menerima `autoReconnect` (dibaca tiap dipakai, jadi perubahan langsung berlaku). Mati: pemicu otomatis (sambungan putus, aplikasi terlihat lagi, hitungan mundur) tidak menyambung; sesi tampil "Terputus" dengan tombol "Sambung sekarang", dan tombol itu tetap bekerja (`manual: true`). Dimatikan saat hitungan mundur berjalan: rangkaian berhenti pada ketukan timer berikutnya.
 - **Desain:** saklar sudah ada di prototipe `Settings` (`recon`, bawaan nyala), jadi bukan tambahan dan artifact tidak diubah. Teks `README.md` (baris Pengaturan) belum menyebut saklar ini; perbarui saat artifact berikutnya dipublikasikan.
-- Belum diuji di HP: perilaku saat saklar dimatikan lalu Wi-Fi diputus, dan tampilan baris baru di layar sempit.
+- Belum dirinci: skenario yang dicoba pemilik (mis. saklar mati lalu Wi-Fi diputus) dan tampilan baris baru di layar sempit.
 
 ## 12. Status terkini dan cara melanjutkan
 
@@ -695,7 +695,7 @@ Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.
 
 **Temuan uji HP 2026-10-16 yang belum dikerjakan (menunggu persetujuan rencana):** (1) [sudah dikerjakan di 11f, belum diuji di HP] sambung ulang tidak menunggu jaringan kembali: saat mode pesawat sesi terus mencoba menyambung, dan diduga memunculkan prompt biometrik berulang (belum dikonfirmasi pengguna); usulan: tunda sambung ulang sampai ada jaringan, dan satu prompt untuk semua sesi yang perlu sambung ulang. (2) Setiap sambung ulang membuka shell baru dan meninggalkan shell lama yatim di server (terlihat di `who`; bertahan sampai dibersihkan `pkill`); tidak bisa dicegah dari aplikasi, penangkalnya `ClientAliveInterval` di `sshd_config` (keputusan pemilik server); pertimbangkan catatan di layar atau dokumentasi pengguna. (3) Satu shell (pts/7) tetap tinggal setelah "Putuskan semua" pada 14:58:51, penyebab belum terbukti.
 
-**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan saklarnya (sudah dikerjakan di 11f dan 11i, belum diuji di HP), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] warna seleksi sesuai desain (menambal penggambar xterm), popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
+**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan saklarnya (sudah dikerjakan di 11f dan 11i; saklar sudah dicoba pemilik di HP), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] warna seleksi sesuai desain (menambal penggambar xterm), popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
 
 **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 33, prototipe versi 39; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
