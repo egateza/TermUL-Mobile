@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:path_provider/path_provider.dart';
 
 import 'core/models/app_settings.dart';
+import 'core/platform/keepalive_platform.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/json/json_host_repository.dart';
 import 'core/storage/json/json_known_hosts_repository.dart';
@@ -47,6 +48,7 @@ class AppDependencies {
     this.settings = const AppSettings(),
     this.reloadSettings,
     this.saveSettings,
+    this.keepAlive,
   });
 
   final HostRepository hosts;
@@ -61,6 +63,9 @@ class AppDependencies {
 
   /// Menyimpan `settings.json`. `null` di tes yang tidak memerlukannya.
   final Future<void> Function(AppSettings)? saveSettings;
+
+  /// Foreground service Android. `null` di tes (memakai `NoopKeepAlive`).
+  final KeepAlivePlatform? keepAlive;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -98,6 +103,7 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
       return settingsRepo.settings;
     },
     saveSettings: settingsRepo.save,
+    keepAlive: MethodChannelKeepAlive(),
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,

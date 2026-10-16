@@ -587,4 +587,60 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String get settingsSaveFailedBody =>
       'Perubahan tetap berlaku sampai aplikasi ditutup, tetapi akan hilang setelah itu. Periksa ruang penyimpanan HP lalu coba lagi.';
+
+  @override
+  String keepAliveNotifTitle(int count) {
+    String _temp0 = intl.Intl.pluralLogic(
+      count,
+      locale: localeName,
+      other: '$count sesi tersambung',
+      one: '1 sesi tersambung',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get keepAliveDisconnectAll => 'Putuskan semua';
+
+  @override
+  String get keepAliveChannelName => 'Sesi aktif';
+
+  @override
+  String get settingsConnectionSection => 'Koneksi';
+
+  @override
+  String get settingsKeepAliveLabel => 'Pertahankan koneksi di latar belakang';
+
+  @override
+  String get settingsKeepAliveDesc =>
+      'Sesi tetap tersambung saat aplikasi ditutup ke latar belakang. Memakai baterai lebih banyak dan menampilkan notifikasi permanen.';
+
+  @override
+  String get settingsKeepAliveNote =>
+      'Membantu sambungan bertahan, tetapi tidak menjaminnya: perpindahan jaringan atau sinyal hilang tetap memutus sesi, lalu sambung ulang otomatis berjalan.';
+
+  @override
+  String get settingsKeepAliveNeedsPermission => 'Izin notifikasi diperlukan untuk menjaga koneksi';
+
+  @override
+  String get settingsNotifPermissionLabel => 'Izin notifikasi';
+
+  @override
+  String get settingsNotifAllowed => 'Diizinkan';
+
+  @override
+  String get settingsNotifDenied => 'Belum diizinkan';
+
+  @override
+  String get settingsNotifAllow => 'Izinkan';
+
+  @override
+  String get settingsBatteryLabel => 'Pembatasan baterai HP';
+
+  @override
+  String get settingsBatteryDesc =>
+      'Beberapa HP (misalnya HyperOS) perlu diatur ke \"Tanpa batasan\" agar sesi tidak dihentikan.';
+
+  @override
+  String get settingsBatteryOpen => 'Buka pengaturan';
 }

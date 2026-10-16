@@ -5,8 +5,10 @@ import '../../app_providers.dart';
 import '../../core/models/app_settings.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
+import '../../shared/widgets/switch_row.dart';
 import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
+import '../../shared/widgets/termul_card.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_stepper.dart';
@@ -21,8 +23,72 @@ class SettingsScreen extends ConsumerStatefulWidget {
   ConsumerState<SettingsScreen> createState() => _SettingsScreenState();
 }
 
-class _SettingsScreenState extends ConsumerState<SettingsScreen> {
+class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBindingObserver {
   bool _saveFailed = false;
+
+  /// Izin notifikasi (untuk foreground service); null selagi belum diketahui.
+  bool? _notifAllowed;
+
+  /// Saklar "Pertahankan koneksi" baru saja ditolak karena izin notifikasi tidak diberikan.
+  bool _needsPermission = false;
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addObserver(this);
+    _refreshNotif();
+  }
+
+  @override
+  void dispose() {
+    WidgetsBinding.instance.removeObserver(this);
+    super.dispose();
+  }
+
+  @override
+  void didChangeAppLifecycleState(AppLifecycleState state) {
+    // Pengguna mungkin baru mengubah izin di pengaturan Android.
+    if (state == AppLifecycleState.resumed) _refreshNotif();
+  }
+
+  Future<void> _refreshNotif() async {
+    try {
+      final allowed = await ref.read(keepAlivePlatformProvider).notificationsEnabled();
+      if (mounted) setState(() => _notifAllowed = allowed);
+    } on Object {
+      // Platform tak tersedia: biarkan status tidak diketahui.
+    }
+  }
+
+  /// Menyalakan meminta izin notifikasi lebih dulu; bila ditolak, saklar tetap mati dan pesan tampil.
+  Future<void> _setKeepAlive(bool on) async {
+    final platform = ref.read(keepAlivePlatformProvider);
+    if (on) {
+      bool allowed;
+      try {
+        allowed = await platform.requestNotifications();
+      } on Object {
+        allowed = false;
+      }
+      if (!mounted) return;
+      setState(() {
+        _notifAllowed = allowed;
+        _needsPermission = !allowed;
+      });
+      if (!allowed) return;
+    } else if (_needsPermission) {
+      setState(() => _needsPermission = false);
+    }
+    try {
+      final current = ref.read(appSettingsProvider);
+      await ref
+          .read(appSettingsProvider.notifier)
+          .update(current.copyWith(connection: ConnectionSettings(keepAlive: on)));
+      if (mounted && _saveFailed) setState(() => _saveFailed = false);
+    } on Object {
+      if (mounted) setState(() => _saveFailed = true);
+    }
+  }
 
   /// Langkah ukuran huruf (px) dan tinggi baris (kelipatan).
   static const _fontStep = 1.0;
@@ -33,7 +99,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
   Future<void> _apply(TerminalSettings Function(TerminalSettings current) change) async {
     try {
       final next = change(ref.read(appSettingsProvider).terminal);
-      await ref.read(appSettingsProvider.notifier).update(AppSettings(terminal: next));
+      await ref.read(appSettingsProvider.notifier).update(ref.read(appSettingsProvider).copyWith(terminal: next));
       if (mounted && _saveFailed) setState(() => _saveFailed = false);
     } on Object {
       if (mounted) setState(() => _saveFailed = true);
@@ -48,6 +114,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
     final l = AppLocalizations.of(context);
     final t = ref.watch(appSettingsProvider).terminal;
     final isDefault = t == const TerminalSettings();
+    final keepAlive = ref.watch(appSettingsProvider).connection.keepAlive;
 
     TerminalSettings Function(TerminalSettings) fontBy(double d) =>
         (c) => TerminalSettings(
@@ -180,6 +247,109 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> {
                       onPressed: isDefault ? null : () => _apply((_) => const TerminalSettings()),
                     ),
                   ),
+                  const SizedBox(height: TermulSpacing.space8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      TermulSpacing.space3,
+                      0,
+                      TermulSpacing.space3,
+                      TermulSpacing.space3,
+                    ),
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        l.settingsConnectionSection.toUpperCase(),
+                        style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
+                      ),
+                    ),
+                  ),
+                  if (_needsPermission)
+                    Padding(
+                      padding: const EdgeInsets.only(bottom: TermulSpacing.space3),
+                      child: TermulBanner(tone: BannerTone.warn, child: Text(l.settingsKeepAliveNeedsPermission)),
+                    ),
+                  SwitchRow(
+                    label: l.settingsKeepAliveLabel,
+                    description: l.settingsKeepAliveDesc,
+                    value: keepAlive,
+                    onChanged: _setKeepAlive,
+                  ),
+                  if (keepAlive) ...[
+                    const SizedBox(height: TermulSpacing.space3),
+                    TermulCard(
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        spacing: TermulSpacing.space5,
+                        children: [
+                          Text(
+                            l.settingsKeepAliveNote,
+                            style: TermulText.caption.copyWith(color: TermulPalette.inkMuted),
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l.settingsNotifPermissionLabel,
+                                      style: TermulText.body.copyWith(color: TermulPalette.ink),
+                                    ),
+                                    Text(
+                                      _notifAllowed == false ? l.settingsNotifDenied : l.settingsNotifAllowed,
+                                      style: TermulText.caption.copyWith(
+                                        color: _notifAllowed == false ? TermulPalette.accent : TermulPalette.ok,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              if (_notifAllowed == false)
+                                TermulButton(
+                                  label: l.settingsNotifAllow,
+                                  size: TermulButtonSize.sm,
+                                  expand: false,
+                                  onPressed: () async {
+                                    try {
+                                      await ref.read(keepAlivePlatformProvider).requestNotifications();
+                                    } on Object {
+                                      // Tetap tampilkan status terbaru di bawah.
+                                    }
+                                    await _refreshNotif();
+                                  },
+                                ),
+                            ],
+                          ),
+                          Row(
+                            children: [
+                              Expanded(
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      l.settingsBatteryLabel,
+                                      style: TermulText.body.copyWith(color: TermulPalette.ink),
+                                    ),
+                                    Text(
+                                      l.settingsBatteryDesc,
+                                      style: TermulText.caption.copyWith(color: TermulPalette.inkMuted),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              const SizedBox(width: TermulSpacing.space5),
+                              TermulButton(
+                                label: l.settingsBatteryOpen,
+                                size: TermulButtonSize.sm,
+                                expand: false,
+                                onPressed: () => ref.read(keepAlivePlatformProvider).openAppSettings(),
+                              ),
+                            ],
+                          ),
+                        ],
+                      ),
+                    ),
+                  ],
                 ],
               ),
             ),

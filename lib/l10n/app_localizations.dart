@@ -1140,6 +1140,96 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Perubahan tetap berlaku sampai aplikasi ditutup, tetapi akan hilang setelah itu. Periksa ruang penyimpanan HP lalu coba lagi.'**
   String get settingsSaveFailedBody;
+
+  /// Judul notifikasi foreground service.
+  ///
+  /// In id, this message translates to:
+  /// **'{count, plural, =1{1 sesi tersambung} other{{count} sesi tersambung}}'**
+  String keepAliveNotifTitle(int count);
+
+  /// Aksi di notifikasi: menutup semua sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan semua'**
+  String get keepAliveDisconnectAll;
+
+  /// Nama saluran notifikasi foreground service.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi aktif'**
+  String get keepAliveChannelName;
+
+  /// Judul bagian pengaturan koneksi.
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi'**
+  String get settingsConnectionSection;
+
+  /// Label saklar foreground service.
+  ///
+  /// In id, this message translates to:
+  /// **'Pertahankan koneksi di latar belakang'**
+  String get settingsKeepAliveLabel;
+
+  /// Keterangan saklar foreground service.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi tetap tersambung saat aplikasi ditutup ke latar belakang. Memakai baterai lebih banyak dan menampilkan notifikasi permanen.'**
+  String get settingsKeepAliveDesc;
+
+  /// Catatan saat saklar foreground service menyala.
+  ///
+  /// In id, this message translates to:
+  /// **'Membantu sambungan bertahan, tetapi tidak menjaminnya: perpindahan jaringan atau sinyal hilang tetap memutus sesi, lalu sambung ulang otomatis berjalan.'**
+  String get settingsKeepAliveNote;
+
+  /// Pesan saat izin notifikasi ditolak dan saklar kembali mati.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin notifikasi diperlukan untuk menjaga koneksi'**
+  String get settingsKeepAliveNeedsPermission;
+
+  /// Label baris status izin notifikasi.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin notifikasi'**
+  String get settingsNotifPermissionLabel;
+
+  /// Status izin notifikasi: diizinkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Diizinkan'**
+  String get settingsNotifAllowed;
+
+  /// Status izin notifikasi: belum diizinkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum diizinkan'**
+  String get settingsNotifDenied;
+
+  /// Tombol meminta izin notifikasi.
+  ///
+  /// In id, this message translates to:
+  /// **'Izinkan'**
+  String get settingsNotifAllow;
+
+  /// Label baris pembatasan baterai.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembatasan baterai HP'**
+  String get settingsBatteryLabel;
+
+  /// Keterangan baris pembatasan baterai.
+  ///
+  /// In id, this message translates to:
+  /// **'Beberapa HP (misalnya HyperOS) perlu diatur ke \"Tanpa batasan\" agar sesi tidak dihentikan.'**
+  String get settingsBatteryDesc;
+
+  /// Tombol membuka pengaturan aplikasi Android.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka pengaturan'**
+  String get settingsBatteryOpen;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

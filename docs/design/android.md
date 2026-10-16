@@ -1,6 +1,6 @@
 # Android: menjaga koneksi di latar belakang
 
-Dokumen ini menjelaskan pengaturan "Pertahankan koneksi di latar belakang" (prototipe 6b), izin yang dibutuhkan, dan cara mengujinya. Status: **rancangan, belum diuji**. Detail izin dan tipe service harus dicek ulang di dokumentasi resmi Android saat implementasi.
+Dokumen ini menjelaskan pengaturan "Pertahankan koneksi di latar belakang" (prototipe 6b), izin yang dibutuhkan, dan cara mengujinya. Status (2026-10-16): **sudah dibuat di aplikasi dan diuji di emulator Android 14; belum diuji di HP fisik (HyperOS)**. Lihat bagian "Implementasi" di bawah. Nama izin dan tipe service sudah dicek di dokumentasi resmi Android (bagian Deklarasi dan izin).
 
 ## Masalah
 
@@ -43,26 +43,41 @@ Pengaturan opt-in (**default mati**) di Pengaturan, bagian Koneksi. Bila menyala
 |---|---|---|
 | `FOREGROUND_SERVICE` | Izin biasa, diberikan otomatis. Wajib sejak Android 9. | Dikonfirmasi di dokumentasi |
 | Tipe service (`android:foregroundServiceType`) | Wajib sejak target API 34; tiap tipe punya izin sendiri (`FOREGROUND_SERVICE_<TIPE>`). | Dikonfirmasi di dokumentasi |
-| Pilihan tipe: `specialUse` | Tipe baru di Android 14 untuk kasus yang tidak cocok dengan tipe lain. Kandidat paling masuk akal untuk SSH. Butuh izin `FOREGROUND_SERVICE_SPECIAL_USE` dan keterangan penggunaan di manifest; rilis di Play Store kemungkinan butuh deklarasi di Play Console. | Nama izin dan syarat Play dari ingatan; **verifikasi** |
+| Pilihan tipe: `specialUse` | Tipe baru di Android 14 untuk kasus yang tidak cocok dengan tipe lain. Kandidat paling masuk akal untuk SSH. Butuh izin `FOREGROUND_SERVICE_SPECIAL_USE` dan keterangan penggunaan di manifest; rilis di Play Store kemungkinan butuh deklarasi di Play Console. | Dikonfirmasi 2026-10-16 di dokumentasi resmi (service-types): tipe `specialUse`, izin `FOREGROUND_SERVICE_SPECIAL_USE`, properti `PROPERTY_SPECIAL_USE_FGS_SUBTYPE`; penggunaan `specialUse` ditinjau di Play Console |
 | Hindari `dataSync` | Android 15 membatasi lama jalannya untuk aplikasi yang menargetkan API 35 ke atas; tidak cocok untuk sesi panjang. | Dikonfirmasi ada batas; angka tidak dicatat di sini |
 | `POST_NOTIFICATIONS` | Izin runtime di Android 13 ke atas agar notifikasi terlihat. Pengingat streak juga memakainya. | Dari pengetahuan umum |
 | `WAKE_LOCK` dan Wi-Fi lock | Opsional, bila Wi-Fi tidur saat layar mati mengganggu. Menambah konsumsi baterai. | Belum diuji |
 | `REQUEST_IGNORE_BATTERY_OPTIMIZATIONS` | **Tidak dipakai.** Bukan penyebab masalah ini dan dibatasi kebijakan Play Store. | Keputusan desain |
 
-Contoh manifest (bentuk, bukan hasil uji):
+Manifest yang dipakai aplikasi (nama service `.KeepAliveService`; bentuk selebihnya sama):
 
 ```xml
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
 <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
 <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
-<service android:name=".SessionKeepAliveService"
+<service android:name=".KeepAliveService"
          android:exported="false"
          android:foregroundServiceType="specialUse">
   <property android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
             android:value="menjaga sesi SSH interaktif tetap tersambung"/>
 </service>
 ```
+
+## Implementasi (2026-10-16)
+
+Dibuat sesuai rancangan di atas. Yang perlu diketahui:
+
+- **Bukti masalah di HP** (Xiaomi 25053PC47G, Android 16, build debug): log sistem `InetDiagMessage: Destroyed live tcp sockets for uids={10493}` muncul sekitar 6 detik setelah aplikasi ke latar belakang; proses aplikasi sendiri tetap hidup (PID sama). Aplikasi lalu menyambung ulang saat dibuka lagi (prompt sidik jari atau pola muncul).
+- **Service**: `KeepAliveService` (Kotlin), tipe `specialUse`, `START_NOT_STICKY`. Tidak membuka soket; hanya menahan proses. Dijalankan dari Dart lewat `MethodChannel` `io.github.egateza.termul/keepalive`. Seluruh teks notifikasi dikirim dari Dart (ARB), bukan ditulis di Kotlin.
+- **Notifikasi**: saluran "Sesi aktif" (prioritas rendah), judul "N sesi tersambung" (bentuk jamak lewat ARB), isi nama sesi dipisah koma, aksi **Putuskan semua**, mengetuk badan notifikasi membuka aplikasi.
+- **Kapan menyala**: selama pengaturan menyala **dan** ada sesi yang tersambung. Sesi yang putus (menunggu sambung ulang) dicabut dari daftar; tersambung ulang mendaftarkannya lagi. Jadi notifikasi hanya menggambarkan sesi yang benar-benar tersambung, dan service padam bila tidak ada.
+- **Putuskan semua** menutup sambungan langsung (tidak bergantung pada penggambaran layar, jadi jalan juga saat aplikasi di latar belakang), menutup layar sesi, dan tidak memicu sambung ulang.
+- **Izin notifikasi**: menyalakan saklar meminta izin (Android 13 ke atas); bila ditolak, saklar tetap mati dan tampil "Izin notifikasi diperlukan untuk menjaga koneksi". Baris izin menampilkan "Diizinkan" atau "Belum diizinkan" (kata, bukan hanya warna) dengan tombol **Izinkan**. Status dibaca ulang saat aplikasi kembali terlihat.
+- **Pembatasan baterai HP**: tombol "Buka pengaturan" membuka halaman info aplikasi Android (`ACTION_APPLICATION_DETAILS_SETTINGS`), tempat pengguna memilih "Tanpa batasan". Aplikasi tidak meminta pengecualian baterai sendiri (keputusan di atas tetap).
+- **Log diagnosis** (hanya build debug, tanpa host, user, atau rahasia): baris berawalan `[termul]` di `adb logcat` memuat perubahan siklus hidup, alasan putus (`serverClosed`, `keepAliveTimeout`, `error`), lama di latar belakang, hasil pemeriksaan sambungan, dan nyala atau padamnya service.
+- **Disimpan**: `settings.json` bagian `connection.keepAlive` (bawaan `false`).
+- **Teruji**: emulator Android 14 (service menjadi foreground bertipe `specialUse`, notifikasi dan aksi benar, "Putuskan semua" menghentikan service tanpa galat) dan tes otomatis. **Belum teruji**: apakah service benar-benar mencegah `Destroyed live tcp sockets` di HyperOS; baterai; Wi-Fi tanpa kabel dengan layar mati; notifikasi yang diblokir pengguna setelah service berjalan.
 
 ## Cara menguji (K10, ulangan)
 
@@ -80,8 +95,8 @@ adb logcat -d | Select-String "Destroyed live tcp"
 
 ## Belum diverifikasi
 
-- Foreground service menahan soket dalam praktik (belum dibuat).
-- Tipe service yang tepat dan syarat Play Store.
+- Foreground service menahan soket dalam praktik di HP (sudah dibuat dan jalan di emulator; belum dicoba di HyperOS).
+- Syarat Play Store sebenarnya saat rilis (deklarasi di Play Console).
 - Perilaku bila notifikasi diblokir pengguna setelah service berjalan.
 - Angka baterai.
 - iOS: tidak ada padanan; iOS tidak diuji (lihat `spike.md`).

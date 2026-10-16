@@ -805,5 +805,70 @@
   "settingsSaveFailedBody": "Perubahan tetap berlaku sampai aplikasi ditutup, tetapi akan hilang setelah itu. Periksa ruang penyimpanan HP lalu coba lagi.",
   "@settingsSaveFailedBody": {
     "description": "Isi banner saat settings.json gagal ditulis."
+  },
+  "keepAliveNotifTitle": "{count, plural, =1{1 sesi tersambung} other{{count} sesi tersambung}}",
+  "@keepAliveNotifTitle": {
+    "description": "Judul notifikasi foreground service.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "keepAliveDisconnectAll": "Putuskan semua",
+  "@keepAliveDisconnectAll": {
+    "description": "Aksi di notifikasi: menutup semua sesi."
+  },
+  "keepAliveChannelName": "Sesi aktif",
+  "@keepAliveChannelName": {
+    "description": "Nama saluran notifikasi foreground service."
+  },
+  "settingsConnectionSection": "Koneksi",
+  "@settingsConnectionSection": {
+    "description": "Judul bagian pengaturan koneksi."
+  },
+  "settingsKeepAliveLabel": "Pertahankan koneksi di latar belakang",
+  "@settingsKeepAliveLabel": {
+    "description": "Label saklar foreground service."
+  },
+  "settingsKeepAliveDesc": "Sesi tetap tersambung saat aplikasi ditutup ke latar belakang. Memakai baterai lebih banyak dan menampilkan notifikasi permanen.",
+  "@settingsKeepAliveDesc": {
+    "description": "Keterangan saklar foreground service."
+  },
+  "settingsKeepAliveNote": "Membantu sambungan bertahan, tetapi tidak menjaminnya: perpindahan jaringan atau sinyal hilang tetap memutus sesi, lalu sambung ulang otomatis berjalan.",
+  "@settingsKeepAliveNote": {
+    "description": "Catatan saat saklar foreground service menyala."
+  },
+  "settingsKeepAliveNeedsPermission": "Izin notifikasi diperlukan untuk menjaga koneksi",
+  "@settingsKeepAliveNeedsPermission": {
+    "description": "Pesan saat izin notifikasi ditolak dan saklar kembali mati."
+  },
+  "settingsNotifPermissionLabel": "Izin notifikasi",
+  "@settingsNotifPermissionLabel": {
+    "description": "Label baris status izin notifikasi."
+  },
+  "settingsNotifAllowed": "Diizinkan",
+  "@settingsNotifAllowed": {
+    "description": "Status izin notifikasi: diizinkan."
+  },
+  "settingsNotifDenied": "Belum diizinkan",
+  "@settingsNotifDenied": {
+    "description": "Status izin notifikasi: belum diizinkan."
+  },
+  "settingsNotifAllow": "Izinkan",
+  "@settingsNotifAllow": {
+    "description": "Tombol meminta izin notifikasi."
+  },
+  "settingsBatteryLabel": "Pembatasan baterai HP",
+  "@settingsBatteryLabel": {
+    "description": "Label baris pembatasan baterai."
+  },
+  "settingsBatteryDesc": "Beberapa HP (misalnya HyperOS) perlu diatur ke \"Tanpa batasan\" agar sesi tidak dihentikan.",
+  "@settingsBatteryDesc": {
+    "description": "Keterangan baris pembatasan baterai."
+  },
+  "settingsBatteryOpen": "Buka pengaturan",
+  "@settingsBatteryOpen": {
+    "description": "Tombol membuka pengaturan aplikasi Android."
   }
 }

@@ -6,6 +6,7 @@ import 'package:termul_mobile/core/models/app_settings.dart';
 import 'package:termul_mobile/core/theme/termul_theme.dart';
 import 'package:termul_mobile/features/settings/settings_screen.dart';
 
+import 'fake_keepalive.dart';
 import 'hosts_ui_harness.dart';
 
 /// Membuka layar Pengaturan dari daftar host, dengan penyimpanan palsu yang mencatat setiap simpanan.
@@ -18,9 +19,11 @@ class _Setup {
     saved.add(s);
   }
 
+  final keepAlive = FakeKeepAlive();
+
   Future<Harness> open(WidgetTester tester, {AppSettings initial = const AppSettings()}) async {
     final h = Harness(settings: initial, saveSettings: save);
-    await h.pump(tester);
+    await h.pump(tester, overrides: [keepAlivePlatformProvider.overrideWithValue(keepAlive)]);
     await tester.tap(find.bySemanticsLabel('Pengaturan'));
     await tester.pumpAndSettle();
     expect(find.byType(SettingsScreen), findsOneWidget);
@@ -130,5 +133,85 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Kembali'));
     await tester.pumpAndSettle();
     expect(find.byType(SettingsScreen), findsNothing);
+  });
+
+  group('bagian Koneksi', () {
+    Future<void> scrollToKoneksi(WidgetTester tester) async {
+      await tester.scrollUntilVisible(find.text('Pertahankan koneksi di latar belakang'), 200);
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('bawaan mati; menyalakan dengan izin tersimpan dan menampilkan catatan, izin, dan baterai', (
+      tester,
+    ) async {
+      final setup = _Setup();
+      await setup.open(tester);
+      await scrollToKoneksi(tester);
+      expect(find.text('KONEKSI'), findsOneWidget);
+      expect(find.text('Pembatasan baterai HP'), findsNothing);
+
+      await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
+      await tester.pumpAndSettle();
+      expect(setup.saved.last.connection.keepAlive, isTrue);
+      expect(_current(tester).connection.keepAlive, isTrue);
+      await tester.scrollUntilVisible(find.text('Pembatasan baterai HP'), 200);
+      expect(find.text('Izin notifikasi'), findsOneWidget);
+      expect(find.text('Diizinkan'), findsOneWidget);
+      expect(find.textContaining('tidak menjaminnya'), findsOneWidget);
+    });
+
+    testWidgets('izin ditolak: saklar tetap mati, pesan tampil, tidak menyimpan', (tester) async {
+      final setup = _Setup();
+      setup.keepAlive
+        ..enabled = false
+        ..grantOnRequest = false;
+      await setup.open(tester);
+      await scrollToKoneksi(tester);
+      await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
+      await tester.pumpAndSettle();
+      expect(find.text('Izin notifikasi diperlukan untuk menjaga koneksi'), findsOneWidget);
+      expect(_current(tester).connection.keepAlive, isFalse);
+      expect(setup.saved, isEmpty);
+    });
+
+    testWidgets('izin dicabut setelah menyala: status Belum diizinkan dengan tombol Izinkan', (tester) async {
+      final setup = _Setup();
+      setup.keepAlive.enabled = false;
+      await setup.open(tester, initial: const AppSettings(connection: ConnectionSettings(keepAlive: true)));
+      await tester.scrollUntilVisible(find.text('Izin notifikasi'), 200);
+      expect(find.text('Belum diizinkan'), findsOneWidget);
+      setup.keepAlive.grantOnRequest = true;
+      await tester.ensureVisible(find.text('Izinkan'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Izinkan'));
+      await tester.pumpAndSettle();
+      expect(find.text('Diizinkan'), findsOneWidget);
+      expect(find.text('Izinkan'), findsNothing);
+    });
+
+    testWidgets('Buka pengaturan memanggil platform; mematikan saklar menyimpan mati', (tester) async {
+      final setup = _Setup();
+      await setup.open(tester, initial: const AppSettings(connection: ConnectionSettings(keepAlive: true)));
+      await tester.scrollUntilVisible(find.text('Buka pengaturan'), 200);
+      await tester.ensureVisible(find.text('Buka pengaturan'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Buka pengaturan'));
+      expect(setup.keepAlive.settingsOpened, 1);
+      await tester.drag(find.byType(ListView), const Offset(0, 400));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
+      await tester.pumpAndSettle();
+      expect(setup.saved.last.connection.keepAlive, isFalse);
+      expect(find.text('Pembatasan baterai HP'), findsNothing);
+    });
+
+    testWidgets('mengubah ukuran font tidak mengubah pengaturan koneksi', (tester) async {
+      final setup = _Setup();
+      await setup.open(tester, initial: const AppSettings(connection: ConnectionSettings(keepAlive: true)));
+      await tester.tap(find.bySemanticsLabel('Besarkan font'));
+      await tester.pumpAndSettle();
+      expect(setup.saved.last.terminal.fontSize, 14);
+      expect(setup.saved.last.connection.keepAlive, isTrue);
+    });
   });
 }

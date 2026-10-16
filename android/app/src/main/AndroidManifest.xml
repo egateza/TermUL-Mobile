@@ -3,6 +3,12 @@
     <uses-permission android:name="android.permission.INTERNET"/>
     <!-- Prompt biometrik untuk membuka rahasia (local_auth). -->
     <uses-permission android:name="android.permission.USE_BIOMETRIC"/>
+    <!-- Foreground service opsional "Pertahankan koneksi di latar belakang" (docs/design/android.md). Nama izin dan
+         tipe specialUse dicek di dokumentasi resmi Android (service-types). POST_NOTIFICATIONS: izin runtime di
+         Android 13 ke atas agar notifikasi terlihat. -->
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
+    <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
+    <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
 
     <application
         android:label="TermUL"
@@ -31,6 +37,14 @@
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
         </activity>
+        <service
+            android:name=".KeepAliveService"
+            android:exported="false"
+            android:foregroundServiceType="specialUse">
+            <property
+                android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
+                android:value="menjaga sesi SSH interaktif tetap tersambung selama aplikasi di latar belakang" />
+        </service>
         <!-- Don't delete the meta-data below.
              This is used by the Flutter tool to generate GeneratedPluginRegistrant.java -->
         <meta-data

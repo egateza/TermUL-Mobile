@@ -4,11 +4,13 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 import 'bootstrap.dart';
 import 'core/keys/key_file_picker.dart';
 import 'core/models/app_settings.dart';
+import 'core/platform/keepalive_platform.dart';
 import 'core/models/profile_snapshot.dart';
 import 'core/ssh/ssh_connector.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/vault/credential_vault.dart';
+import 'features/connect/keepalive_sync.dart';
 import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
 import 'features/terminal/shell_channel.dart';
@@ -54,6 +56,15 @@ final appSettingsProvider = NotifierProvider<AppSettingsNotifier, AppSettings>(A
 final settingsLoaderProvider = Provider<Future<AppSettings> Function()>((ref) {
   return () async => ref.read(appSettingsProvider);
 });
+
+/// Jembatan ke foreground service Android; diganti `NoopKeepAlive` di tes (bootstrap memasang yang nyata).
+final keepAlivePlatformProvider = Provider<KeepAlivePlatform>((ref) => const NoopKeepAlive());
+
+/// Sesi terminal yang sedang aktif; dipakai untuk isi notifikasi dan "Putuskan semua".
+final activeSessionsProvider = NotifierProvider<ActiveSessionsNotifier, List<ActiveSession>>(
+  ActiveSessionsNotifier.new,
+);
+
 final bootReportProvider = Provider<BootReport>((ref) => const BootReport());
 
 /// Pemilih berkas kunci; diganti di test.
@@ -86,6 +97,7 @@ extension AppDependenciesOverrides on AppDependencies {
     bootReportProvider.overrideWithValue(report),
     initialSettingsProvider.overrideWithValue(settings),
     if (saveSettings != null) settingsSaverProvider.overrideWithValue(saveSettings!),
+    if (keepAlive != null) keepAlivePlatformProvider.overrideWithValue(keepAlive!),
     if (reloadSettings != null) settingsLoaderProvider.overrideWithValue(reloadSettings!),
   ];
 }

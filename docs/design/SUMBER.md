@@ -56,3 +56,7 @@ Prototipe:
 - `prototype/Settings.dc.html`: rentang ukuran font 10-20 menjadi 8-24 px, baris baru "Tinggi baris" (1,0 sampai 2,0, langkah 0,1, bawaan 1,3), pratinjau memakai tinggi baris itu (sebelumnya tetap 1,5). Sudah dirender di Chrome tanpa galat.
 - `prototype/Main.dc.html` **tidak diubah**: ikon pengaturan di header Host adalah jalan masuk sementara di Flutter, sedangkan prototipe tetap memakai `NavBar` lima tab.
 
+## Perubahan lokal lanjutan (2026-10-16, foreground service)
+
+- `android.md`: status diperbarui dan bagian baru "Implementasi" (bukti dari HP, perilaku, apa yang teruji dan belum). Isi rancangan di bagian lain tidak diubah. Sudah di-publish ke design system (versi 21, `1792125397-d101`) bersama pembaruan `design-system.json` (`lastChange`). Tabel "Deklarasi dan izin" diperbarui: tipe `specialUse` dan izinnya dikonfirmasi di dokumentasi resmi; nama service di contoh manifest menjadi `.KeepAliveService`.
+

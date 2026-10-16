@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:flutter_riverpod/misc.dart' show Override;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app_providers.dart';
 import 'package:termul_mobile/core/models/app_settings.dart';
@@ -11,10 +12,12 @@ import 'package:termul_mobile/core/ssh/ssh_connector.dart';
 import 'package:termul_mobile/core/ssh/ssh_failure.dart';
 import 'package:termul_mobile/core/vault/secret_type.dart';
 import 'package:termul_mobile/features/connect/connect_flow.dart';
+import 'package:termul_mobile/features/connect/keepalive_sync.dart';
 import 'package:termul_mobile/features/terminal/terminal_screen.dart';
 import 'package:termul_mobile/shared/widgets/host_row.dart';
 import 'package:xterm/xterm.dart';
 
+import 'fake_keepalive.dart';
 import 'hosts_ui_harness.dart';
 import 'silent_socket.dart';
 import 'terminal/terminal_session_test.dart' show FakeShell;
@@ -65,8 +68,12 @@ void goForeground() {
 
 Terminal terminalOf(WidgetTester tester) => tester.widget<TerminalView>(find.byType(TerminalView)).terminal;
 
-Future<(Harness, FakeNet, HostProfile)> start(WidgetTester tester) async {
-  final h = Harness();
+Future<(Harness, FakeNet, HostProfile)> start(
+  WidgetTester tester, {
+  List<Override> overrides = const [],
+  AppSettings settings = const AppSettings(),
+}) async {
+  final h = Harness(settings: settings);
   await h.seed([host(id1)]);
   await h.vault.put(id1, SecretType.loginPassword, 'rahasia');
   final profile = h.hosts.snapshot.profiles.single;
@@ -77,6 +84,7 @@ Future<(Harness, FakeNet, HostProfile)> start(WidgetTester tester) async {
     overrides: [
       connectFunctionProvider.overrideWithValue(net.fn),
       shellOpenerProvider.overrideWithValue(net.shellOpener),
+      ...overrides,
     ],
     realConnect: true,
   );
@@ -294,5 +302,70 @@ void main() {
     expect(view().textStyle.height, 1.0);
     expect(net.shells.single.resizes, isNotEmpty);
     expect(net.shells.single.resizes.last, isNot(equals(rowsBefore)));
+  });
+
+  group('foreground service mengikuti sesi tersambung', () {
+    testWidgets('menyala saat tersambung, padam saat putus, menyala lagi saat tersambung ulang, padam saat keluar', (
+      tester,
+    ) async {
+      final platform = FakeKeepAlive();
+      final (h, net, profile) = await start(
+        tester,
+        settings: const AppSettings(connection: ConnectionSettings(keepAlive: true)),
+        overrides: [keepAlivePlatformProvider.overrideWithValue(platform)],
+      );
+      List<ActiveSession> active() =>
+          ProviderScope.containerOf(tester.element(find.byType(TerminalView))).read(activeSessionsProvider);
+      expect(active().map((s) => s.name), ['app-01']);
+      expect(platform.updates.last.title, '1 sesi tersambung');
+
+      // Putus selagi tersambung ulang tertahan: tidak ada sesi tersambung, jadi service padam.
+      final gate = Completer<SshConnection>();
+      net.queue.add((_) => gate.future);
+      await drop(tester, net);
+      expect(active(), isEmpty);
+      expect(platform.stops, 1);
+
+      gate.complete(net.open(profile));
+      await tester.pumpAndSettle();
+      expect(active().map((s) => s.name), ['app-01']);
+      expect(platform.updates, hasLength(2));
+
+      // Keluar dari sesi (konfirmasi Putuskan): tidak ada lagi sesi, service padam.
+      await tester.tap(find.bySemanticsLabel('Kembali'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Putuskan'));
+      await tester.pumpAndSettle();
+      final container = ProviderScope.containerOf(tester.element(find.byType(HostRow).first));
+      expect(container.read(activeSessionsProvider), isEmpty);
+      expect(platform.stops, 2);
+      expect(h.hosts.snapshot.profiles, isNotEmpty);
+    });
+
+    testWidgets('Putuskan semua dari notifikasi menutup sambungan dan layar sesi, bahkan tanpa mengetuk apa pun', (
+      tester,
+    ) async {
+      final platform = FakeKeepAlive();
+      final (_, net, _) = await start(
+        tester,
+        settings: const AppSettings(connection: ConnectionSettings(keepAlive: true)),
+        overrides: [keepAlivePlatformProvider.overrideWithValue(platform)],
+      );
+      platform.disconnectAll!();
+      await tester.pumpAndSettle();
+      expect(net.connections.single.isClosed, isTrue);
+      expect(net.shells.single.closed, isTrue);
+      expect(find.byType(TerminalScreen), findsNothing);
+      expect(find.byType(HostRow), findsWidgets);
+      expect(platform.stops, 1);
+      expect(net.calls, 1, reason: 'tidak ada sambung ulang setelah diputus pengguna');
+    });
+
+    testWidgets('pengaturan mati: sesi tetap terdaftar tetapi service tidak pernah menyala', (tester) async {
+      final platform = FakeKeepAlive();
+      await start(tester, overrides: [keepAlivePlatformProvider.overrideWithValue(platform)]);
+      expect(platform.updates, isEmpty);
+      expect(platform.stops, 0);
+    });
   });
 }

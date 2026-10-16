@@ -7,6 +7,7 @@ import '../../app_providers.dart';
 import '../../core/keys/private_key_inspector.dart';
 import '../../core/models/auth_method.dart';
 import '../../core/models/host_profile.dart';
+import '../../core/ssh/connection_log.dart';
 import '../../core/ssh/ssh_connector.dart';
 import '../../core/ssh/ssh_failure.dart';
 import '../../core/theme/termul_theme.dart';
@@ -23,6 +24,7 @@ import '../terminal/terminal_palette.dart';
 import '../terminal/terminal_screen.dart';
 import '../terminal/terminal_session.dart';
 import 'connect_flow.dart';
+import 'keepalive_sync.dart';
 import 'host_key_prompt.dart';
 
 /// Layar alur sambung ke satu host: membuka rahasia, menyambung, meminta keputusan host key, dan menampilkan
@@ -49,9 +51,21 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
   /// Sambungan [_current] sudah putus dan sambung ulang belum berhasil.
   bool _lost = false;
 
+  static int _nextSessionId = 0;
+  final int _sessionId = _nextSessionId++;
+
+  /// Daftar sesi aktif (untuk notifikasi foreground service). Sesi terdaftar selama tersambung; putus
+  /// mencabutnya, tersambung ulang mendaftarkannya lagi.
+  late final ActiveSessionsNotifier _registry;
+  bool _registered = false;
+
+  /// Waktu terakhir aplikasi meninggalkan layar, untuk log diagnosis (tanpa data sensitif).
+  DateTime? _backgroundSince;
+
   @override
   void initState() {
     super.initState();
+    _registry = ref.read(activeSessionsProvider.notifier);
     WidgetsBinding.instance.addObserver(this);
   }
 
@@ -73,8 +87,46 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
     flow.start();
   }
 
+  void _register() {
+    if (_registered) return;
+    _registered = true;
+    _registry.register(
+      ActiveSession(id: _sessionId, name: widget.profile.name, disconnect: _disconnectFromNotification),
+    );
+  }
+
+  /// Mencabut pendaftaran. Saat dipanggil dari [dispose], perubahan state provider ditunda ke microtask supaya tidak
+  /// terjadi di tengah pembongkaran pohon widget (dan diabaikan bila kontainer sudah dibuang).
+  void _unregister({bool defer = false}) {
+    if (!_registered) return;
+    _registered = false;
+    if (!defer) {
+      _registry.unregister(_sessionId);
+      return;
+    }
+    scheduleMicrotask(() {
+      try {
+        _registry.unregister(_sessionId);
+      } on Object {
+        // Kontainer provider sudah dibuang (aplikasi ditutup): tidak ada yang perlu dicabut.
+      }
+    });
+  }
+
+  /// "Putuskan semua" di notifikasi: menutup sambungan segera (juga saat aplikasi di latar belakang, jadi tidak
+  /// bergantung pada penggambaran layar), lalu menutup layar ini.
+  void _disconnectFromNotification() {
+    connLog('putus atas permintaan notifikasi');
+    _current?.close();
+    _unregister();
+    if (!mounted) return;
+    final route = ModalRoute.of(context);
+    if (route != null) Navigator.of(context).removeRoute(route);
+  }
+
   @override
   void dispose() {
+    _unregister(defer: true);
     WidgetsBinding.instance.removeObserver(this);
     final flow = _flow;
     if (flow != null) {
@@ -105,6 +157,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
     final previous = _current;
     _current = connection;
     _lost = false;
+    _register();
     previous?.close();
     unawaited(connection.closed.then((reason) => _onClosed(connection, reason)));
     Future<ShellChannel> open({required int columns, required int rows}) =>
@@ -119,9 +172,15 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
 
   void _onClosed(SshConnection connection, CloseReason reason) {
     if (!mounted || !identical(connection, _current) || reason == CloseReason.userClosed || _lost) return;
+    final lifecycle = WidgetsBinding.instance.lifecycleState;
+    final since = _backgroundSince;
+    connLog(
+      'sambungan putus: alasan=${reason.name}, siklus=${lifecycle?.name}, '
+      'di latar belakang ${since == null ? '-' : '${DateTime.now().difference(since).inSeconds} dtk'}',
+    );
+    _unregister();
     setState(() => _lost = true);
     // `null` = belum ada pesan siklus hidup (aplikasi baru mulai): anggap terlihat.
-    final lifecycle = WidgetsBinding.instance.lifecycleState;
     if (lifecycle == null || lifecycle == AppLifecycleState.resumed) _reconnect();
   }
 
@@ -137,7 +196,17 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
 
   @override
   void didChangeAppLifecycleState(AppLifecycleState lifecycle) {
-    if (lifecycle != AppLifecycleState.resumed) return;
+    if (lifecycle != AppLifecycleState.resumed) {
+      _backgroundSince ??= DateTime.now();
+      connLog('siklus: ${lifecycle.name}');
+      return;
+    }
+    final since = _backgroundSince;
+    _backgroundSince = null;
+    connLog(
+      'siklus: resumed setelah ${since == null ? '-' : '${DateTime.now().difference(since).inSeconds} dtk'}, '
+      'sambungan ${_lost ? 'sudah putus' : 'dianggap hidup'}',
+    );
     final connection = _current;
     if (connection == null) return;
     if (_lost) {
@@ -147,6 +216,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
     // Android mematikan soket aplikasi di latar belakang tanpa memberi tahu; periksa sebelum dipakai (spike A4).
     unawaited(
       connection.checkAlive().then((alive) {
+        connLog('pemeriksaan sambungan setelah kembali: ${alive ? 'hidup' : 'mati'}');
         if (alive || !mounted || !identical(connection, _current) || _lost) return;
         connection.close();
         _onClosed(connection, CloseReason.error);
