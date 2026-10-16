@@ -82,3 +82,7 @@ Aturan pemilik (dicatat di `CLAUDE.md` butir 8): desain sistem dan prototipe har
 - **Aplikasi mengikuti desain:** gagang seleksi memakai warna `info` dan bentuk prototipe (bulatan 14 dp dengan tangkai 2 x 4 dp), bukan `accent`.
 - **Belum bisa mengikuti desain:** warna seleksi (xterm 4.0.0 menggambar seleksi di atas teks; aplikasi memakai `#3E7CA8` alpha 55%) dan petunjuk bilah (xterm menghapus seleksi saat diketuk).
 
+## Perubahan lokal lanjutan (2026-10-16, gagang seleksi)
+
+- Pemilik lebih memilih gagang seleksi berwarna `accent` bertepi `ground`. Aplikasi memakai itu; prototipe (gagang `info` bertangkai) **tidak diubah** dan perbedaannya dicatat di `README.md` design system (versi 26, `1792133660-c984`).
+
