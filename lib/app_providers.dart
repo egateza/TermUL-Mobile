@@ -26,6 +26,13 @@ final hostServiceProvider = Provider<HostService>((ref) => throw UnimplementedEr
 
 /// Pengaturan dari `settings.json`, dibaca sekali saat mulai.
 final appSettingsProvider = Provider<AppSettings>((ref) => const AppSettings());
+
+/// Memuat ulang `settings.json`; dipanggil tiap sesi baru dibuka supaya perubahan berkas langsung terpakai
+/// tanpa menutup aplikasi. Bawaan: nilai yang dimuat saat mulai.
+final settingsLoaderProvider = Provider<Future<AppSettings> Function()>((ref) {
+  final s = ref.watch(appSettingsProvider);
+  return () async => s;
+});
 final bootReportProvider = Provider<BootReport>((ref) => const BootReport());
 
 /// Pemilih berkas kunci; diganti di test.
@@ -57,6 +64,7 @@ extension AppDependenciesOverrides on AppDependencies {
     hostServiceProvider.overrideWithValue(service),
     bootReportProvider.overrideWithValue(report),
     appSettingsProvider.overrideWithValue(settings),
+    if (reloadSettings != null) settingsLoaderProvider.overrideWithValue(reloadSettings!),
   ];
 }
 

@@ -484,7 +484,7 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 
 ## 11a. Pengaturan (`settings.json`) dan rencana menu setting
 
-**Sudah ada (2026-10-16):** berkas `settings.json` di folder pribadi aplikasi (`getApplicationSupportDirectory`; di Android `/data/user/0/io.github.egateza.termul/files/settings.json`). Dibuat otomatis dengan nilai bawaan saat pertama kali aplikasi dijalankan; properti yang tidak dikenal diabaikan; nilai di luar batas dijepit; tipe yang salah membuat berkas disisihkan ke `settings.json.corrupt-<waktu>` lalu nilai bawaan dipakai (tanpa banner, pengaturan hilang tidak berbahaya). Perubahan berlaku **setelah aplikasi dimulai ulang**. Kode: `lib/core/models/app_settings.dart`, `lib/core/storage/json/json_settings_repository.dart`, `appSettingsProvider`, `terminalStyleFor` di `terminal_palette.dart`.
+**Sudah ada (2026-10-16):** berkas `settings.json` di folder pribadi aplikasi (`getApplicationSupportDirectory`; di Android `/data/user/0/io.github.egateza.termul/files/settings.json`). Dibuat otomatis dengan nilai bawaan saat pertama kali aplikasi dijalankan; properti yang tidak dikenal diabaikan; nilai di luar batas dijepit; tipe yang salah membuat berkas disisihkan ke `settings.json.corrupt-<waktu>` lalu nilai bawaan dipakai (tanpa banner, pengaturan hilang tidak berbahaya). Berkas dibaca ulang **setiap sesi baru dibuka** (mengetuk host), jadi perubahan terpakai tanpa menutup aplikasi; sambung ulang di sesi yang sama tidak membacanya lagi. Kode: `lib/core/models/app_settings.dart`, `lib/core/storage/json/json_settings_repository.dart`, `appSettingsProvider`, `terminalStyleFor` di `terminal_palette.dart`.
 
 ```json
 {
@@ -498,7 +498,7 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 | `terminal.fontSize` | 13.0 | 8 sampai 24 | ukuran huruf terminal (sp) |
 | `terminal.lineHeight` | 1.3 | 1.0 sampai 2.0 | tinggi baris terminal (kelipatan ukuran huruf) |
 
-Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as io.github.egateza.termul` lalu sunting `files/settings.json` (mis. `cat > files/settings.json`), kemudian tutup dan buka lagi aplikasinya. Di build rilis berkas ini tidak terjangkau tanpa menu setting, jadi menu itu perlu dibuat sebelum rilis.
+Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as io.github.egateza.termul` lalu sunting `files/settings.json` (mis. `cat > files/settings.json`), kemudian keluar dari sesi dan ketuk host lagi. Di build rilis berkas ini tidak terjangkau tanpa menu setting, jadi menu itu perlu dibuat sebelum rilis.
 
 **Bawaan tinggi baris 1,3, bukan 1,5 dari token `terminal`:** di HP fisik (Xiaomi 25053PC47G) 1,5 hanya memuat sekitar 12 baris di landscape sehingga daftar proses `htop` tidak terlihat. Keputusan baru, perlu masuk ke artifact desain (baris terminal lebih rapat daripada teks antarmuka).
 

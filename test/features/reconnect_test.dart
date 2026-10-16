@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app_providers.dart';
+import 'package:termul_mobile/core/models/app_settings.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
 import 'package:termul_mobile/core/models/known_host.dart';
 import 'package:termul_mobile/core/ssh/ssh_connector.dart';
@@ -233,5 +234,47 @@ void main() {
     await tester.pumpAndSettle();
     expect(net.connections.single.isClosed, isTrue);
     expect(net.shells.single.closed, isTrue);
+  });
+
+  testWidgets('sesi baru memakai settings.json terbaru tanpa memulai ulang aplikasi', (tester) async {
+    final h = Harness();
+    await h.seed([host(id1)]);
+    await h.vault.put(id1, SecretType.loginPassword, 'rahasia');
+    final profile = h.hosts.snapshot.profiles.single;
+    final net = FakeNet()
+      ..succeed(profile)
+      ..succeed(profile);
+    var fontSize = 13.0;
+    var loads = 0;
+    await h.pump(
+      tester,
+      overrides: [
+        connectFunctionProvider.overrideWithValue(net.fn),
+        shellOpenerProvider.overrideWithValue(net.shellOpener),
+        settingsLoaderProvider.overrideWithValue(() async {
+          loads++;
+          return AppSettings(terminal: TerminalSettings(fontSize: fontSize, lineHeight: 1.2));
+        }),
+      ],
+      realConnect: true,
+    );
+
+    await tester.tap(find.widgetWithText(HostRow, 'app-01'));
+    await tester.pumpAndSettle();
+    expect(tester.widget<TerminalView>(find.byType(TerminalView)).textStyle.fontSize, 13);
+    expect(loads, 1);
+
+    // Berkas diubah di luar; keluar dari sesi lalu buka lagi: ukuran baru terpakai.
+    fontSize = 9;
+    await tester.tap(find.bySemanticsLabel('Kembali'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Putuskan'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.widgetWithText(HostRow, 'app-01'));
+    await tester.pumpAndSettle();
+    final style = tester.widget<TerminalView>(find.byType(TerminalView)).textStyle;
+    expect(style.fontSize, 9);
+    expect(style.height, 1.2);
+    expect(loads, 2);
   });
 }

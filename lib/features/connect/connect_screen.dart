@@ -5,6 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_providers.dart';
 import '../../core/keys/private_key_inspector.dart';
+import '../../core/models/app_settings.dart';
 import '../../core/models/auth_method.dart';
 import '../../core/models/host_profile.dart';
 import '../../core/ssh/ssh_connector.dart';
@@ -39,6 +40,9 @@ class ConnectScreen extends ConsumerStatefulWidget {
 class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindingObserver {
   ConnectFlow? _flow;
 
+  /// Pengaturan tampilan terminal; dibaca ulang dari `settings.json` tiap sesi baru dibuka.
+  AppSettings? _settings;
+
   /// Sesi terminal, dibuat saat tersambung pertama kali. Dimiliki di sini (bukan oleh [TerminalScreen]) supaya
   /// riwayat layar bertahan selama sambung ulang, ketika layar lain (host key, rahasia hilang) tampil.
   TerminalSession? _session;
@@ -69,6 +73,8 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
     );
     flow.addListener(_onFlow);
     _flow = flow;
+    _settings = ref.read(appSettingsProvider);
+    unawaited(_reloadSettings());
     flow.start();
   }
 
@@ -85,6 +91,15 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
     _current?.close();
     _session?.dispose();
     super.dispose();
+  }
+
+  Future<void> _reloadSettings() async {
+    try {
+      final fresh = await ref.read(settingsLoaderProvider)();
+      if (mounted) setState(() => _settings = fresh);
+    } on Object {
+      // Berkas tak terbaca: tetap memakai pengaturan yang sudah ada.
+    }
   }
 
   /// Tersambung (pertama kali atau setelah sambung ulang): pasang sambungan ke sesi terminal dan awasi putusnya.
@@ -155,7 +170,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
         final state = flow.state;
         final session = _session;
         final l = AppLocalizations.of(context);
-        final style = terminalStyleFor(ref.read(appSettingsProvider).terminal);
+        final style = terminalStyleFor((_settings ?? const AppSettings()).terminal);
         if (session != null) {
           if (state is ConnectDone) {
             return TerminalScreen(
