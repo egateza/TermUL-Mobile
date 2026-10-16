@@ -85,4 +85,5 @@ Aturan pemilik (dicatat di `CLAUDE.md` butir 8): desain sistem dan prototipe har
 ## Perubahan lokal lanjutan (2026-10-16, gagang seleksi)
 
 - Pemilik lebih memilih gagang seleksi berwarna `accent` bertepi `ground`. Aplikasi memakai itu; prototipe (gagang `info` bertangkai) **tidak diubah** dan perbedaannya dicatat di `README.md` design system (versi 26, `1792133660-c984`).
+- Gagang kemudian dibentuk menjadi tetesan air (bulatan dengan ujung runcing ke teks) atas permintaan pemilik; README design system versi 27 (`1792133960-e2b6`) mencatatnya, prototipe tetap tidak diubah.
 

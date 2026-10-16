@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:xterm/xterm.dart';
@@ -8,7 +10,7 @@ import 'package:xterm/src/ui/render.dart' show RenderTerminal;
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Dua gagang (bulatan `accent` bertepi `ground`, pilihan pemilik) yang bisa diseret di awal dan akhir seleksi, plus kaca pembesar di atas jari saat menyeret (xterm
+/// Dua gagang (tetesan `accent` bertepi `ground`, pilihan pemilik) yang bisa diseret di awal dan akhir seleksi, plus kaca pembesar di atas jari saat menyeret (xterm
 /// 4.0.0 hanya memilih satu kata tanpa gagang; perhitungannya dari lampiran A8 di `docs/design/spike-temuan.md`).
 /// Dipasang di atas [TerminalView] dalam `Stack`; tanpa seleksi, widget ini kosong dan tidak menangkap sentuhan.
 ///
@@ -34,7 +36,11 @@ class SelectionHandles extends StatefulWidget {
   /// Jarak pusat bulatan dari bawah sel, supaya jari tidak menutupi huruf yang dipilih.
   static const _gap = 14.0;
   static const _touch = 44.0;
-  static const _dot = 14.0;
+
+  /// Ukuran tetesan: jari-jari bulatan, jarak ujung ke pusat bulatan, dan jarak ujung dari tepi atas area sentuh.
+  static const _dropRadius = 8.0;
+  static const _dropReach = 12.0;
+  static const _dropTop = 5.0;
 
   /// Jarak minimum pusat gagang dari tepi kiri dan kanan (zona gestur kembali Android sekitar 24 dp).
   static const _edgeMargin = 36.0;
@@ -172,10 +178,14 @@ class _SelectionHandlesState extends State<SelectionHandles> {
     const half = SelectionHandles._touch / 2;
     const margin = SelectionHandles._edgeMargin;
     final cx = area.width > margin * 2 ? anchor.dx.clamp(margin, area.width - margin) : anchor.dx;
-    final cy = (anchor.dy + cell.height + SelectionHandles._gap).clamp(half, area.height - half);
+    // Ujung tetesan menyentuh dasar sel; di tepi bawah area ia naik supaya tetap terlihat.
+    final top = (anchor.dy + cell.height + 1 - SelectionHandles._dropTop).clamp(
+      0.0,
+      area.height - SelectionHandles._touch,
+    );
     return Positioned(
       left: cx - half,
-      top: cy - half,
+      top: top,
       width: SelectionHandles._touch,
       height: SelectionHandles._touch,
       child: Semantics(
@@ -186,16 +196,16 @@ class _SelectionHandlesState extends State<SelectionHandles> {
           onPanUpdate: (d) => _updateDrag(d.globalPosition),
           onPanEnd: (_) => _endDrag(),
           onPanCancel: _endDrag,
-          // Pilihan pemilik (2026-10-16): bulatan `accent` bertepi `ground`, bukan `info` bertangkai seperti prototipe.
-          child: Center(
-            child: Container(
-              width: SelectionHandles._dot,
-              height: SelectionHandles._dot,
-              decoration: BoxDecoration(
-                color: TermulPalette.accent,
-                shape: BoxShape.circle,
-                border: Border.all(color: TermulPalette.ground, width: 2),
+          // Pilihan pemilik: tetesan `accent` bertepi `ground` dengan ujung runcing ke teks, bukan bulatan `info`
+          // bertangkai seperti prototipe.
+          child: Align(
+            alignment: Alignment.topCenter,
+            child: CustomPaint(
+              size: const Size(
+                2 * SelectionHandles._dropRadius + 2,
+                SelectionHandles._dropTop + SelectionHandles._dropReach + SelectionHandles._dropRadius + 2,
               ),
+              painter: const _DropPainter(),
             ),
           ),
         ),
@@ -301,4 +311,44 @@ class _LensMarkerPainter extends CustomPainter {
 
   @override
   bool shouldRepaint(_LensMarkerPainter old) => old.at != at || old.height != height;
+}
+
+/// Gagang berbentuk tetesan air: bulatan dengan ujung runcing di atas yang sisinya sedikit melengkung ke dalam,
+/// bersambung halus ke bulatan. Ujungnya menunjuk batas seleksi.
+class _DropPainter extends CustomPainter {
+  const _DropPainter();
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    const r = SelectionHandles._dropRadius;
+    const reach = SelectionHandles._dropReach;
+    final tip = Offset(size.width / 2, SelectionHandles._dropTop);
+    final center = tip.translate(0, reach);
+    // Titik singgung garis dari ujung ke bulatan.
+    final alpha = math.acos(r / reach);
+    final start = -math.pi / 2 - alpha;
+    final end = -math.pi / 2 + alpha;
+    final left = center + Offset(math.cos(start), math.sin(start)) * r;
+    final right = center + Offset(math.cos(end), math.sin(end)) * r;
+    // Titik kendali ditarik sedikit ke sumbu supaya sisi runcing melengkung ke dalam.
+    Offset control(Offset p) => Offset.lerp(tip, p, 0.5)! + Offset((tip.dx - p.dx).sign * 1.2, 0);
+    final path = Path()
+      ..moveTo(tip.dx, tip.dy)
+      ..quadraticBezierTo(control(left).dx, control(left).dy, left.dx, left.dy)
+      ..arcTo(Rect.fromCircle(center: center, radius: r), start, -(2 * math.pi - 2 * alpha), false)
+      ..quadraticBezierTo(control(right).dx, control(right).dy, tip.dx, tip.dy)
+      ..close();
+    canvas.drawPath(
+      path,
+      Paint()
+        ..color = TermulPalette.ground
+        ..style = PaintingStyle.stroke
+        ..strokeWidth = 3
+        ..strokeJoin = StrokeJoin.round,
+    );
+    canvas.drawPath(path, Paint()..color = TermulPalette.accent);
+  }
+
+  @override
+  bool shouldRepaint(_DropPainter old) => false;
 }
