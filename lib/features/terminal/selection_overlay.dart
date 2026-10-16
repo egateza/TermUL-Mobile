@@ -322,7 +322,7 @@ class SelectionHandleShape extends StatelessWidget {
 
   static const _size = Size(
     2 * SelectionHandles._dropRadius + 2,
-    SelectionHandles._dropTop + 18 + SelectionHandles._dropRadius + 2,
+    SelectionHandles._dropTop + 15 + SelectionHandles._dropRadius + 2,
   );
 
   @override
@@ -391,9 +391,9 @@ class _HandlePainter extends CustomPainter {
 
   void _triangle(Canvas canvas, Offset tip) {
     const r = 7.0;
-    const gap = 4.0;
-    const halfAngle = 36 * math.pi / 180;
-    final center = tip.translate(0, 18);
+    const gap = 3.0;
+    const halfAngle = 28 * math.pi / 180;
+    final center = tip.translate(0, 15);
     _paint(canvas, Path()..addOval(Rect.fromCircle(center: center, radius: r)));
     // Segitiga: ujung di atas, alas berupa busur yang sepusat dengan bulatan (melengkung mengikuti bulatan).
     const outer = r + gap;

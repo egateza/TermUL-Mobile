@@ -90,4 +90,4 @@ Aturan pemilik (dicatat di `CLAUDE.md` butir 8): desain sistem dan prototipe har
 ## Perubahan lokal lanjutan (2026-10-16, pilihan bentuk gagang seleksi)
 
 - Tambahan atas permintaan pemilik: pengaturan "Bentuk gagang seleksi" (Tetesan, Segitiga, Bulatan) di Pengaturan, bagian Terminal. Di artifact: `prototype/Settings.dc.html` (baris baru dengan `Segmented` dan pratinjau bentuk, di antara "Tinggi baris" dan "Tema"; dirender di Chrome tanpa galat) dan `README.md` design system (butir seleksi). **Sudah di-publish:** prototipe versi 36 (`1792134367-fce0`) dan design system versi 28 (`1792134370-edd2`). Sebelum itu dicek bahwa `Settings.dc.html` di artifact identik dengan salinan lokal sebelum diubah.
-
+- Segitiga pada pilihan bentuk gagang diperkecil atas permintaan pemilik (setengah sudut 28 derajat, jarak 3 dp, pusat bulatan 15 dp dari ujung); `prototype/Settings.dc.html` ikut disesuaikan dan dipublish sebagai prototipe versi 37 (`1792134537-aa46`).
