@@ -35,7 +35,7 @@ Baca dulu sebelum menulis kode:
 
 1. **Usulkan rencana dulu, tunggu persetujuan, baru tulis kode.** Kerjakan per irisan vertikal, bukan semua layar sekaligus.
 2. Tandai dengan jelas apa yang belum teruji. Jangan menulis "sudah berfungsi" untuk kode yang belum dijalankan di HP.
-3. Uji di HP Android fisik untuk hal yang menyangkut jaringan, latar belakang, keyboard, dan biometrik. Emulator tidak mewakili itu.
+3. Uji di HP Android fisik untuk hal yang menyangkut jaringan, latar belakang, keyboard, dan biometrik. Emulator tidak mewakili itu. Pemilik kadang meminta Claude menguji langsung lewat adb di HP (pasang, jalankan, baca log) demi kesesuaian pengujian; lakukan hanya saat diminta, dan prompt biometrik tetap disentuh pemilik.
 4. Lisensi: sebelum menambah paket, periksa lisensinya dan catat di `docs/`.
 5. Tulis kode produksi: tangani galat, tutup sumber daya (`SSHClient`, sesi, `Terminal`) di `dispose`, jangan memblokir thread UI saat keluaran deras.
 6. Jangan memasukkan kredensial server, kunci privat, atau token ke repo, termasuk contoh dan tes.
