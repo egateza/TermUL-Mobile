@@ -58,6 +58,7 @@ class _Rig {
   final probed = <String>[];
   var connectCalls = 0;
   var reachable = false;
+  var autoReconnect = true;
 
   /// Percobaan sambung ke-[failOn] gagal dengan [failure] (bawaan: jaringan); lainnya berhasil.
   int? failOn;
@@ -93,6 +94,7 @@ class _Rig {
       },
       backoff: const ReconnectBackoff([Duration(seconds: 2), Duration(seconds: 5)]),
       screenMonitor: screen,
+      autoReconnect: () => autoReconnect,
     );
   }
 
@@ -141,6 +143,67 @@ void main() {
     expect(rig.auth.reasons, hasLength(1), reason: 'rahasia dipegang selama layar tidak mati');
     expect(controller.lost, isFalse);
     expect(controller.secondsUntilRetry, isNull);
+    rig.dispose();
+  });
+
+  testWidgets('sambung ulang otomatis mati: putus tidak menyambung sendiri, tombol Sambung sekarang tetap jalan', (
+    tester,
+  ) async {
+    final rig = _Rig()
+      ..reachable = true
+      ..autoReconnect = false;
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final controller = await rig.controller(container);
+    addTearDown(controller.dispose);
+
+    controller.attach();
+    unawaited(controller.start());
+    await tester.pump();
+    expect(rig.connectCalls, 1);
+
+    rig.links.single.socket.dropServer();
+    await tester.pump(const Duration(milliseconds: 10));
+    await tester.pump(const Duration(seconds: 10));
+    expect(controller.lost, isTrue);
+    expect(rig.probed, isEmpty, reason: 'tidak ada probe otomatis');
+    expect(rig.connectCalls, 1);
+    expect(controller.secondsUntilRetry, isNull);
+
+    controller.reconnect(); // pemicu otomatis (mis. aplikasi terlihat lagi) tetap diabaikan
+    await tester.pump();
+    expect(rig.connectCalls, 1);
+
+    controller.reconnect(manual: true);
+    await tester.pump(const Duration(milliseconds: 10));
+    await tester.pump();
+    expect(rig.connectCalls, 2);
+    expect(controller.lost, isFalse);
+    rig.dispose();
+  });
+
+  testWidgets('sambung ulang otomatis dimatikan saat menunggu: rangkaian berhenti', (tester) async {
+    final rig = _Rig(); // host belum terjangkau
+    final container = ProviderContainer();
+    addTearDown(container.dispose);
+    final controller = await rig.controller(container);
+    addTearDown(controller.dispose);
+
+    controller.attach();
+    unawaited(controller.start());
+    await tester.pump();
+    rig.links.single.socket.dropServer();
+    await tester.pump(const Duration(milliseconds: 10));
+    await tester.pump();
+    expect(controller.secondsUntilRetry, 2);
+
+    rig.autoReconnect = false;
+    await tester.pump(const Duration(seconds: 2));
+    await tester.pump();
+    expect(controller.secondsUntilRetry, isNull);
+    expect(rig.probed, hasLength(1), reason: 'hanya probe pertama sebelum dimatikan');
+    await tester.pump(const Duration(seconds: 30));
+    expect(rig.probed, hasLength(1));
     rig.dispose();
   });
 

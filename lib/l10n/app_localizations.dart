@@ -1249,6 +1249,18 @@ abstract class AppLocalizations {
   /// **'Koneksi'**
   String get settingsConnectionSection;
 
+  /// Label saklar sambung ulang otomatis.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambung ulang otomatis'**
+  String get settingsAutoReconnectLabel;
+
+  /// Keterangan saklar sambung ulang otomatis.
+  ///
+  /// In id, this message translates to:
+  /// **'Saat jaringan berpindah atau aplikasi kembali aktif'**
+  String get settingsAutoReconnectDesc;
+
   /// Label saklar foreground service.
   ///
   /// In id, this message translates to:

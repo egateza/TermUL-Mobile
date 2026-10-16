@@ -888,6 +888,14 @@
   "@settingsConnectionSection": {
     "description": "Judul bagian pengaturan koneksi."
   },
+  "settingsAutoReconnectLabel": "Sambung ulang otomatis",
+  "@settingsAutoReconnectLabel": {
+    "description": "Label saklar sambung ulang otomatis."
+  },
+  "settingsAutoReconnectDesc": "Saat jaringan berpindah atau aplikasi kembali aktif",
+  "@settingsAutoReconnectDesc": {
+    "description": "Keterangan saklar sambung ulang otomatis."
+  },
   "settingsKeepAliveLabel": "Pertahankan koneksi di latar belakang",
   "@settingsKeepAliveLabel": {
     "description": "Label saklar foreground service."

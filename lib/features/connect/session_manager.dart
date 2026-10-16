@@ -37,6 +37,7 @@ class SessionManager extends Notifier<List<SessionController>> {
       reconnectedMarker: reconnectedMarker,
       probe: ref.read(hostProbeProvider),
       screenMonitor: ref.read(screenMonitorProvider),
+      autoReconnect: () => ref.read(appSettingsProvider).connection.autoReconnect,
       onEndedWhileDetached: () => release(controller),
     );
     _all.add(controller);

@@ -75,24 +75,33 @@ class TerminalSettings {
 /// Pengaturan koneksi. [keepAlive]: foreground service yang menjaga proses tidak dibekukan Android selama ada sesi
 /// aktif (default mati; `docs/design/android.md`). Tipe yang salah (bukan boolean) membuat berkas dianggap rusak.
 class ConnectionSettings {
-  const ConnectionSettings({this.keepAlive = false});
+  const ConnectionSettings({this.keepAlive = false, this.autoReconnect = true});
 
   final bool keepAlive;
 
-  factory ConnectionSettings.fromJson(Map<String, Object?> json) =>
-      ConnectionSettings(keepAlive: optBool(json, 'keepAlive') ?? false);
+  /// Sambung ulang otomatis saat sambungan putus. Mati: sesi menampilkan "Terputus" dan menunggu "Sambung sekarang".
+  final bool autoReconnect;
 
-  Map<String, Object?> toJson() => {'keepAlive': keepAlive};
+  ConnectionSettings copyWith({bool? keepAlive, bool? autoReconnect}) =>
+      ConnectionSettings(keepAlive: keepAlive ?? this.keepAlive, autoReconnect: autoReconnect ?? this.autoReconnect);
+
+  factory ConnectionSettings.fromJson(Map<String, Object?> json) => ConnectionSettings(
+    keepAlive: optBool(json, 'keepAlive') ?? false,
+    autoReconnect: optBool(json, 'autoReconnect') ?? true,
+  );
+
+  Map<String, Object?> toJson() => {'keepAlive': keepAlive, 'autoReconnect': autoReconnect};
 
   @override
-  bool operator ==(Object other) => other is ConnectionSettings && other.keepAlive == keepAlive;
+  bool operator ==(Object other) =>
+      other is ConnectionSettings && other.keepAlive == keepAlive && other.autoReconnect == autoReconnect;
 
   @override
-  int get hashCode => keepAlive.hashCode;
+  int get hashCode => Object.hash(keepAlive, autoReconnect);
 }
 
 /// Isi `settings.json`:
-/// `{"version": 1, "terminal": {"fontSize": 13, "lineHeight": 1.3, "handleStyle": "drop"}, "connection": {"keepAlive": false}}`.
+/// `{"version": 1, "terminal": {"fontSize": 13, "lineHeight": 1.3, "handleStyle": "drop"}, "connection": {"keepAlive": false, "autoReconnect": true}}`.
 /// Properti yang tidak dikenal diabaikan; bagian yang hilang memakai bawaan.
 class AppSettings {
   const AppSettings({this.terminal = const TerminalSettings(), this.connection = const ConnectionSettings()});

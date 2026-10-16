@@ -654,7 +654,7 @@ Menjawab temuan uji HP 1 (sambung ulang tidak menunggu jaringan, prompt biometri
 - Server ditutup dari sisi server (`pkill` sshd di WSL, layar menyala): putus `serverClosed`, tersambung ulang sekitar 1 detik, **tanpa prompt**, penanda "— tersambung ulang —" [T]. Server uji: sshd di WSL (`tool/ssh_test_server/setup.sh`) dijangkau HP lewat `adb reverse tcp:2222 tcp:2222` karena server LAN pemilik tidak terjangkau saat itu.
 - Belum diuji: dua sesi bersamaan (AuthGate), `SCREEN_OFF` saat proses dibekukan lama (layar mati puluhan menit) di HyperOS, mode pesawat sungguhan, pindah Wi-Fi ke seluler, `vim`/`tmux`. Catatan: dengan Wi-Fi mati, probe TCP ke host LAN sempat lolos (percobaan 2 tercatat "gagal jaringan", artinya probe berhasil lalu sambung gagal); penyebabnya belum diketahui, perilaku keseluruhan tetap benar.
 
-**Belum dikerjakan:** saklar "Sambung ulang otomatis" di Pengaturan. **Artifact desain sudah diperbarui** (prototipe 39, design system 33; `SUMBER.md`). CLAUDE.md (butir Rahasia) sudah menyebut keputusan rahasia dipegang selama layar menyala (2026-10-16); `docs/design/android.md` masih perlu, tetapi itu salinan artifact: ubah lewat alur publish (butir 9).
+Saklar "Sambung ulang otomatis" sudah dikerjakan di 11i. **Artifact desain sudah diperbarui** (prototipe 39, design system 33; `SUMBER.md`). CLAUDE.md (butir Rahasia) sudah menyebut keputusan rahasia dipegang selama layar menyala (2026-10-16); `docs/design/android.md` masih perlu, tetapi itu salinan artifact: ubah lewat alur publish (butir 9).
 
 **Belum teruji di HP:** mode pesawat (tanpa prompt selama menunggu), sambung ulang tanpa prompt saat layar menyala, prompt muncul setelah layar mati lalu dibuka, pengiriman `SCREEN_OFF` di HyperOS saat proses dibekukan, pindah Wi-Fi ke seluler.
 
@@ -676,9 +676,18 @@ Menjawab temuan uji HP 1 (sambung ulang tidak menunggu jaringan, prompt biometri
 - **Artifact desain sudah diperbarui (2026-10-16):** prototipe versi 39 (`1792156922-600e`) dan design system versi 33 (`1792156945-0858`); lihat `docs/design/SUMBER.md`. Berisi juga banner sambung ulang "menunggu" dan "Perlu verifikasi", layar sementara SFTP dan Snippet, dan layar "Memuat…" (11f dan 11g).
 - Belum diuji di HP: perilaku tombol kembali sistem dari tab lain, bar saat keyboard terbuka (pencarian Host), landscape.
 
+## 11i. Saklar "Sambung ulang otomatis" (2026-10-16)
+
+**Selesai di PC (380 tes, `flutter analyze` bersih); belum diuji di HP.**
+
+- `ConnectionSettings.autoReconnect` (bawaan **nyala**, kunci `connection.autoReconnect` di `settings.json`; berkas lama tanpa kunci ini tetap termuat). Saklar di Pengaturan, bagian Koneksi, di atas "Pertahankan koneksi di latar belakang", teks mengikuti prototipe `Settings` ("Saat jaringan berpindah atau aplikasi kembali aktif"). Perbaikan sampingan: menyalakan "Pertahankan koneksi" tidak lagi menimpa `autoReconnect` (memakai `copyWith`).
+- `SessionController` menerima `autoReconnect` (dibaca tiap dipakai, jadi perubahan langsung berlaku). Mati: pemicu otomatis (sambungan putus, aplikasi terlihat lagi, hitungan mundur) tidak menyambung; sesi tampil "Terputus" dengan tombol "Sambung sekarang", dan tombol itu tetap bekerja (`manual: true`). Dimatikan saat hitungan mundur berjalan: rangkaian berhenti pada ketukan timer berikutnya.
+- **Desain:** saklar sudah ada di prototipe `Settings` (`recon`, bawaan nyala), jadi bukan tambahan dan artifact tidak diubah. Teks `README.md` (baris Pengaturan) belum menyebut saklar ini; perbarui saat artifact berikutnya dipublikasikan.
+- Belum diuji di HP: perilaku saat saklar dimatikan lalu Wi-Fi diputus, dan tampilan baris baru di layar sempit.
+
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 377 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 380 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
 **Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Belum diuji di HP:** tempel (11c), layar mati 30 menit atau lebih, tanpa kabel, efek HyperOS, "Putuskan semua" dari notifikasi. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
@@ -686,7 +695,7 @@ Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.
 
 **Temuan uji HP 2026-10-16 yang belum dikerjakan (menunggu persetujuan rencana):** (1) [sudah dikerjakan di 11f, belum diuji di HP] sambung ulang tidak menunggu jaringan kembali: saat mode pesawat sesi terus mencoba menyambung, dan diduga memunculkan prompt biometrik berulang (belum dikonfirmasi pengguna); usulan: tunda sambung ulang sampai ada jaringan, dan satu prompt untuk semua sesi yang perlu sambung ulang. (2) Setiap sambung ulang membuka shell baru dan meninggalkan shell lama yatim di server (terlihat di `who`; bertahan sampai dibersihkan `pkill`); tidak bisa dicegah dari aplikasi, penangkalnya `ClientAliveInterval` di `sshd_config` (keputusan pemilik server); pertimbangkan catatan di layar atau dokumentasi pengguna. (3) Satu shell (pts/7) tetap tinggal setelah "Putuskan semua" pada 14:58:51, penyebab belum terbukti.
 
-**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan pengaturannya (termasuk temuan 1 di atas), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] warna seleksi sesuai desain (menambal penggambar xterm), popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
+**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan saklarnya (sudah dikerjakan di 11f dan 11i, belum diuji di HP), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] warna seleksi sesuai desain (menambal penggambar xterm), popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
 
 **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 33, prototipe versi 39; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
@@ -694,7 +703,7 @@ Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 377 tes otomatis, tanpa jaringan
+flutter test                                   # 380 tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]

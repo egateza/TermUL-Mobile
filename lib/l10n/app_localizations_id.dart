@@ -653,6 +653,12 @@ class AppLocalizationsId extends AppLocalizations {
   String get settingsConnectionSection => 'Koneksi';
 
   @override
+  String get settingsAutoReconnectLabel => 'Sambung ulang otomatis';
+
+  @override
+  String get settingsAutoReconnectDesc => 'Saat jaringan berpindah atau aplikasi kembali aktif';
+
+  @override
   String get settingsKeepAliveLabel => 'Pertahankan koneksi di latar belakang';
 
   @override

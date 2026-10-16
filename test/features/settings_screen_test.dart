@@ -82,6 +82,8 @@ void main() {
       await tester.tap(find.text('Segitiga'));
       await tester.pumpAndSettle();
       expect(setup.saved.last.terminal.handleStyle, SelectionHandleStyle.triangle);
+      await tester.scrollUntilVisible(find.bySemanticsLabel('Besarkan font'), -100);
+      await tester.pumpAndSettle();
       await tester.tap(find.bySemanticsLabel('Besarkan font'));
       await tester.pumpAndSettle();
       expect(setup.saved.last.terminal.handleStyle, SelectionHandleStyle.triangle);
@@ -178,6 +180,21 @@ void main() {
       expect(find.text('Izin notifikasi'), findsOneWidget);
       expect(find.text('Diizinkan'), findsOneWidget);
       expect(find.textContaining('tidak menjaminnya'), findsOneWidget);
+    });
+
+    testWidgets('sambung ulang otomatis: bawaan nyala, mematikan tersimpan tanpa mengubah Tetap terhubung', (
+      tester,
+    ) async {
+      final setup = _Setup();
+      await setup.open(tester, initial: const AppSettings(connection: ConnectionSettings(keepAlive: true)));
+      await scrollToKoneksi(tester);
+      expect(_current(tester).connection.autoReconnect, isTrue);
+
+      await tester.scrollUntilVisible(find.text('Sambung ulang otomatis'), -200);
+      await tester.tap(find.text('Sambung ulang otomatis'));
+      await tester.pumpAndSettle();
+      expect(setup.saved.last.connection.autoReconnect, isFalse);
+      expect(setup.saved.last.connection.keepAlive, isTrue);
     });
 
     testWidgets('izin ditolak: saklar tetap mati, pesan tampil, tidak menyimpan', (tester) async {

@@ -46,7 +46,9 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
     this._probe = tcpProbe,
     this._backoff = const ReconnectBackoff(),
     this._screenMonitor = const NoopScreenMonitor(),
-  }) : startedAt = startedAt ?? DateTime.now() {
+    bool Function()? autoReconnect,
+  }) : _autoReconnect = autoReconnect ?? _alwaysOn,
+       startedAt = startedAt ?? DateTime.now() {
     flow.addListener(_onFlow);
     _screenOffSub = _screenMonitor.onScreenOff.listen((_) => flow.releaseCredentials());
     WidgetsBinding.instance.addObserver(this);
@@ -71,6 +73,11 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
   final HostProbe _probe;
   final ReconnectBackoff _backoff;
   final ScreenMonitor _screenMonitor;
+
+  /// Pengaturan "Sambung ulang otomatis", dibaca saat dibutuhkan supaya perubahan langsung berlaku.
+  final bool Function() _autoReconnect;
+
+  static bool _alwaysOn() => true;
   StreamSubscription<void>? _screenOffSub;
 
   /// Nilai [ScreenMonitor.screenOffCount] saat rahasia terakhir dibaca atau diperiksa. Bila sekarang berbeda, layar
@@ -258,6 +265,8 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
   /// memintanya lewat tombol, supaya mengetuk di luar prompt tidak membuat prompt muncul berulang.
   void reconnect({bool manual = false}) {
     if (_disposed || _ended || !_lost) return;
+    // Pengaturan mati: hanya tombol "Sambung sekarang" / "Tampilkan prompt" yang menyambung ulang.
+    if (!manual && !_autoReconnect()) return;
     final state = flow.state;
     if (state is ConnectPreparing || state is ConnectConnecting || state is ConnectNeedsHostKey) return;
     if (_probing) return;
@@ -309,6 +318,12 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
     _retryTimer = Timer(delay, () {
       _stopTimers();
       if (_stale(epoch)) return;
+      if (!_autoReconnect()) {
+        // Dimatikan saat menunggu: hentikan rangkaian, tombol "Sambung sekarang" tetap ada.
+        _endSeries();
+        notifyListeners();
+        return;
+      }
       // Di latar belakang tidak menyambung (bisa memunculkan prompt biometrik); dilanjutkan saat aplikasi terlihat.
       final lifecycle = WidgetsBinding.instance.lifecycleState;
       if (lifecycle != null && lifecycle != AppLifecycleState.resumed) {

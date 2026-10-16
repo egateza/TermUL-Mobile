@@ -88,7 +88,19 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
       final current = ref.read(appSettingsProvider);
       await ref
           .read(appSettingsProvider.notifier)
-          .update(current.copyWith(connection: ConnectionSettings(keepAlive: on)));
+          .update(current.copyWith(connection: current.connection.copyWith(keepAlive: on)));
+      if (mounted && _saveFailed) setState(() => _saveFailed = false);
+    } on Object {
+      if (mounted) setState(() => _saveFailed = true);
+    }
+  }
+
+  Future<void> _setAutoReconnect(bool on) async {
+    try {
+      final current = ref.read(appSettingsProvider);
+      await ref
+          .read(appSettingsProvider.notifier)
+          .update(current.copyWith(connection: current.connection.copyWith(autoReconnect: on)));
       if (mounted && _saveFailed) setState(() => _saveFailed = false);
     } on Object {
       if (mounted) setState(() => _saveFailed = true);
@@ -120,6 +132,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     final t = ref.watch(appSettingsProvider).terminal;
     final isDefault = t == const TerminalSettings();
     final keepAlive = ref.watch(appSettingsProvider).connection.keepAlive;
+    final autoReconnect = ref.watch(appSettingsProvider).connection.autoReconnect;
 
     TerminalSettings Function(TerminalSettings) fontBy(double d) =>
         (c) => c.copyWith(fontSize: (c.fontSize + d).clamp(TerminalSettings.minFontSize, TerminalSettings.maxFontSize));
@@ -305,6 +318,13 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                       padding: const EdgeInsets.only(bottom: TermulSpacing.space3),
                       child: TermulBanner(tone: BannerTone.warn, child: Text(l.settingsKeepAliveNeedsPermission)),
                     ),
+                  SwitchRow(
+                    label: l.settingsAutoReconnectLabel,
+                    description: l.settingsAutoReconnectDesc,
+                    value: autoReconnect,
+                    onChanged: _setAutoReconnect,
+                  ),
+                  const SizedBox(height: TermulSpacing.space3),
                   SwitchRow(
                     label: l.settingsKeepAliveLabel,
                     description: l.settingsKeepAliveDesc,
