@@ -111,7 +111,13 @@ class TerminalSession extends ChangeNotifier {
     notifyListeners();
   }
 
+  /// Dipanggil setiap ada masukan ke server (papan ketik, tombol cepat, tempel). Layar memakainya untuk menghapus
+  /// seleksi begitu pengguna mengetik, seperti terminal pada umumnya. Termasuk jawaban otomatis terminal atas
+  /// pertanyaan program (mis. atribut perangkat), yang jarang terjadi.
+  VoidCallback? onInput;
+
   void _onOutput(String data) {
+    onInput?.call();
     final out = applyModifiers(data, ctrl: _ctrl, alt: _alt);
     _releaseModifiers();
     final channel = _channel;

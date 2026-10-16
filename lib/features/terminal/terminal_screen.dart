@@ -74,6 +74,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   @override
   void initState() {
     super.initState();
+    _session.onInput = _clearSelectionOnInput;
     // Buka shell setelah layout pertama supaya PTY langsung berukuran layar sebenarnya, bukan 80x24.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _session.start();
@@ -82,9 +83,15 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
   @override
   void dispose() {
+    if (_session.onInput == _clearSelectionOnInput) _session.onInput = null;
     _controller.dispose();
     _scrollController.dispose();
     super.dispose();
+  }
+
+  /// Mengetik (atau menekan Enter, tombol cepat, tempel) mengakhiri seleksi.
+  void _clearSelectionOnInput() {
+    if (_controller.selection != null) _controller.clearSelection();
   }
 
   bool get _alive =>

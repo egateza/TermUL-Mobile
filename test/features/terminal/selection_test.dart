@@ -190,6 +190,27 @@ void main() {
     await gesture.up();
   });
 
+  testWidgets('mengetik atau menekan Enter menghapus seleksi', (tester) async {
+    await pumpTerminal(tester);
+    final terminal = terminalView(tester).terminal;
+    terminal.write('halo dunia');
+    await tester.pump();
+    select(tester, CellOffset(0, 0), CellOffset(4, 0));
+    await tester.pump();
+    expect(find.textContaining('karakter dipilih'), findsOneWidget);
+    terminal.keyInput(TerminalKey.enter);
+    await tester.pump();
+    expect(terminalView(tester).controller!.selection, isNull);
+    expect(find.textContaining('karakter dipilih'), findsNothing);
+
+    select(tester, CellOffset(0, 0), CellOffset(4, 0));
+    await tester.pump();
+    terminal.textInput('l');
+    await tester.pump();
+    expect(terminalView(tester).controller!.selection, isNull);
+    expect(find.bySemanticsLabel('Tempel dari papan klip'), findsOneWidget);
+  });
+
   testWidgets('tekan lama memilih satu kata dan memunculkan bilah', (tester) async {
     await pumpTerminal(tester);
     terminalView(tester).terminal.write('halo dunia');
