@@ -530,7 +530,7 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 - **Perilaku:** default mati; menyalakan meminta izin notifikasi (ditolak: saklar tetap mati dengan pesan); service hanya nyala selama ada sesi tersambung; notifikasi "N sesi tersambung" dengan aksi "Putuskan semua"; tidak ada janji "sesi tidak akan putus".
 - **Tes:** 309 tes otomatis lulus (provider sinkronisasi 7, layar Pengaturan bagian Koneksi 5, siklus sesi dan "Putuskan semua" 3). Emulator Android 14 (AVD `termul_uji_bersih`): service jadi foreground bertipe `specialUse`, notifikasi dan aksi benar, aksi Putuskan semua menghentikan service tanpa galat. Dicek lewat `adb shell run-as ... am start-foreground-service --user 0`, bukan lewat UI.
 - **Belum teruji (butuh HP):** efek sebenarnya di HyperOS (apakah baris `Destroyed live tcp sockets ... uids={10493}` masih muncul dengan saklar menyala), tes 5 dan 30 menit dengan layar mati di Wi-Fi tanpa kabel, baterai, notifikasi yang diblokir setelah service berjalan, aksi Putuskan semua dari notifikasi di perangkat nyata, alur izin notifikasi di HP (Android 16).
-- **Belum dikerjakan (usulan berikutnya):** auto-attach tmux per host (setelah sambung ulang langsung masuk ke sesi tmux yang sama).
+- **Keputusan pemilik (2026-10-16): auto-attach tmux per host tidak dibuat.** Di luar kebiasaan klien SSH pada umumnya; yang dipakai adalah foreground service. Pengguna tetap bisa menjalankan `tmux` sendiri di server.
 - **Sinkron desain:** `docs/design/android.md` diperbarui (bagian Implementasi).
 
 ### Pengujian tertunda di HP (dicatat 2026-10-16, menunggu pengguna)
