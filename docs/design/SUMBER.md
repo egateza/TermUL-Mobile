@@ -2,6 +2,8 @@
 
 Tanggal salin: 2026-10-15
 
+**Versi terkini (dicek 2026-10-16):** design system versi 32 (`1792136738-d2c2`, hanya `design-system.json` yang berubah dari versi 31), prototipe versi 38 (`1792136358-c0f1`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
+
 ## Design system
 
 - URL: https://claude.ai/artifact/HgnCv9wwMUjoKTbKWZCLC8
