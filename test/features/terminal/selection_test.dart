@@ -1,4 +1,5 @@
 import 'package:flutter/foundation.dart';
+import 'package:flutter/material.dart' show RawMagnifier;
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
@@ -168,6 +169,25 @@ void main() {
     await gesture.up();
     await tester.pump();
     expect(find.byKey(const ValueKey('selection-lens')), findsNothing);
+  });
+
+  testWidgets('kaca pembesar di tepi kiri: wilayah yang diambil tidak keluar dari layar', (tester) async {
+    await pumpTerminal(tester);
+    terminalView(tester).terminal.write('halo dunia');
+    await tester.pump();
+    select(tester, CellOffset(3, 0), CellOffset(8, 0));
+    await tester.pump();
+    final area = tester.getRect(find.byType(SelectionHandles));
+    final gesture = await tester.startGesture(tester.getCenter(find.bySemanticsLabel('Gagang awal pilihan')));
+    await gesture.moveTo(Offset(area.left + 1, tester.getCenter(find.bySemanticsLabel('Gagang awal pilihan')).dy));
+    await tester.pump();
+    final lens = find.byKey(const ValueKey('selection-lens'));
+    expect(lens, findsOneWidget);
+    final magnifier = tester.widget<RawMagnifier>(lens);
+    final sampleX = tester.getCenter(lens).dx + magnifier.focalPointOffset.dx;
+    final halfW = magnifier.size.width / magnifier.magnificationScale / 2;
+    expect(sampleX - halfW, greaterThanOrEqualTo(area.left - 0.01));
+    await gesture.up();
   });
 
   testWidgets('tekan lama memilih satu kata dan memunculkan bilah', (tester) async {

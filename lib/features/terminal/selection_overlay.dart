@@ -213,6 +213,17 @@ class _SelectionHandlesState extends State<SelectionHandles> {
       dy = focal.dy + cell.height / 2 + SelectionHandles._gap + SelectionHandles._touch + size.height / 2;
     }
     final center = Offset(dx, dy);
+    // Kaca pembesar hanya bisa mengambil isi yang ada di layar: di tepi, wilayah yang diambil (lebar lensa dibagi
+    // perbesaran) digeser ke dalam. Titik yang sebenarnya ditunjuk lalu tidak lagi di tengah lensa, jadi ditandai
+    // dengan garis.
+    const zoom = SelectionHandles._zoom;
+    final halfW = size.width / zoom / 2;
+    final halfH = size.height / zoom / 2;
+    final sample = Offset(
+      area.width > halfW * 2 ? focal.dx.clamp(halfW, area.width - halfW) : focal.dx,
+      area.height > halfH * 2 ? focal.dy.clamp(halfH, area.height - halfH) : focal.dy,
+    );
+    final mark = Offset(size.width / 2, size.height / 2) + (focal - sample) * zoom;
     return Positioned(
       left: center.dx - size.width / 2,
       top: center.dy - size.height / 2,
@@ -223,8 +234,8 @@ class _SelectionHandlesState extends State<SelectionHandles> {
           child: RawMagnifier(
             key: const ValueKey('selection-lens'),
             size: size,
-            magnificationScale: SelectionHandles._zoom,
-            focalPointOffset: focal - center,
+            magnificationScale: zoom,
+            focalPointOffset: sample - center,
             clipBehavior: Clip.hardEdge,
             decoration: MagnifierDecoration(
               shape: RoundedRectangleBorder(
@@ -232,6 +243,7 @@ class _SelectionHandlesState extends State<SelectionHandles> {
                 side: const BorderSide(color: TermulPalette.accent, width: 1.5),
               ),
             ),
+            child: CustomPaint(painter: _LensMarkerPainter(mark, cell.height * zoom)),
           ),
         ),
       ),
@@ -266,4 +278,26 @@ class _SelectionHandlesState extends State<SelectionHandles> {
       },
     );
   }
+}
+
+/// Garis tegak di titik yang sedang ditunjuk di dalam kaca pembesar.
+class _LensMarkerPainter extends CustomPainter {
+  const _LensMarkerPainter(this.at, this.height);
+
+  final Offset at;
+  final double height;
+
+  @override
+  void paint(Canvas canvas, Size size) {
+    canvas.drawLine(
+      Offset(at.dx, at.dy - height / 2),
+      Offset(at.dx, at.dy + height / 2),
+      Paint()
+        ..color = TermulPalette.accent
+        ..strokeWidth = 2,
+    );
+  }
+
+  @override
+  bool shouldRepaint(_LensMarkerPainter old) => old.at != at || old.height != height;
 }
