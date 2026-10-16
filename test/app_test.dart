@@ -24,7 +24,11 @@ void main() {
     expect(AppLocalizations.of(context).appTitle, 'TermUL');
     expect(find.byType(TermulNavBar), findsOneWidget);
     for (final tab in ['Host', 'Sesi', 'SFTP', 'Snippet', 'Pengaturan']) {
-      expect(find.descendant(of: find.byType(TermulNavBar), matching: find.text(tab)), findsOneWidget, reason: tab);
+      expect(
+        find.descendant(of: find.byType(TermulNavBar), matching: find.text(tab)),
+        findsOneWidget,
+        reason: tab,
+      );
     }
     expect(find.text('Host'), findsNWidgets(2)); // judul layar dan tab
   });

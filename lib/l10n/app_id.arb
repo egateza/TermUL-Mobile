@@ -65,6 +65,15 @@
   "@hostsSearchPlaceholder": {
     "description": "Placeholder kolom pencarian host."
   },
+  "filterTitle": "Filter host",
+  "@filterTitle": {
+    "description": "Judul daftar pilihan filter host (dropdown di landscape)."
+  },
+  "filterDropdownLabel": "Filter host: {current}",
+  "@filterDropdownLabel": {
+    "description": "Nama tombol dropdown filter untuk pembaca layar.",
+    "placeholders": { "current": { "type": "String" } }
+  },
   "filterAll": "Semua",
   "@filterAll": {
     "description": "Chip filter: semua host."

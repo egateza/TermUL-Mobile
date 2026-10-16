@@ -49,45 +49,48 @@ Future<void> showTermulActions(
           TermulSpacing.space9,
           TermulSpacing.space9,
         ),
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            Center(
-              child: Container(
-                width: 40,
-                height: 4,
-                decoration: BoxDecoration(color: TermulPalette.lineStrong, borderRadius: BorderRadius.circular(2)),
+        // Bisa digulir: di landscape (tinggi sekitar 393 dp) daftar aksi yang panjang tidak boleh meluap.
+        child: SingleChildScrollView(
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              Center(
+                child: Container(
+                  width: 40,
+                  height: 4,
+                  decoration: BoxDecoration(color: TermulPalette.lineStrong, borderRadius: BorderRadius.circular(2)),
+                ),
               ),
-            ),
-            const SizedBox(height: TermulSpacing.space7),
-            Semantics(
-              header: true,
-              child: Text(
-                title,
-                style: TermulText.h2.copyWith(color: TermulPalette.ink),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
+              const SizedBox(height: TermulSpacing.space7),
+              Semantics(
+                header: true,
+                child: Text(
+                  title,
+                  style: TermulText.h2.copyWith(color: TermulPalette.ink),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
               ),
-            ),
-            if (child != null) ...[const SizedBox(height: TermulSpacing.space5), child],
-            const SizedBox(height: TermulSpacing.space6),
-            for (final a in actions) ...[
-              TermulButton(
-                label: a.label,
-                icon: a.icon,
-                variant: a.danger
-                    ? TermulButtonVariant.danger
-                    : (a.primary ? TermulButtonVariant.primary : TermulButtonVariant.secondary),
-                size: TermulButtonSize.lg,
-                onPressed: () {
-                  Navigator.of(sheetContext).pop();
-                  a.onSelected();
-                },
-              ),
-              const SizedBox(height: TermulSpacing.space3),
+              if (child != null) ...[const SizedBox(height: TermulSpacing.space5), child],
+              const SizedBox(height: TermulSpacing.space6),
+              for (final a in actions) ...[
+                TermulButton(
+                  label: a.label,
+                  icon: a.icon,
+                  variant: a.danger
+                      ? TermulButtonVariant.danger
+                      : (a.primary ? TermulButtonVariant.primary : TermulButtonVariant.secondary),
+                  size: TermulButtonSize.lg,
+                  onPressed: () {
+                    Navigator.of(sheetContext).pop();
+                    a.onSelected();
+                  },
+                ),
+                const SizedBox(height: TermulSpacing.space3),
+              ],
             ],
-          ],
+          ),
         ),
       ),
     ),

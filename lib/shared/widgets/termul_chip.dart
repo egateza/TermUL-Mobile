@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/termul_theme.dart';
 import 'pressable.dart';
+import 'termul_icon.dart';
 
 /// Chip filter: tombol 44 px, satu terpilih dalam satu baris yang bisa digulir mendatar.
 class FilterChipButton extends StatelessWidget {
@@ -31,6 +32,53 @@ class FilterChipButton extends StatelessWidget {
           child: Text(
             label,
             style: TermulText.label.copyWith(color: on ? TermulPalette.onAccent : TermulPalette.inkSoft),
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Tombol dropdown berbentuk pil: menampilkan pilihan yang aktif dengan panah bawah dan membuka daftar pilihan.
+/// Dipakai menggantikan deretan [FilterChipButton] di landscape, di mana banyak chip tidak muat satu baris.
+/// [active] = bukan pilihan bawaan (tepi dan teks `accent`).
+class DropdownPill extends StatelessWidget {
+  const DropdownPill({
+    super.key,
+    required this.label,
+    required this.onPressed,
+    this.active = false,
+    this.semanticLabel,
+  });
+
+  final String label;
+  final VoidCallback? onPressed;
+  final bool active;
+  final String? semanticLabel;
+
+  @override
+  Widget build(BuildContext context) {
+    return Pressable(
+      onPressed: onPressed,
+      radius: TermulRadius.radiusPill,
+      semanticLabel: semanticLabel ?? label,
+      builder: (context, pressed) {
+        final color = active ? TermulPalette.accent : TermulPalette.inkSoft;
+        return Container(
+          constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
+          padding: const EdgeInsets.only(left: TermulSpacing.space7, right: TermulSpacing.space5),
+          decoration: BoxDecoration(
+            color: pressed ? TermulPalette.surfaceRaised : TermulPalette.surface,
+            borderRadius: BorderRadius.circular(TermulRadius.radiusPill),
+            border: Border.all(color: active ? TermulPalette.accent : TermulPalette.lineStrong),
+          ),
+          child: Row(
+            mainAxisSize: MainAxisSize.min,
+            spacing: TermulSpacing.space3,
+            children: [
+              Text(label, style: TermulText.label.copyWith(color: color)),
+              TermulIcon(TermulIconName.chevronDown, size: 16, color: color),
+            ],
           ),
         );
       },

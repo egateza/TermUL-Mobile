@@ -123,6 +123,9 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
     final groups = buildHostGroups(snapshot, query: listState.query, filter: listState.filter);
     final searching = listState.query.trim().isNotEmpty;
     final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
+    // Landscape dengan keyboard terbuka: tinggi tersisa hanya cukup untuk kolom pencarian dan satu-dua baris host,
+    // jadi judul, filter, dan tombol tambah disembunyikan selama mengetik.
+    final typing = landscape && MediaQuery.viewInsetsOf(context).bottom > 0;
 
     final banners = <Widget>[
       if (report.hosts.hadCorruptFile && !_hideHostsBanner)
@@ -170,20 +173,24 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
             if (landscape)
               // Landscape: judul, pencarian, filter, dan tombol tambah dalam satu baris supaya daftar mendapat tinggi.
               Padding(
-                padding: const EdgeInsets.fromLTRB(
+                padding: EdgeInsets.fromLTRB(
                   TermulSpacing.space8,
-                  TermulSpacing.space3,
+                  typing ? TermulSpacing.space2 : TermulSpacing.space3,
                   TermulSpacing.space8,
-                  TermulSpacing.space3,
+                  typing ? TermulSpacing.space2 : TermulSpacing.space3,
                 ),
                 child: Row(
                   spacing: TermulSpacing.space4,
+                  // Kunci menjaga kolom pencarian (dan fokusnya) tetap sama saat elemen lain muncul atau hilang.
                   children: [
-                    Semantics(
-                      header: true,
-                      child: Text(l.hostsTitle, style: TermulText.h2.copyWith(color: TermulPalette.ink)),
-                    ),
+                    if (!typing)
+                      Semantics(
+                        key: const ValueKey('landscape-title'),
+                        header: true,
+                        child: Text(l.hostsTitle, style: TermulText.h2.copyWith(color: TermulPalette.ink)),
+                      ),
                     Expanded(
+                      key: const ValueKey('landscape-search'),
                       child: TermulTextField(
                         label: l.hostsSearchLabel,
                         hideLabel: true,
@@ -193,22 +200,23 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                         onChanged: ref.read(hostListProvider.notifier).setQuery,
                       ),
                     ),
-                    FilterChipButton(
-                      label: l.filterAll,
-                      selected: listState.filter == HostFilter.all,
-                      onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.all),
-                    ),
-                    FilterChipButton(
-                      label: l.filterFavorites,
-                      selected: listState.filter == HostFilter.favorites,
-                      onPressed: () => ref.read(hostListProvider.notifier).setFilter(HostFilter.favorites),
-                    ),
-                    TermulIconButton(
-                      icon: TermulIconName.plus,
-                      label: l.hostsAddHost,
-                      tone: IconButtonTone.accent,
-                      onPressed: _openForm,
-                    ),
+                    // Satu tombol dropdown menggantikan deretan chip: banyak filter tidak muat satu baris landscape.
+                    if (!typing)
+                      DropdownPill(
+                        key: const ValueKey('landscape-filter'),
+                        label: _filterLabel(l, listState.filter),
+                        semanticLabel: l.filterDropdownLabel(_filterLabel(l, listState.filter)),
+                        active: listState.filter != HostFilter.all,
+                        onPressed: () => _chooseFilter(l, listState.filter),
+                      ),
+                    if (!typing)
+                      TermulIconButton(
+                        key: const ValueKey('landscape-add'),
+                        icon: TermulIconName.plus,
+                        label: l.hostsAddHost,
+                        tone: IconButtonTone.accent,
+                        onPressed: _openForm,
+                      ),
                   ],
                 ),
               )
@@ -324,7 +332,8 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                         for (final g in groups)
                           _Group(
                             group: g,
-                            expanded: searching || !listState.collapsed.contains(g.path),
+                            expanded: searching || typing || !listState.collapsed.contains(g.path),
+                            showHeader: !typing,
                             onToggle: () => ref.read(hostListProvider.notifier).toggleGroup(g.path),
                             onOpen: _open,
                             onActions: _showActions,
@@ -338,6 +347,27 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
     );
   }
 
+  static String _filterLabel(AppLocalizations l, HostFilter f) => switch (f) {
+    HostFilter.all => l.filterAll,
+    HostFilter.favorites => l.filterFavorites,
+  };
+
+  /// Daftar pilihan filter (dari [HostFilter.values], jadi filter baru ikut otomatis); pilihan aktif jadi tombol utama.
+  void _chooseFilter(AppLocalizations l, HostFilter current) {
+    showTermulActions(
+      context,
+      title: l.filterTitle,
+      actions: [
+        for (final f in HostFilter.values)
+          SheetAction(
+            label: _filterLabel(l, f),
+            primary: f == current,
+            onSelected: () => ref.read(hostListProvider.notifier).setFilter(f),
+          ),
+      ],
+    );
+  }
+
   static String _fileName(String path) => path.split(RegExp(r'[\\/]')).last;
 }
 
@@ -348,9 +378,13 @@ class _Group extends StatelessWidget {
     required this.onToggle,
     required this.onOpen,
     required this.onActions,
+    this.showHeader = true,
   });
 
   final HostGroupView group;
+
+  /// Judul grup disembunyikan selagi mengetik di landscape (tinggi tersisa hanya cukup untuk satu-dua baris host).
+  final bool showHeader;
   final bool expanded;
   final VoidCallback onToggle;
   final void Function(HostProfile) onOpen;
@@ -363,35 +397,36 @@ class _Group extends StatelessWidget {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.stretch,
       children: [
-        Pressable(
-          onPressed: onToggle,
-          semanticLabel: l.hostsGroupToggle(name, group.hosts.length),
-          toggled: expanded,
-          builder: (context, pressed) => Padding(
-            padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3),
-            child: SizedBox(
-              height: TermulSize.tapMin,
-              child: Row(
-                children: [
-                  Transform.rotate(
-                    angle: expanded ? 0 : -1.5708,
-                    child: TermulIcon(TermulIconName.chevronDown, size: 16, color: TermulPalette.inkMuted),
-                  ),
-                  const SizedBox(width: TermulSpacing.space4),
-                  Expanded(
-                    child: Text(
-                      name.toUpperCase(),
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
+        if (showHeader)
+          Pressable(
+            onPressed: onToggle,
+            semanticLabel: l.hostsGroupToggle(name, group.hosts.length),
+            toggled: expanded,
+            builder: (context, pressed) => Padding(
+              padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3),
+              child: SizedBox(
+                height: TermulSize.tapMin,
+                child: Row(
+                  children: [
+                    Transform.rotate(
+                      angle: expanded ? 0 : -1.5708,
+                      child: TermulIcon(TermulIconName.chevronDown, size: 16, color: TermulPalette.inkMuted),
                     ),
-                  ),
-                  Text('${group.hosts.length}', style: TermulText.overline.copyWith(color: TermulPalette.inkMuted)),
-                ],
+                    const SizedBox(width: TermulSpacing.space4),
+                    Expanded(
+                      child: Text(
+                        name.toUpperCase(),
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
+                      ),
+                    ),
+                    Text('${group.hosts.length}', style: TermulText.overline.copyWith(color: TermulPalette.inkMuted)),
+                  ],
+                ),
               ),
             ),
           ),
-        ),
         if (expanded)
           for (final p in group.hosts)
             Padding(

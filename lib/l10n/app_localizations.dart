@@ -181,6 +181,18 @@ abstract class AppLocalizations {
   /// **'Cari nama, user, atau IP'**
   String get hostsSearchPlaceholder;
 
+  /// Judul daftar pilihan filter host (dropdown di landscape).
+  ///
+  /// In id, this message translates to:
+  /// **'Filter host'**
+  String get filterTitle;
+
+  /// Nama tombol dropdown filter untuk pembaca layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Filter host: {current}'**
+  String filterDropdownLabel(String current);
+
   /// Chip filter: semua host.
   ///
   /// In id, this message translates to:

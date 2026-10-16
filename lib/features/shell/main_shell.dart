@@ -77,15 +77,21 @@ class _MainShellState extends ConsumerState<MainShell> {
         if (!didPop) _select(_ids.first);
       },
       child: Scaffold(
-        // Landscape: rel di sisi kiri (tidak memakai tinggi layar) dan tetap ada saat keyboard terbuka. Potret: bar
-        // bawah, disembunyikan selagi keyboard terbuka.
+        // Halaman di dalamnya (Scaffold sendiri) yang menyesuaikan tinggi dengan keyboard. Bila kerangka ini ikut
+        // mengurangi, tinggi keyboard terpotong dua kali dan daftar host menyusut jadi 0 dp di landscape.
+        resizeToAvoidBottomInset: false,
+        // Landscape: rel di sisi kiri (tidak memakai tinggi layar). Potret: bar bawah. Selagi keyboard terbuka
+        // keduanya disembunyikan supaya ruang isian tidak terpotong.
         body: landscape
             ? Row(
                 children: [
-                  TermulNavRail(label: l.navLabel, active: _ids[_index], onSelect: _select, items: items),
-                  // Rel sudah menjaga lekukan kiri; halaman tidak perlu menjaganya lagi.
+                  if (!keyboardOpen)
+                    TermulNavRail(label: l.navLabel, active: _ids[_index], onSelect: _select, items: items),
+                  // Berkunci: halaman (dan fokus kolom pencarian) tidak dibangun ulang saat rel muncul atau hilang.
                   Expanded(
-                    child: MediaQuery.removePadding(context: context, removeLeft: true, child: pages),
+                    key: const ValueKey('halaman'),
+                    // Rel sudah menjaga lekukan kiri; halaman tidak perlu menjaganya lagi.
+                    child: MediaQuery.removePadding(context: context, removeLeft: !keyboardOpen, child: pages),
                   ),
                 ],
               )

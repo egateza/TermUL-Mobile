@@ -57,6 +57,14 @@ class AppLocalizationsId extends AppLocalizations {
   String get hostsSearchPlaceholder => 'Cari nama, user, atau IP';
 
   @override
+  String get filterTitle => 'Filter host';
+
+  @override
+  String filterDropdownLabel(String current) {
+    return 'Filter host: $current';
+  }
+
+  @override
   String get filterAll => 'Semua';
 
   @override

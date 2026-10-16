@@ -64,7 +64,7 @@ class TermulNavBar extends StatelessWidget {
 }
 
 /// Rel navigasi di sisi kiri untuk landscape: lima tab yang sama dengan [TermulNavBar] disusun vertikal supaya tidak
-/// memakai tinggi layar (hanya sekitar 393 dp). Lebar 76 dp, tiap tab minimal 44 dp, tab aktif `accent`, tepi kanan
+/// memakai tinggi layar (hanya sekitar 393 dp). Lebar 80 dp, tiap tab minimal 44 dp, tab aktif `accent`, tepi kanan
 /// 1 px `line`, tanpa bayangan. Menangani sendiri area aman di kiri, atas, dan bawah.
 class TermulNavRail extends StatelessWidget {
   const TermulNavRail({super.key, required this.items, required this.active, required this.onSelect, this.label});
@@ -76,7 +76,7 @@ class TermulNavRail extends StatelessWidget {
   /// Nama landmark untuk pembaca layar.
   final String? label;
 
-  static const width = 76.0;
+  static const width = 80.0;
 
   @override
   Widget build(BuildContext context) {
@@ -94,19 +94,27 @@ class TermulNavRail extends StatelessWidget {
           child: SizedBox(
             width: width,
             // Gulir bila layar sangat pendek (jaga-jaga): tab tidak pernah terpotong.
-            child: SingleChildScrollView(
-              padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 6),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  for (final item in items)
-                    _NavTab(
-                      item: item,
-                      selected: item.id == active,
-                      onPressed: () => onSelect(item.id),
-                      minHeight: TermulSize.tapMin,
-                    ),
-                ],
+            child: LayoutBuilder(
+              // Seluruh tab dipusatkan secara vertikal; bila layar lebih pendek dari tab, rel menggulir.
+              builder: (context, constraints) => SingleChildScrollView(
+                padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 6),
+                child: ConstrainedBox(
+                  constraints: BoxConstraints(minHeight: constraints.maxHeight - 12),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    spacing: 4,
+                    children: [
+                      for (final item in items)
+                        _NavTab(
+                          item: item,
+                          selected: item.id == active,
+                          onPressed: () => onSelect(item.id),
+                          minHeight: TermulSize.tapMin + 4,
+                        ),
+                    ],
+                  ),
+                ),
               ),
             ),
           ),
@@ -132,43 +140,47 @@ class _NavTab extends StatelessWidget {
       toggled: selected,
       semanticLabel: item.semanticLabel ?? item.label,
       onPressed: onPressed,
-      builder: (context, pressed) => Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        mainAxisSize: MainAxisSize.min,
-        spacing: 4,
-        children: [
-          Stack(
-            clipBehavior: Clip.none,
-            children: [
-              TermulIcon(item.icon, size: 22, color: color),
-              if (item.badge > 0)
-                Positioned(
-                  top: -6,
-                  right: -12,
-                  child: Container(
-                    constraints: const BoxConstraints(minWidth: 18),
-                    height: 18,
-                    padding: const EdgeInsets.symmetric(horizontal: 5),
-                    alignment: Alignment.center,
-                    decoration: BoxDecoration(color: TermulPalette.accent, borderRadius: BorderRadius.circular(9)),
-                    child: Text(
-                      '${item.badge}',
-                      // Lencana prototipe `Main`: JetBrains Mono 11 px, tebal 500.
-                      style: const TextStyle(
-                        fontFamily: TermulFonts.mono,
-                        fontSize: 11,
-                        height: 1,
-                        fontWeight: FontWeight.w500,
-                        fontVariations: [FontVariation('wght', 500)],
-                        color: TermulPalette.onAccent,
+      builder: (context, pressed) => SizedBox(
+        width: double.infinity,
+        height: minHeight,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          mainAxisSize: MainAxisSize.min,
+          spacing: 4,
+          children: [
+            Stack(
+              clipBehavior: Clip.none,
+              children: [
+                TermulIcon(item.icon, size: 22, color: color),
+                if (item.badge > 0)
+                  Positioned(
+                    top: -6,
+                    right: -12,
+                    child: Container(
+                      constraints: const BoxConstraints(minWidth: 18),
+                      height: 18,
+                      padding: const EdgeInsets.symmetric(horizontal: 5),
+                      alignment: Alignment.center,
+                      decoration: BoxDecoration(color: TermulPalette.accent, borderRadius: BorderRadius.circular(9)),
+                      child: Text(
+                        '${item.badge}',
+                        // Lencana prototipe `Main`: JetBrains Mono 11 px, tebal 500.
+                        style: const TextStyle(
+                          fontFamily: TermulFonts.mono,
+                          fontSize: 11,
+                          height: 1,
+                          fontWeight: FontWeight.w500,
+                          fontVariations: [FontVariation('wght', 500)],
+                          color: TermulPalette.onAccent,
+                        ),
                       ),
                     ),
                   ),
-                ),
-            ],
-          ),
-          Text(item.label, style: TermulText.navLabel.copyWith(color: color), maxLines: 1),
-        ],
+              ],
+            ),
+            Text(item.label, style: TermulText.navLabel.copyWith(color: color), maxLines: 1),
+          ],
+        ),
       ),
     );
   }

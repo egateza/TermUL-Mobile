@@ -2,7 +2,7 @@
 
 Tanggal salin: 2026-10-15
 
-**Versi terkini (dicek 2026-10-16):** design system versi 36 (`1792166030-cba5`, `README.md` dan `components/NavBar/README.md` yang berubah dari versi 35), prototipe versi 41 (`1792166021-e467`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
+**Versi terkini (dicek 2026-10-16):** design system versi 37 (`1792166613-3902`, `README.md` dan `components/NavBar/README.md` yang berubah dari versi 36), prototipe versi 42 (`1792166610-11cb`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
 
 ## Design system
 
@@ -123,3 +123,4 @@ Berkas artifact dibaca dulu dan hash-nya sama dengan salinan lokal (`README.md` 
 
 - **Prototipe versi 41 (`1792166021-e467`):** berkas baru `MainLandscape.dc.html` (contoh 1b, 844 x 390): rel navigasi di kiri, header satu baris (judul Host, pencarian, chip Semua dan Favorit, tombol tambah), dan daftar host satu kolom. `canvas.json` mendapat papan baru di akhir `order`.
 - **Design system versi 36 (`1792166030-cba5`):** `README.md` bagian Batasan (landscape kini juga untuk layar utama) dan butir baru "Layar utama di landscape" di catatan implementasi; `components/NavBar/README.md` mendapat varian rel.
+- **Pembaruan atas temuan pemilik (prototipe versi 42, `1792166610-11cb`; design system versi 37, `1792166613-3902`):** `MainLandscape.dc.html`: dropdown filter "Semua" menggantikan chip Semua dan Favorit, rel 80 px dengan tab 48 px yang dipusatkan. `README.md`: butir landscape menyebut dropdown, rel 80 dp, dan perilaku saat keyboard terbuka (rel, judul, dropdown, tombol tambah, dan judul grup disembunyikan); `components/NavBar/README.md`: rel 80px, tab 48px, hilang saat keyboard terbuka.
