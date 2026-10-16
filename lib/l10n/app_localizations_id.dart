@@ -701,6 +701,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get keyPasteAria => 'Tempel dari papan klip';
 
   @override
+  String pasteMenuClipboard(String summary) {
+    return 'Papan klip: $summary';
+  }
+
+  @override
+  String pasteMenuLines(int count) {
+    return '$count baris';
+  }
+
+  @override
+  String get pasteMenuClipboardEmpty => 'kosong';
+
+  @override
   String get pasteEmpty => 'Papan klip kosong';
 
   @override

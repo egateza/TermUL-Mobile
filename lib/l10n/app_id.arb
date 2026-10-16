@@ -948,6 +948,20 @@
   "@keyPasteAria": {
     "description": "Nama aksesibilitas tombol tempel."
   },
+  "pasteMenuClipboard": "Papan klip: {summary}",
+  "@pasteMenuClipboard": {
+    "description": "Ringkasan isi papan klip di popover Tempel.",
+    "placeholders": { "summary": { "type": "String" } }
+  },
+  "pasteMenuLines": "{count} baris",
+  "@pasteMenuLines": {
+    "description": "Jumlah baris di papan klip (popover Tempel).",
+    "placeholders": { "count": { "type": "int" } }
+  },
+  "pasteMenuClipboardEmpty": "kosong",
+  "@pasteMenuClipboardEmpty": {
+    "description": "Papan klip kosong (popover Tempel)."
+  },
   "pasteEmpty": "Papan klip kosong",
   "@pasteEmpty": {
     "description": "Toast bila papan klip kosong."

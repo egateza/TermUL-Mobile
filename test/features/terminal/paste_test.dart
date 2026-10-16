@@ -1,5 +1,7 @@
+import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:xterm/xterm.dart';
 import 'package:termul_mobile/features/terminal/paste_analysis.dart';
 import 'package:termul_mobile/features/terminal/terminal_screen.dart' show TerminalLink;
 import 'package:termul_mobile/shared/widgets/termul_button.dart';
@@ -103,6 +105,67 @@ void main() {
     test('kosong', () {
       expect(analyze('').isEmpty, isTrue);
       expect(analyze('\x1b\x07').isEmpty, isTrue);
+    });
+  });
+
+  group('popover Tempel di kursor prompt', () {
+    Future<void> tapCursor(WidgetTester tester) async {
+      final state = tester.state<TerminalViewState>(find.byType(TerminalView));
+      await tester.tapAt(state.globalCursorRect.center);
+      await tester.pumpAndSettle();
+      await tester.pump(const Duration(milliseconds: 400)); // timer ketuk-ganda xterm
+    }
+
+    testWidgets('mengetuk kursor membuka popover dengan ringkasan papan klip; Tempel menempel dan menutupnya', (
+      tester,
+    ) async {
+      setClipboard(tester, 'systemctl status nginx');
+      final rig = await pumpTerminal(tester);
+      terminalView(tester).terminal.write(r'user@host:~$ ');
+      await tester.pump();
+      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+
+      await tapCursor(tester);
+      expect(find.byKey(const ValueKey('paste-popover')), findsOneWidget);
+      expect(find.text('Papan klip: 1 baris'), findsOneWidget);
+      expect(rig.shell.sent, isEmpty);
+
+      await tester.tap(find.descendant(of: find.byKey(const ValueKey('paste-popover')), matching: find.text('Tempel')));
+      await tester.pumpAndSettle();
+      expect(rig.shell.sent, 'systemctl status nginx');
+      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+    });
+
+    testWidgets('ketukan kedua di kursor menutup; papan klip kosong tampil "kosong"', (tester) async {
+      setClipboard(tester, null);
+      await pumpTerminal(tester);
+      terminalView(tester).terminal.write(r'user@host:~$ ');
+      await tester.pump();
+      await tapCursor(tester);
+      expect(find.text('Papan klip: kosong'), findsOneWidget);
+      await tapCursor(tester);
+      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+    });
+
+    testWidgets('mengetik atau keluaran yang menggeser kursor menutup popover', (tester) async {
+      setClipboard(tester, 'ls');
+      await pumpTerminal(tester);
+      terminalView(tester).terminal.write(r'user@host:~$ ');
+      await tester.pump();
+      await tapCursor(tester);
+      expect(find.byKey(const ValueKey('paste-popover')), findsOneWidget);
+      terminalView(tester).terminal.write('x');
+      await tester.pump();
+      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
+    });
+
+    testWidgets('layar alternatif (vim, htop): ketukan di kursor tidak membuka popover', (tester) async {
+      setClipboard(tester, 'ls');
+      await pumpTerminal(tester);
+      terminalView(tester).terminal.write('[?1049h');
+      await tester.pump();
+      await tapCursor(tester);
+      expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
     });
   });
 

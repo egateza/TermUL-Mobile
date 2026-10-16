@@ -1,3 +1,4 @@
+import 'package:flutter/gestures.dart' show kTouchSlop;
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:xterm/xterm.dart';
@@ -16,6 +17,7 @@ import '../../shared/widgets/termul_action_sheet.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_toast.dart';
 import 'paste_analysis.dart';
+import 'paste_popover.dart';
 import 'quick_key_bar.dart';
 import 'selection_bar.dart';
 import 'selection_overlay.dart';
@@ -98,11 +100,17 @@ class _TerminalScreenState extends State<TerminalScreen> {
   final _controller = TerminalController();
   final _scrollController = ScrollController();
   final _viewKey = GlobalKey<TerminalViewState>();
+  final _areaKey = GlobalKey();
+
+  /// Popover Tempel di kursor prompt; null bila tertutup.
+  _PasteMenu? _pasteMenu;
 
   @override
   void initState() {
     super.initState();
     _session.onInput = _clearSelectionOnInput;
+    _session.terminal.addListener(_closeMenuIfCursorMoved);
+    _scrollController.addListener(_closePasteMenu);
     // Buka shell setelah layout pertama supaya PTY langsung berukuran layar sebenarnya, bukan 80x24.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _session.start();
@@ -111,6 +119,8 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
   @override
   void dispose() {
+    _session.terminal.removeListener(_closeMenuIfCursorMoved);
+    _scrollController.removeListener(_closePasteMenu);
     if (_session.onInput == _clearSelectionOnInput) _session.onInput = null;
     _controller.dispose();
     _scrollController.dispose();
@@ -119,7 +129,93 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
   /// Mengetik (atau menekan Enter, tombol cepat, tempel) mengakhiri seleksi.
   void _clearSelectionOnInput() {
+    _closePasteMenu();
     if (_controller.selection != null) _controller.clearSelection();
+  }
+
+  void _closePasteMenu() {
+    if (_pasteMenu == null) return;
+    if (mounted) setState(() => _pasteMenu = null);
+  }
+
+  void _closeMenuIfCursorMoved() {
+    final menu = _pasteMenu;
+    if (menu == null) return;
+    final b = _session.terminal.buffer;
+    if (b.cursorX != menu.cursorX || b.absoluteCursorY != menu.cursorY) _closePasteMenu();
+  }
+
+  Offset? _downAt;
+  Duration? _downTime;
+
+  void _onPointerDown(PointerDownEvent e) {
+    _downAt = e.position;
+    _downTime = e.timeStamp;
+  }
+
+  /// Ketukan singkat tanpa geser (bukan gulir, tekan lama, atau seret gagang) dibaca sebagai ketuk.
+  void _onPointerUp(PointerUpEvent e) {
+    final at = _downAt;
+    final time = _downTime;
+    _downAt = null;
+    _downTime = null;
+    final view = _viewKey.currentState;
+    if (at == null || time == null || view == null || !view.renderTerminal.attached) return;
+    if ((e.position - at).distance > kTouchSlop || e.timeStamp - time > const Duration(milliseconds: 350)) return;
+    _onTerminalTap(view.renderTerminal.getCellOffset(view.renderTerminal.globalToLocal(e.position)));
+  }
+
+  /// Ketukan di kursor prompt membuka popover Tempel; ketukan lain (atau di kursor lagi) menutupnya.
+  Future<void> _onTerminalTap(CellOffset cell) async {
+    if (_pasteMenu != null) {
+      _closePasteMenu();
+      return;
+    }
+    final terminal = _session.terminal;
+    final b = terminal.buffer;
+    final atCursor = cell.y == b.absoluteCursorY && (cell.x - b.cursorX).abs() <= 2;
+    if (!atCursor || !_alive || terminal.isUsingAltBuffer || _session.state != TerminalSessionState.running) return;
+    var lines = 0;
+    try {
+      final text = (await Clipboard.getData(Clipboard.kTextPlain))?.text ?? '';
+      if (text.isNotEmpty) lines = text.replaceFirst(RegExp(r'\n+$'), '').split('\n').length;
+    } on Object {
+      lines = 0;
+    }
+    if (!mounted || _pasteMenu != null) return;
+    final area = _areaKey.currentContext?.findRenderObject();
+    final view = _viewKey.currentState;
+    if (area is! RenderBox || !area.attached || view == null) return;
+    final global = view.globalCursorRect;
+    final topLeft = area.globalToLocal(global.topLeft);
+    setState(
+      () => _pasteMenu = _PasteMenu(
+        cursorX: b.cursorX,
+        cursorY: b.absoluteCursorY,
+        anchor: topLeft & global.size,
+        areaSize: area.size,
+        lines: lines,
+      ),
+    );
+  }
+
+  void _pasteFromMenu() {
+    _closePasteMenu();
+    _paste();
+  }
+
+  Widget _pasteMenuOverlay(BuildContext context) {
+    final menu = _pasteMenu!;
+    if (MediaQuery.sizeOf(context) != menu.screenSize) {
+      WidgetsBinding.instance.addPostFrameCallback((_) => _closePasteMenu());
+      return const SizedBox.shrink();
+    }
+    final right = (menu.areaSize.width - menu.anchor.right - 6).clamp(4.0, menu.areaSize.width);
+    final popover = PastePopover(clipLines: menu.lines, onPaste: _pasteFromMenu);
+    // Di atas kursor; di baris paling atas layar (tidak muat) di bawahnya.
+    return menu.anchor.top > 100
+        ? Positioned(right: right, bottom: menu.areaSize.height - menu.anchor.top + 6, child: popover)
+        : Positioned(right: right, top: menu.anchor.bottom + 6, child: popover);
   }
 
   bool get _alive =>
@@ -371,18 +467,26 @@ class _TerminalScreenState extends State<TerminalScreen> {
                       removeTop: true,
                       removeBottom: true,
                       child: Stack(
+                        key: _areaKey,
                         fit: StackFit.expand,
                         children: [
-                          TerminalView(
-                            _session.terminal,
-                            key: _viewKey,
-                            controller: _controller,
-                            scrollController: _scrollController,
-                            theme: termulTerminalTheme,
-                            textStyle: widget.textStyle ?? termulTerminalStyle,
-                            padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
-                            autofocus: true,
-                            backgroundOpacity: 1,
+                          // `onTapUp` milik TerminalView tidak pernah dipanggil di xterm 4.0.0, jadi ketukan dibaca dari
+                          // pointer mentah (tidak ikut arena gestur: ketuk, gulir, dan seleksi xterm tidak terganggu).
+                          Listener(
+                            behavior: HitTestBehavior.translucent,
+                            onPointerDown: _onPointerDown,
+                            onPointerUp: _onPointerUp,
+                            child: TerminalView(
+                              _session.terminal,
+                              key: _viewKey,
+                              controller: _controller,
+                              scrollController: _scrollController,
+                              theme: termulTerminalTheme,
+                              textStyle: widget.textStyle ?? termulTerminalStyle,
+                              padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
+                              autofocus: true,
+                              backgroundOpacity: 1,
+                            ),
                           ),
                           SelectionHandles(
                             terminal: _session.terminal,
@@ -391,6 +495,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                             viewKey: _viewKey,
                             style: widget.handleStyle,
                           ),
+                          if (_pasteMenu != null) _pasteMenuOverlay(context),
                         ],
                       ),
                     ),
@@ -623,4 +728,27 @@ class _PasteDetails extends StatelessWidget {
       ],
     );
   }
+}
+
+/// Keadaan popover Tempel: posisi kursor saat dibuka (untuk menutupnya bila kursor pindah), kotak kursor di
+/// koordinat area terminal, dan isi papan klip.
+class _PasteMenu {
+  _PasteMenu({
+    required this.cursorX,
+    required this.cursorY,
+    required this.anchor,
+    required this.areaSize,
+    required this.lines,
+  }) : screenSize =
+           WidgetsBinding.instance.platformDispatcher.views.first.physicalSize /
+           WidgetsBinding.instance.platformDispatcher.views.first.devicePixelRatio;
+
+  final int cursorX;
+  final int cursorY;
+  final Rect anchor;
+  final Size areaSize;
+  final int lines;
+
+  /// Ukuran layar saat dibuka; berubah (putar layar, keyboard) menutup popover karena posisinya usang.
+  final Size screenSize;
 }

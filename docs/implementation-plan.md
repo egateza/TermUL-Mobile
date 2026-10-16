@@ -685,9 +685,19 @@ Saklar "Sambung ulang otomatis" sudah dikerjakan di 11i. **Artifact desain sudah
 - **Desain:** saklar sudah ada di prototipe `Settings` (`recon`, bawaan nyala), jadi bukan tambahan dan artifact tidak diubah. Teks `README.md` (baris Pengaturan) belum menyebut saklar ini; perbarui saat artifact berikutnya dipublikasikan.
 - Belum dirinci: skenario yang dicoba pemilik (mis. saklar mati lalu Wi-Fi diputus) dan tampilan baris baru di layar sempit.
 
+## 11j. Popover Tempel di kursor prompt (2026-10-16)
+
+**Selesai di PC (384 tes, `flutter analyze` bersih); belum diuji di HP.**
+
+- Mengetuk kursor prompt (baris yang sama, selisih kolom paling 2 untuk toleransi jari) membuka popover di atas kursor, rata kanan dengan kursor: tombol **Tempel** (`accent`, 44 dp) dan "Papan klip: N baris" atau "kosong" (`PastePopover`, `paste_popover.dart`; rujukan prototipe `TerminalPasteMenu`). Di baris paling atas layar popover muncul di bawah kursor. Tempel memakai alur yang sama dengan tombol Tempel di baris tombol cepat (`_paste`: satu baris langsung, selain itu dialog konfirmasi).
+- Menutup: ketukan lain atau ketukan kedua di kursor, mengetik atau tombol cepat, keluaran yang menggeser kursor, gulir, dan ukuran layar berubah (putar, keyboard). Tidak muncul di layar alternatif (`vim`, `htop`) atau saat sesi belum berjalan atau putus.
+- **Temuan xterm 4.0.0:** `TerminalView.onTapUp` tidak pernah dipanggil (detektor gestur hanya meneruskan `onSingleTapUp`, yang tidak dipasang `TerminalView`). Ketukan dibaca lewat `Listener` pointer mentah (jarak paling `kTouchSlop`, paling 350 ms) yang tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi xterm tidak terganggu.
+- **Desain:** popover sudah ada di prototipe `TerminalPasteMenu`, jadi bukan tambahan. Catatan README design system baris Tempel di terminal ("belum ada popover di kursor prompt") sudah usang; perbarui saat artifact berikutnya dipublikasikan.
+- Belum diuji di HP: kemudahan mengetuk kursor dengan jari, posisi popover dengan keyboard terbuka dan landscape, dan perilaku saat program (mis. `tmux` dengan mouse mode) mengambil alih sentuhan.
+
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 380 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 384 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
 **Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Belum diuji di HP:** tempel (11c), layar mati 30 menit atau lebih, tanpa kabel, efek HyperOS, "Putuskan semua" dari notifikasi. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
@@ -695,7 +705,7 @@ Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.
 
 **Temuan uji HP 2026-10-16 yang belum dikerjakan (menunggu persetujuan rencana):** (1) [sudah dikerjakan di 11f, belum diuji di HP] sambung ulang tidak menunggu jaringan kembali: saat mode pesawat sesi terus mencoba menyambung, dan diduga memunculkan prompt biometrik berulang (belum dikonfirmasi pengguna); usulan: tunda sambung ulang sampai ada jaringan, dan satu prompt untuk semua sesi yang perlu sambung ulang. (2) Setiap sambung ulang membuka shell baru dan meninggalkan shell lama yatim di server (terlihat di `who`; bertahan sampai dibersihkan `pkill`); tidak bisa dicegah dari aplikasi, penangkalnya `ClientAliveInterval` di `sshd_config` (keputusan pemilik server); pertimbangkan catatan di layar atau dokumentasi pengguna. (3) Satu shell (pts/7) tetap tinggal setelah "Putuskan semua" pada 14:58:51, penyebab belum terbukti.
 
-**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan saklarnya (sudah dikerjakan di 11f dan 11i; saklar sudah dicoba pemilik di HP), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
+**Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan saklarnya (sudah dikerjakan di 11f dan 11i; saklar sudah dicoba pemilik di HP), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] [popover Tempel di kursor: sudah dikerjakan di 11j, belum diuji di HP] snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
 
 **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 33, prototipe versi 39; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
@@ -703,7 +713,7 @@ Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 380 tes otomatis, tanpa jaringan
+flutter test                                   # 384 tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]

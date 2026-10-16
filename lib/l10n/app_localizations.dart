@@ -1339,6 +1339,24 @@ abstract class AppLocalizations {
   /// **'Tempel dari papan klip'**
   String get keyPasteAria;
 
+  /// Ringkasan isi papan klip di popover Tempel.
+  ///
+  /// In id, this message translates to:
+  /// **'Papan klip: {summary}'**
+  String pasteMenuClipboard(String summary);
+
+  /// Jumlah baris di papan klip (popover Tempel).
+  ///
+  /// In id, this message translates to:
+  /// **'{count} baris'**
+  String pasteMenuLines(int count);
+
+  /// Papan klip kosong (popover Tempel).
+  ///
+  /// In id, this message translates to:
+  /// **'kosong'**
+  String get pasteMenuClipboardEmpty;
+
   /// Toast bila papan klip kosong.
   ///
   /// In id, this message translates to:
