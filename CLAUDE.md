@@ -40,6 +40,8 @@ Baca dulu sebelum menulis kode:
 5. Tulis kode produksi: tangani galat, tutup sumber daya (`SSHClient`, sesi, `Terminal`) di `dispose`, jangan memblokir thread UI saat keluaran deras.
 6. Jangan memasukkan kredensial server, kunci privat, atau token ke repo, termasuk contoh dan tes.
 7. Bila ada keputusan baru atau temuan baru, tulis di `docs/` dan beri tahu bahwa artifact desain perlu diperbarui.
+8. **Setiap perubahan yang menyimpang dari desain awal harus ikut mengubah kedua artifact desain di irisan yang sama**, bukan ditunda: design system (`README.md` bagian "Catatan dari implementasi Flutter", berkas komponen terkait, `tokens.json` bila nilai token berubah) dan prototipe (`prototype/*.dc.html` dan `canvas.json`; layar atau varian baru dibuat sebagai contoh baru di kanvas). Menyimpang berarti: warna, ukuran, tata letak, teks, perilaku, atau alur yang berbeda dari prototipe; fitur yang hanya belum dibuat bukan penyimpangan, tetapi catat di README bila prototipe menggambarnya.
+9. Alur publish artifact (sudah disetujui pemilik untuk perubahan semacam ini): salin ulang berkas dari artifact lewat `read` dengan `path` dan bandingkan dengan salinan lokal sebelum mengubah, edit di folder staging, publish, render prototipe di Chrome bila diubah, lalu catat versi baru dan isi perubahan di `docs/design/SUMBER.md` dan `docs/implementation-plan.md`. Jangan mengklaim artifact sudah sinkron sebelum publish berhasil.
 
 ## Dokumentasi desain
 

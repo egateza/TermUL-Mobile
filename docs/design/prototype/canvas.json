@@ -275,6 +275,24 @@
    "title": "6b · Pengaturan: pertahankan koneksi di latar belakang (menyala)",
    "is_interactive": true,
    "radius": 28
+  },
+  "TerminalPasteUnsafe.dc.html": {
+   "x": 2000,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2h · Contoh: tempel di server tanpa tempel aman",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalSelectLens.dc.html": {
+   "x": 2470,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2i · Contoh: seleksi dengan kaca pembesar",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -307,7 +325,9 @@
   "TerminalReconnectPlain.dc.html",
   "TerminalLandscape.dc.html",
   "TerminalLandscapeKb.dc.html",
-  "SettingsFg.dc.html"
+  "SettingsFg.dc.html",
+  "TerminalPasteUnsafe.dc.html",
+  "TerminalSelectLens.dc.html"
  ],
  "notes": {
   "judul": {

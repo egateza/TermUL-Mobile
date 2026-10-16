@@ -69,3 +69,8 @@ Prototipe:
 
 - **Sudah di-publish** (design system versi 23, `1792132127-c203`): `README.md` dua butir baru di "Catatan dari implementasi Flutter" (seleksi dan salin: gagang, kaca pembesar, bilah seleksi, yang belum dibuat; warna seleksi tembus pandang), `components/TerminalSurface/README.md` satu butir warna seleksi, `design-system.json` (`lastChange`). Sebelum itu dicek bahwa salinan lokal kedua berkas sama dengan isi artifact. Prototipe `Terminal.dc.html` **tidak diubah**: bilah seleksinya masih memuat Cari, Kirim, Snippet, Bagikan, dan belum menggambar gagang, kaca pembesar, tombol Tempel di baris tombol cepat, serta varian tanpa tempel aman. `tokens.json` tidak diubah (`terminal-selection` tetap nilai desain; aplikasi memakai warna tembus pandang yang dicatat di README).
 
+## Perubahan lokal lanjutan (2026-10-16, prototipe Terminal disesuaikan)
+
+- **Sudah di-publish** (prototipe versi 34, `1792132712-5fa3`): `prototype/Terminal.dc.html` (hint bilah seleksi "Seret gagang untuk mengubah pilihan", warna seleksi `#3E7CA8` alpha 55% dengan teks tetap berwarna aslinya, gagang `accent` dengan tepi `ground`, tombol Tempel di baris tombol cepat, kaca pembesar lewat properti `lens`, varian tempel tanpa tempel aman lewat properti `bracketed="mati"` dengan pilihan aman jadi tombol utama), dua contoh layar baru `prototype/TerminalPasteUnsafe.dc.html` (2h) dan `prototype/TerminalSelectLens.dc.html` (2i), dan `prototype/canvas.json` (dua papan baru di x 2000 dan 2470, y 5732). Sebelum itu dicek bahwa `Terminal.dc.html` di artifact identik dengan salinan lokal sebelum diubah. Dirender di Chrome tanpa galat.
+- `README.md` design system: kalimat "prototipe tidak diubah" diperbarui (design system dipublish ulang sebagai versi berikutnya).
+

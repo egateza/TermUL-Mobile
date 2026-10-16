@@ -66,11 +66,18 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 <div style="flex: none; margin-bottom: auto">
 
 <sc-for list="{{lines}}" as="ln" hint-placeholder-count="7">
-<div style="white-space: pre-wrap; min-height: 19.5px"><sc-for list="{{ln.toks}}" as="w" hint-placeholder-count="5"><button type="button" onClick="{{w.pick}}" aria-pressed="{{w.on}}" style="display: inline; position: relative; margin: 0; padding: 0; border: none; border-radius: 2px; background: {{w.bg}}; color: {{w.fg}}; font: inherit; text-align: left; white-space: pre-wrap; cursor: text">{{w.t}}<sc-if value="{{w.startHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; left: -7px; top: 100%; width: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none"><span style="width: 2px; height: 4px; background: #6CB4FF"></span><span style="width: 14px; height: 14px; border-radius: 50%; background: #6CB4FF"></span></span></sc-if><sc-if value="{{w.endHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; right: -7px; top: 100%; width: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none"><span style="width: 2px; height: 4px; background: #6CB4FF"></span><span style="width: 14px; height: 14px; border-radius: 50%; background: #6CB4FF"></span></span></sc-if></button></sc-for><sc-if value="{{ln.cursor}}" hint-placeholder-val="{{ false }}"><span style="position: relative; display: inline-block; vertical-align: text-bottom"><button type="button" onClick="{{togglePasteMenu}}" aria-label="Menu tempel di prompt" aria-expanded="{{pasteMenu}}" style="display: block; margin: 0 -6px; padding: 0 6px; border: none; background: transparent; cursor: text"><span style="display: block; width: 8px; height: 15px; background: #E8EEF0"></span></button><sc-if value="{{pasteMenu}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; bottom: 100%; margin-bottom: 6px; z-index: 2; display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; white-space: nowrap"><button type="button" onClick="{{pasteNow}}" style="min-height: 44px; padding: 0 18px; border-radius: 8px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Tempel</button><span style="padding: 0 4px 2px 4px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 11.5px; color: #9AA8AF">Papan klip: {{clipSummary}}</span></span></sc-if></span></sc-if></div>
+<div style="white-space: pre-wrap; min-height: 19.5px"><sc-for list="{{ln.toks}}" as="w" hint-placeholder-count="5"><button type="button" onClick="{{w.pick}}" aria-pressed="{{w.on}}" style="display: inline; position: relative; margin: 0; padding: 0; border: none; border-radius: 2px; background: {{w.bg}}; color: {{w.fg}}; font: inherit; text-align: left; white-space: pre-wrap; cursor: text">{{w.t}}<sc-if value="{{w.startHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; left: -7px; top: 100%; width: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none"><span style="width: 2px; height: 4px; background: #F0B34A"></span><span style="width: 14px; height: 14px; box-sizing: border-box; border-radius: 50%; background: #F0B34A; border: 2px solid #0F1316"></span></span></sc-if><sc-if value="{{w.endHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; right: -7px; top: 100%; width: 14px; display: flex; flex-direction: column; align-items: center; pointer-events: none"><span style="width: 2px; height: 4px; background: #F0B34A"></span><span style="width: 14px; height: 14px; box-sizing: border-box; border-radius: 50%; background: #F0B34A; border: 2px solid #0F1316"></span></span></sc-if></button></sc-for><sc-if value="{{ln.cursor}}" hint-placeholder-val="{{ false }}"><span style="position: relative; display: inline-block; vertical-align: text-bottom"><button type="button" onClick="{{togglePasteMenu}}" aria-label="Menu tempel di prompt" aria-expanded="{{pasteMenu}}" style="display: block; margin: 0 -6px; padding: 0 6px; border: none; background: transparent; cursor: text"><span style="display: block; width: 8px; height: 15px; background: #E8EEF0"></span></button><sc-if value="{{pasteMenu}}" hint-placeholder-val="{{ false }}"><span style="position: absolute; right: -6px; bottom: 100%; margin-bottom: 6px; z-index: 2; display: flex; flex-direction: column; gap: 2px; padding: 6px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; white-space: nowrap"><button type="button" onClick="{{pasteNow}}" style="min-height: 44px; padding: 0 18px; border-radius: 8px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Tempel</button><span style="padding: 0 4px 2px 4px; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 11.5px; color: #9AA8AF">Papan klip: {{clipSummary}}</span></span></sc-if></span></sc-if></div>
 </sc-for>
 
 </div>
 </div>
+
+<sc-if value="{{lens}}" hint-placeholder-val="{{ false }}">
+<div aria-hidden="true" style="position: absolute; left: 96px; bottom: 150px; width: 120px; height: 56px; box-sizing: border-box; overflow: hidden; border-radius: 14px; border: 1.5px solid #F0B34A; background: #0A0E10; pointer-events: none">
+<div style="position: absolute; left: 10px; right: 0; top: 14px; height: 28px; display: flex; align-items: center; white-space: pre; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 20.8px; line-height: 1.5; color: #C9D4D9"><span style="background: #3E7CA88C">tl rest</span><span>art</span></div>
+<div style="position: absolute; left: 82px; top: 12px; width: 2px; height: 32px; background: #F0B34A"></div>
+</div>
+</sc-if>
 
 <sc-if value="{{showDown}}" hint-placeholder-val="{{ false }}">
 <button type="button" onClick="{{toBottom}}" aria-label="Gulir ke bawah" style="position: absolute; right: 12px; bottom: 12px; min-height: 44px; display: flex; align-items: center; gap: 8px; padding: 0 16px; border-radius: 22px; border: 1px solid #F0B34A; background: #1E262B; color: #F0B34A; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">
@@ -104,7 +111,7 @@ Ke bawah
 <div style="display: flex; align-items: center; gap: 8px; padding: 0 4px">
 <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
 <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #E8EEF0">{{selCount}} karakter dipilih</span>
-<span style="font-size: 12px; color: #9AA8AF">Ketuk kata lain untuk memperluas pilihan</span>
+<span style="font-size: 12px; color: #9AA8AF">Seret gagang untuk mengubah pilihan</span>
 </div>
 <button type="button" onClick="{{cancel}}" style="min-height: 44px; padding: 0 12px; border: none; background: transparent; color: #9AA8AF; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; cursor: pointer">Batal</button>
 </div>
@@ -144,15 +151,23 @@ Lainnya
 <span>{{riskText}}</span>
 </div>
 </sc-if>
+<sc-if value="{{unsafe}}" hint-placeholder-val="{{ false }}">
+<div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid #6B2C25; background: #1D1210; color: #FFB3A9; font-size: 13px; line-height: 1.4">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M12 4l10 17H2z"/><path d="M12 10v5M12 18h.01"/></svg>
+<span>Server ini belum mendukung tempel aman: setiap baris langsung dijalankan begitu ditempel.</span>
+</div>
+</sc-if>
 <div style="max-height: 96px; overflow-y: auto; padding: 8px 10px; border-radius: 10px; background: #0A0E10; border: 1px solid #1E262B; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; line-height: 1.5">
 <sc-for list="{{clipRows}}" as="cr" hint-placeholder-count="3">
 <div style="display: flex; gap: 10px; white-space: pre-wrap; word-break: break-all"><span style="width: 14px; flex: none; text-align: right; color: #5C6A71">{{cr.n}}</span><span style="flex: 1; color: {{cr.fg}}">{{cr.text}}</span><sc-if value="{{cr.risky}}" hint-placeholder-val="{{ false }}"><span style="flex: none; color: #FF7F70">berisiko</span></sc-if></div>
 </sc-for>
 </div>
+<sc-if value="{{safeNote}}" hint-placeholder-val="{{ true }}">
 <span style="font-size: 12.5px; line-height: 1.4; color: #9AA8AF">Teks masuk ke prompt tanpa menekan Enter, jadi belum dijalankan.</span>
+</sc-if>
 <div style="display: flex; gap: 8px">
-<button type="button" onClick="{{cancelPaste}}" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Batal</button>
-<button type="button" onClick="{{confirmPaste}}" style="flex: 2; min-height: 48px; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer">Tempel</button>
+<button type="button" onClick="{{cancelPaste}}" style="flex: {{cancelFlex}}; min-height: 48px; border-radius: 12px; border: 1px solid {{cancelBd}}; background: {{cancelBg}}; color: {{cancelFg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: {{cancelWeight}}; cursor: pointer">Batal</button>
+<button type="button" onClick="{{confirmPaste}}" style="flex: {{okFlex}}; min-height: 48px; border-radius: 12px; border: 1px solid {{okBd}}; background: {{okBg}}; color: {{okFg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: {{okWeight}}; cursor: pointer">Tempel</button>
 </div>
 </div>
 </sc-if>
@@ -228,7 +243,7 @@ Lainnya
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"connection":{"editor":"enum","default":"connected","options":["connected","reconnecting"],"section":"Status"},"session":{"editor":"enum","default":"tmux","options":["tmux","biasa"],"section":"Status"},"showKeyboard":{"editor":"boolean","default":true,"section":"Tampilan"},"preselect":{"editor":"boolean","default":true,"section":"Tampilan"},"startAt":{"editor":"enum","default":"normal","options":["normal","menu","dialog"],"section":"Papan klip"},"clipboard":{"editor":"enum","default":"berisiko","options":["berisiko","aman","kosong"],"section":"Papan klip"},"$preview":{"width":390,"height":844}}'>
+<script type="text/x-dc" data-dc-script data-props='{"connection":{"editor":"enum","default":"connected","options":["connected","reconnecting"],"section":"Status"},"session":{"editor":"enum","default":"tmux","options":["tmux","biasa"],"section":"Status"},"showKeyboard":{"editor":"boolean","default":true,"section":"Tampilan"},"preselect":{"editor":"boolean","default":true,"section":"Tampilan"},"startAt":{"editor":"enum","default":"normal","options":["normal","menu","dialog"],"section":"Papan klip"},"clipboard":{"editor":"enum","default":"berisiko","options":["berisiko","aman","kosong"],"section":"Papan klip"},"bracketed":{"editor":"enum","default":"aktif","options":["aktif","mati"],"section":"Papan klip"},"lens":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
   renderVals() {
     const s = this.state || {};
@@ -272,7 +287,8 @@ class Component extends DCLogic {
       { id: 'pipe', label: '|', aria: 'Pipa' },
       { id: 'tilde', label: '~', aria: 'Tilde' },
       { id: 'slash', label: '/', aria: 'Garis miring' },
-      { id: 'dash', label: '-', aria: 'Strip' }
+      { id: 'dash', label: '-', aria: 'Strip' },
+      { id: 'paste', label: 'Tempel', aria: 'Tempel dari papan klip' }
     ];
     const keys = keyDefs.map((k) => {
       const on = (k.id === 'ctrl' && ctrl) || (k.id === 'alt' && !!s.alt);
@@ -286,6 +302,7 @@ class Component extends DCLogic {
         pick: () => {
           if (k.id === 'ctrl') this.setState({ ctrl: !ctrl });
           else if (k.id === 'alt') this.setState({ alt: !s.alt });
+          else if (k.id === 'paste') startPaste();
           else sent(k.label);
         }
       };
@@ -382,8 +399,8 @@ class Component extends DCLogic {
       ln.toks.forEach((tk) => {
         const on = tk.i >= lo && tk.i <= hi;
         tk.on = on;
-        tk.bg = on ? '#2C4F6B' : 'transparent';
-        tk.fg = on ? '#F4F8FA' : tk.c;
+        tk.bg = on ? '#3E7CA88C' : 'transparent';
+        tk.fg = tk.c;
         tk.startHandle = selecting && tk.i === lo;
         tk.endHandle = selecting && tk.i === hi;
         tk.pick = () => {
@@ -445,6 +462,10 @@ class Component extends DCLogic {
       return { n: i + 1, text: t, risky: risky, fg: risky ? '#FF7F70' : '#C9D4D9' };
     });
     const riskCount = clipRows.filter((r) => r.risky).length;
+    // Bash di bawah 5.1 tidak menyalakan tempel aman: banyak baris langsung dijalankan begitu ditempel.
+    const unsafe = this.props.bracketed === 'mati' && clipLines.length > 1;
+    const cancelPrimary = riskCount > 0 || unsafe;
+    const pastedMsg = (n) => 'Ditempel \u00b7 ' + n + ' baris' + (unsafe ? '' : ' \u00b7 belum dijalankan');
     const needConfirm = clipLines.length > 1 || riskCount > 0;
     const record = (label) => this.setState({ recent: [label].concat(recentNow.filter((l) => l !== label)).slice(0, 12) });
     const flash = (msg) => {
@@ -595,12 +616,25 @@ class Component extends DCLogic {
       clipRows: clipRows,
       clipCount: clipLines.length,
       hasRisk: riskCount > 0,
+      unsafe: unsafe,
+      safeNote: !unsafe,
+      cancelFlex: cancelPrimary ? 2 : 1,
+      cancelBd: cancelPrimary ? '#F0B34A' : '#2A343A',
+      cancelBg: cancelPrimary ? '#F0B34A' : 'transparent',
+      cancelFg: cancelPrimary ? '#1B1406' : '#E8EEF0',
+      cancelWeight: cancelPrimary ? 600 : 400,
+      okFlex: cancelPrimary ? 1 : 2,
+      okBd: cancelPrimary ? '#2A343A' : '#F0B34A',
+      okBg: cancelPrimary ? 'transparent' : '#F0B34A',
+      okFg: cancelPrimary ? '#E8EEF0' : '#1B1406',
+      okWeight: cancelPrimary ? 400 : 600,
+      lens: this.props.lens === true || this.props.lens === 'true',
       riskText: riskCount + ' baris berisiko (mis. rm -rf). Periksa sebelum menekan Enter.',
       togglePasteMenu: () => this.setState({ pasteMenu: !pasteMenu }),
       pasteNow: () => startPaste(),
       confirmPaste: () => {
         this.setState({ confirm: false });
-        flash('Ditempel \u00b7 ' + clipLines.length + ' baris \u00b7 belum dijalankan');
+        flash(pastedMsg(clipLines.length));
       },
       cancelPaste: () => this.setState({ confirm: false }),
       panelBg: panel ? '#F0B34A' : '#1E262B',
