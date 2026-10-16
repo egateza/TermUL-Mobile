@@ -8,7 +8,7 @@ import 'package:xterm/src/ui/render.dart' show RenderTerminal;
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Dua gagang yang bisa diseret di awal dan akhir seleksi, plus kaca pembesar di atas jari saat menyeret (xterm
+/// Dua gagang (warna `info`, bentuk dari prototipe) yang bisa diseret di awal dan akhir seleksi, plus kaca pembesar di atas jari saat menyeret (xterm
 /// 4.0.0 hanya memilih satu kata tanpa gagang; perhitungannya dari lampiran A8 di `docs/design/spike-temuan.md`).
 /// Dipasang di atas [TerminalView] dalam `Stack`; tanpa seleksi, widget ini kosong dan tidak menangkap sentuhan.
 ///
@@ -35,6 +35,7 @@ class SelectionHandles extends StatefulWidget {
   static const _gap = 14.0;
   static const _touch = 44.0;
   static const _dot = 14.0;
+  static const _stem = 4.0;
 
   /// Jarak minimum pusat gagang dari tepi kiri dan kanan (zona gestur kembali Android sekitar 24 dp).
   static const _edgeMargin = 36.0;
@@ -186,16 +187,20 @@ class _SelectionHandlesState extends State<SelectionHandles> {
           onPanUpdate: (d) => _updateDrag(d.globalPosition),
           onPanEnd: (_) => _endDrag(),
           onPanCancel: _endDrag,
-          child: Center(
-            child: Container(
-              width: SelectionHandles._dot,
-              height: SelectionHandles._dot,
-              decoration: BoxDecoration(
-                color: TermulPalette.accent,
-                shape: BoxShape.circle,
-                border: Border.all(color: TermulPalette.ground, width: 2),
+          // Bentuk dari prototipe: bulatan 14 dp berwarna `info` dengan tangkai 2 x 4 dp di atasnya.
+          child: Stack(
+            alignment: Alignment.center,
+            children: [
+              Positioned(
+                top: half - SelectionHandles._dot / 2 - SelectionHandles._stem,
+                child: Container(width: 2, height: SelectionHandles._stem, color: TermulPalette.info),
               ),
-            ),
+              Container(
+                width: SelectionHandles._dot,
+                height: SelectionHandles._dot,
+                decoration: const BoxDecoration(color: TermulPalette.info, shape: BoxShape.circle),
+              ),
+            ],
           ),
         ),
       ),

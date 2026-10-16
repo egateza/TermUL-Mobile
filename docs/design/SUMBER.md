@@ -74,3 +74,11 @@ Prototipe:
 - **Sudah di-publish** (prototipe versi 34, `1792132712-5fa3`): `prototype/Terminal.dc.html` (hint bilah seleksi "Seret gagang untuk mengubah pilihan", warna seleksi `#3E7CA8` alpha 55% dengan teks tetap berwarna aslinya, gagang `accent` dengan tepi `ground`, tombol Tempel di baris tombol cepat, kaca pembesar lewat properti `lens`, varian tempel tanpa tempel aman lewat properti `bracketed="mati"` dengan pilihan aman jadi tombol utama), dua contoh layar baru `prototype/TerminalPasteUnsafe.dc.html` (2h) dan `prototype/TerminalSelectLens.dc.html` (2i), dan `prototype/canvas.json` (dua papan baru di x 2000 dan 2470, y 5732). Sebelum itu dicek bahwa `Terminal.dc.html` di artifact identik dengan salinan lokal sebelum diubah. Dirender di Chrome tanpa galat.
 - `README.md` design system: kalimat "prototipe tidak diubah" diperbarui (design system dipublish ulang sebagai versi berikutnya).
 
+## Perubahan lokal lanjutan (2026-10-16, desain tetap diikuti)
+
+Aturan pemilik (dicatat di `CLAUDE.md` butir 8): desain sistem dan prototipe harus diikuti; tambahan dimasukkan ke artifact; yang tidak atau belum bisa diterapkan hanya diberi catatan, desainnya dipertahankan. Karena itu perubahan pada publish sebelumnya yang mengubah desain agar cocok dengan aplikasi dibatalkan:
+
+- **Sudah di-publish:** prototipe versi 35 (`1792132943-afd3`): `Terminal.dc.html` dikembalikan untuk hint bilah ("Ketuk kata lain untuk memperluas pilihan"), warna seleksi (`#2C4F6B`, teks `#F4F8FA`), dan gagang (`#6CB4FF`). Tambahan tetap ada: kaca pembesar (properti `lens`, contoh 2i), varian tempel tanpa tempel aman (properti `bracketed`, contoh 2h), tombol Tempel di baris tombol cepat. Design system versi 25 (`1792132941-49dc`): `README.md` memisahkan tambahan (kaca pembesar, gagang dijepit di dalam layar) dari catatan "belum bisa diterapkan" (petunjuk bilah, warna seleksi, aksi yang belum dibuat); `TerminalSurface/README.md` memberi catatan bahwa warna seleksi aplikasi sementara.
+- **Aplikasi mengikuti desain:** gagang seleksi memakai warna `info` dan bentuk prototipe (bulatan 14 dp dengan tangkai 2 x 4 dp), bukan `accent`.
+- **Belum bisa mengikuti desain:** warna seleksi (xterm 4.0.0 menggambar seleksi di atas teks; aplikasi memakai `#3E7CA8` alpha 55%) dan petunjuk bilah (xterm menghapus seleksi saat diketuk).
+

@@ -5,4 +5,4 @@ Permukaan terminal yang menampilkan baris berwarna: prompt, path, teks, output r
 - Komponen ini untuk tampilan statis (pratinjau, dialog, dokumentasi); terminal sungguhan dirender oleh mesin terminal, yang memakai token `terminal-*` yang sama.
 - Teks terpilih memakai `terminal-selection` dan menimpa semua warna dengan `terminal-selection-ink`.
 - Latar `ground-deep`; teks biasa `terminal-ink`.
-- Di terminal sungguhan seleksi digambar di atas teks dengan `#3E7CA8` alpha 55%, bukan `terminal-selection` pekat; lihat catatan implementasi Flutter di README sistem.
+- Catatan: di aplikasi Flutter seleksi sementara memakai `#3E7CA8` alpha 55% karena mesin terminal menggambar seleksi di atas teks; desain di atas tetap berlaku (lihat catatan implementasi Flutter di README sistem).
