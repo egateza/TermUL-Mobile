@@ -272,13 +272,13 @@ Status per 2026-10-16. "Emulator" = Android 14 dengan Keystore dan server SSH su
 | 0 | konfigurasi Android (A12) | pemindahan paket, hapus iOS | selesai |
 | 1 | pola atomik dan karantina ada di desktop | seluruh lapisan data | selesai (PC, emulator) |
 | 2 | – | seluruh tema dan widget | selesai (PC, emulator) |
-| 3 | A11 (Keystore + biometrik) | satu entri per tipe, `getMany`, kunci 5, impor, yatim, HP tanpa biometrik | selesai (PC, emulator); PIN/pola dan tanpa kunci layar belum |
+| 3 | A11 (Keystore + biometrik) | satu entri per tipe, `getMany`, kunci 5, impor, yatim, HP tanpa biometrik | selesai (PC, emulator); pola di HP berhasil (dilaporkan pengguna); PIN/sandi dan tanpa kunci layar belum |
 | 4 | – | seluruh UI dan state | selesai (PC, emulator, HP) |
 | 5 | A1, A2, A3 | penyimpanan sidik jari permanen, aturan tipe | selesai (OpenSSH 9.6 dan 7.6, HP: Ubuntu 14.04 dan 18.04) |
 | 6 | logika A1 | seluruh UI | selesai (PC, emulator, HP) |
 | 7 | A4, A5, A6 | integrasi, test A10 di project baru | selesai (PC, emulator, HP: `htop`, F10, landscape) |
 | 8 | pemeriksaan sambungan A4 | sambung ulang otomatis | selesai (PC, emulator); di HP baru banner terlihat, hasilnya belum dikonfirmasi |
-| tambahan | – | `settings.json` (ukuran huruf, tinggi baris) | selesai, diuji di HP; menu setting belum |
+| tambahan | – | `settings.json` (ukuran huruf, tinggi baris) | selesai, diuji di HP; menu setting selesai (PC, HP) |
 
 ## 6. Dependensi
 
@@ -439,7 +439,8 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 - Kode: `lib/core/vault/` (`CredentialVault`, `KeystoreCredentialVault`, `DeviceAuth`/`LocalAuthDeviceAuth`, `SecretStore`, `JsonVaultIndex`, `SecretType` dengan kode 5 khusus mobile), `lib/core/keys/private_key_inspector.dart`, dan `lib/features/hosts/host_service.dart` (urutan simpan dan hapus, pembersihan rahasia yatim saat mulai). Aturan penguncian tiga tingkat sudah tertulis di `CLAUDE.md` (butir "Rahasia").
 - Tes otomatis: 33 tes vault dan kunci (kunci uji dibuat saat tes berjalan dengan `ssh-keygen`; tidak ada kunci privat di repo) dan 17 tes `HostService`.
 - Di emulator Android 14 (`integration_test/vault_test.dart`): Keystore sungguhan (simpan, ada, hapus, pembersihan yatim) lulus; deteksi tingkat memberi `biometric` pada AVD `hp_besar_pin_121212_` (sudah punya sidik jari terdaftar); **prompt biometrik nyata dijawab dengan sidik jari virtual (`adb emu finger touch 1`) dan rahasia terbaca**.
-- **Belum teruji:** jalur PIN/pola/sandi (`deviceCredential`) dan deteksi HP tanpa kunci layar (`none`). Percobaan di AVD bersih `termul_uji_bersih` terhenti karena memori mesin habis dengan dua emulator berjalan; ulangi dengan satu emulator bersih. Jalur "biometrik dibatalkan", sidik jari ditambah atau dihapus, dan semuanya di HP fisik juga belum.
+- **Di HP fisik (dilaporkan pengguna, 2026-10-16): membuka rahasia dengan pola layar kunci berhasil.** Rincian belum dicatat: apakah HP punya sidik jari terdaftar saat itu (jalur `biometric` dengan pilihan pola, atau `deviceCredential` murni) dan apakah penyimpanan juga lewat pola.
+- **Belum teruji:** jalur PIN dan sandi, dan deteksi HP tanpa kunci layar (`none`). Percobaan di AVD bersih `termul_uji_bersih` terhenti karena memori mesin habis dengan dua emulator berjalan; ulangi dengan satu emulator bersih. Jalur "biometrik dibatalkan", sidik jari ditambah atau dihapus, dan semuanya di HP fisik juga belum.
 
 ### Langkah 4 (selesai di PC dan emulator)
 
@@ -483,9 +484,9 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 - Perangkat: Xiaomi 25053PC47G, Android 16 (API 36), arm64, build debug lewat `flutter run`.
 - Berhasil: aplikasi terpasang dan berjalan; tambah host dan sambung ke server Ubuntu 14.04.6 (OpenSSH 6.6, **menutup pertanyaan tentang server lama**) dan Ubuntu 18.04; terminal tampil dengan keyboard terbuka dan tertutup, tombol cepat tampil; banner "Menyambung ulang" dengan riwayat layar tetap terlihat muncul pada pemakaian nyata. `htop` di Ubuntu 18.04 (24 inti, 46 kolom di potret) tampil benar: warna meter, baris terpilih, bilah F1 sampai F7; bilah fungsi terpotong di F8 ke kanan karena lebar layar, F10 lewat tombol Fn dicoba pengguna di `htop` dan berhasil (urutan tombol F sampai ke program nyata). Landscape tanpa keyboard dicoba pengguna dengan `htop`: mode ringkas (satu baris status, tombol kembali 32 dp, baris F1 sampai F12 36 dp), `htop` menggambar ulang selebar layar (bilah F1 sampai F10 penuh), tetapi hanya sekitar 12 baris muat sehingga daftar proses tidak terlihat; tinggi baris token `terminal` (1,5) ikut menentukan ini (catatan keputusan: turunkan ke sekitar 1,3 atau jadikan pengaturan?).
 - Kejadian di jalan: sekali aplikasi hanya menampilkan layar hitam saat peluncuran pertama dari VSCode (bersama galat alat "log reader stopped unexpectedly"); tidak bisa direproduksi pada start dingin berikutnya (1,7 detik). Dugaan: `main()` menunggu `bootstrap()` sebelum menggambar apa pun. Belum ada perubahan; layar pemuatan awal bisa ditambahkan bila terulang.
-- **Belum dikonfirmasi:** apakah sambung ulang yang terlihat di tangkapan layar berhasil dan apa pemicunya; biometrik di HP; impor kunci lewat pemilih berkas (pengguna belum punya host berkunci untuk dicoba); `vim`, `tmux`, Ctrl dan F di program itu; Home 13 detik dan 5 menit; Wi-Fi ke seluler.
+- **Belum dikonfirmasi:** apakah sambung ulang yang terlihat di tangkapan layar berhasil dan apa pemicunya; biometrik sidik jari di HP (pola sudah berhasil); impor kunci lewat pemilih berkas (pengguna belum punya host berkunci untuk dicoba); `vim`, `tmux`, Ctrl dan F di program itu; Home 13 detik dan 5 menit; Wi-Fi ke seluler.
 
-## 11a. Pengaturan (`settings.json`) dan rencana menu setting
+## 11a. Pengaturan (`settings.json`) dan menu setting
 
 **Sudah ada (2026-10-16):** berkas `settings.json` di folder pribadi aplikasi (`getApplicationSupportDirectory`; di Android `/data/user/0/io.github.egateza.termul/files/settings.json`). Dibuat otomatis dengan nilai bawaan saat pertama kali aplikasi dijalankan; properti yang tidak dikenal diabaikan; nilai di luar batas dijepit; tipe yang salah membuat berkas disisihkan ke `settings.json.corrupt-<waktu>` lalu nilai bawaan dipakai (tanpa banner, pengaturan hilang tidak berbahaya). Berkas dibaca ulang **setiap sesi baru dibuka** (mengetuk host), jadi perubahan terpakai tanpa menutup aplikasi; sambung ulang di sesi yang sama tidak membacanya lagi. Kode: `lib/core/models/app_settings.dart`, `lib/core/storage/json/json_settings_repository.dart`, `appSettingsProvider`, `terminalStyleFor` di `terminal_palette.dart`.
 
@@ -505,22 +506,30 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 
 **Bawaan tinggi baris 1,3, bukan 1,5 dari token `terminal`:** di HP fisik (Xiaomi 25053PC47G) 1,5 hanya memuat sekitar 12 baris di landscape sehingga daftar proses `htop` tidak terlihat. Keputusan baru, perlu masuk ke artifact desain (baris terminal lebih rapat daripada teks antarmuka).
 
-**Perlu dibuat berikutnya (menu setting, belum dikerjakan):**
-- Layar pengaturan untuk ukuran huruf dan tinggi baris terminal, dengan pratinjau; berlaku seketika tanpa memulai ulang aplikasi (ukuran PTY dihitung ulang dan dikirim lewat debounce yang sudah ada).
-- **Tanpa cubit-untuk-zoom di terminal** (keputusan pengguna: tersentuh tanpa sengaja akan mengganggu). Perubahan ukuran hanya lewat menu.
-- Pembanding yang disebut pengguna: JuiceSSH menampilkan banyak baris dan kolom karena huruf sangat kecil dan tinggi baris rapat; pilihan ukuran harus cukup lebar supaya pengguna bisa menyesuaikan sendiri.
-- Kandidat pengaturan lain dari pembahasan: tema terminal (gelap, kontras tinggi, terang; token `term-contrast-*` dan `term-light-*` sudah ada), baris tombol cepat dua baris di layar luas, sambung ulang otomatis (nyala atau mati, jumlah percobaan dan jeda), konfirmasi sebelum memutus, foreground service (opt-in, `android.md`), pemeriksaan status host (online atau offline).
+**Menu setting (selesai di PC dan dicoba di HP fisik, 2026-10-16):**
+- Kode: `lib/features/settings/settings_screen.dart` (layar), `lib/shared/widgets/termul_stepper.dart` (komponen `Stepper` baru, ikon `minus` baru), `JsonSettingsRepository.save` (tulis atomik), dan `appSettingsProvider` yang sekarang `NotifierProvider` (`update` menyimpan, `replace` hanya memakai nilai tanpa menyimpan). `ConnectScreen` memantau provider itu, jadi perubahan langsung mengubah huruf dan tinggi baris sesi terminal yang terbuka; ukuran PTY ikut berubah lewat debounce 150 ms yang sudah ada. Pembacaan ulang berkas tiap sesi baru dipertahankan (hasilnya dimasukkan lewat `replace`).
+- Jalan masuk: ikon pengaturan di header layar Host, di samping tombol tambah. Keputusan sementara karena `NavBar` lima tab belum dibangun; saat `NavBar` ada, ikon ini pindah ke tab Pengaturan.
+- Isi layar: pratinjau dua baris dengan gaya terminal sungguhan, `Stepper` ukuran font (8 sampai 24 px, langkah 1) dan tinggi baris (1,0 sampai 2,0, langkah 0,1), keterangan, tombol "Kembalikan bawaan" (nonaktif bila sudah bawaan). Bukan slider seperti usulan awal: `Stepper` mengikuti prototipe `Settings` yang sudah ada dan target sentuhnya 44 px. Tombol di batas rentang nonaktif. Perubahan tersimpan tiap ketukan; bila gagal menulis, banner "Pengaturan tidak tersimpan" tampil dan nilai tetap berlaku sampai aplikasi ditutup.
+- Rentang ukuran font diperlebar dari prototipe (10 sampai 20) ke 8 sampai 24 sesuai batas di `AppSettings`, dan prototipe disesuaikan.
+- Tes: 8 tes layar (`test/features/settings_screen_test.dart`: nilai bawaan, langkah font dan baris, tanpa sisa desimal, batas rentang, kembalikan bawaan, gagal simpan, target 44 px), 2 tes `save`, 1 tes perubahan langsung pada sesi terbuka (`reconnect_test.dart`); 294 tes seluruhnya lulus, `flutter analyze` bersih.
+- **Di HP fisik (dilaporkan pengguna, 2026-10-16, build debug):** pengguna menyatakan menu setting "aman" setelah dicoba. Rincian yang diperiksa tidak dirinci pengguna (tampilan, ubah ukuran saat sesi hidup, simpan setelah tutup paksa).
+- **Belum teruji / belum dikonfirmasi rinci:** `stty size` setelah mengubah ukuran saat sesi hidup, `htop` atau `vim` menggambar ulang setelah perubahan ukuran, dan penyimpanan `settings.json` di build rilis.
+- **Sinkron dengan desain:** salinan lokal `docs/design/` sudah diperbarui (komponen `Stepper`, catatan implementasi di `README.md` dan `flutter.md`, prototipe `Settings.dc.html`), dan **sudah di-publish ke kedua artifact claude.ai** (design system v20, prototipe v33). Lihat `docs/design/SUMBER.md`, bagian "Perubahan lokal".
+
+**Sisa daftar (belum dikerjakan):**
+- Kandidat pengaturan lain dari pembahasan: tema terminal (gelap, kontras tinggi, terang; token `term-contrast-*` dan `term-light-*` sudah ada; prototipe `Settings` sudah memuat baris Tema), baris tombol cepat dua baris di layar luas, sambung ulang otomatis (nyala atau mati, jumlah percobaan dan jeda), konfirmasi sebelum memutus, foreground service (opt-in, `android.md`), pemeriksaan status host (online atau offline).
 - Pengaturan lain ditambahkan ke berkas yang sama (`version` dinaikkan bila bentuknya berubah) dan ke layar yang sama.
+- Dasar keputusan: tanpa cubit-untuk-zoom di terminal (keputusan pengguna: tersentuh tanpa sengaja akan mengganggu); pembanding JuiceSSH menampilkan banyak baris karena huruf kecil dan baris rapat, jadi rentang ukuran dibuat lebar.
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` (bagian 11a). Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. **Belum:** sisa uji HP (Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, `vim` dan `tmux`, hasil sambung ulang di HP), jalur PIN/pola dan HP tanpa kunci layar, `keyboard-interactive`, animasi keyboard (belum diukur). **Di luar irisan pertama:** menu setting (wajib sebelum rilis), seleksi dan salin teks, tempel, status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1), foreground service. **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna) dan pembaruan artifact desain (penguncian tiga tingkat, `PRIVATE_KEY_PEM` kode 5, warna ANSI magenta dan sian, konfirmasi memutus, sambung ulang otomatis sekali, tinggi baris terminal 1,3, `settings.json`).
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` (bagian 11a). Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. **Belum:** sisa uji HP (Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP), HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur). **Menu setting** (ukuran huruf dan tinggi baris) selesai dan dicoba di HP. **Di luar irisan pertama:** seleksi dan salin teks, tempel, status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1), foreground service. **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna) dan sinkron desain: salinan lokal `docs/design/` dan kedua artifact sudah memuat penguncian tiga tingkat, warna ANSI magenta dan sian, konfirmasi memutus, sambung ulang otomatis sekali, tinggi baris terminal 1,3, komponen `Stepper`, dan layar Pengaturan (prototipe `Settings`), (lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
 Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 280+ tes otomatis, tanpa jaringan
+flutter test                                   # 290+ tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]

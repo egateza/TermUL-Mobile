@@ -46,6 +46,7 @@ class AppDependencies {
     required this.report,
     this.settings = const AppSettings(),
     this.reloadSettings,
+    this.saveSettings,
   });
 
   final HostRepository hosts;
@@ -57,6 +58,9 @@ class AppDependencies {
 
   /// Membaca ulang `settings.json` (dipanggil tiap sesi baru). `null` di tes yang tidak memerlukannya.
   final Future<AppSettings> Function()? reloadSettings;
+
+  /// Menyimpan `settings.json`. `null` di tes yang tidak memerlukannya.
+  final Future<void> Function(AppSettings)? saveSettings;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -93,6 +97,7 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
       await settingsRepo.load();
       return settingsRepo.settings;
     },
+    saveSettings: settingsRepo.save,
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,

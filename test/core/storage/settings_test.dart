@@ -123,5 +123,27 @@ void main() {
       expect(result.hadCorruptFile, isFalse);
       expect(repo.settings.terminal, const TerminalSettings());
     });
+    test('save menulis berkas yang bisa dibaca ulang dan menjadi nilai terkini', () async {
+      final repo = JsonSettingsRepository(file);
+      await repo.load();
+      const baru = AppSettings(terminal: TerminalSettings(fontSize: 10, lineHeight: 1.1));
+      await repo.save(baru);
+      expect(repo.settings.terminal, baru.terminal);
+      final lain = JsonSettingsRepository(file);
+      await lain.load();
+      expect(lain.settings.terminal, baru.terminal);
+    });
+
+    test('save gagal: berkas lama utuh, nilai terkini tidak berubah, galat dilempar', () async {
+      file.writeAsStringSync('{"version":1,"terminal":{"fontSize":17}}');
+      final repo = JsonSettingsRepository(file, writer: (f, b) async => throw const FileSystemException('penuh'));
+      await repo.load();
+      await expectLater(
+        repo.save(const AppSettings(terminal: TerminalSettings(fontSize: 9))),
+        throwsA(isA<FileSystemException>()),
+      );
+      expect(repo.settings.terminal.fontSize, 17);
+      expect(file.readAsStringSync(), '{"version":1,"terminal":{"fontSize":17}}');
+    });
   });
 }

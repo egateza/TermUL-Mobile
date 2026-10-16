@@ -1044,6 +1044,102 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Menyambung ulang…'**
   String get terminalStatusReconnecting;
+
+  /// Nama aksesibilitas tombol pengaturan di header daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan'**
+  String get hostsOpenSettings;
+
+  /// Judul layar pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan'**
+  String get settingsTitle;
+
+  /// Judul bagian pengaturan terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Terminal'**
+  String get settingsTerminalSection;
+
+  /// Label pengaturan ukuran huruf terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Ukuran font'**
+  String get settingsFontSize;
+
+  /// Nilai ukuran huruf terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'{px} px'**
+  String settingsFontSizeValue(int px);
+
+  /// Tombol mengurangi ukuran huruf.
+  ///
+  /// In id, this message translates to:
+  /// **'Kecilkan font'**
+  String get settingsFontSmaller;
+
+  /// Tombol menambah ukuran huruf.
+  ///
+  /// In id, this message translates to:
+  /// **'Besarkan font'**
+  String get settingsFontLarger;
+
+  /// Label pengaturan tinggi baris terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Tinggi baris'**
+  String get settingsLineHeight;
+
+  /// Nilai tinggi baris terminal sebagai kelipatan ukuran huruf, mis. 1,3×.
+  ///
+  /// In id, this message translates to:
+  /// **'{value}×'**
+  String settingsLineHeightValue(String value);
+
+  /// Tombol mengurangi tinggi baris.
+  ///
+  /// In id, this message translates to:
+  /// **'Rapatkan baris'**
+  String get settingsLineTighter;
+
+  /// Tombol menambah tinggi baris.
+  ///
+  /// In id, this message translates to:
+  /// **'Renggangkan baris'**
+  String get settingsLineLooser;
+
+  /// Keterangan di bawah pengaturan terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Berlaku langsung di sesi yang sedang terbuka. Makin kecil huruf dan makin rapat baris, makin banyak baris yang muat; terlalu kecil sulit dibaca.'**
+  String get settingsTerminalHint;
+
+  /// Tombol mengembalikan pengaturan terminal ke nilai bawaan.
+  ///
+  /// In id, this message translates to:
+  /// **'Kembalikan bawaan'**
+  String get settingsResetDefaults;
+
+  /// Nama aksesibilitas pratinjau terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Pratinjau terminal'**
+  String get settingsPreviewLabel;
+
+  /// Judul banner saat settings.json gagal ditulis.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan tidak tersimpan'**
+  String get settingsSaveFailedTitle;
+
+  /// Isi banner saat settings.json gagal ditulis.
+  ///
+  /// In id, this message translates to:
+  /// **'Perubahan tetap berlaku sampai aplikasi ditutup, tetapi akan hilang setelah itu. Periksa ruang penyimpanan HP lalu coba lagi.'**
+  String get settingsSaveFailedBody;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

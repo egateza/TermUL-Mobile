@@ -69,3 +69,5 @@ ThemeData termulTheme() => ThemeData(
 - Sertakan berkas font IBM Plex Sans dan JetBrains Mono sebagai aset aplikasi agar tidak bergantung pada jaringan. Keduanya setahu kami berlisensi OFL; periksa berkas lisensi saat membundelnya.
 - Fokus: bungkus kontrol interaktif dengan `FocusableActionDetector` atau `Focus` dan gambar cincin 2px `accent`, offset 2px.
 - Reduce motion: baca `MediaQuery.disableAnimationsOf(context)` dan lewati animasi bila benar.
+- Penerapan di aplikasi (2026-10-16): tema memakai konstanta statis (`TermulPalette`, `TermulSpacing`, `TermulSize`, `TermulRadius`, `TermulText`) yang dihasilkan dari `tokens.json`, bukan `ThemeExtension`, karena hanya ada tema Gelap.
+- Pengaturan terminal (`settings.json`: `terminal.fontSize` 8 sampai 24, bawaan 13; `terminal.lineHeight` 1,0 sampai 2,0, bawaan 1,3) diubah dari layar Pengaturan lewat `Notifier` Riverpod dan langsung memengaruhi `TerminalStyle` sesi yang terbuka; ukuran PTY dihitung ulang dan dikirim lewat debounce 150 ms. Nilai bawaan 1,3 menggantikan 1,5 dari token `terminal` untuk baris terminal.

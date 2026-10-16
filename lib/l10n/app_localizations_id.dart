@@ -533,4 +533,58 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get terminalStatusReconnecting => 'Menyambung ulang…';
+
+  @override
+  String get hostsOpenSettings => 'Pengaturan';
+
+  @override
+  String get settingsTitle => 'Pengaturan';
+
+  @override
+  String get settingsTerminalSection => 'Terminal';
+
+  @override
+  String get settingsFontSize => 'Ukuran font';
+
+  @override
+  String settingsFontSizeValue(int px) {
+    return '$px px';
+  }
+
+  @override
+  String get settingsFontSmaller => 'Kecilkan font';
+
+  @override
+  String get settingsFontLarger => 'Besarkan font';
+
+  @override
+  String get settingsLineHeight => 'Tinggi baris';
+
+  @override
+  String settingsLineHeightValue(String value) {
+    return '$value×';
+  }
+
+  @override
+  String get settingsLineTighter => 'Rapatkan baris';
+
+  @override
+  String get settingsLineLooser => 'Renggangkan baris';
+
+  @override
+  String get settingsTerminalHint =>
+      'Berlaku langsung di sesi yang sedang terbuka. Makin kecil huruf dan makin rapat baris, makin banyak baris yang muat; terlalu kecil sulit dibaca.';
+
+  @override
+  String get settingsResetDefaults => 'Kembalikan bawaan';
+
+  @override
+  String get settingsPreviewLabel => 'Pratinjau terminal';
+
+  @override
+  String get settingsSaveFailedTitle => 'Pengaturan tidak tersimpan';
+
+  @override
+  String get settingsSaveFailedBody =>
+      'Perubahan tetap berlaku sampai aplikasi ditutup, tetapi akan hilang setelah itu. Periksa ruang penyimpanan HP lalu coba lagi.';
 }

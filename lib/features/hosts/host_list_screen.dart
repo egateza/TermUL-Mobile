@@ -17,6 +17,7 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../../shared/widgets/termul_toast.dart';
+import '../settings/settings_screen.dart';
 import 'host_form_screen.dart';
 import 'host_list_model.dart';
 
@@ -45,6 +46,10 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
 
   void _openForm([HostProfile? existing]) {
     Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => HostFormScreen(existing: existing)));
+  }
+
+  void _openSettings() {
+    Navigator.of(context).push<void>(MaterialPageRoute(builder: (_) => const SettingsScreen()));
   }
 
   void _open(HostProfile p) {
@@ -205,6 +210,7 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                       child: Text(l.hostsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
                     ),
                   ),
+                  TermulIconButton(icon: TermulIconName.settings, label: l.hostsOpenSettings, onPressed: _openSettings),
                   TermulIconButton(
                     icon: TermulIconName.plus,
                     label: l.hostsAddHost,

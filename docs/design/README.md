@@ -33,7 +33,7 @@ Sistem desain TermUL Mobile: klien SSH pribadi untuk ponsel (Android dan iOS), t
 ## Komponen
 
 - Aksi: `Button` untuk teks, `IconButton` untuk ikon saja. Satu `Button` varian `primary` per layar atau sheet; dalam dialog berisiko, tombol utama adalah pilihan aman.
-- Input: `TextField` (pencarian dan form), `Switch` (baris pengaturan dengan deskripsi), `Segmented` (2-4 pilihan eksklusif), `Chip` (filter, tag, level).
+- Input: `TextField` (pencarian dan form), `Switch` (baris pengaturan dengan deskripsi), `Segmented` (2-4 pilihan eksklusif), `Stepper` (satu angka dalam rentang kecil, dengan tombol kurangi dan tambah), `Chip` (filter, tag, level).
 - Umpan balik: `Banner` (peringatan, risiko, es), `Toast` (konfirmasi sesaat, maksimal satu baris), `StatusDot` (titik dengan kata), `Progress` (bar atau titik ketukan).
 - Permukaan: `Card`, `BottomSheet`, `HostRow`, `NavBar`.
 - Terminal: `KeyButton` untuk baris tombol-khusus dan panel tombol, `TerminalSurface` untuk menampilkan baris terminal berwarna.
@@ -48,3 +48,17 @@ Sebelum UI penuh dibangun, tumpukan Flutter (`dartssh2`, `xterm`) diuji ke serve
 - Hanya tema Gelap dan orientasi potret yang didefinisikan.
 - Sembilan tier api, ambang harinya dan palet warnanya mengambil nilai dari artifact desktop "Streak Api TermUL"; jika `StreakTier` di kode desktop berbeda, kode itulah yang benar.
 - Tepi `line` pada input dan chip di prototipe tidak mencapai 3:1; sistem ini mencatatnya dan menyediakan `line-strong`.
+
+## Catatan dari implementasi Flutter (diperbarui 2026-10-16)
+
+Keputusan yang muncul saat aplikasi dibangun dan menyimpang atau menambah dari desain di atas. Rinciannya di `docs/implementation-plan.md` repo aplikasi.
+
+- Platform: Android saja; iOS belum diuji sama sekali (kalimat awal "Android dan iOS" tidak lagi berlaku).
+- Pengaturan: layar Pengaturan sudah ada dengan bagian Terminal saja (pratinjau, `Stepper` ukuran font dan tinggi baris, tombol "Kembalikan bawaan"; prototipe `Settings`). Karena `NavBar` lima tab belum dibangun, layar ini sementara dibuka dari ikon pengaturan di header layar Host, di samping tombol tambah host. Bagian lain di prototipe (Tema, Keamanan, Koneksi, Data, Streak, Widget) belum dibuat.
+- Terminal: tinggi baris bawaan aplikasi 1,3, bukan 1,5 dari token `terminal` (di HP 1,5 hanya memuat sekitar 12 baris di landscape sehingga daftar proses `htop` tidak terlihat); token `terminal` tetap rujukan untuk teks terminal di luar pengaturan. Ukuran font 8 sampai 24 px (bawaan 13), tinggi baris 1,0 sampai 2,0. Tanpa cubit-untuk-zoom; ukuran hanya diubah lewat Pengaturan.
+- Warna ANSI magenta dan sian tidak ada di `tokens.json`; aplikasi memakai `#D59BF6` dan `#7FD6E0` (versi cerah `#E6BDFB` dan `#A9E8EF`) supaya `htop`, `vim`, dan `ls --color` terbaca di `ground-deep`.
+- Keluar dari terminal (tombol kembali di layar maupun sistem) meminta konfirmasi selama shell hidup, karena shell di server ikut berakhir.
+- Sambung ulang: otomatis satu kali saat putus; bila gagal, menunggu tombol "Sambung sekarang". Setiap sambung ulang membuka vault lagi, jadi prompt penguncian muncul lagi.
+- Penguncian rahasia tiga tingkat (mengubah K15 di `spike.md`): biometrik; PIN, pola, atau sandi perangkat bila HP tanpa biometrik; tanpa kunci layar boleh menyimpan tetapi dengan peringatan. Rahasia selalu terenkripsi di Keystore.
+- Tombol cepat terminal: Fn (F1 sampai F12) ditaruh setelah Alt; mode ringkas landscape memakai tombol status 32 dp dan tombol cepat 36 dp.
+

@@ -731,5 +731,79 @@
   "terminalStatusReconnecting": "Menyambung ulang…",
   "@terminalStatusReconnecting": {
     "description": "Status header terminal saat menyambung ulang."
+  },
+  "hostsOpenSettings": "Pengaturan",
+  "@hostsOpenSettings": {
+    "description": "Nama aksesibilitas tombol pengaturan di header daftar host."
+  },
+  "settingsTitle": "Pengaturan",
+  "@settingsTitle": {
+    "description": "Judul layar pengaturan."
+  },
+  "settingsTerminalSection": "Terminal",
+  "@settingsTerminalSection": {
+    "description": "Judul bagian pengaturan terminal."
+  },
+  "settingsFontSize": "Ukuran font",
+  "@settingsFontSize": {
+    "description": "Label pengaturan ukuran huruf terminal."
+  },
+  "settingsFontSizeValue": "{px} px",
+  "@settingsFontSizeValue": {
+    "description": "Nilai ukuran huruf terminal.",
+    "placeholders": {
+      "px": {
+        "type": "int"
+      }
+    }
+  },
+  "settingsFontSmaller": "Kecilkan font",
+  "@settingsFontSmaller": {
+    "description": "Tombol mengurangi ukuran huruf."
+  },
+  "settingsFontLarger": "Besarkan font",
+  "@settingsFontLarger": {
+    "description": "Tombol menambah ukuran huruf."
+  },
+  "settingsLineHeight": "Tinggi baris",
+  "@settingsLineHeight": {
+    "description": "Label pengaturan tinggi baris terminal."
+  },
+  "settingsLineHeightValue": "{value}×",
+  "@settingsLineHeightValue": {
+    "description": "Nilai tinggi baris terminal sebagai kelipatan ukuran huruf, mis. 1,3×.",
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsLineTighter": "Rapatkan baris",
+  "@settingsLineTighter": {
+    "description": "Tombol mengurangi tinggi baris."
+  },
+  "settingsLineLooser": "Renggangkan baris",
+  "@settingsLineLooser": {
+    "description": "Tombol menambah tinggi baris."
+  },
+  "settingsTerminalHint": "Berlaku langsung di sesi yang sedang terbuka. Makin kecil huruf dan makin rapat baris, makin banyak baris yang muat; terlalu kecil sulit dibaca.",
+  "@settingsTerminalHint": {
+    "description": "Keterangan di bawah pengaturan terminal."
+  },
+  "settingsResetDefaults": "Kembalikan bawaan",
+  "@settingsResetDefaults": {
+    "description": "Tombol mengembalikan pengaturan terminal ke nilai bawaan."
+  },
+  "settingsPreviewLabel": "Pratinjau terminal",
+  "@settingsPreviewLabel": {
+    "description": "Nama aksesibilitas pratinjau terminal."
+  },
+  "settingsSaveFailedTitle": "Pengaturan tidak tersimpan",
+  "@settingsSaveFailedTitle": {
+    "description": "Judul banner saat settings.json gagal ditulis."
+  },
+  "settingsSaveFailedBody": "Perubahan tetap berlaku sampai aplikasi ditutup, tetapi akan hilang setelah itu. Periksa ruang penyimpanan HP lalu coba lagi.",
+  "@settingsSaveFailedBody": {
+    "description": "Isi banner saat settings.json gagal ditulis."
   }
 }

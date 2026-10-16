@@ -1,6 +1,7 @@
 import 'dart:async';
 
 import 'package:flutter/widgets.dart' show AppLifecycleState, WidgetsBinding;
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app_providers.dart';
 import 'package:termul_mobile/core/models/app_settings.dart';
@@ -276,5 +277,22 @@ void main() {
     expect(style.fontSize, 9);
     expect(style.height, 1.2);
     expect(loads, 2);
+  });
+
+  testWidgets('mengubah pengaturan saat sesi terbuka langsung mengubah huruf dan ukuran PTY', (tester) async {
+    final (_, net, _) = await start(tester);
+    TerminalView view() => tester.widget<TerminalView>(find.byType(TerminalView));
+    expect(view().textStyle.fontSize, 13);
+    final rowsBefore = net.shells.single.resizes.isEmpty ? null : net.shells.single.resizes.last;
+    final container = ProviderScope.containerOf(tester.element(find.byType(TerminalView)));
+    await container
+        .read(appSettingsProvider.notifier)
+        .update(const AppSettings(terminal: TerminalSettings(fontSize: 9, lineHeight: 1.0)));
+    await tester.pump();
+    await tester.pump(const Duration(milliseconds: 400)); // melewati debounce 150 ms
+    expect(view().textStyle.fontSize, 9);
+    expect(view().textStyle.height, 1.0);
+    expect(net.shells.single.resizes, isNotEmpty);
+    expect(net.shells.single.resizes.last, isNot(equals(rowsBefore)));
   });
 }

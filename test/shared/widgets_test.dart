@@ -271,7 +271,9 @@ void main() {
     );
     expect(tester.takeException(), isNull);
     for (final n in TermulIconName.values) {
-      expect(n.path.getBounds().isEmpty, isFalse, reason: n.name);
+      // Garis lurus (mis. minus) bertinggi nol, jadi "punya bentuk" = lebar atau tinggi tidak nol.
+      final b = n.path.getBounds();
+      expect(b.width > 0 || b.height > 0, isTrue, reason: n.name);
     }
   });
 

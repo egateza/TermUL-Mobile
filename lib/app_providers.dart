@@ -24,14 +24,35 @@ final credentialVaultProvider = Provider<CredentialVault>(
 );
 final hostServiceProvider = Provider<HostService>((ref) => throw UnimplementedError('Suntikkan lewat bootstrap'));
 
-/// Pengaturan dari `settings.json`, dibaca sekali saat mulai.
-final appSettingsProvider = Provider<AppSettings>((ref) => const AppSettings());
+/// Pengaturan yang dimuat dari `settings.json` saat mulai; nilai awal [appSettingsProvider].
+final initialSettingsProvider = Provider<AppSettings>((ref) => const AppSettings());
+
+/// Menyimpan pengaturan ke `settings.json`. Bawaan: tidak menyimpan apa pun (tes).
+final settingsSaverProvider = Provider<Future<void> Function(AppSettings)>((ref) => (_) async {});
+
+/// Pengaturan yang berlaku. Perubahan dari layar pengaturan ([AppSettingsNotifier.update]) langsung berlaku di
+/// sesi terminal yang sedang terbuka.
+class AppSettingsNotifier extends Notifier<AppSettings> {
+  @override
+  AppSettings build() => ref.watch(initialSettingsProvider);
+
+  /// Memakai [next] dan menyimpannya. Bila penyimpanan gagal, nilai tetap berlaku sampai aplikasi ditutup dan
+  /// galatnya dilempar supaya layar bisa memberi tahu pengguna.
+  Future<void> update(AppSettings next) async {
+    state = next;
+    await ref.read(settingsSaverProvider)(next);
+  }
+
+  /// Memakai [next] tanpa menyimpan (hasil membaca ulang berkas).
+  void replace(AppSettings next) => state = next;
+}
+
+final appSettingsProvider = NotifierProvider<AppSettingsNotifier, AppSettings>(AppSettingsNotifier.new);
 
 /// Memuat ulang `settings.json`; dipanggil tiap sesi baru dibuka supaya perubahan berkas langsung terpakai
 /// tanpa menutup aplikasi. Bawaan: nilai yang dimuat saat mulai.
 final settingsLoaderProvider = Provider<Future<AppSettings> Function()>((ref) {
-  final s = ref.watch(appSettingsProvider);
-  return () async => s;
+  return () async => ref.read(appSettingsProvider);
 });
 final bootReportProvider = Provider<BootReport>((ref) => const BootReport());
 
@@ -63,7 +84,8 @@ extension AppDependenciesOverrides on AppDependencies {
     credentialVaultProvider.overrideWithValue(vault),
     hostServiceProvider.overrideWithValue(service),
     bootReportProvider.overrideWithValue(report),
-    appSettingsProvider.overrideWithValue(settings),
+    initialSettingsProvider.overrideWithValue(settings),
+    if (saveSettings != null) settingsSaverProvider.overrideWithValue(saveSettings!),
     if (reloadSettings != null) settingsLoaderProvider.overrideWithValue(reloadSettings!),
   ];
 }

@@ -29,7 +29,7 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 <div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
 
 <div style="padding: 14px">
-<div style="padding: 12px; border-radius: 10px; background: {{pvBg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: {{fontPx}}px; line-height: 1.5; color: {{pvFg}}; overflow: hidden; white-space: nowrap">
+<div style="padding: 12px; border-radius: 10px; background: {{pvBg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: {{fontPx}}px; line-height: {{lhNum}}; color: {{pvFg}}; overflow: hidden; white-space: nowrap">
 <div><span style="color: {{pvPrompt}}">deploy@app-01</span>:~$ ls -la</div>
 <div>drwxr-xr-x 4 deploy deploy</div>
 </div>
@@ -40,6 +40,13 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 <button type="button" onClick="{{fontDec}}" aria-label="Kecilkan font" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 20px; cursor: pointer; opacity: {{decOpacity}}">&#8722;</button>
 <span style="min-width: 48px; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">{{fontPx}} px</span>
 <button type="button" onClick="{{fontInc}}" aria-label="Besarkan font" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 20px; cursor: pointer; opacity: {{incOpacity}}">+</button>
+</div>
+
+<div style="display: flex; align-items: center; gap: 12px; padding: 8px 14px; min-height: 56px; border-top: 1px solid #2A343A">
+<span style="flex: 1; font-size: 15px">Tinggi baris</span>
+<button type="button" onClick="{{lhDec}}" aria-label="Rapatkan baris" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 20px; cursor: pointer; opacity: {{lhDecOpacity}}">&#8722;</button>
+<span style="min-width: 48px; text-align: center; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 14px">{{lhText}}</span>
+<button type="button" onClick="{{lhInc}}" aria-label="Renggangkan baris" style="width: 44px; height: 44px; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 20px; cursor: pointer; opacity: {{lhIncOpacity}}">+</button>
 </div>
 
 <div style="display: flex; flex-direction: column; gap: 10px; padding: 12px 14px 14px 14px; border-top: 1px solid #2A343A">
@@ -256,6 +263,7 @@ class Component extends DCLogic {
   renderVals() {
     const s = this.state || {};
     const font = s.font || 13;
+    const lh = s.lh || 13; // tinggi baris dalam persepuluhan (13 = 1,3); bawaan aplikasi 1,3
     const theme = s.theme || 'ops';
     const lock = s.lock || '60';
     const ka = s.ka || '30';
@@ -315,10 +323,16 @@ class Component extends DCLogic {
       pvBg: pv.bg,
       pvFg: pv.fg,
       pvPrompt: pv.prompt,
-      decOpacity: font <= 10 ? '0.4' : '1',
-      incOpacity: font >= 20 ? '0.4' : '1',
-      fontDec: () => this.setState({ font: Math.max(10, font - 1) }),
-      fontInc: () => this.setState({ font: Math.min(20, font + 1) }),
+      decOpacity: font <= 8 ? '0.4' : '1',
+      incOpacity: font >= 24 ? '0.4' : '1',
+      fontDec: () => this.setState({ font: Math.max(8, font - 1) }),
+      fontInc: () => this.setState({ font: Math.min(24, font + 1) }),
+      lhNum: (lh / 10).toFixed(1),
+      lhText: (lh / 10).toFixed(1).replace('.', ',') + '×',
+      lhDecOpacity: lh <= 10 ? '0.4' : '1',
+      lhIncOpacity: lh >= 20 ? '0.4' : '1',
+      lhDec: () => this.setState({ lh: Math.max(10, lh - 1) }),
+      lhInc: () => this.setState({ lh: Math.min(20, lh + 1) }),
       themes: themes,
       secSwitches: [
         mkSwitch('bio', 'Biometrik untuk membuka vault', 'Sidik jari atau wajah'),

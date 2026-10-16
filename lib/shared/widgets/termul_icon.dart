@@ -15,6 +15,7 @@ String _circle(double cx, double cy, double r) => 'M${cx - r} $cy a$r $r 0 1 0 $
 enum TermulIconName {
   search('M20 20l-3.5-3.5'),
   plus('M12 5v14M5 12h14'),
+  minus('M5 12h14'),
   close('M6 6l12 12M18 6L6 18'),
   check('M5 12l5 5 9-10'),
   chevronDown('M6 9l6 6 6-6'),

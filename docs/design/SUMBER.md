@@ -40,4 +40,19 @@ Tanggal salin: 2026-10-15
   - TerminalPaste, TerminalPasteMenu, TerminalReconnect, TerminalReconnectPlain (`.dc.html`)
   - WidgetFavorit, WidgetGallery, WidgetStreak, Widgets (`.dc.html`)
 
-Salinan ini tidak diubah dari sumbernya. Bila artifact diperbarui, salin ulang dan perbarui tanggal serta versi di atas.
+Salinan ini tidak diubah dari sumbernya kecuali yang tercatat di bagian "Perubahan lokal" di bawah. Bila artifact diperbarui, salin ulang dan perbarui tanggal serta versi di atas.
+
+## Perubahan lokal (2026-10-16), sudah di-publish ke artifact
+
+Dibuat bersama menu setting (lihat `docs/implementation-plan.md`, bagian 11a). **Sudah di-publish 2026-10-16** atas persetujuan pemilik: design system menjadi versi 20 (`1792121434-7216`), prototipe versi 33 (`1792121460-ecc0`). Sebelum itu dicek bahwa isi berkas sumber yang diubah sama dengan salinan lokal (sha256 sama), walau nomor versi artifact sudah naik dari salinan awal (`abe7` dan `38e8`). Salinan lokal dan artifact kini sama untuk berkas di bawah; selain itu salinan lain dari 2026-10-15 belum dibandingkan ulang dengan versi artifact terbaru. Di design system, `design-system.json` hanya berubah pada `lastChange`.
+
+Design system:
+- `components/Stepper/README.md`: **berkas baru** (komponen `Stepper`; di artifact path `project/components/Stepper/README.md`).
+- `README.md`: `Stepper` ditambahkan ke daftar input; bagian baru "Catatan dari implementasi Flutter" (Android saja, Pengaturan dibuka dari ikon di header Host selagi `NavBar` belum ada, tinggi baris terminal bawaan 1,3, warna ANSI magenta dan sian, konfirmasi keluar, sambung ulang otomatis sekali, penguncian tiga tingkat, tombol Fn).
+- `flutter.md`: dua butir di akhir (tema konstanta statis; pengaturan terminal lewat `Notifier`).
+- Tidak diubah: `tokens.json`, `components/index.d.ts`, `bundle.js`, `preview.html`. `Stepper` belum ada di kode web komponen.
+
+Prototipe:
+- `prototype/Settings.dc.html`: rentang ukuran font 10-20 menjadi 8-24 px, baris baru "Tinggi baris" (1,0 sampai 2,0, langkah 0,1, bawaan 1,3), pratinjau memakai tinggi baris itu (sebelumnya tetap 1,5). Sudah dirender di Chrome tanpa galat.
+- `prototype/Main.dc.html` **tidak diubah**: ikon pengaturan di header Host adalah jalan masuk sementara di Flutter, sedangkan prototipe tetap memakai `NavBar` lima tab.
+

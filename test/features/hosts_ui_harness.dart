@@ -10,6 +10,7 @@ import 'package:termul_mobile/app_providers.dart';
 import 'package:termul_mobile/bootstrap.dart';
 import 'package:termul_mobile/core/keys/key_file_picker.dart';
 import 'package:termul_mobile/core/models/auth_method.dart';
+import 'package:termul_mobile/core/models/app_settings.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
 import 'package:termul_mobile/core/storage/json/json_host_repository.dart';
 import 'package:termul_mobile/core/storage/json/json_known_hosts_repository.dart';
@@ -42,7 +43,12 @@ class FakeKeyPicker implements KeyFilePicker {
 /// Seluruh ketergantungan aplikasi di memori: tanpa I/O berkas sungguhan (yang tidak selesai di dalam
 /// `testWidgets`), tanpa Keystore dan autentikasi sungguhan.
 class Harness {
-  Harness({AuthLevel level = AuthLevel.biometric, BootReport report = const BootReport()}) {
+  Harness({
+    AuthLevel level = AuthLevel.biometric,
+    BootReport report = const BootReport(),
+    AppSettings settings = const AppSettings(),
+    Future<void> Function(AppSettings)? saveSettings,
+  }) {
     auth = FakeDeviceAuth(currentLevel: level);
     hosts = JsonHostRepository(File('tidak-dipakai-profiles.json'), writer: noWrite);
     known = JsonKnownHostsRepository(File('tidak-dipakai-known.json'), writer: noWrite);
@@ -50,7 +56,15 @@ class Harness {
     index = MemoryVaultIndex();
     vault = KeystoreCredentialVault(auth: auth, store: store, index: index);
     service = HostService(hosts: hosts, knownHosts: known, vault: vault);
-    deps = AppDependencies(hosts: hosts, knownHosts: known, vault: vault, service: service, report: report);
+    deps = AppDependencies(
+      hosts: hosts,
+      knownHosts: known,
+      vault: vault,
+      service: service,
+      report: report,
+      settings: settings,
+      saveSettings: saveSettings,
+    );
   }
 
   late final FakeDeviceAuth auth;
