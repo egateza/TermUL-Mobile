@@ -1,9 +1,12 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/painting.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xterm/xterm.dart';
 
 import 'package:termul_mobile/features/terminal/terminal_palette.dart';
+
+import 'package:termul_mobile/features/terminal/selection_overlay.dart';
 
 import 'terminal_screen_test.dart' show pumpTerminal, terminalView;
 
@@ -116,6 +119,55 @@ void main() {
     await tester.pump();
     expect(controller.selection!.normalized.begin.x, greaterThan(0));
     expect(controller.selection!.normalized.end, endBefore);
+  });
+
+  testWidgets('gagang di kolom pertama dan kolom terakhir menjauh dari tepi layar (zona gestur kembali)', (
+    tester,
+  ) async {
+    await pumpTerminal(tester);
+    final view = terminalView(tester);
+    view.terminal.write('halo dunia');
+    await tester.pump();
+    select(tester, CellOffset(0, 0), CellOffset(view.terminal.viewWidth, 0));
+    await tester.pump();
+    final width = tester.view.physicalSize.width;
+    expect(tester.getCenter(find.bySemanticsLabel('Gagang awal pilihan')).dx, greaterThanOrEqualTo(36));
+    expect(tester.getCenter(find.bySemanticsLabel('Gagang akhir pilihan')).dx, lessThanOrEqualTo(width - 36));
+  });
+
+  testWidgets('seleksi di baris paling bawah: gagang tetap di dalam area terminal dan bisa diseret', (tester) async {
+    await pumpTerminal(tester);
+    final view = terminalView(tester);
+    final rows = view.terminal.viewHeight;
+    view.terminal.write(List.generate(rows, (i) => 'baris $i').join('\r\n'));
+    await tester.pump();
+    final last = view.terminal.buffer.lines.length - 1;
+    select(tester, CellOffset(0, last), CellOffset(5, last));
+    await tester.pump();
+    final area = tester.getRect(find.byType(SelectionHandles));
+    final end = find.bySemanticsLabel('Gagang akhir pilihan');
+    expect(end, findsOneWidget);
+    expect(area.contains(tester.getCenter(end)), isTrue);
+    await tester.drag(end, const Offset(40, 0));
+    await tester.pump();
+    expect(view.controller!.selection!.normalized.end.y, last);
+    expect(view.controller!.selection!.normalized.end.x, greaterThan(5));
+  });
+
+  testWidgets('kaca pembesar muncul selama gagang diseret dan hilang saat dilepas', (tester) async {
+    await pumpTerminal(tester);
+    terminalView(tester).terminal.write('halo dunia');
+    await tester.pump();
+    select(tester, CellOffset(0, 0), CellOffset(4, 0));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('selection-lens')), findsNothing);
+    final gesture = await tester.startGesture(tester.getCenter(find.bySemanticsLabel('Gagang akhir pilihan')));
+    await gesture.moveBy(const Offset(30, 0));
+    await tester.pump();
+    expect(find.byKey(const ValueKey('selection-lens')), findsOneWidget);
+    await gesture.up();
+    await tester.pump();
+    expect(find.byKey(const ValueKey('selection-lens')), findsNothing);
   });
 
   testWidgets('tekan lama memilih satu kata dan memunculkan bilah', (tester) async {

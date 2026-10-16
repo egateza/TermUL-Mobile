@@ -8,9 +8,15 @@ import 'package:xterm/src/ui/render.dart' show RenderTerminal;
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 
-/// Dua gagang yang bisa diseret di awal dan akhir seleksi (xterm 4.0.0 hanya memilih satu kata tanpa gagang;
-/// perhitungannya dari lampiran A8 di `docs/design/spike-temuan.md`). Dipasang di atas [TerminalView] dalam
-/// `Stack`; tanpa seleksi, widget ini kosong dan tidak menangkap sentuhan.
+/// Dua gagang yang bisa diseret di awal dan akhir seleksi, plus kaca pembesar di atas jari saat menyeret (xterm
+/// 4.0.0 hanya memilih satu kata tanpa gagang; perhitungannya dari lampiran A8 di `docs/design/spike-temuan.md`).
+/// Dipasang di atas [TerminalView] dalam `Stack`; tanpa seleksi, widget ini kosong dan tidak menangkap sentuhan.
+///
+/// - Gagang tetap berada di dalam layar: di tepi bawah ia naik, di tepi kiri dan kanan ia menjauh dari tepi
+///   ([_edgeMargin]) supaya sentuhan tidak jatuh di zona gestur kembali Android. Yang dihitung adalah selisih jari
+///   dari titik seleksi saat gagang diraih, bukan posisi gagang, jadi seleksi tetap bisa mencapai kolom pertama,
+///   kolom terakhir, dan baris terakhir.
+/// - Kaca pembesar menampilkan sel yang sedang ditunjuk dengan perbesaran [_zoom].
 class SelectionHandles extends StatefulWidget {
   const SelectionHandles({
     super.key,
@@ -30,13 +36,33 @@ class SelectionHandles extends StatefulWidget {
   static const _touch = 44.0;
   static const _dot = 14.0;
 
+  /// Jarak minimum pusat gagang dari tepi kiri dan kanan (zona gestur kembali Android sekitar 24 dp).
+  static const _edgeMargin = 36.0;
+
+  static const _lensSize = Size(120, 56);
+  static const _zoom = 1.6;
+
   @override
   State<SelectionHandles> createState() => _SelectionHandlesState();
 }
 
+/// Keadaan satu seretan gagang.
+class _Drag {
+  _Drag({required this.fixed, required this.movingStart, required this.grab});
+
+  /// Sisi seleksi yang tidak digeser.
+  final CellOffset fixed;
+  final bool movingStart;
+
+  /// Selisih jari dari titik seleksi (tepi kiri sel, tengah baris) saat gagang diraih.
+  final Offset grab;
+
+  /// Titik yang sedang ditunjuk (tepi kiri sel, tengah baris) di koordinat widget; dasar posisi kaca pembesar.
+  Offset? focal;
+}
+
 class _SelectionHandlesState extends State<SelectionHandles> {
-  /// Sisi seleksi yang tidak sedang digeser (anchor akan dibuat ulang dari offset ini).
-  CellOffset? _fixed;
+  _Drag? _drag;
 
   @override
   void initState() {
@@ -87,53 +113,79 @@ class _SelectionHandlesState extends State<SelectionHandles> {
 
   RenderTerminal? get _render => widget.viewKey.currentState?.renderTerminal;
 
-  /// Pojok kiri atas sel di koordinat widget ini; null bila belum bisa dihitung.
-  Offset? _cellTopLeft(CellOffset cell) {
-    final render = _render;
+  RenderBox? get _box {
     final box = context.findRenderObject();
-    if (render == null || !render.attached || box is! RenderBox || !box.hasSize) return null;
-    return box.globalToLocal(render.localToGlobal(render.getOffset(cell)));
+    return box is RenderBox && box.hasSize ? box : null;
   }
 
-  void _drag(Offset global, {required bool movingStart}) {
+  /// Pojok kiri atas sel di koordinat widget ini; null bila belum bisa dihitung. Widget ini menutupi persis
+  /// [TerminalView] (sama-sama memenuhi `Stack`), jadi koordinat render terminal sama dengan koordinat di sini; ini
+  /// juga berlaku saat dipanggil dari tahap layout (LayoutBuilder), ketika transformasi global belum siap.
+  Offset? _cellTopLeft(CellOffset cell) {
     final render = _render;
-    final fixed = _fixed;
-    final box = context.findRenderObject();
-    if (render == null || fixed == null || box is! RenderBox) return;
+    if (render == null || !render.attached) return null;
+    return render.getOffset(cell);
+  }
+
+  void _startDrag(Offset global, {required bool isStart}) {
+    final range = widget.controller.selection?.normalized;
+    final render = _render;
+    final box = _box;
+    if (range == null || render == null || box == null) return;
+    final boundary = isStart ? range.begin : range.end;
+    final topLeft = _cellTopLeft(boundary);
+    if (topLeft == null) return;
+    final point = Offset(topLeft.dx, topLeft.dy + render.cellSize.height / 2);
+    _drag = _Drag(
+      fixed: isStart ? range.end : range.begin,
+      movingStart: isStart,
+      grab: box.globalToLocal(global) - point,
+    );
+  }
+
+  void _updateDrag(Offset global) {
+    final drag = _drag;
+    final render = _render;
+    final box = _box;
+    if (drag == null || render == null || box == null) return;
     final cell = render.cellSize;
-    final local = box.globalToLocal(global);
-    // Jari ada di bulatan; sel yang dimaksud ada di atasnya. Geser setengah lebar sel agar yang dipilih adalah
-    // batas antar-sel terdekat (ujung seleksi bersifat eksklusif).
-    final p = local - Offset(0, SelectionHandles._gap + cell.height / 2);
+    final p = box.globalToLocal(global) - drag.grab;
+    // Geser setengah lebar sel supaya yang dipilih adalah batas antar-sel terdekat (ujung seleksi eksklusif).
     final hit = render.getCellOffset(render.globalToLocal(box.localToGlobal(Offset(p.dx + cell.width / 2, p.dy))));
     final terminal = widget.terminal;
     final target = CellOffset(hit.x.clamp(0, terminal.viewWidth), hit.y.clamp(0, terminal.buffer.lines.length - 1));
     widget.controller.setSelection(
-      terminal.buffer.createAnchorFromOffset(movingStart ? target : fixed),
-      terminal.buffer.createAnchorFromOffset(movingStart ? fixed : target),
+      terminal.buffer.createAnchorFromOffset(drag.movingStart ? target : drag.fixed),
+      terminal.buffer.createAnchorFromOffset(drag.movingStart ? drag.fixed : target),
     );
+    final tl = _cellTopLeft(target);
+    setState(() => drag.focal = tl == null ? null : Offset(tl.dx, tl.dy + cell.height / 2));
   }
 
-  Widget _handle(Offset anchor, {required bool isStart, required Size cell}) {
+  void _endDrag() {
+    if (_drag == null) return;
+    setState(() => _drag = null);
+  }
+
+  Widget _handle(Offset anchor, {required bool isStart, required Size cell, required Size area}) {
     final l = AppLocalizations.of(context);
-    final center = Offset(anchor.dx, anchor.dy + cell.height + SelectionHandles._gap);
     const half = SelectionHandles._touch / 2;
+    const margin = SelectionHandles._edgeMargin;
+    final cx = area.width > margin * 2 ? anchor.dx.clamp(margin, area.width - margin) : anchor.dx;
+    final cy = (anchor.dy + cell.height + SelectionHandles._gap).clamp(half, area.height - half);
     return Positioned(
-      left: center.dx - half,
-      top: center.dy - half,
+      left: cx - half,
+      top: cy - half,
       width: SelectionHandles._touch,
       height: SelectionHandles._touch,
       child: Semantics(
         label: isStart ? l.selectionHandleStart : l.selectionHandleEnd,
         child: GestureDetector(
           behavior: HitTestBehavior.opaque,
-          onPanStart: (_) {
-            final range = widget.controller.selection?.normalized;
-            _fixed = range == null ? null : (isStart ? range.end : range.begin);
-          },
-          onPanUpdate: (d) => _drag(d.globalPosition, movingStart: isStart),
-          onPanEnd: (_) => _fixed = null,
-          onPanCancel: () => _fixed = null,
+          onPanStart: (d) => _startDrag(d.globalPosition, isStart: isStart),
+          onPanUpdate: (d) => _updateDrag(d.globalPosition),
+          onPanEnd: (_) => _endDrag(),
+          onPanCancel: _endDrag,
           child: Center(
             child: Container(
               width: SelectionHandles._dot,
@@ -150,25 +202,68 @@ class _SelectionHandlesState extends State<SelectionHandles> {
     );
   }
 
+  /// Kaca pembesar di atas titik yang ditunjuk; bila tidak muat di atas, di bawah gagang.
+  Widget? _lens(Size cell, Size area) {
+    final focal = _drag?.focal;
+    if (focal == null) return null;
+    const size = SelectionHandles._lensSize;
+    final dx = focal.dx.clamp(size.width / 2, area.width - size.width / 2);
+    var dy = focal.dy - cell.height / 2 - 12 - size.height / 2 - SelectionHandles._touch / 2;
+    if (dy - size.height / 2 < 0) {
+      dy = focal.dy + cell.height / 2 + SelectionHandles._gap + SelectionHandles._touch + size.height / 2;
+    }
+    final center = Offset(dx, dy);
+    return Positioned(
+      left: center.dx - size.width / 2,
+      top: center.dy - size.height / 2,
+      width: size.width,
+      height: size.height,
+      child: IgnorePointer(
+        child: ExcludeSemantics(
+          child: RawMagnifier(
+            key: const ValueKey('selection-lens'),
+            size: size,
+            magnificationScale: SelectionHandles._zoom,
+            focalPointOffset: focal - center,
+            clipBehavior: Clip.hardEdge,
+            decoration: MagnifierDecoration(
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(TermulRadius.radiusLg),
+                side: const BorderSide(color: TermulPalette.accent, width: 1.5),
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final range = widget.controller.selection?.normalized;
-    final render = _render;
-    if (range == null || range.isCollapsed || render == null || !render.attached) {
-      return const SizedBox.shrink();
-    }
-    final start = _cellTopLeft(range.begin);
-    final end = _cellTopLeft(range.end);
-    if (start == null || end == null) return const SizedBox.shrink();
-    final cell = render.cellSize;
-    return ClipRect(
-      child: Stack(
-        fit: StackFit.expand,
-        children: [
-          _handle(start, isStart: true, cell: cell),
-          _handle(end, isStart: false, cell: cell),
-        ],
-      ),
+    if (range == null || range.isCollapsed) return const SizedBox.shrink();
+    // LayoutBuilder: ukuran area harus yang terbaru (bilah di bawah bisa berganti tinggi dalam frame yang sama).
+    return LayoutBuilder(
+      builder: (context, constraints) {
+        final render = _render;
+        if (render == null || !render.attached) return const SizedBox.shrink();
+        final start = _cellTopLeft(range.begin);
+        final end = _cellTopLeft(range.end);
+        if (start == null || end == null) return const SizedBox.shrink();
+        final area = constraints.biggest;
+        final cell = render.cellSize;
+        final lens = _lens(cell, area);
+        return ClipRect(
+          child: Stack(
+            fit: StackFit.expand,
+            children: [
+              _handle(start, isStart: true, cell: cell, area: area),
+              _handle(end, isStart: false, cell: cell, area: area),
+              ?lens,
+            ],
+          ),
+        );
+      },
     );
   }
 }
