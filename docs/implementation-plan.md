@@ -558,7 +558,7 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 - **Belum dibuat (ada di prototipe `Terminal.dc.html`):** Cari, Kirim ke host lain, Simpan sebagai snippet, Bagikan, Salin sebagai satu baris, gulir otomatis saat gagang diseret ke tepi layar (juga belum di spike).
 - **Tes:** 8 tes baru (`test/features/terminal/selection_test.dart`): bilah dan gagang muncul, Salin, Semua, Batal, seret kedua gagang, tekan lama, landscape. 335 tes seluruhnya lulus, `flutter analyze` bersih.
 - **Belum teruji (butuh HP):** tekan lama dan seret gagang dengan jari (area sentuh 44 dp), seleksi lintas baris dan di scrollback, posisi gagang saat keyboard terbuka dan saat terminal bergulir, tempel hasil salin di aplikasi lain, seleksi di `vim` dan `tmux` (mouse mode bisa mengambil alih sentuhan).
-- **Sinkron desain:** bilah berbeda dari prototipe (tanpa Cari, Kirim, Snippet, Bagikan; ditambah gagang dari spike). Artifact desain belum diperbarui.
+- **Sinkron desain:** bilah berbeda dari prototipe (tanpa Cari, Kirim, Snippet, Bagikan; ditambah gagang dari spike). Catatan sudah di-publish ke design system versi 23 (prototipe `Terminal` belum diubah).
 
 ### Pengujian tertunda di HP (dicatat 2026-10-16, menunggu pengguna)
 

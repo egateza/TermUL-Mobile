@@ -64,3 +64,8 @@ Prototipe:
 
 - **Sudah di-publish** (design system versi 22, `1792126727-a0ce`): `README.md`: dua butir baru di "Catatan dari implementasi Flutter" (letak tombol Tempel, aturan dialog, varian tanpa tempel aman, karakter kontrol, batas ukuran). Prototipe `Terminal.dc.html` **tidak diubah**: varian tanpa tempel aman dan tombol Tempel di baris tombol cepat belum tergambar di prototipe.
 - Pada publish yang sama, butir Pengaturan di `README.md` diperbarui (bagian Koneksi sudah ada, bukan lagi "belum dibuat").
+
+## Perubahan lokal lanjutan (2026-10-16, seleksi dan salin teks)
+
+- **Sudah di-publish** (design system versi 23, `1792132127-c203`): `README.md` dua butir baru di "Catatan dari implementasi Flutter" (seleksi dan salin: gagang, kaca pembesar, bilah seleksi, yang belum dibuat; warna seleksi tembus pandang), `components/TerminalSurface/README.md` satu butir warna seleksi, `design-system.json` (`lastChange`). Sebelum itu dicek bahwa salinan lokal kedua berkas sama dengan isi artifact. Prototipe `Terminal.dc.html` **tidak diubah**: bilah seleksinya masih memuat Cari, Kirim, Snippet, Bagikan, dan belum menggambar gagang, kaca pembesar, tombol Tempel di baris tombol cepat, serta varian tanpa tempel aman. `tokens.json` tidak diubah (`terminal-selection` tetap nilai desain; aplikasi memakai warna tembus pandang yang dicatat di README).
+
