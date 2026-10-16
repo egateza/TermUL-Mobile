@@ -956,5 +956,51 @@
         "type": "int"
       }
     }
+  },
+  "selectionCount": "{count} karakter dipilih",
+  "@selectionCount": {
+    "description": "Jumlah karakter terpilih di bilah seleksi terminal.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectionHint": "Seret gagang untuk mengubah pilihan",
+  "@selectionHint": {
+    "description": "Petunjuk di bilah seleksi terminal."
+  },
+  "selectionCopy": "Salin",
+  "@selectionCopy": {
+    "description": "Tombol salin di bilah seleksi."
+  },
+  "selectionCopyAria": "Salin teks terpilih",
+  "@selectionCopyAria": {
+    "description": "Nama aksesibilitas tombol salin."
+  },
+  "selectionAll": "Semua",
+  "@selectionAll": {
+    "description": "Tombol pilih semua di bilah seleksi."
+  },
+  "selectionAllAria": "Pilih semua teks di terminal",
+  "@selectionAllAria": {
+    "description": "Nama aksesibilitas tombol pilih semua."
+  },
+  "selectionCopied": "Disalin · {count} karakter",
+  "@selectionCopied": {
+    "description": "Toast setelah menyalin teks terpilih.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "selectionHandleStart": "Gagang awal pilihan",
+  "@selectionHandleStart": {
+    "description": "Nama aksesibilitas gagang awal seleksi."
+  },
+  "selectionHandleEnd": "Gagang akhir pilihan",
+  "@selectionHandleEnd": {
+    "description": "Nama aksesibilitas gagang akhir seleksi."
   }
 }

@@ -15,6 +15,8 @@ import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_toast.dart';
 import 'paste_analysis.dart';
 import 'quick_key_bar.dart';
+import 'selection_bar.dart';
+import 'selection_overlay.dart';
 import 'terminal_palette.dart';
 import 'terminal_session.dart';
 
@@ -66,6 +68,8 @@ class TerminalScreen extends StatefulWidget {
 class _TerminalScreenState extends State<TerminalScreen> {
   TerminalSession get _session => widget.session;
   final _controller = TerminalController();
+  final _scrollController = ScrollController();
+  final _viewKey = GlobalKey<TerminalViewState>();
 
   @override
   void initState() {
@@ -79,6 +83,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   @override
   void dispose() {
     _controller.dispose();
+    _scrollController.dispose();
     super.dispose();
   }
 
@@ -134,6 +139,41 @@ class _TerminalScreenState extends State<TerminalScreen> {
       confirmLabel: l.pasteConfirm,
       cancelIsPrimary: analysis.cancelIsPrimary,
       onConfirm: send,
+    );
+  }
+
+  /// Salin teks terpilih ke papan klip, lalu hapus seleksi.
+  Future<void> _copySelection() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final range = _controller.selection?.normalized;
+    if (range == null) return;
+    final text = _session.terminal.buffer.getText(range);
+    _controller.clearSelection();
+    if (text.isEmpty) return;
+    try {
+      await Clipboard.setData(ClipboardData(text: text));
+    } on Object {
+      return;
+    }
+    if (!mounted) return;
+    showTermulToastOn(
+      messenger,
+      l.selectionCopied(text.length),
+      bottomOffset: TermulSize.tapMin + TermulSpacing.space3 * 3,
+    );
+  }
+
+  /// Memilih seluruh isi terminal sampai baris terakhir yang berisi teks.
+  void _selectAll() {
+    final buffer = _session.terminal.buffer;
+    var last = buffer.lines.length - 1;
+    while (last > 0 && buffer.lines[last].getText().trim().isEmpty) {
+      last--;
+    }
+    _controller.setSelection(
+      buffer.createAnchorFromOffset(CellOffset(0, 0)),
+      buffer.createAnchorFromOffset(CellOffset(_session.terminal.viewWidth, last)),
     );
   }
 
@@ -239,24 +279,52 @@ class _TerminalScreenState extends State<TerminalScreen> {
                       context: context,
                       removeTop: true,
                       removeBottom: true,
-                      child: TerminalView(
-                        _session.terminal,
-                        controller: _controller,
-                        theme: termulTerminalTheme,
-                        textStyle: widget.textStyle ?? termulTerminalStyle,
-                        padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
-                        autofocus: true,
-                        backgroundOpacity: 1,
+                      child: Stack(
+                        fit: StackFit.expand,
+                        children: [
+                          TerminalView(
+                            _session.terminal,
+                            key: _viewKey,
+                            controller: _controller,
+                            scrollController: _scrollController,
+                            theme: termulTerminalTheme,
+                            textStyle: widget.textStyle ?? termulTerminalStyle,
+                            padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
+                            autofocus: true,
+                            backgroundOpacity: 1,
+                          ),
+                          SelectionHandles(
+                            terminal: _session.terminal,
+                            controller: _controller,
+                            scrollController: _scrollController,
+                            viewKey: _viewKey,
+                          ),
+                        ],
                       ),
                     ),
                   ),
                 ),
                 SafeArea(
                   top: false,
-                  child: QuickKeyBar(
-                    session: _session,
-                    compact: compact,
-                    onPaste: widget.link == TerminalLink.up ? _paste : null,
+                  child: ListenableBuilder(
+                    listenable: _controller,
+                    builder: (context, _) {
+                      final range = _controller.selection?.normalized;
+                      if (range == null || range.isCollapsed) {
+                        return QuickKeyBar(
+                          session: _session,
+                          compact: compact,
+                          onPaste: widget.link == TerminalLink.up ? _paste : null,
+                        );
+                      }
+                      return SelectionBar(
+                        count: _session.terminal.buffer.getText(range).length,
+                        compact: compact,
+                        onCopy: _copySelection,
+                        onSelectAll: _selectAll,
+                        onCancel: _controller.clearSelection,
+                      );
+                    },
                   ),
                 ),
               ],

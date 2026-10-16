@@ -279,6 +279,9 @@ Status per 2026-10-16. "Emulator" = Android 14 dengan Keystore dan server SSH su
 | 7 | A4, A5, A6 | integrasi, test A10 di project baru | selesai (PC, emulator, HP: `htop`, F10, landscape) |
 | 8 | pemeriksaan sambungan A4 | sambung ulang otomatis | selesai (PC, emulator); di HP baru banner terlihat, hasilnya belum dikonfirmasi |
 | tambahan | – | `settings.json` (ukuran huruf, tinggi baris) | selesai, diuji di HP; menu setting selesai (PC, HP) |
+| tambahan (11b) | log logcat HP: soket dihancurkan OS (`Destroyed live tcp sockets`) | foreground service opsional, pengaturan Koneksi | selesai (PC, emulator); **belum dicoba di HP**, efektivitas di HyperOS belum terbukti |
+| tambahan (11c) | K11: bash di bawah 5.1 tanpa tempel aman | tombol Tempel, dialog konfirmasi, karakter kontrol dibuang | selesai (PC, 327 tes); **belum dicoba di HP** |
+| tambahan (11d) | K13: gagang dan bilah Salin (hasil di HP sesuai) | gagang, bilah seleksi, Salin, Semua | selesai (PC, 335 tes); **belum dicoba di HP** |
 
 ## 6. Dependensi
 
@@ -544,6 +547,16 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 - **Belum teruji (butuh HP):** baca papan klip di Android 16 (izin dan toast sistem), tempel di `bash` 5.x (tempel aman) dan 4.4 (Ubuntu 18.04) dan 4.3 (14.04), di `vim` (mode insert dan normal) dan `tmux`, tempelan beberapa ratus baris, keyboard yang tetap terbuka setelah dialog tertutup, ukuran dialog di potret dan landscape ringkas.
 - **Sinkron desain:** `README.md` salinan lokal diperbarui; prototipe tidak diubah (lihat `docs/design/SUMBER.md`).
 
+## 11d. Seleksi dan salin teks (2026-10-16)
+
+- **Kode:** `lib/features/terminal/selection_overlay.dart` (`SelectionHandles`: dua gagang yang bisa diseret, perhitungan dari lampiran A8 spike-temuan.md), `selection_bar.dart` (`SelectionBar`: jumlah karakter, Batal, Salin, Semua; menggantikan tombol cepat selama ada seleksi), `_copySelection` dan `_selectAll` di `terminal_screen.dart`, ikon `copy` dan `selectAll`, string `selection*` di ARB. Tekan lama memilih satu kata (bawaan xterm); gagang memperluas atau menyempitkan. Salin mengisi papan klip, menghapus seleksi, toast "Disalin · N karakter".
+- **Semua:** memilih sampai baris terakhir yang berisi teks (baris kosong di bawahnya tidak ikut).
+- **Landscape ringkas:** bilah satu baris tanpa petunjuk.
+- **Belum dibuat (ada di prototipe `Terminal.dc.html`):** Cari, Kirim ke host lain, Simpan sebagai snippet, Bagikan, Salin sebagai satu baris, gulir otomatis saat gagang diseret ke tepi layar (juga belum di spike).
+- **Tes:** 8 tes baru (`test/features/terminal/selection_test.dart`): bilah dan gagang muncul, Salin, Semua, Batal, seret kedua gagang, tekan lama, landscape. 335 tes seluruhnya lulus, `flutter analyze` bersih.
+- **Belum teruji (butuh HP):** tekan lama dan seret gagang dengan jari (area sentuh 44 dp), seleksi lintas baris dan di scrollback, posisi gagang saat keyboard terbuka dan saat terminal bergulir, tempel hasil salin di aplikasi lain, seleksi di `vim` dan `tmux` (mouse mode bisa mengambil alih sentuhan).
+- **Sinkron desain:** bilah berbeda dari prototipe (tanpa Cari, Kirim, Snippet, Bagikan; ditambah gagang dari spike). Artifact desain belum diperbarui.
+
 ### Pengujian tertunda di HP (dicatat 2026-10-16, menunggu pengguna)
 
 Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang dicabut). Urutan uji saat HP tersedia:
@@ -555,6 +568,13 @@ Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang d
 5. Ketuk "Putuskan semua" di notifikasi saat aplikasi di latar belakang: sambungan tertutup, layar sesi tertutup, tidak menyambung ulang.
 6. Bila sambungan tetap putus: atur penghemat baterai TermUL ke "Tanpa batasan" dan aktifkan Mulai otomatis (HyperOS), ulangi 3 dan 4.
 7. Catat hasil di sini, dan di `docs/design/android.md` (bagian Implementasi, "Belum teruji").
+
+Uji seleksi dan salin (11d) di HP, kunjungan yang sama:
+
+1. Tekan lama sebuah kata: bilah "N karakter dipilih" muncul, dua gagang tampil di bawah awal dan akhir kata.
+2. Seret kedua gagang, juga lintas baris dan ke scrollback; ketuk Salin, tempel di aplikasi lain, cocokkan isinya.
+3. Ketuk Semua lalu Salin; Batal mengembalikan tombol cepat.
+4. Ulangi dengan keyboard terbuka dan di `vim`/`tmux` (mouse mode); catat bila sentuhan diambil alih program.
 
 Uji tempel (11c) di HP, bisa dilakukan pada kunjungan yang sama:
 
@@ -568,13 +588,13 @@ Hasil sementara: belum ada. Yang sudah terbukti hanya di emulator Android 14 (li
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` (bagian 11a). Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. **Belum:** sisa uji HP (Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP), HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur). **Menu setting** (ukuran huruf dan tinggi baris) selesai dan dicoba di HP. **Di luar irisan pertama:** seleksi dan salin teks, tempel, status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1), foreground service. **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna) dan sinkron desain: salinan lokal `docs/design/` dan kedua artifact sudah memuat penguncian tiga tingkat, warna ANSI magenta dan sian, konfirmasi memutus, sambung ulang otomatis sekali, tinggi baris terminal 1,3, komponen `Stepper`, dan layar Pengaturan (prototipe `Settings`), (lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` (bagian 11a), foreground service (11b), dan tempel (11c); 335 tes lulus, `flutter analyze` bersih. HP sedang tidak tersambung, jadi 11b dan 11c belum diuji di HP (daftar uji di "Pengujian tertunda di HP"). Keputusan: sesi persisten `tmux` otomatis tidak dibuat (di luar kebiasaan klien SSH; penangkalnya foreground service). **Seleksi dan salin teks selesai di PC (11d), belum di HP.** **Kandidat irisan berikutnya (menunggu persetujuan):** layar pemuatan awal (layar hitam saat peluncuran pertama), sambung ulang berulang dengan jeda dan pengaturannya, popover Tempel di kursor, snippet, sisa pengaturan (tema terminal dan lainnya), NavBar lima tab. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. **Belum:** sisa uji HP (Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP), HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur). **Menu setting** (ukuran huruf dan tinggi baris) selesai dan dicoba di HP. **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1). **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna) dan sinkron desain: salinan lokal `docs/design/` dan kedua artifact sudah memuat penguncian tiga tingkat, warna ANSI magenta dan sian, konfirmasi memutus, sambung ulang otomatis sekali, tinggi baris terminal 1,3, komponen `Stepper`, dan layar Pengaturan (prototipe `Settings`), (lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
 Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 290+ tes otomatis, tanpa jaringan
+flutter test                                   # 335 tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]

@@ -698,4 +698,35 @@ class AppLocalizationsId extends AppLocalizations {
   String pasteMoreLines(int count) {
     return '… dan $count baris lagi';
   }
+
+  @override
+  String selectionCount(int count) {
+    return '$count karakter dipilih';
+  }
+
+  @override
+  String get selectionHint => 'Seret gagang untuk mengubah pilihan';
+
+  @override
+  String get selectionCopy => 'Salin';
+
+  @override
+  String get selectionCopyAria => 'Salin teks terpilih';
+
+  @override
+  String get selectionAll => 'Semua';
+
+  @override
+  String get selectionAllAria => 'Pilih semua teks di terminal';
+
+  @override
+  String selectionCopied(int count) {
+    return 'Disalin · $count karakter';
+  }
+
+  @override
+  String get selectionHandleStart => 'Gagang awal pilihan';
+
+  @override
+  String get selectionHandleEnd => 'Gagang akhir pilihan';
 }

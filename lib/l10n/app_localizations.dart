@@ -1314,6 +1314,60 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'… dan {count} baris lagi'**
   String pasteMoreLines(int count);
+
+  /// Jumlah karakter terpilih di bilah seleksi terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} karakter dipilih'**
+  String selectionCount(int count);
+
+  /// Petunjuk di bilah seleksi terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Seret gagang untuk mengubah pilihan'**
+  String get selectionHint;
+
+  /// Tombol salin di bilah seleksi.
+  ///
+  /// In id, this message translates to:
+  /// **'Salin'**
+  String get selectionCopy;
+
+  /// Nama aksesibilitas tombol salin.
+  ///
+  /// In id, this message translates to:
+  /// **'Salin teks terpilih'**
+  String get selectionCopyAria;
+
+  /// Tombol pilih semua di bilah seleksi.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua'**
+  String get selectionAll;
+
+  /// Nama aksesibilitas tombol pilih semua.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih semua teks di terminal'**
+  String get selectionAllAria;
+
+  /// Toast setelah menyalin teks terpilih.
+  ///
+  /// In id, this message translates to:
+  /// **'Disalin · {count} karakter'**
+  String selectionCopied(int count);
+
+  /// Nama aksesibilitas gagang awal seleksi.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagang awal pilihan'**
+  String get selectionHandleStart;
+
+  /// Nama aksesibilitas gagang akhir seleksi.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagang akhir pilihan'**
+  String get selectionHandleEnd;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

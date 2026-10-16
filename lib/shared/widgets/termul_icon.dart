@@ -36,7 +36,9 @@ enum TermulIconName {
   key('M11 12l9-9M16 7l3 3M14 9l2 2'),
   star('M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'),
   refresh('M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4'),
-  more('M12 6h.01M12 12h.01M12 18h.01');
+  more('M12 6h.01M12 12h.01M12 18h.01'),
+  copy('M5 15V6a2 2 0 0 1 2-2h8'),
+  selectAll('M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M8 12h8');
 
   const TermulIconName(this._extra);
 
@@ -53,6 +55,7 @@ enum TermulIconName {
     hosts => '${_rect(3, 4, 18, 7, 2)} ${_rect(3, 13, 18, 7, 2)} $_extra',
     terminal => '${_rect(3, 4, 18, 16, 2)} $_extra',
     key => '${_circle(8, 15, 4)} $_extra',
+    copy => '${_rect(9, 9, 11, 11, 2)} $_extra',
     _ => _extra,
   };
 }
