@@ -234,7 +234,7 @@ void main() {
 
       await tapPaste(tester);
       expect(popover, findsOneWidget);
-      await tester.tapAt(const Offset(200, 30)); // bar atas
+      await tester.tapAt(const Offset(355, 30)); // bar atas, sisi kanan yang kosong
       await tester.pump(const Duration(milliseconds: 400));
       await tester.pumpAndSettle();
       expect(popover, findsNothing);
@@ -275,8 +275,9 @@ void main() {
       tester,
     ) async {
       setClipboard(tester, 'ls -la');
-      await pumpTerminal(tester, size: const Size(853, 393), keyboard: 209);
-      terminalView(tester).terminal.write('user@host:~\$ ');
+      // Bilah status 24 dp di atas; prompt di baris terbawah (setelah banyak keluaran), seperti sesi sungguhan.
+      await pumpTerminal(tester, size: const Size(853, 393), keyboard: 209, padding: const EdgeInsets.only(top: 24));
+      terminalView(tester).terminal.write('${'\r\n' * 20}user@host:~\$ ');
       await tester.pump();
       final cursor = tester.state<TerminalViewState>(find.byType(TerminalView)).globalCursorRect;
 
@@ -284,8 +285,9 @@ void main() {
       await tapPaste(tester);
       expect(popover, findsOneWidget);
       var box = tester.getRect(popover);
-      expect(box.top, greaterThanOrEqualTo(0));
-      expect(box.bottom, lessThanOrEqualTo(393));
+      expect(box.top, greaterThanOrEqualTo(24 + 8), reason: 'tidak menimpa bilah status');
+      expect(box.bottom, lessThanOrEqualTo(393 - 209), reason: 'di atas keyboard');
+      expect(box.height, lessThan(80), reason: 'susunan mendatar di layar pendek');
       expect(box.left, greaterThanOrEqualTo(8));
       expect(box.right, lessThanOrEqualTo(853 - 8));
       await tester.tapAt(const Offset(600, 200)); // ketukan di luar menutup
@@ -296,8 +298,8 @@ void main() {
       await holdAt(tester, Offset(600, cursor.center.dy));
       expect(popover, findsOneWidget);
       box = tester.getRect(popover);
-      expect(box.top, greaterThanOrEqualTo(0));
-      expect(box.bottom, lessThanOrEqualTo(393));
+      expect(box.top, greaterThanOrEqualTo(24 + 8));
+      expect(box.bottom, lessThanOrEqualTo(393 - 209));
     });
 
     testWidgets('layar alternatif (tmux, vim): tekan-tahan di sel kosong membuka popover', (tester) async {

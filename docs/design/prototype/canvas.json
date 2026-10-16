@@ -348,6 +348,15 @@
    "is_interactive": true,
    "radius": 28
   },
+  "TerminalLandscapePaste.dc.html": {
+   "x": 3410,
+   "y": 6202,
+   "w": 844,
+   "h": 390,
+   "title": "2m · Landscape, keyboard terbuka: popover Tempel mendatar",
+   "is_interactive": true,
+   "radius": 28
+  },
   "Boot.dc.html": {
    "x": 4230,
    "y": 964,
@@ -397,7 +406,8 @@
   "TerminalNeedsAuth.dc.html",
   "ComingSoon.dc.html",
   "Boot.dc.html",
-  "MainLandscape.dc.html"
+  "MainLandscape.dc.html",
+  "TerminalLandscapePaste.dc.html"
  ],
  "notes": {
   "judul": {

@@ -252,7 +252,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
       return const SizedBox.shrink();
     }
     return CustomSingleChildLayout(
-      delegate: _PopoverLayout(menu.anchor),
+      delegate: _PopoverLayout(menu.anchor, MediaQuery.paddingOf(context)),
       child: PastePopover(key: _menuKey, text: menu.text, onPaste: menu.onPaste),
     );
   }
@@ -815,28 +815,36 @@ class _PasteMenu {
   final Size screenSize;
 }
 
-/// Menaruh popover di atas [anchor], dipusatkan pada jangkar dan dibatasi 8 dp dari tepi area; bila tidak muat di
-/// atas, di bawahnya.
+/// Menaruh popover di atas [anchor], dipusatkan pada jangkar dan dibatasi 8 dp dari tepi area serta dari area aman
+/// [safe] (bilah status, lekukan layar, bilah gestur); bila tidak muat di atas, di bawahnya.
 class _PopoverLayout extends SingleChildLayoutDelegate {
-  const _PopoverLayout(this.anchor);
+  const _PopoverLayout(this.anchor, this.safe);
 
   final Rect anchor;
+  final EdgeInsets safe;
 
   static const _margin = 8.0;
   static const _gap = 6.0;
 
   @override
-  BoxConstraints getConstraintsForChild(BoxConstraints constraints) => constraints.loosen();
+  BoxConstraints getConstraintsForChild(BoxConstraints constraints) => BoxConstraints(
+    maxWidth: constraints.maxWidth - safe.horizontal - _margin * 2,
+    maxHeight: constraints.maxHeight - safe.vertical - _margin * 2,
+  );
 
   @override
   Offset getPositionForChild(Size size, Size childSize) {
-    final maxX = size.width - childSize.width - _margin;
-    final x = (anchor.center.dx - childSize.width / 2).clamp(_margin, maxX < _margin ? _margin : maxX);
+    final minX = safe.left + _margin;
+    final maxX = size.width - safe.right - _margin - childSize.width;
+    final x = (anchor.center.dx - childSize.width / 2).clamp(minX, maxX < minX ? minX : maxX);
+    final minY = safe.top + _margin;
+    final maxY = size.height - safe.bottom - _margin - childSize.height;
     final above = anchor.top - childSize.height - _gap;
-    final y = above >= _margin ? above : anchor.bottom + _gap;
-    return Offset(x, y);
+    final below = anchor.bottom + _gap;
+    final y = above >= minY ? above : below;
+    return Offset(x, y.clamp(minY, maxY < minY ? minY : maxY));
   }
 
   @override
-  bool shouldRelayout(_PopoverLayout old) => old.anchor != anchor;
+  bool shouldRelayout(_PopoverLayout old) => old.anchor != anchor || old.safe != safe;
 }

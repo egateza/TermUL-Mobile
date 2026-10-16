@@ -54,9 +54,19 @@ terhubung · 18 ms
 </sc-if>
 <div style="flex: none; height: 16px; background: {{gestureBg}}"></div>
 
+<sc-if value="{{pasteOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 12px; bottom: 295px; z-index: 2; display: flex; align-items: center; gap: 12px; max-width: 420px; padding: 6px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; box-sizing: border-box">
+<span style="display: flex; flex-direction: column; gap: 2px; padding-left: 6px; min-width: 0">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #E8EEF0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">systemctl status</span>
+<span style="font-size: 11.5px; color: #9AA8AF; white-space: nowrap">Masuk ke prompt, belum dijalankan</span>
+</span>
+<button type="button" style="flex: none; min-height: 44px; padding: 0 18px; border-radius: 8px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Tempel</button>
+</div>
+</sc-if>
+
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"keyboard":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"keyboard":{"editor":"boolean","default":false,"section":"Tampilan"},"paste":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   renderVals() {
     const open = this.props.keyboard === true || this.props.keyboard === 'true';
@@ -85,6 +95,7 @@ class Component extends DCLogic {
     const lines = all.slice(Math.max(0, all.length - rows));
     const labels = ['Esc', 'Tab', 'Ctrl', 'Alt', '^C', '^D', '\u2190', '\u2193', '\u2191', '\u2192', 'Home', 'End', 'PgUp', 'PgDn', '|', '~', '/', '-', 'Fn'];
     return {
+      pasteOpen: this.props.paste === true || this.props.paste === 'true',
       keyboardOpen: open,
       keyboardClosed: !open,
       statusH: open ? 20 : 32,
