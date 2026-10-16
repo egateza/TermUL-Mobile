@@ -183,11 +183,14 @@ class _SelectionHandlesState extends State<SelectionHandles> {
     const half = SelectionHandles._touch / 2;
     const margin = SelectionHandles._edgeMargin;
     final cx = area.width > margin * 2 ? anchor.dx.clamp(margin, area.width - margin) : anchor.dx;
-    // Ujung tetesan menyentuh dasar sel; di tepi bawah area ia naik supaya tetap terlihat.
-    final top = (anchor.dy + cell.height + 1 - SelectionHandles._dropTop).clamp(
-      0.0,
-      area.height - SelectionHandles._touch,
-    );
+    // Badan gagang dijauhkan dari tepi kiri dan kanan, tetapi ujungnya tetap menunjuk titik seleksi yang sebenarnya:
+    // gagang miring ke arahnya.
+    final tilt = anchor.dx - cx;
+    // Ujung menyentuh dasar sel. Bila tidak ada ruang di bawah (baris paling bawah), gagang dibalik: ujungnya
+    // menyentuh sisi atas sel dan badannya berada di atas.
+    final below = anchor.dy + cell.height + 1 - SelectionHandles._dropTop;
+    final flip = below + SelectionHandles._touch > area.height && anchor.dy - 1 - SelectionHandles._touch > 0;
+    final top = flip ? anchor.dy - 1 - SelectionHandles._touch + SelectionHandles._dropTop : below;
     return Positioned(
       left: cx - half,
       top: top,
@@ -203,9 +206,11 @@ class _SelectionHandlesState extends State<SelectionHandles> {
           onPanCancel: _endDrag,
           // Bentuk gagang pilihan pemilik (bawaan tetesan `accent` bertepi `ground`, bisa diganti di Pengaturan),
           // bukan bulatan `info` bertangkai seperti prototipe.
-          child: Align(
-            alignment: Alignment.topCenter,
-            child: SelectionHandleShape(style: widget.style),
+          child: SelectionHandleShape(
+            style: widget.style,
+            tilt: tilt,
+            flip: flip,
+            size: const Size.square(SelectionHandles._touch),
           ),
         ),
       ),
@@ -313,35 +318,44 @@ class _LensMarkerPainter extends CustomPainter {
 }
 
 /// Gambar satu gagang seleksi dalam salah satu bentuk [SelectionHandleStyle]; dipakai oleh gagang di terminal dan
-/// pratinjau di Pengaturan. Ujung atas (titik yang menunjuk batas seleksi) ada [SelectionHandles._dropTop] dari tepi
-/// atas gambar.
+/// pratinjau di Pengaturan. Ujung (titik yang menunjuk batas seleksi) ada [SelectionHandles._dropTop] dari tepi atas
+/// gambar dan sejajar dengan pusat bulatan; [tilt] menggesernya ke samping (gagang miring) dan [flip] membalik gambar
+/// secara vertikal (ujung di bawah).
 class SelectionHandleShape extends StatelessWidget {
-  const SelectionHandleShape({super.key, required this.style});
+  const SelectionHandleShape({
+    super.key,
+    required this.style,
+    this.tilt = 0,
+    this.flip = false,
+    this.size = const Size(44, 36),
+  });
 
   final SelectionHandleStyle style;
 
-  static const _size = Size(
-    2 * SelectionHandles._dropRadius + 2,
-    SelectionHandles._dropTop + 15 + SelectionHandles._dropRadius + 2,
-  );
+  /// Selisih mendatar ujung dari pusat bulatan (dp); positif ke kanan.
+  final double tilt;
+  final bool flip;
+  final Size size;
 
   @override
   Widget build(BuildContext context) => ExcludeSemantics(
-    child: CustomPaint(size: _size, painter: _HandlePainter(style)),
+    child: CustomPaint(size: size, painter: _HandlePainter(style, tilt, flip)),
   );
 }
 
 /// Bentuk:
-/// - tetesan: bulatan dengan ujung runcing di atas yang sisinya sedikit melengkung ke dalam, bersambung halus ke
-///   bulatan;
-/// - segitiga: bulatan dengan segitiga terpisah di atasnya, sisi bawah segitiga melengkung mengikuti bulatan;
-/// - bulatan: bulatan polos.
+/// - tetesan: bulatan dengan ujung runcing yang sisinya sedikit melengkung ke dalam, bersambung halus ke bulatan;
+/// - segitiga: bulatan dengan segitiga terpisah di dekat ujung, sisi bawah segitiga melengkung mengikuti bulatan;
+/// - bulatan: bulatan polos (tanpa ujung, jadi tidak miring).
 class _HandlePainter extends CustomPainter {
-  const _HandlePainter(this.style);
+  const _HandlePainter(this.style, this.tilt, this.flip);
 
   final SelectionHandleStyle style;
+  final double tilt;
+  final bool flip;
 
   static const _ring = 3.0;
+  static const _radius = 7.0;
 
   void _paint(Canvas canvas, Path path) {
     canvas.drawPath(
@@ -357,29 +371,56 @@ class _HandlePainter extends CustomPainter {
 
   @override
   void paint(Canvas canvas, Size size) {
-    final tip = Offset(size.width / 2, SelectionHandles._dropTop);
+    if (flip) {
+      canvas.translate(0, size.height);
+      canvas.scale(1, -1);
+    }
+    final x = size.width / 2;
     switch (style) {
       case SelectionHandleStyle.drop:
-        _drop(canvas, tip);
+        final center = Offset(x, SelectionHandles._dropTop + SelectionHandles._dropReach);
+        _drop(canvas, _tipFor(center, SelectionHandles._dropReach), center);
       case SelectionHandleStyle.triangle:
-        _triangle(canvas, tip);
+        final center = Offset(x, SelectionHandles._dropTop + 15);
+        _triangle(canvas, _tipFor(center, 15), center);
       case SelectionHandleStyle.dot:
-        _paint(canvas, Path()..addOval(Rect.fromCircle(center: tip.translate(0, 13), radius: 7)));
+        _paint(
+          canvas,
+          Path()..addOval(Rect.fromCircle(center: Offset(x, SelectionHandles._dropTop + 13), radius: _radius)),
+        );
     }
   }
 
-  void _drop(Canvas canvas, Offset tip) {
+  /// Letak ujung: dari pusat bulatan ke arah titik seleksi yang sebenarnya ([tilt] ke samping, [reach] ke atas).
+  /// Sudut dari tegak lurus dibatasi 60 derajat dan panjangnya 1,5 kali [reach], supaya gagang yang jauh dari
+  /// titiknya tetap miring ke arahnya tanpa memanjang seperti ekor.
+  Offset _tipFor(Offset center, double reach) {
+    const maxAngle = 60 * math.pi / 180;
+    final angle = math.atan2(tilt, reach).clamp(-maxAngle, maxAngle);
+    final length = math.min(math.sqrt(tilt * tilt + reach * reach), reach * 1.5);
+    return center + Offset(math.sin(angle), -math.cos(angle)) * length;
+  }
+
+  /// Tetesan: garis singgung dari [tip] ke bulatan di [center]; titik kendali ditarik sedikit ke sumbu supaya sisi
+  /// runcing melengkung ke dalam.
+  void _drop(Canvas canvas, Offset tip, Offset center) {
     const r = SelectionHandles._dropRadius;
-    const reach = SelectionHandles._dropReach;
-    final center = tip.translate(0, reach);
-    // Titik singgung garis dari ujung ke bulatan.
-    final alpha = math.acos(r / reach);
-    final start = -math.pi / 2 - alpha;
-    final end = -math.pi / 2 + alpha;
+    final toTip = tip - center;
+    final d = toTip.distance;
+    final base = math.atan2(toTip.dy, toTip.dx);
+    final alpha = math.acos(r / d);
+    final start = base - alpha;
+    final end = base + alpha;
     final left = center + Offset(math.cos(start), math.sin(start)) * r;
     final right = center + Offset(math.cos(end), math.sin(end)) * r;
-    // Titik kendali ditarik sedikit ke sumbu supaya sisi runcing melengkung ke dalam.
-    Offset control(Offset p) => Offset.lerp(tip, p, 0.5)! + Offset((tip.dx - p.dx).sign * 1.2, 0);
+    final axis = toTip / d;
+    final normal = Offset(-axis.dy, axis.dx);
+    Offset control(Offset p) {
+      final mid = Offset.lerp(tip, p, 0.5)!;
+      final side = ((p - tip).dx * normal.dx + (p - tip).dy * normal.dy).sign;
+      return mid - normal * (1.2 * side);
+    }
+
     final path = Path()
       ..moveTo(tip.dx, tip.dy)
       ..quadraticBezierTo(control(left).dx, control(left).dy, left.dx, left.dy)
@@ -389,23 +430,24 @@ class _HandlePainter extends CustomPainter {
     _paint(canvas, path);
   }
 
-  void _triangle(Canvas canvas, Offset tip) {
-    const r = 7.0;
+  /// Segitiga: ujung di [tip], alas berupa busur sepusat dengan bulatan di [center] sehingga melengkung mengikuti
+  /// bulatan; arah segitiga mengikuti arah [tip] dari pusat.
+  void _triangle(Canvas canvas, Offset tip, Offset center) {
     const gap = 3.0;
     const halfAngle = 28 * math.pi / 180;
-    final center = tip.translate(0, 15);
-    _paint(canvas, Path()..addOval(Rect.fromCircle(center: center, radius: r)));
-    // Segitiga: ujung di atas, alas berupa busur yang sepusat dengan bulatan (melengkung mengikuti bulatan).
-    const outer = r + gap;
-    final corner = center + Offset(math.sin(halfAngle), -math.cos(halfAngle)) * outer;
+    _paint(canvas, Path()..addOval(Rect.fromCircle(center: center, radius: _radius)));
+    const outer = _radius + gap;
+    final toTip = tip - center;
+    final base = math.atan2(toTip.dy, toTip.dx);
+    final corner = center + Offset(math.cos(base + halfAngle), math.sin(base + halfAngle)) * outer;
     final path = Path()
       ..moveTo(tip.dx, tip.dy)
       ..lineTo(corner.dx, corner.dy)
-      ..arcTo(Rect.fromCircle(center: center, radius: outer), -math.pi / 2 + halfAngle, -2 * halfAngle, false)
+      ..arcTo(Rect.fromCircle(center: center, radius: outer), base + halfAngle, -2 * halfAngle, false)
       ..close();
     _paint(canvas, path);
   }
 
   @override
-  bool shouldRepaint(_HandlePainter old) => old.style != style;
+  bool shouldRepaint(_HandlePainter old) => old.style != style || old.tilt != tilt || old.flip != flip;
 }

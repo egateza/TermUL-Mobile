@@ -136,6 +136,43 @@ void main() {
     expect(tester.getCenter(find.bySemanticsLabel('Gagang akhir pilihan')).dx, lessThanOrEqualTo(width - 36));
   });
 
+  testWidgets('ujung gagang miring ke titik seleksi sebenarnya saat badan gagang dijauhkan dari tepi', (tester) async {
+    await pumpTerminal(tester);
+    final view = terminalView(tester);
+    view.terminal.write('halo dunia');
+    await tester.pump();
+    select(tester, CellOffset(0, 0), CellOffset(view.terminal.viewWidth, 0));
+    await tester.pump();
+    SelectionHandleShape shapeOf(String label) => tester.widget<SelectionHandleShape>(
+      find.descendant(of: find.bySemanticsLabel(label), matching: find.byType(SelectionHandleShape)),
+    );
+    expect(shapeOf('Gagang awal pilihan').tilt, lessThan(0), reason: 'titiknya di kiri badan gagang');
+    expect(shapeOf('Gagang akhir pilihan').tilt, greaterThan(0), reason: 'titiknya di kanan badan gagang');
+    // Di tengah layar tidak miring.
+    select(tester, CellOffset(10, 0), CellOffset(14, 0));
+    await tester.pump();
+    expect(shapeOf('Gagang awal pilihan').tilt, 0);
+    expect(shapeOf('Gagang akhir pilihan').tilt, 0);
+  });
+
+  testWidgets('baris paling bawah: gagang dibalik (ujung ke sisi atas sel); baris lain tidak', (tester) async {
+    await pumpTerminal(tester);
+    final view = terminalView(tester);
+    final rows = view.terminal.viewHeight;
+    view.terminal.write(List.generate(rows, (i) => 'baris $i').join('\r\n'));
+    await tester.pump();
+    SelectionHandleShape endShape() => tester.widget<SelectionHandleShape>(
+      find.descendant(of: find.bySemanticsLabel('Gagang akhir pilihan'), matching: find.byType(SelectionHandleShape)),
+    );
+    final last = view.terminal.buffer.lines.length - 1;
+    select(tester, CellOffset(0, last), CellOffset(5, last));
+    await tester.pump();
+    expect(endShape().flip, isTrue);
+    select(tester, CellOffset(0, 2), CellOffset(5, 2));
+    await tester.pump();
+    expect(endShape().flip, isFalse);
+  });
+
   testWidgets('seleksi di baris paling bawah: gagang tetap di dalam area terminal dan bisa diseret', (tester) async {
     await pumpTerminal(tester);
     final view = terminalView(tester);
