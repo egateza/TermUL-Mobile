@@ -550,6 +550,7 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 ## 11d. Seleksi dan salin teks (2026-10-16)
 
 - **Kode:** `lib/features/terminal/selection_overlay.dart` (`SelectionHandles`: dua gagang yang bisa diseret, perhitungan dari lampiran A8 spike-temuan.md), `selection_bar.dart` (`SelectionBar`: jumlah karakter, Batal, Salin, Semua; menggantikan tombol cepat selama ada seleksi), `_copySelection` dan `_selectAll` di `terminal_screen.dart`, ikon `copy` dan `selectAll`, string `selection*` di ARB. Tekan lama memilih satu kata (bawaan xterm); gagang memperluas atau menyempitkan. Salin mengisi papan klip, menghapus seleksi, toast "Disalin · N karakter".
+- **Warna seleksi (perbaikan setelah dicoba di HP):** xterm 4.0.0 menggambar seleksi di atas teks, jadi `terminal-selection` yang pekat menutupi huruf. Dipakai biru lebih terang (`#3E7CA8`) dengan alpha 55% (`terminalSelectionOverlay` di `terminal_palette.dart`). Keputusan baru: perlu masuk ke desain (token `terminal-selection` dan `terminal-selection-ink` tidak berlaku untuk terminal sungguhan). Belum dicek ulang di HP.
 - **Semua:** memilih sampai baris terakhir yang berisi teks (baris kosong di bawahnya tidak ikut).
 - **Landscape ringkas:** bilah satu baris tanpa petunjuk.
 - **Belum dibuat (ada di prototipe `Terminal.dc.html`):** Cari, Kirim ke host lain, Simpan sebagai snippet, Bagikan, Salin sebagai satu baris, gulir otomatis saat gagang diseret ke tepi layar (juga belum di spike).

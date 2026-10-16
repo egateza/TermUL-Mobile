@@ -4,13 +4,19 @@ import 'package:xterm/xterm.dart';
 import '../../core/models/app_settings.dart';
 import '../../core/theme/termul_theme.dart';
 
+/// Warna seleksi di terminal. xterm 4.0.0 menggambar seleksi di atas teks, bukan di bawahnya, jadi warna latar
+/// `terminal-selection` yang pekat (#2C4F6B) menutupi huruf. Dipakai biru yang lebih terang dengan alpha 55%
+/// supaya teks di bawahnya tetap terbaca (keputusan baru, perlu masuk ke desain; `terminal-selection-ink` tidak
+/// bisa dipakai karena teks tidak digambar ulang).
+const terminalSelectionOverlay = Color(0x8C3E7CA8);
+
 /// Warna terminal untuk `xterm`. Latar, teks, kursor, seleksi, hijau (prompt), biru (path), merah, kuning, dan
 /// abu-abu berasal dari token `terminal-*`, `ok`, `info`, `bad`, `accent`. Magenta dan sian tidak ada di
 /// `tokens.json`; nilainya dipilih di sini supaya `htop`, `vim`, dan `ls --color` terbaca di latar gelap
 /// (keputusan baru, perlu dimasukkan ke desain).
 const termulTerminalTheme = TerminalTheme(
   cursor: TermulPalette.terminalCursor,
-  selection: TermulPalette.terminalSelection,
+  selection: terminalSelectionOverlay,
   foreground: TermulPalette.terminalInk,
   background: TermulPalette.groundDeep,
   black: Color(0xFF1B2328),

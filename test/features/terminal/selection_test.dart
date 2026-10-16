@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xterm/xterm.dart';
 
+import 'package:termul_mobile/features/terminal/terminal_palette.dart';
+
 import 'terminal_screen_test.dart' show pumpTerminal, terminalView;
 
 /// Papan klip palsu; mengembalikan teks yang terakhir ditulis.
@@ -127,6 +129,10 @@ void main() {
     expect(find.bySemanticsLabel('Gagang awal pilihan'), findsOneWidget);
   });
 
+  test('warna seleksi tembus pandang supaya teks di bawahnya tetap terlihat', () {
+    expect(termulTerminalTheme.selection.a, lessThan(1));
+  });
+
   testWidgets('landscape ringkas: bilah satu baris, tombol Salin tetap bisa ditekan', (tester) async {
     final clip = mockClipboard(tester);
     await pumpTerminal(tester, size: const Size(853, 393), padding: const EdgeInsets.only(top: 24, bottom: 16));
@@ -138,5 +144,9 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Salin teks terpilih'));
     await tester.pumpAndSettle();
     expect(clip.text, 'halo');
+  });
+
+  test('warna seleksi tembus pandang supaya teks di bawahnya tetap terlihat', () {
+    expect(termulTerminalTheme.selection.a, lessThan(1));
   });
 }
