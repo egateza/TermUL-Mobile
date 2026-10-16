@@ -2,9 +2,11 @@ import 'dart:io';
 
 import 'package:path_provider/path_provider.dart';
 
+import 'core/models/app_settings.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/json/json_host_repository.dart';
 import 'core/storage/json/json_known_hosts_repository.dart';
+import 'core/storage/json/json_settings_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/storage/load_result.dart';
 import 'core/vault/credential_vault.dart';
@@ -20,12 +22,16 @@ class BootReport {
     this.hosts = const LoadResult(),
     this.knownHosts = const LoadResult(),
     this.vaultIndex = const LoadResult(),
+    this.settings = const LoadResult(),
     this.sweptSecrets = 0,
   });
 
   final LoadResult hosts;
   final LoadResult knownHosts;
   final LoadResult vaultIndex;
+
+  /// `settings.json` rusak diganti nilai bawaan tanpa banner (pengaturan hilang tidak berbahaya).
+  final LoadResult settings;
 
   /// Jumlah rahasia yatim yang dibuang saat mulai.
   final int sweptSecrets;
@@ -38,6 +44,7 @@ class AppDependencies {
     required this.vault,
     required this.service,
     required this.report,
+    this.settings = const AppSettings(),
   });
 
   final HostRepository hosts;
@@ -45,6 +52,7 @@ class AppDependencies {
   final CredentialVault vault;
   final HostService service;
   final BootReport report;
+  final AppSettings settings;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -60,6 +68,8 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
   final hostsLoad = await hosts.load();
   final knownLoad = await known.load();
   final indexLoad = await index.load();
+  final settingsRepo = JsonSettingsRepository(file('settings.json'));
+  final settingsLoad = await settingsRepo.load();
 
   final vault = KeystoreCredentialVault(
     auth: auth ?? LocalAuthDeviceAuth(),
@@ -74,6 +84,13 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     knownHosts: known,
     vault: vault,
     service: service,
-    report: BootReport(hosts: hostsLoad, knownHosts: knownLoad, vaultIndex: indexLoad, sweptSecrets: swept),
+    settings: settingsRepo.settings,
+    report: BootReport(
+      hosts: hostsLoad,
+      knownHosts: knownLoad,
+      vaultIndex: indexLoad,
+      settings: settingsLoad,
+      sweptSecrets: swept,
+    ),
   );
 }

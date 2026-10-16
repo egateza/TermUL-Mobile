@@ -482,6 +482,33 @@ Belum teruji (tetap berlaku dari bagian 9): semuanya di **HP fisik**; apakah `fl
 - Kejadian di jalan: sekali aplikasi hanya menampilkan layar hitam saat peluncuran pertama dari VSCode (bersama galat alat "log reader stopped unexpectedly"); tidak bisa direproduksi pada start dingin berikutnya (1,7 detik). Dugaan: `main()` menunggu `bootstrap()` sebelum menggambar apa pun. Belum ada perubahan; layar pemuatan awal bisa ditambahkan bila terulang.
 - **Belum dikonfirmasi:** apakah sambung ulang yang terlihat di tangkapan layar berhasil dan apa pemicunya; biometrik di HP; impor kunci lewat pemilih berkas (pengguna belum punya host berkunci untuk dicoba); `vim`, `tmux`, Ctrl dan F di program itu; Home 13 detik dan 5 menit; Wi-Fi ke seluler.
 
+## 11a. Pengaturan (`settings.json`) dan rencana menu setting
+
+**Sudah ada (2026-10-16):** berkas `settings.json` di folder pribadi aplikasi (`getApplicationSupportDirectory`; di Android `/data/user/0/io.github.egateza.termul/files/settings.json`). Dibuat otomatis dengan nilai bawaan saat pertama kali aplikasi dijalankan; properti yang tidak dikenal diabaikan; nilai di luar batas dijepit; tipe yang salah membuat berkas disisihkan ke `settings.json.corrupt-<waktu>` lalu nilai bawaan dipakai (tanpa banner, pengaturan hilang tidak berbahaya). Perubahan berlaku **setelah aplikasi dimulai ulang**. Kode: `lib/core/models/app_settings.dart`, `lib/core/storage/json/json_settings_repository.dart`, `appSettingsProvider`, `terminalStyleFor` di `terminal_palette.dart`.
+
+```json
+{
+  "version": 1,
+  "terminal": { "fontSize": 13.0, "lineHeight": 1.3 }
+}
+```
+
+| Kunci | Bawaan | Batas | Arti |
+|---|---|---|---|
+| `terminal.fontSize` | 13.0 | 8 sampai 24 | ukuran huruf terminal (sp) |
+| `terminal.lineHeight` | 1.3 | 1.0 sampai 2.0 | tinggi baris terminal (kelipatan ukuran huruf) |
+
+Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as io.github.egateza.termul` lalu sunting `files/settings.json` (mis. `cat > files/settings.json`), kemudian tutup dan buka lagi aplikasinya. Di build rilis berkas ini tidak terjangkau tanpa menu setting, jadi menu itu perlu dibuat sebelum rilis.
+
+**Bawaan tinggi baris 1,3, bukan 1,5 dari token `terminal`:** di HP fisik (Xiaomi 25053PC47G) 1,5 hanya memuat sekitar 12 baris di landscape sehingga daftar proses `htop` tidak terlihat. Keputusan baru, perlu masuk ke artifact desain (baris terminal lebih rapat daripada teks antarmuka).
+
+**Perlu dibuat berikutnya (menu setting, belum dikerjakan):**
+- Layar pengaturan untuk ukuran huruf dan tinggi baris terminal, dengan pratinjau; berlaku seketika tanpa memulai ulang aplikasi (ukuran PTY dihitung ulang dan dikirim lewat debounce yang sudah ada).
+- **Tanpa cubit-untuk-zoom di terminal** (keputusan pengguna: tersentuh tanpa sengaja akan mengganggu). Perubahan ukuran hanya lewat menu.
+- Pembanding yang disebut pengguna: JuiceSSH menampilkan banyak baris dan kolom karena huruf sangat kecil dan tinggi baris rapat; pilihan ukuran harus cukup lebar supaya pengguna bisa menyesuaikan sendiri.
+- Kandidat pengaturan lain dari pembahasan: tema terminal (gelap, kontras tinggi, terang; token `term-contrast-*` dan `term-light-*` sudah ada), baris tombol cepat dua baris di layar luas, sambung ulang otomatis (nyala atau mati, jumlah percobaan dan jeda), konfirmasi sebelum memutus, foreground service (opt-in, `android.md`), pemeriksaan status host (online atau offline).
+- Pengaturan lain ditambahkan ke berkas yang sama (`version` dinaikkan bila bentuknya berubah) dan ke layar yang sama.
+
 ## 12. Status terkini dan cara melanjutkan
 
 Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai: seluruh irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan. **Berikutnya:** revisi dan pengecekan bersama pengguna, uji di HP fisik, pembersihan sumber daya sementara (daftar di bawah), dan pembaruan artifact desain.

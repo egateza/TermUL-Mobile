@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/misc.dart' show Override;
 
 import 'bootstrap.dart';
 import 'core/keys/key_file_picker.dart';
+import 'core/models/app_settings.dart';
 import 'core/models/profile_snapshot.dart';
 import 'core/ssh/ssh_connector.dart';
 import 'core/storage/host_repository.dart';
@@ -22,6 +23,9 @@ final credentialVaultProvider = Provider<CredentialVault>(
   (ref) => throw UnimplementedError('Suntikkan lewat bootstrap'),
 );
 final hostServiceProvider = Provider<HostService>((ref) => throw UnimplementedError('Suntikkan lewat bootstrap'));
+
+/// Pengaturan dari `settings.json`, dibaca sekali saat mulai.
+final appSettingsProvider = Provider<AppSettings>((ref) => const AppSettings());
 final bootReportProvider = Provider<BootReport>((ref) => const BootReport());
 
 /// Pemilih berkas kunci; diganti di test.
@@ -52,6 +56,7 @@ extension AppDependenciesOverrides on AppDependencies {
     credentialVaultProvider.overrideWithValue(vault),
     hostServiceProvider.overrideWithValue(service),
     bootReportProvider.overrideWithValue(report),
+    appSettingsProvider.overrideWithValue(settings),
   ];
 }
 

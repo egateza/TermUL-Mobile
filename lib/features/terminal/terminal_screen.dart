@@ -38,6 +38,7 @@ class TerminalScreen extends StatefulWidget {
     this.link = TerminalLink.up,
     this.failureText,
     this.onReconnect,
+    this.textStyle,
   });
 
   final HostProfile profile;
@@ -49,6 +50,9 @@ class TerminalScreen extends StatefulWidget {
 
   /// Dipanggil oleh tombol "Sambung sekarang".
   final VoidCallback? onReconnect;
+
+  /// Gaya huruf terminal; bawaan [termulTerminalStyle].
+  final TerminalStyle? textStyle;
 
   static const compactBelowDp = 480.0;
 
@@ -185,7 +189,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                         _session.terminal,
                         controller: _controller,
                         theme: termulTerminalTheme,
-                        textStyle: termulTerminalStyle,
+                        textStyle: widget.textStyle ?? termulTerminalStyle,
                         padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
                         autofocus: true,
                         backgroundOpacity: 1,

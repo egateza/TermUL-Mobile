@@ -3,7 +3,9 @@ import 'package:flutter/services.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
+import 'package:termul_mobile/core/models/app_settings.dart';
 import 'package:termul_mobile/core/theme/termul_theme.dart';
+import 'package:termul_mobile/features/terminal/terminal_palette.dart';
 import 'package:termul_mobile/features/terminal/terminal_screen.dart';
 import 'package:termul_mobile/features/terminal/terminal_session.dart';
 import 'package:termul_mobile/shared/widgets/key_button.dart';
@@ -63,6 +65,7 @@ Future<TermRig> pumpTerminal(
   TerminalLink link = TerminalLink.up,
   String? failureText,
   VoidCallback? onReconnect,
+  TerminalStyle? textStyle,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -83,6 +86,7 @@ Future<TermRig> pumpTerminal(
               link: link,
               failureText: failureText,
               onReconnect: onReconnect,
+              textStyle: textStyle,
             ),
           ),
         ),
@@ -318,6 +322,30 @@ void main() {
     rig.session.terminal.write('riwayat-lama\r\n');
     await tester.pump();
     expect(rig.session.terminal.buffer.getText(), contains('riwayat-lama'));
+    expectRowsFit(tester);
+  });
+
+  testWidgets('ukuran huruf bawaan: 13 sp dengan tinggi baris 1,3', (tester) async {
+    final rig = await pumpTerminal(tester);
+    expect(terminalView(tester).textStyle.fontSize, 13);
+    expect(terminalView(tester).textStyle.height, 1.3);
+    expect(rig.openedRows, terminalView(tester).terminal.viewHeight);
+    expectRowsFit(tester);
+  });
+
+  testWidgets('ukuran huruf dari pengaturan dipakai: huruf kecil memuat banyak baris dan kolom, PTY ikut', (
+    tester,
+  ) async {
+    final rig = await pumpTerminal(
+      tester,
+      textStyle: terminalStyleFor(const TerminalSettings(fontSize: 9, lineHeight: 1.1)),
+    );
+    expect(terminalView(tester).textStyle.fontSize, 9);
+    expect(terminalView(tester).textStyle.height, 1.1);
+    expect(terminalView(tester).terminal.viewHeight, greaterThan(60)); // sekitar 72 baris pada 720 dp
+    expect(terminalView(tester).terminal.viewWidth, greaterThan(40)); // huruf uji lebar sama dengan tingginya (Ahem)
+    expect(rig.openedRows, terminalView(tester).terminal.viewHeight);
+    expect(rig.openedCols, terminalView(tester).terminal.viewWidth);
     expectRowsFit(tester);
   });
 }

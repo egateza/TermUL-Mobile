@@ -16,6 +16,13 @@ int? optInt(Map<String, Object?> json, String key) {
   throw FormatException('Field "$key" harus bilangan bulat');
 }
 
+double? optNum(Map<String, Object?> json, String key) {
+  final v = json[key];
+  if (v == null) return null;
+  if (v is num) return v.toDouble();
+  throw FormatException('Field "$key" harus angka');
+}
+
 bool? optBool(Map<String, Object?> json, String key) {
   final v = json[key];
   if (v == null) return null;

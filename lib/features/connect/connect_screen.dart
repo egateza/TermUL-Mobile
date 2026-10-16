@@ -19,6 +19,7 @@ import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../terminal/shell_channel.dart';
+import '../terminal/terminal_palette.dart';
 import '../terminal/terminal_screen.dart';
 import '../terminal/terminal_session.dart';
 import 'connect_flow.dart';
@@ -154,6 +155,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
         final state = flow.state;
         final session = _session;
         final l = AppLocalizations.of(context);
+        final style = terminalStyleFor(ref.read(appSettingsProvider).terminal);
         if (session != null) {
           if (state is ConnectDone) {
             return TerminalScreen(
@@ -161,10 +163,16 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
               session: session,
               link: _lost ? TerminalLink.lost : TerminalLink.up,
               onReconnect: _reconnect,
+              textStyle: style,
             );
           }
           if (state is ConnectPreparing || state is ConnectConnecting) {
-            return TerminalScreen(profile: widget.profile, session: session, link: TerminalLink.reconnecting);
+            return TerminalScreen(
+              profile: widget.profile,
+              session: session,
+              link: TerminalLink.reconnecting,
+              textStyle: style,
+            );
           }
           if (state is ConnectFailed || state is ConnectAuthDenied) {
             return TerminalScreen(
@@ -173,6 +181,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> with WidgetsBindi
               link: TerminalLink.lost,
               failureText: _failureSummary(l, state),
               onReconnect: _reconnect,
+              textStyle: style,
             );
           }
         }
