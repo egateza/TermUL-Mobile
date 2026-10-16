@@ -391,14 +391,13 @@ class _HandlePainter extends CustomPainter {
     }
   }
 
-  /// Letak ujung: dari pusat bulatan ke arah titik seleksi yang sebenarnya ([tilt] ke samping, [reach] ke atas).
-  /// Sudut dari tegak lurus dibatasi 60 derajat dan panjangnya 1,5 kali [reach], supaya gagang yang jauh dari
-  /// titiknya tetap miring ke arahnya tanpa memanjang seperti ekor.
+  /// Letak ujung: dari pusat bulatan ke arah titik seleksi yang sebenarnya ([tilt] ke samping, [reach] ke atas),
+  /// dengan jarak tetap [reach] dan sudut dari tegak lurus paling 45 derajat. Jarak tetap membuat bentuk hanya
+  /// berputar, tidak memanjang atau menggepeng saat miring.
   Offset _tipFor(Offset center, double reach) {
-    const maxAngle = 60 * math.pi / 180;
+    const maxAngle = 45 * math.pi / 180;
     final angle = math.atan2(tilt, reach).clamp(-maxAngle, maxAngle);
-    final length = math.min(math.sqrt(tilt * tilt + reach * reach), reach * 1.5);
-    return center + Offset(math.sin(angle), -math.cos(angle)) * length;
+    return center + Offset(math.sin(angle), -math.cos(angle)) * reach;
   }
 
   /// Tetesan: garis singgung dari [tip] ke bulatan di [center]; titik kendali ditarik sedikit ke sumbu supaya sisi
