@@ -687,7 +687,7 @@ Saklar "Sambung ulang otomatis" sudah dikerjakan di 11i. **Artifact desain sudah
 
 ## 11j. Popover Tempel dan saklar konfirmasi tempel satu baris (2026-10-16)
 
-**Selesai di PC (393 tes, `flutter analyze` bersih). Dicoba di HP lewat adb (Xiaomi 25053PC47G, server uji WSL) [T]; kecuali satu perubahan akhir (lihat "Belum diuji"). Artifact sudah diperbarui: prototipe versi 40, design system versi 34.**
+**Selesai di PC (393 tes, `flutter analyze` bersih). Dicoba di HP lewat adb (Xiaomi 25053PC47G, server uji WSL) [T], termasuk build akhir. Artifact sudah diperbarui: prototipe versi 40, design system versi 34.**
 
 Usulan dan keputusan pemilik, bertahap: popover di kursor (prototipe `TerminalPasteMenu`) ternyata sulit dikenai jari, dan pemilik sudah memakai tombol Tempel di panel. Yang dipilih: tempel selalu divalidasi, dengan popover ringan untuk teks pendek dan dialog untuk sisanya.
 
@@ -705,7 +705,8 @@ Usulan dan keputusan pemilik, bertahap: popover di kursor (prototipe `TerminalPa
 - **Temuan xterm 4.0.0:** `TerminalView.onTapUp` tidak pernah dipanggil (detektor gestur hanya meneruskan `onSingleTapUp`, yang tidak dipasang `TerminalView`). Tekan-tahan dibaca lewat `Listener` pointer mentah yang tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi xterm tidak terganggu.
 - **Hasil uji HP [T]:** tekan-tahan di area kosong dekat tepi kiri memunculkan popover berisi teks ("Fri", disalin lewat seleksi) di atas jari, dalam layar; Tempel di popover menempelkan dan toast "Ditempel · 1 baris · belum dijalankan" tampil; tombol Tempel di panel memunculkan popover yang sama; ketukan di tempat lain menutup; tekan lama di atas teks tetap memilih kata (bilah Salin/Semua). Versi pertama (popover rata kanan di kursor) menempel ke tepi kiri layar, dan zona ketuk kursor terlalu kecil; keduanya sudah diganti seperti di atas.
 - **Desain:** popover dan saklar sudah di artifact (prototipe versi 40, README versi 34; lihat `docs/design/SUMBER.md`). Penyimpangan dari prototipe asli dicatat di README: popover dipusatkan pada titik asal (bukan rata kanan), dan pemicu tekan-tahan hanya ada di aplikasi.
-- **Belum diuji di HP:** popover dari tombol Tempel setelah dipindah ke atas baris kursor (build terakhir belum dipasang), tekan-tahan di `tmux` (mouse mode: seharusnya tidak muncul), landscape dan keyboard tertutup, tempel isi papan klip panjang (45 baris milik pemilik sengaja tidak ditempel saat uji), dan kenyamanan ambang 40 karakter.
+- **Build akhir [T]:** tombol Tempel memunculkan popover tepat di atas baris prompt (baris prompt tetap terlihat); Tempel di popover memasukkan teks ke prompt tanpa menjalankannya (bash 5.1 menyorot teks hasil tempel aman).
+- **Belum diuji di HP:** tekan-tahan di `tmux` (mouse mode: seharusnya tidak muncul), landscape dan keyboard tertutup, tempel isi papan klip panjang (45 baris milik pemilik sengaja tidak ditempel saat uji), dan kenyamanan ambang 40 karakter.
 
 ## 12. Status terkini dan cara melanjutkan
 
