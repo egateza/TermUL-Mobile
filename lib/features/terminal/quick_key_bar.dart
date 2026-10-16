@@ -10,10 +10,13 @@ import 'terminal_session.dart';
 /// PgDn, simbol, dan Fn yang menukar baris dengan F1 sampai F12. Satu baris yang bisa digeser; [compact]
 /// (36 dp) hanya untuk landscape ringkas. Tombol tidak mengambil fokus sehingga keyboard sistem tetap terbuka.
 class QuickKeyBar extends StatefulWidget {
-  const QuickKeyBar({super.key, required this.session, this.compact = false});
+  const QuickKeyBar({super.key, required this.session, this.compact = false, this.onPaste});
 
   final TerminalSession session;
   final bool compact;
+
+  /// Dipanggil saat tombol Tempel ditekan (membaca papan klip dan meminta konfirmasi bila perlu).
+  final VoidCallback? onPaste;
 
   @override
   State<QuickKeyBar> createState() => _QuickKeyBarState();
@@ -68,6 +71,7 @@ class _QuickKeyBarState extends State<QuickKeyBar> {
     _key('Ctrl', l.keyCtrl, s.toggleCtrl, pressed: s.ctrl),
     _key('Alt', l.keyAlt, s.toggleAlt, pressed: s.alt),
     _key('Fn', l.keyFunctionToggle, () => setState(() => _functionRow = true)),
+    if (widget.onPaste != null) _key(l.keyPaste, l.keyPasteAria, widget.onPaste!, width: 72),
     _key('^C', l.keyCtrlC, () => s.pressControl('c')),
     _key('^D', l.keyCtrlD, () => s.pressControl('d')),
     _key('←', l.keyArrowLeft, () => s.pressKey(TerminalKey.arrowLeft)),

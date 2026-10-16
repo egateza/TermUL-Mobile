@@ -16,6 +16,9 @@ Future<T?> showTermulSheet<T>(
   required VoidCallback onConfirm,
   VoidCallback? onCancel,
   bool confirmIsDanger = false,
+
+  /// Pilihan aman (batal) menjadi tombol utama dan konfirmasi menjadi tombol biasa; untuk keputusan berisiko.
+  bool cancelIsPrimary = false,
   bool dismissible = true,
 }) {
   return showModalBottomSheet<T>(
@@ -64,6 +67,7 @@ Future<T?> showTermulSheet<T>(
                   child: TermulButton(
                     label: cancelLabel,
                     size: TermulButtonSize.lg,
+                    variant: cancelIsPrimary ? TermulButtonVariant.primary : TermulButtonVariant.secondary,
                     onPressed: () {
                       Navigator.of(sheetContext).pop();
                       onCancel?.call();
@@ -76,7 +80,9 @@ Future<T?> showTermulSheet<T>(
                   child: TermulButton(
                     label: confirmLabel,
                     size: TermulButtonSize.lg,
-                    variant: confirmIsDanger ? TermulButtonVariant.danger : TermulButtonVariant.primary,
+                    variant: confirmIsDanger
+                        ? TermulButtonVariant.danger
+                        : (cancelIsPrimary ? TermulButtonVariant.secondary : TermulButtonVariant.primary),
                     onPressed: () {
                       Navigator.of(sheetContext).pop();
                       onConfirm();

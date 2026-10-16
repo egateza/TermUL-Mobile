@@ -163,6 +163,13 @@ class TerminalSession extends ChangeNotifier {
     terminal.textInput(text);
   }
 
+  /// Menempel [text] (sudah dibersihkan, baris baru sebagai `\r`). Dibungkus tempel aman hanya bila program di
+  /// server menyalakannya; selain itu setiap baris baru dijalankan seperti menekan Enter.
+  void paste(String text) {
+    if (_disposed || text.isEmpty) return;
+    terminal.paste(text);
+  }
+
   @override
   void dispose() {
     if (_disposed) return;

@@ -870,5 +870,91 @@
   "settingsBatteryOpen": "Buka pengaturan",
   "@settingsBatteryOpen": {
     "description": "Tombol membuka pengaturan aplikasi Android."
+  },
+  "keyPaste": "Tempel",
+  "@keyPaste": {
+    "description": "Tombol tempel di baris tombol cepat."
+  },
+  "keyPasteAria": "Tempel dari papan klip",
+  "@keyPasteAria": {
+    "description": "Nama aksesibilitas tombol tempel."
+  },
+  "pasteEmpty": "Papan klip kosong",
+  "@pasteEmpty": {
+    "description": "Toast bila papan klip kosong."
+  },
+  "pasteTooLarge": "Teks terlalu besar untuk ditempel (maksimal 100.000 karakter)",
+  "@pasteTooLarge": {
+    "description": "Toast bila isi papan klip terlalu besar."
+  },
+  "pasteTitle": "Tempel {count} baris?",
+  "@pasteTitle": {
+    "description": "Judul dialog tempel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pasteConfirm": "Tempel",
+  "@pasteConfirm": {
+    "description": "Tombol konfirmasi di dialog tempel."
+  },
+  "pasteDone": "Ditempel · {count} baris · belum dijalankan",
+  "@pasteDone": {
+    "description": "Toast setelah tempel; teks belum dijalankan.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pasteDoneRunning": "Ditempel · {count} baris",
+  "@pasteDoneRunning": {
+    "description": "Toast setelah tempel di server tanpa tempel aman.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pasteRiskNote": "{count} baris berisiko (mis. rm -rf). Periksa sebelum menekan Enter.",
+  "@pasteRiskNote": {
+    "description": "Peringatan di dialog tempel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pasteUnsafeNote": "Server ini belum mendukung tempel aman: setiap baris langsung dijalankan begitu ditempel.",
+  "@pasteUnsafeNote": {
+    "description": "Peringatan bila mode bracketed paste mati."
+  },
+  "pasteRiskTag": "berisiko",
+  "@pasteRiskTag": {
+    "description": "Tanda pada baris berisiko di dialog tempel."
+  },
+  "pasteSafeNote": "Teks masuk ke prompt tanpa menekan Enter, jadi belum dijalankan.",
+  "@pasteSafeNote": {
+    "description": "Catatan di dialog tempel aman."
+  },
+  "pasteControlRemoved": "{count} karakter kontrol dihapus dari teks yang ditempel.",
+  "@pasteControlRemoved": {
+    "description": "Peringatan bila karakter kontrol dibuang.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "pasteMoreLines": "… dan {count} baris lagi",
+  "@pasteMoreLines": {
+    "description": "Ringkasan baris yang tidak ditampilkan di dialog tempel.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
   }
 }

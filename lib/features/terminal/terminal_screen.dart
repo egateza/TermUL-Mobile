@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:xterm/xterm.dart';
 
 import '../../core/models/host_profile.dart';
@@ -11,6 +12,8 @@ import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_sheet.dart';
+import '../../shared/widgets/termul_toast.dart';
+import 'paste_analysis.dart';
 import 'quick_key_bar.dart';
 import 'terminal_palette.dart';
 import 'terminal_session.dart';
@@ -82,6 +85,57 @@ class _TerminalScreenState extends State<TerminalScreen> {
   bool get _alive =>
       widget.link == TerminalLink.up &&
       (_session.state == TerminalSessionState.opening || _session.state == TerminalSessionState.running);
+
+  /// Tempel dari papan klip. Satu baris tanpa tanda bahaya langsung masuk ke prompt; selain itu isi dan akibatnya
+  /// ditampilkan dulu (layar 2b dan 2c di desain).
+  Future<void> _paste() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final offset = TermulSize.tapMin + TermulSpacing.space3 * 2 + TermulSpacing.space3;
+    ClipboardData? clip;
+    try {
+      clip = await Clipboard.getData(Clipboard.kTextPlain);
+    } on Object {
+      clip = null;
+    }
+    if (!mounted) return;
+    final raw = clip?.text ?? '';
+    if (raw.isEmpty) {
+      showTermulToastOn(messenger, l.pasteEmpty, icon: TermulIconName.warning, bottomOffset: offset);
+      return;
+    }
+    if (raw.length > PasteAnalysis.maxChars) {
+      showTermulToastOn(messenger, l.pasteTooLarge, icon: TermulIconName.warning, bottomOffset: offset);
+      return;
+    }
+    final analysis = PasteAnalysis.of(raw, bracketed: _session.terminal.bracketedPasteMode);
+    if (analysis.isEmpty) {
+      showTermulToastOn(messenger, l.pasteEmpty, icon: TermulIconName.warning, bottomOffset: offset);
+      return;
+    }
+    void send() {
+      _session.paste(analysis.outgoing);
+      showTermulToastOn(
+        messenger,
+        analysis.runsImmediately ? l.pasteDoneRunning(analysis.lineCount) : l.pasteDone(analysis.lineCount),
+        bottomOffset: offset,
+      );
+    }
+
+    if (!analysis.needsConfirm) {
+      send();
+      return;
+    }
+    await showTermulSheet<void>(
+      context,
+      title: l.pasteTitle(analysis.lineCount),
+      child: _PasteDetails(analysis: analysis),
+      cancelLabel: l.actionCancel,
+      confirmLabel: l.pasteConfirm,
+      cancelIsPrimary: analysis.cancelIsPrimary,
+      onConfirm: send,
+    );
+  }
 
   Future<void> _confirmLeave() async {
     final l = AppLocalizations.of(context);
@@ -199,7 +253,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
                 ),
                 SafeArea(
                   top: false,
-                  child: QuickKeyBar(session: _session, compact: compact),
+                  child: QuickKeyBar(
+                    session: _session,
+                    compact: compact,
+                    onPaste: widget.link == TerminalLink.up ? _paste : null,
+                  ),
                 ),
               ],
             ),
@@ -319,6 +377,90 @@ class _CompactBar extends StatelessWidget {
           ],
         ),
       ),
+    );
+  }
+}
+
+/// Isi dialog tempel: peringatan akibat, daftar baris (yang berisiko diberi kata "berisiko"), dan catatan.
+class _PasteDetails extends StatelessWidget {
+  const _PasteDetails({required this.analysis});
+
+  final PasteAnalysis analysis;
+
+  /// Baris yang ditampilkan paling banyak; sisanya diringkas supaya dialog tetap ringan.
+  static const _maxShown = 50;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    final shown = analysis.lines.take(_maxShown).toList();
+    final hidden = analysis.lineCount - shown.length;
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      spacing: TermulSpacing.space5,
+      children: [
+        if (analysis.hasRisk)
+          TermulBanner(tone: BannerTone.risk, child: Text(l.pasteRiskNote(analysis.riskCount)))
+        else if (analysis.runsImmediately)
+          TermulBanner(tone: BannerTone.risk, child: Text(l.pasteUnsafeNote)),
+        if (analysis.hasRisk && analysis.runsImmediately)
+          TermulBanner(tone: BannerTone.risk, child: Text(l.pasteUnsafeNote)),
+        if (analysis.removedControls > 0)
+          TermulBanner(tone: BannerTone.warn, child: Text(l.pasteControlRemoved(analysis.removedControls))),
+        Container(
+          key: const ValueKey('paste-lines'),
+          padding: const EdgeInsets.all(TermulSpacing.space4),
+          decoration: BoxDecoration(
+            color: TermulPalette.groundDeep,
+            borderRadius: BorderRadius.circular(TermulRadius.radiusMd),
+            border: Border.all(color: TermulPalette.line),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              for (final line in shown)
+                Padding(
+                  padding: const EdgeInsets.symmetric(vertical: 2),
+                  child: Row(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(
+                        width: 24,
+                        child: Text(
+                          '${line.number}',
+                          style: TermulText.terminalSm.copyWith(color: TermulPalette.inkFaint),
+                        ),
+                      ),
+                      Expanded(
+                        child: Text(
+                          line.text.isEmpty ? ' ' : line.text,
+                          style: TermulText.terminalSm.copyWith(
+                            color: line.risky ? TermulPalette.bad : TermulPalette.terminalInk,
+                          ),
+                        ),
+                      ),
+                      if (line.risky)
+                        Padding(
+                          padding: const EdgeInsets.only(left: TermulSpacing.space3),
+                          child: Text(l.pasteRiskTag, style: TermulText.caption.copyWith(color: TermulPalette.bad)),
+                        ),
+                    ],
+                  ),
+                ),
+              if (hidden > 0)
+                Padding(
+                  padding: const EdgeInsets.only(top: TermulSpacing.space3),
+                  child: Text(
+                    l.pasteMoreLines(hidden),
+                    style: TermulText.caption.copyWith(color: TermulPalette.inkMuted),
+                  ),
+                ),
+            ],
+          ),
+        ),
+        if (!analysis.runsImmediately)
+          Text(l.pasteSafeNote, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
+      ],
     );
   }
 }

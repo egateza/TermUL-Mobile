@@ -643,4 +643,59 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsBatteryOpen => 'Buka pengaturan';
+
+  @override
+  String get keyPaste => 'Tempel';
+
+  @override
+  String get keyPasteAria => 'Tempel dari papan klip';
+
+  @override
+  String get pasteEmpty => 'Papan klip kosong';
+
+  @override
+  String get pasteTooLarge => 'Teks terlalu besar untuk ditempel (maksimal 100.000 karakter)';
+
+  @override
+  String pasteTitle(int count) {
+    return 'Tempel $count baris?';
+  }
+
+  @override
+  String get pasteConfirm => 'Tempel';
+
+  @override
+  String pasteDone(int count) {
+    return 'Ditempel · $count baris · belum dijalankan';
+  }
+
+  @override
+  String pasteDoneRunning(int count) {
+    return 'Ditempel · $count baris';
+  }
+
+  @override
+  String pasteRiskNote(int count) {
+    return '$count baris berisiko (mis. rm -rf). Periksa sebelum menekan Enter.';
+  }
+
+  @override
+  String get pasteUnsafeNote =>
+      'Server ini belum mendukung tempel aman: setiap baris langsung dijalankan begitu ditempel.';
+
+  @override
+  String get pasteRiskTag => 'berisiko';
+
+  @override
+  String get pasteSafeNote => 'Teks masuk ke prompt tanpa menekan Enter, jadi belum dijalankan.';
+
+  @override
+  String pasteControlRemoved(int count) {
+    return '$count karakter kontrol dihapus dari teks yang ditempel.';
+  }
+
+  @override
+  String pasteMoreLines(int count) {
+    return '… dan $count baris lagi';
+  }
 }

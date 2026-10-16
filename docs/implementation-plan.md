@@ -533,6 +533,17 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 - **Keputusan pemilik (2026-10-16): auto-attach tmux per host tidak dibuat.** Di luar kebiasaan klien SSH pada umumnya; yang dipakai adalah foreground service. Pengguna tetap bisa menjalankan `tmux` sendiri di server.
 - **Sinkron desain:** `docs/design/android.md` diperbarui (bagian Implementasi).
 
+## 11c. Tempel di terminal (2026-10-16)
+
+- **Kode:** `lib/features/terminal/paste_analysis.dart` (pemeriksaan teks tanpa UI), `TerminalSession.paste`, tombol Tempel di `QuickKeyBar` (setelah Fn; hanya saat sambungan hidup), `_paste` dan `_PasteDetails` di `terminal_screen.dart`, `showTermulSheet(cancelIsPrimary: ...)` untuk menjadikan pilihan aman tombol utama, string `paste*` dan `keyPaste*` di ARB. Membaca papan klip lewat `Clipboard.getData` (tanpa dependensi baru).
+- **Aturan:** papan klip kosong: toast. Satu baris tanpa tanda bahaya: langsung ke prompt (toast "Ditempel · 1 baris · belum dijalankan"). Selain itu dialog dengan isi, kata "berisiko" pada baris yang cocok pola desain (`rm -rf`, `dd if=`, `mkfs`, `shutdown`, `reboot`, `chmod -R`, `chown -R`, `truncate`, `drop table/database`), dan akibatnya. Baris baru dikirim sebagai CR (seperti Enter). Bungkus tempel aman dipakai hanya bila server menyalakannya (xterm).
+- **Dari temuan spike K11 (bash di bawah 5.1 tanpa bracketed paste menjalankan tiap baris begitu ditempel):** bila `terminal.bracketedPasteMode` mati dan teks berbaris-baris, dialog memberi peringatan "Server ini belum mendukung tempel aman…" sebagai ganti kalimat "belum dijalankan" milik prototipe, pilihan aman jadi tombol utama, dan toast tidak berjanji "belum dijalankan".
+- **Tambahan di luar prototipe:** karakter kontrol (ESC, BEL, dan sejenisnya; bukan tab atau baris baru) dibuang dan dilaporkan (mencegah teks yang menyuntik urutan terminal, mis. penutup tempel aman); batas 100.000 karakter; dialog menampilkan paling banyak 50 baris.
+- **Belum dibuat:** popover Tempel di kursor prompt (`TerminalPasteMenu`) dan snippet (`Snippets`); keduanya di luar irisan ini.
+- **Tes:** 18 tes baru (`test/features/terminal/paste_test.dart`: analisis teks dan alur di layar terminal dengan papan klip palsu, termasuk bungkus tempel aman `\x1b[200~...\x1b[201~`); 327 tes seluruhnya lulus, `flutter analyze` bersih.
+- **Belum teruji (butuh HP):** baca papan klip di Android 16 (izin dan toast sistem), tempel di `bash` 5.x (tempel aman) dan 4.4 (Ubuntu 18.04) dan 4.3 (14.04), di `vim` (mode insert dan normal) dan `tmux`, tempelan beberapa ratus baris, keyboard yang tetap terbuka setelah dialog tertutup, ukuran dialog di potret dan landscape ringkas.
+- **Sinkron desain:** `README.md` salinan lokal diperbarui; prototipe tidak diubah (lihat `docs/design/SUMBER.md`).
+
 ### Pengujian tertunda di HP (dicatat 2026-10-16, menunggu pengguna)
 
 Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang dicabut). Urutan uji saat HP tersedia:
@@ -544,6 +555,14 @@ Build debug dengan fitur ini belum dipasang di HP Xiaomi 25053PC47G (HP sedang d
 5. Ketuk "Putuskan semua" di notifikasi saat aplikasi di latar belakang: sambungan tertutup, layar sesi tertutup, tidak menyambung ulang.
 6. Bila sambungan tetap putus: atur penghemat baterai TermUL ke "Tanpa batasan" dan aktifkan Mulai otomatis (HyperOS), ulangi 3 dan 4.
 7. Catat hasil di sini, dan di `docs/design/android.md` (bagian Implementasi, "Belum teruji").
+
+Uji tempel (11c) di HP, bisa dilakukan pada kunjungan yang sama:
+
+1. Salin satu baris dari aplikasi lain, buka terminal, ketuk Tempel: masuk ke prompt tanpa dijalankan; toast "Ditempel · 1 baris · belum dijalankan".
+2. Salin tiga baris yang memuat `sudo rm -rf /tmp/uji/*`: dialog muncul, baris berisiko bertanda "berisiko", Batal jadi tombol utama; pilih Batal lalu coba lagi dengan Tempel.
+3. Ulangi di server dengan bash 5.x (tempel aman nyala) dan bash 4.4 atau 4.3 (Ubuntu 18.04, 14.04): di yang lama harus muncul peringatan "belum mendukung tempel aman" dan baris langsung dijalankan setelah konfirmasi.
+4. Tempel di `vim` (mode insert) dan di `tmux`; catat hasilnya.
+5. Papan klip kosong: toast "Papan klip kosong". Tempelan besar (beberapa ratus baris): dialog tetap responsif.
 
 Hasil sementara: belum ada. Yang sudah terbukti hanya di emulator Android 14 (lihat 11b).
 

@@ -1230,6 +1230,90 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Buka pengaturan'**
   String get settingsBatteryOpen;
+
+  /// Tombol tempel di baris tombol cepat.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel'**
+  String get keyPaste;
+
+  /// Nama aksesibilitas tombol tempel.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel dari papan klip'**
+  String get keyPasteAria;
+
+  /// Toast bila papan klip kosong.
+  ///
+  /// In id, this message translates to:
+  /// **'Papan klip kosong'**
+  String get pasteEmpty;
+
+  /// Toast bila isi papan klip terlalu besar.
+  ///
+  /// In id, this message translates to:
+  /// **'Teks terlalu besar untuk ditempel (maksimal 100.000 karakter)'**
+  String get pasteTooLarge;
+
+  /// Judul dialog tempel.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel {count} baris?'**
+  String pasteTitle(int count);
+
+  /// Tombol konfirmasi di dialog tempel.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel'**
+  String get pasteConfirm;
+
+  /// Toast setelah tempel; teks belum dijalankan.
+  ///
+  /// In id, this message translates to:
+  /// **'Ditempel · {count} baris · belum dijalankan'**
+  String pasteDone(int count);
+
+  /// Toast setelah tempel di server tanpa tempel aman.
+  ///
+  /// In id, this message translates to:
+  /// **'Ditempel · {count} baris'**
+  String pasteDoneRunning(int count);
+
+  /// Peringatan di dialog tempel.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} baris berisiko (mis. rm -rf). Periksa sebelum menekan Enter.'**
+  String pasteRiskNote(int count);
+
+  /// Peringatan bila mode bracketed paste mati.
+  ///
+  /// In id, this message translates to:
+  /// **'Server ini belum mendukung tempel aman: setiap baris langsung dijalankan begitu ditempel.'**
+  String get pasteUnsafeNote;
+
+  /// Tanda pada baris berisiko di dialog tempel.
+  ///
+  /// In id, this message translates to:
+  /// **'berisiko'**
+  String get pasteRiskTag;
+
+  /// Catatan di dialog tempel aman.
+  ///
+  /// In id, this message translates to:
+  /// **'Teks masuk ke prompt tanpa menekan Enter, jadi belum dijalankan.'**
+  String get pasteSafeNote;
+
+  /// Peringatan bila karakter kontrol dibuang.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} karakter kontrol dihapus dari teks yang ditempel.'**
+  String pasteControlRemoved(int count);
+
+  /// Ringkasan baris yang tidak ditampilkan di dialog tempel.
+  ///
+  /// In id, this message translates to:
+  /// **'… dan {count} baris lagi'**
+  String pasteMoreLines(int count);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

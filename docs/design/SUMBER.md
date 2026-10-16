@@ -60,3 +60,7 @@ Prototipe:
 
 - `android.md`: status diperbarui dan bagian baru "Implementasi" (bukti dari HP, perilaku, apa yang teruji dan belum). Isi rancangan di bagian lain tidak diubah. Sudah di-publish ke design system (versi 21, `1792125397-d101`) bersama pembaruan `design-system.json` (`lastChange`). Tabel "Deklarasi dan izin" diperbarui: tipe `specialUse` dan izinnya dikonfirmasi di dokumentasi resmi; nama service di contoh manifest menjadi `.KeepAliveService`.
 
+## Perubahan lokal lanjutan (2026-10-16, tempel di terminal)
+
+- **Sudah di-publish** (design system versi 22, `1792126727-a0ce`): `README.md`: dua butir baru di "Catatan dari implementasi Flutter" (letak tombol Tempel, aturan dialog, varian tanpa tempel aman, karakter kontrol, batas ukuran). Prototipe `Terminal.dc.html` **tidak diubah**: varian tanpa tempel aman dan tombol Tempel di baris tombol cepat belum tergambar di prototipe.
+- Pada publish yang sama, butir Pengaturan di `README.md` diperbarui (bagian Koneksi sudah ada, bukan lagi "belum dibuat").
