@@ -265,17 +265,20 @@ Setiap langkah berhenti di titik yang bisa diuji. "Uji" memisahkan apa yang bisa
 
 ## 5. Daftar langkah dan status ringkas
 
-| Langkah | Terbukti di spike | Kode baru |
-|---|---|---|
-| 0 | konfigurasi Android (A12) | pemindahan paket, hapus iOS |
-| 1 | pola atomik dan karantina ada di desktop | seluruh lapisan data |
-| 2 | – | seluruh tema dan widget |
-| 3 | A11 (Keystore + biometrik) | satu entri per tipe, `getMany`, kunci 5, impor, yatim, HP tanpa biometrik |
-| 4 | – | seluruh UI dan state |
-| 5 | A1, A2, A3 | penyimpanan sidik jari permanen, aturan tipe |
-| 6 | logika A1 | seluruh UI |
-| 7 | A4, A5, A6 | integrasi, test A10 di project baru |
-| 8 | pemeriksaan sambungan A4 | sambung ulang otomatis |
+Status per 2026-10-16. "Emulator" = Android 14 dengan Keystore dan server SSH sungguhan; "HP" = Xiaomi 25053PC47G, Android 16.
+
+| Langkah | Terbukti di spike | Kode baru | Status |
+|---|---|---|---|
+| 0 | konfigurasi Android (A12) | pemindahan paket, hapus iOS | selesai |
+| 1 | pola atomik dan karantina ada di desktop | seluruh lapisan data | selesai (PC, emulator) |
+| 2 | – | seluruh tema dan widget | selesai (PC, emulator) |
+| 3 | A11 (Keystore + biometrik) | satu entri per tipe, `getMany`, kunci 5, impor, yatim, HP tanpa biometrik | selesai (PC, emulator); PIN/pola dan tanpa kunci layar belum |
+| 4 | – | seluruh UI dan state | selesai (PC, emulator, HP) |
+| 5 | A1, A2, A3 | penyimpanan sidik jari permanen, aturan tipe | selesai (OpenSSH 9.6 dan 7.6, HP: Ubuntu 14.04 dan 18.04) |
+| 6 | logika A1 | seluruh UI | selesai (PC, emulator, HP) |
+| 7 | A4, A5, A6 | integrasi, test A10 di project baru | selesai (PC, emulator, HP: `htop`, F10, landscape) |
+| 8 | pemeriksaan sambungan A4 | sambung ulang otomatis | selesai (PC, emulator); di HP baru banner terlihat, hasilnya belum dikonfirmasi |
+| tambahan | – | `settings.json` (ukuran huruf, tinggi baris) | selesai, diuji di HP; menu setting belum |
 
 ## 6. Dependensi
 
@@ -390,7 +393,7 @@ Usulan: **ARB sejak awal**, dengan satu bahasa (`id`).
 
 ### 10.3 Pertanyaan baru
 
-1. **Menguji server Ubuntu 14.04.** 7 dari 23 profil Anda berjalan di 14.04 dan spike tidak pernah mengujinya. Cara yang paling bermakna adalah satu kali login percobaan ke salah satu server 14.04 sungguhan (hanya login dan `exit`, tanpa perubahan apa pun), memakai kredensial yang Anda ketik sendiri di HP. Alternatifnya WSL dengan distro 14.04, yang tidak ada di daftar distro Anda saat ini. Pilih yang mana, atau lewati dan terima risikonya?
+1. **[Terjawab 2026-10-16: login ke Ubuntu 14.04.6 (OpenSSH 6.6) dari HP berhasil dan terminalnya bekerja.]** ~~**Menguji server Ubuntu 14.04.** 7 dari 23 profil Anda berjalan di 14.04 dan spike tidak pernah mengujinya. Cara yang paling bermakna adalah satu kali login percobaan ke salah satu server 14.04 sungguhan (hanya login dan `exit`, tanpa perubahan apa pun), memakai kredensial yang Anda ketik sendiri di HP. Alternatifnya WSL dengan distro 14.04, yang tidak ada di daftar distro Anda saat ini. Pilih yang mana, atau lewati dan terima risikonya?~~
 2. **Server Ubuntu 24.04 dari spike**: user `spike` di sana belum dibersihkan (tidak ada akses dari sesi ini). Perintah: `sudo pkill -u spike; sudo userdel -r spike`, hapus `spike_sshd_config` bila ada.
 3. **Perubahan keputusan tetap.** Usulan kalimat baru untuk `CLAUDE.md` (butir "Rahasia") bila Anda setuju: "Rahasia: kunci privat dan password hanya di Android Keystore dan selalu terenkripsi. Pembacaan dijaga biometrik, atau PIN/pola/sandi perangkat; bila HP tanpa penguncian layar, tampilkan peringatan tetapi tetap izinkan penyimpanan. Jangan menulis rahasia ke berkas, log, atau konsol." Catatan K15 di `spike.md` ("tanpa jatuh ke PIN") tidak lagi berlaku; salinan desain tidak saya ubah lokal, perubahan ini dicatat di dokumen ini dan artifact desain perlu diperbarui.
 
@@ -511,13 +514,13 @@ Cara mengubah di HP selama pengembangan (hanya build debug): `adb shell run-as i
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai: seluruh irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan. **Berikutnya:** revisi dan pengecekan bersama pengguna, uji di HP fisik, pembersihan sumber daya sementara (daftar di bawah), dan pembaruan artifact desain.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` (bagian 11a). Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. **Belum:** sisa uji HP (Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, `vim` dan `tmux`, hasil sambung ulang di HP), jalur PIN/pola dan HP tanpa kunci layar, `keyboard-interactive`, animasi keyboard (belum diukur). **Di luar irisan pertama:** menu setting (wajib sebelum rilis), seleksi dan salin teks, tempel, status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1), foreground service. **Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna) dan pembaruan artifact desain (penguncian tiga tingkat, `PRIVATE_KEY_PEM` kode 5, warna ANSI magenta dan sian, konfirmasi memutus, sambung ulang otomatis sekali, tinggi baris terminal 1,3, `settings.json`).
 
 Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 200+ tes otomatis, tanpa jaringan
+flutter test                                   # 280+ tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]
