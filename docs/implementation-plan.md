@@ -654,7 +654,7 @@ Menjawab temuan uji HP 1 (sambung ulang tidak menunggu jaringan, prompt biometri
 - Server ditutup dari sisi server (`pkill` sshd di WSL, layar menyala): putus `serverClosed`, tersambung ulang sekitar 1 detik, **tanpa prompt**, penanda "— tersambung ulang —" [T]. Server uji: sshd di WSL (`tool/ssh_test_server/setup.sh`) dijangkau HP lewat `adb reverse tcp:2222 tcp:2222` karena server LAN pemilik tidak terjangkau saat itu.
 - Belum diuji: dua sesi bersamaan (AuthGate), `SCREEN_OFF` saat proses dibekukan lama (layar mati puluhan menit) di HyperOS, mode pesawat sungguhan, pindah Wi-Fi ke seluler, `vim`/`tmux`. Catatan: dengan Wi-Fi mati, probe TCP ke host LAN sempat lolos (percobaan 2 tercatat "gagal jaringan", artinya probe berhasil lalu sambung gagal); penyebabnya belum diketahui, perilaku keseluruhan tetap benar.
 
-**Belum dikerjakan:** saklar "Sambung ulang otomatis" di Pengaturan. **Artifact desain sudah diperbarui** (prototipe 39, design system 33; `SUMBER.md`). `docs/design/android.md` dan CLAUDE.md (butir Rahasia) perlu menyebut keputusan rahasia dipegang selama layar menyala.
+**Belum dikerjakan:** saklar "Sambung ulang otomatis" di Pengaturan. **Artifact desain sudah diperbarui** (prototipe 39, design system 33; `SUMBER.md`). CLAUDE.md (butir Rahasia) sudah menyebut keputusan rahasia dipegang selama layar menyala (2026-10-16); `docs/design/android.md` masih perlu, tetapi itu salinan artifact: ubah lewat alur publish (butir 9).
 
 **Belum teruji di HP:** mode pesawat (tanpa prompt selama menunggu), sambung ulang tanpa prompt saat layar menyala, prompt muncul setelah layar mati lalu dibuka, pengiriman `SCREEN_OFF` di HyperOS saat proses dibekukan, pindah Wi-Fi ke seluler.
 
