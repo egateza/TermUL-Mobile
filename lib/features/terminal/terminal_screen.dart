@@ -162,18 +162,22 @@ class _TerminalScreenState extends State<TerminalScreen> {
     final view = _viewKey.currentState;
     if (at == null || time == null || view == null || !view.renderTerminal.attached) return;
     if ((e.position - at).distance > kTouchSlop || e.timeStamp - time > const Duration(milliseconds: 350)) return;
-    _onTerminalTap(view.renderTerminal.getCellOffset(view.renderTerminal.globalToLocal(e.position)));
+    _onTerminalTap(e.position);
   }
 
-  /// Ketukan di kursor prompt membuka popover Tempel; ketukan lain (atau di kursor lagi) menutupnya.
-  Future<void> _onTerminalTap(CellOffset cell) async {
+  /// Ketukan di baris kursor prompt membuka popover Tempel; ketukan lain (atau di baris itu lagi) menutupnya.
+  /// Kursor hanya satu sel (sekitar 8 x 17 dp), terlalu kecil untuk jari: zona ketuk selebar layar dan setinggi
+  /// minimal [TermulSize.tapMin] di sekitar kursor.
+  Future<void> _onTerminalTap(Offset tapAt) async {
     if (_pasteMenu != null) {
       _closePasteMenu();
       return;
     }
     final terminal = _session.terminal;
     final b = terminal.buffer;
-    final atCursor = cell.y == b.absoluteCursorY && (cell.x - b.cursorX).abs() <= 2;
+    final cursor = _viewKey.currentState?.globalCursorRect;
+    final pad = cursor == null ? 0.0 : ((TermulSize.tapMin - cursor.height) / 2).clamp(0.0, TermulSize.tapMin);
+    final atCursor = cursor != null && tapAt.dy >= cursor.top - pad && tapAt.dy <= cursor.bottom + pad;
     if (!atCursor || !_alive || terminal.isUsingAltBuffer || _session.state != TerminalSessionState.running) return;
     var lines = 0;
     try {

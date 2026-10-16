@@ -159,6 +159,39 @@ void main() {
       expect(find.byKey(const ValueKey('paste-popover')), findsNothing);
     });
 
+    testWidgets(
+      'zona ketuk lebar: di kanan kursor dan beberapa dp di atas atau bawah baris tetap membuka; jauh tidak',
+      (tester) async {
+        setClipboard(tester, 'ls');
+        await pumpTerminal(tester);
+        terminalView(tester).terminal.write('\r\n\r\n\r\n\r\nuser@host:~\$ ');
+        await tester.pump();
+        final rect = tester.state<TerminalViewState>(find.byType(TerminalView)).globalCursorRect;
+
+        Future<bool> openedAt(Offset at) async {
+          await tester.tapAt(at);
+          await tester.pump(const Duration(milliseconds: 400));
+          await tester.pumpAndSettle();
+          final opened = find.byKey(const ValueKey('paste-popover')).evaluate().isNotEmpty;
+          if (opened) {
+            await tester.tapAt(Offset(at.dx, at.dy + 250)); // ketukan di mana saja menutup
+            await tester.pump(const Duration(milliseconds: 400));
+            await tester.pumpAndSettle();
+          }
+          return opened;
+        }
+
+        expect(
+          await openedAt(Offset(rect.center.dx + 150, rect.center.dy)),
+          isTrue,
+          reason: 'jauh di kanan, baris sama',
+        );
+        expect(await openedAt(Offset(rect.center.dx, rect.top - 8)), isTrue, reason: '8 dp di atas kursor');
+        expect(await openedAt(Offset(rect.center.dx, rect.bottom + 8)), isTrue, reason: '8 dp di bawah kursor');
+        expect(await openedAt(Offset(rect.center.dx, rect.bottom + 60)), isFalse, reason: 'baris jauh di bawah');
+      },
+    );
+
     testWidgets('layar alternatif (vim, htop): ketukan di kursor tidak membuka popover', (tester) async {
       setClipboard(tester, 'ls');
       await pumpTerminal(tester);

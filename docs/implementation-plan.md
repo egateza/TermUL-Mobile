@@ -687,9 +687,9 @@ Saklar "Sambung ulang otomatis" sudah dikerjakan di 11i. **Artifact desain sudah
 
 ## 11j. Popover Tempel di kursor prompt (2026-10-16)
 
-**Selesai di PC (384 tes, `flutter analyze` bersih); belum diuji di HP.**
+**Selesai di PC (385 tes, `flutter analyze` bersih). Dicoba di HP lewat adb (2026-10-16, WSL Uji): popover muncul, tetapi (1) kursor satu sel (sekitar 8 x 17 dp) terlalu kecil untuk jari dan sering meleset, (2) posisinya rata kanan dengan kursor sehingga, bila prompt di kiri, menempel ke tepi layar dan menutupi keluaran. (1) diperbaiki: zona ketuk selebar layar dan setinggi minimal 44 dp di sekitar kursor. (2) menunggu keputusan pemilik (prototipe rata kanan).**
 
-- Mengetuk kursor prompt (baris yang sama, selisih kolom paling 2 untuk toleransi jari) membuka popover di atas kursor, rata kanan dengan kursor: tombol **Tempel** (`accent`, 44 dp) dan "Papan klip: N baris" atau "kosong" (`PastePopover`, `paste_popover.dart`; rujukan prototipe `TerminalPasteMenu`). Di baris paling atas layar popover muncul di bawah kursor. Tempel memakai alur yang sama dengan tombol Tempel di baris tombol cepat (`_paste`: satu baris langsung, selain itu dialog konfirmasi).
+- Mengetuk baris kursor prompt membuka popover di atas kursor, rata kanan dengan kursor: tombol **Tempel** (`accent`, 44 dp) dan "Papan klip: N baris" atau "kosong" (`PastePopover`, `paste_popover.dart`; rujukan prototipe `TerminalPasteMenu`). Di baris paling atas layar popover muncul di bawah kursor. Tempel memakai alur yang sama dengan tombol Tempel di baris tombol cepat (`_paste`: satu baris langsung, selain itu dialog konfirmasi).
 - Menutup: ketukan lain atau ketukan kedua di kursor, mengetik atau tombol cepat, keluaran yang menggeser kursor, gulir, dan ukuran layar berubah (putar, keyboard). Tidak muncul di layar alternatif (`vim`, `htop`) atau saat sesi belum berjalan atau putus.
 - **Temuan xterm 4.0.0:** `TerminalView.onTapUp` tidak pernah dipanggil (detektor gestur hanya meneruskan `onSingleTapUp`, yang tidak dipasang `TerminalView`). Ketukan dibaca lewat `Listener` pointer mentah (jarak paling `kTouchSlop`, paling 350 ms) yang tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi xterm tidak terganggu.
 - **Desain:** popover sudah ada di prototipe `TerminalPasteMenu`, jadi bukan tambahan. Catatan README design system baris Tempel di terminal ("belum ada popover di kursor prompt") sudah usang; perbarui saat artifact berikutnya dipublikasikan.
@@ -697,7 +697,7 @@ Saklar "Sambung ulang otomatis" sudah dikerjakan di 11i. **Artifact desain sudah
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 384 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-16. Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), dan sesi di latar belakang (11e). 385 tes lulus, `flutter analyze` bersih. Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
 **Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Belum diuji di HP:** tempel (11c), layar mati 30 menit atau lebih, tanpa kabel, efek HyperOS, "Putuskan semua" dari notifikasi. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
@@ -713,7 +713,7 @@ Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 384 tes otomatis, tanpa jaringan
+flutter test                                   # 385 tes otomatis, tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]
