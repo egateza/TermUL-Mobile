@@ -152,6 +152,9 @@ void main() {
     await tester.pumpAndSettle();
     expect(find.text('Es pecah! Streak dilanjutkan. Hari ini terhitung.'), findsOneWidget);
     expect(s.repo.record.streak, Streak(24, daysAgo(0)));
+    // Seperti prototipe 8: hari yang dilompati tetap ditandai absen setelah es pecah.
+    expect(find.bySemanticsLabel('12 Sen, Okt, absen'), findsOneWidget);
+    expect(find.bySemanticsLabel('14 Rab, Okt, aktif'), findsOneWidget);
   });
 
   testWidgets('hangus: streak mulai lagi dari 1/3', (tester) async {

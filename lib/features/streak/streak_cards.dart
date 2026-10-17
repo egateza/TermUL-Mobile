@@ -56,16 +56,29 @@ class StreakDays {
 
   DateTime get today => view.today;
 
-  /// Hari absen yang membuat api padam atau beku: sehari setelah hari terakhir dihitung sampai kemarin.
+  /// Hari absen yang membuat api padam atau beku: sehari setelah hari terakhir dihitung sampai kemarin. Setelah api
+  /// dinyalakan lagi hari ini, absen yang dilompati tetap ditandai (seperti prototipe 8): celah 2-11 hari antara hari
+  /// ini dan hari terhitung sebelumnya, selama streak tidak dimulai ulang.
   ({DateTime from, DateTime to, int count})? get absence {
-    if (!view.waiting) return null;
-    final last = view.record.streak.lastDay;
+    final DateTime? last;
+    if (view.waiting) {
+      last = view.record.streak.lastDay;
+    } else if (view.todayCounted && view.record.streak.active) {
+      final before = view.record.days.where((d) => d.isBefore(today));
+      last = before.isEmpty ? null : before.last;
+      if (last != null && daysBetween(last, today) - 1 > Streak.maxFrozenMissed) return null;
+    } else {
+      return null;
+    }
     if (last == null) return null;
     final from = last.add(const Duration(days: 1));
     final to = today.subtract(const Duration(days: 1));
     if (to.isBefore(from)) return null;
     return (from: from, to: to, count: daysBetween(from, to) + 1);
   }
+
+  /// Api sedang (atau tadi) beku: absen lebih dari dua hari.
+  bool get _frozenGap => (absence?.count ?? 0) > Streak.maxGrayMissed;
 
   DayKind kind(DateTime day) {
     if (day == today) return view.todayCounted ? DayKind.on : DayKind.pending;
@@ -77,7 +90,7 @@ class StreakDays {
   }
 
   /// Warna hari absen: es untuk beku, abu-abu untuk padam.
-  Color get absentTone => view.status is StreakFrozen ? TermulPalette.chipIce : TermulPalette.chipGray;
+  Color get absentTone => _frozenGap ? TermulPalette.chipIce : TermulPalette.chipGray;
 
   String stateLabel(AppLocalizations l, DayKind kind) => switch (kind) {
     DayKind.on => l.streakDayActive,
@@ -473,7 +486,7 @@ class StreakCalendarCard extends StatelessWidget {
               ],
             ),
           Text(l.streakLegend, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
-          if (absence != null)
+          if (absence != null && view.waiting)
             Text(
               view.status is StreakFrozen
                   ? l.streakAbsentFrozen(absence.count, dayRange(l, absence.from, absence.to), view.need)

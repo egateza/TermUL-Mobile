@@ -1112,3 +1112,17 @@ Permintaan pemilik: lengkapi fitur streak sesuai design system, irisan 1 sampai 
 - **Belum teruji di HP:** notifikasi benar-benar muncul sekitar pukul 20.00, berulang keesokan harinya, bertahan setelah HP dinyalakan ulang, tidak muncul setelah aplikasi dibuka di hari itu, dan perilaku setelah aplikasi dihentikan paksa (Android membatalkan alarm aplikasi yang dihentikan paksa sampai dibuka lagi; belum dicek). HP tidak terdeteksi adb saat irisan ini selesai.
 - **Artifact:** design system versi 66 (`docs/design/SUMBER.md`); prototipe tidak berubah (saklar sudah ada di prototipe `Settings`).
 
+### Uji HP streak (2026-10-18, dd3bf2af, build profile)
+
+Keadaan padam, beku, dan hangus diatur dengan menulis `streak.json` lewat `adb run-as` (build profile ternyata mengizinkannya) saat proses aplikasi mati; berkas asli dicadangkan dan dikembalikan sesudahnya (1/3, 18 Okt).
+
+- **Terbukti:**
+  - hari pertama: splash bara `1/3`, chip `1/3` di kiri chip vault, tab Streak (hero, Pekan ini, statistik, level, kalender);
+  - padam (23 hari, absen 1 hari): splash abu-abu dengan asap, satu ketukan memunculkan asap, tiga ketukan cepat (sekitar 60 ms antar ketukan) menyalakan api: cincin dan percikan, lencana "Api Merah", angka 24, `streak.json` mencatat 18 Okt;
+  - beku (absen 5 hari): splash es "Retak 3/7" setelah tiga ketukan, "Nanti saja" menutup, chip dan tab meneruskan progres (3 dari 7 titik), empat ketukan di tab memecahkan es, 24 hari tersimpan;
+  - hangus (absen 12 hari): 47 dicoret dengan "Kamu absen 12 hari. Streak 47 hari hangus.", lalu bara `1/3` dengan pesan mulai lagi; `longest` tetap 47;
+  - alarm pengingat terdaftar di `dumpsys alarm`: RTC_WAKEUP 19 Okt 20.00, jendela Android +1 jam (inexact di Android 12 ke atas, jadi pengingat bisa datang sampai sekitar pukul 21.00).
+- **Diperbaiki dari uji HP:** setelah api padam atau beku dinyalakan, hari absen di Pekan ini dan kalender kembali tampil biasa; kini tetap putus-putus (abu-abu atau es) seperti prototipe 8, selama streak tidak dimulai ulang. Keterangan absen di bawah kalender hanya tampil selagi api menunggu. Tes ditambah.
+- **Belum terjelaskan:** pada percobaan pertama, tiga ketukan cepat di splash padam tembus ke daftar host (membuka sambungan "development", lalu dibatalkan). Tidak terulang di empat percobaan berikutnya. Pada saat yang sama terlihat `am force-stop` tidak selalu langsung mematikan proses, jadi dugaan sementara ada dua instans aplikasi; belum terbukti.
+- **Belum teruji di HP:** notifikasi pengingat benar-benar tampil, pemulihan setelah HP dinyalakan ulang, pergantian tanggal saat aplikasi terbuka, dan reduce motion sistem.
+
