@@ -1123,11 +1123,35 @@ abstract class AppLocalizations {
   /// **'Snippet'**
   String get navSnippets;
 
+  /// Tab Streak di bar navigasi (satu kata).
+  ///
+  /// In id, this message translates to:
+  /// **'Streak'**
+  String get navStreak;
+
   /// Tab Pengaturan di bar navigasi.
   ///
   /// In id, this message translates to:
   /// **'Pengaturan'**
   String get navSettings;
+
+  /// Judul layar tab Streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak'**
+  String get streakTitle;
+
+  /// Judul banner di tab Streak: fitur belum tersedia.
+  ///
+  /// In id, this message translates to:
+  /// **'Segera hadir'**
+  String get streakSoonTitle;
+
+  /// Isi banner di tab Streak: fitur yang akan datang.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak api, hitungan hari kamu membuka TermUL, akan hadir di versi berikutnya.'**
+  String get streakSoonBody;
 
   /// Judul layar pengaturan.
   ///

@@ -794,9 +794,25 @@
   "@navSnippets": {
     "description": "Tab Snippet di bar navigasi."
   },
+  "navStreak": "Streak",
+  "@navStreak": {
+    "description": "Tab Streak di bar navigasi (satu kata)."
+  },
   "navSettings": "Pengaturan",
   "@navSettings": {
     "description": "Tab Pengaturan di bar navigasi."
+  },
+  "streakTitle": "Streak",
+  "@streakTitle": {
+    "description": "Judul layar tab Streak."
+  },
+  "streakSoonTitle": "Segera hadir",
+  "@streakSoonTitle": {
+    "description": "Judul banner di tab Streak: fitur belum tersedia."
+  },
+  "streakSoonBody": "Streak api, hitungan hari kamu membuka TermUL, akan hadir di versi berikutnya.",
+  "@streakSoonBody": {
+    "description": "Isi banner di tab Streak: fitur yang akan datang."
   },
   "settingsTitle": "Pengaturan",
   "@settingsTitle": {

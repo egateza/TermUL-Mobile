@@ -578,7 +578,19 @@ class AppLocalizationsId extends AppLocalizations {
   String get navSnippets => 'Snippet';
 
   @override
+  String get navStreak => 'Streak';
+
+  @override
   String get navSettings => 'Pengaturan';
+
+  @override
+  String get streakTitle => 'Streak';
+
+  @override
+  String get streakSoonTitle => 'Segera hadir';
+
+  @override
+  String get streakSoonBody => 'Streak api, hitungan hari kamu membuka TermUL, akan hadir di versi berikutnya.';
 
   @override
   String get settingsTitle => 'Pengaturan';

@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:termul_mobile/core/theme/termul_theme.dart';
 import 'package:termul_mobile/features/hosts/host_list_screen.dart';
 import 'package:termul_mobile/features/sessions/sessions_screen.dart';
 import 'package:termul_mobile/features/settings/settings_screen.dart';
 import 'package:termul_mobile/features/snippets/snippets_screen.dart';
+import 'package:termul_mobile/features/streak/streak_screen.dart';
 import 'package:termul_mobile/shared/widgets/termul_nav_bar.dart';
 
 import 'hosts_ui_harness.dart';
@@ -11,13 +13,13 @@ import 'hosts_ui_harness.dart';
 Finder tab(String label) => find.descendant(of: find.byType(TermulNavBar), matching: find.text(label));
 
 void main() {
-  testWidgets('lima tab; Host aktif dan tab lain dibangun saat pertama dibuka', (tester) async {
+  testWidgets('lima tab (Streak di kiri Pengaturan); Host aktif dan tab lain dibangun saat pertama dibuka', (tester) async {
     await Harness().pump(tester);
     expect(find.byType(HostListScreen), findsOneWidget);
     expect(find.byType(SessionsScreen), findsNothing);
     expect(find.byType(SettingsScreen), findsNothing);
     final bar = tester.widget<TermulNavBar>(find.byType(TermulNavBar));
-    expect(bar.items.map((i) => i.label), ['Host', 'Sesi', 'Snippet', 'Pengaturan']);
+    expect(bar.items.map((i) => i.label), ['Host', 'Sesi', 'Snippet', 'Streak', 'Pengaturan']);
     expect(bar.active, 'hosts');
   });
 
@@ -38,10 +40,22 @@ void main() {
     expect(find.byType(SnippetsScreen), findsOneWidget);
     expect(find.text('Belum ada snippet'), findsOneWidget);
 
+    await tester.tap(tab('Streak'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StreakScreen), findsOneWidget);
+    expect(find.text('Segera hadir'), findsOneWidget);
+
     await tester.tap(tab('Pengaturan'));
     await tester.pumpAndSettle();
     expect(find.byType(SettingsScreen), findsOneWidget);
     expect(find.bySemanticsLabel('Kembali'), findsNothing);
+  });
+
+  testWidgets('tab Streak memakai warna sorot merah api, tab lain tetap aksen', (tester) async {
+    await Harness().pump(tester);
+    final items = tester.widget<TermulNavBar>(find.byType(TermulNavBar)).items;
+    expect(items.singleWhere((i) => i.id == 'streak').highlight, TermulPalette.level3);
+    expect(items.where((i) => i.id != 'streak').every((i) => i.highlight == null), isTrue);
   });
 
   testWidgets('pencarian di Host bertahan saat berpindah tab', (tester) async {
@@ -68,7 +82,7 @@ void main() {
     tester,
   ) async {
     await Harness().pump(tester);
-    for (final label in ['Host', 'Sesi', 'Snippet', 'Pengaturan']) {
+    for (final label in ['Host', 'Sesi', 'Snippet', 'Streak', 'Pengaturan']) {
       final size = tester.getSize(find.ancestor(of: tab(label), matching: find.byType(InkWell)).first);
       expect(size.height, greaterThanOrEqualTo(56), reason: label);
     }

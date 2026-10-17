@@ -17,18 +17,18 @@ String _uuid(int i) => '00000000-0000-4000-8000-${i.toString().padLeft(12, '0')}
 Finder railTab(String label) => find.descendant(of: find.byType(TermulNavRail), matching: find.text(label));
 
 void main() {
-  testWidgets('landscape: rel navigasi di kiri menggantikan bar bawah, empat tab, tinggi tab minimal 44 dp', (
+  testWidgets('landscape: rel navigasi di kiri menggantikan bar bawah, lima tab, tinggi tab minimal 44 dp', (
     tester,
   ) async {
     await Harness().pump(tester, size: landscape);
     expect(find.byType(TermulNavBar), findsNothing);
     expect(find.byType(TermulNavRail), findsOneWidget);
     final rail = tester.widget<TermulNavRail>(find.byType(TermulNavRail));
-    expect(rail.items.map((i) => i.label), ['Host', 'Sesi', 'Snippet', 'Pengaturan']);
+    expect(rail.items.map((i) => i.label), ['Host', 'Sesi', 'Snippet', 'Streak', 'Pengaturan']);
     expect(rail.active, 'hosts');
     expect(tester.getRect(find.byType(TermulNavRail)).left, 0);
     expect(tester.getSize(find.byType(TermulNavRail)).width, TermulNavRail.width);
-    for (final label in ['Host', 'Sesi', 'Snippet', 'Pengaturan']) {
+    for (final label in ['Host', 'Sesi', 'Snippet', 'Streak', 'Pengaturan']) {
       final size = tester.getSize(find.ancestor(of: railTab(label), matching: find.byType(InkWell)).first);
       expect(size.height, greaterThanOrEqualTo(44), reason: label);
     }
@@ -175,7 +175,7 @@ void main() {
     await Harness().pump(tester, size: landscape);
     final rail = tester.getRect(find.byType(TermulNavRail));
     final centers = <double>[];
-    for (final label in ['Host', 'Sesi', 'Snippet', 'Pengaturan']) {
+    for (final label in ['Host', 'Sesi', 'Snippet', 'Streak', 'Pengaturan']) {
       final tab = tester.getRect(find.ancestor(of: railTab(label), matching: find.byType(InkWell)).first);
       centers.add(tester.getCenter(railTab(label)).dx - tab.center.dx);
     }

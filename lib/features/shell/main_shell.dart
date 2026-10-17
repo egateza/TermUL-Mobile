@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../core/models/host_profile.dart';
+import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_nav_bar.dart';
@@ -11,8 +12,9 @@ import '../sessions/sessions_screen.dart';
 import '../sftp/sftp_session_manager.dart';
 import '../settings/settings_screen.dart';
 import '../snippets/snippets_screen.dart';
+import '../streak/streak_screen.dart';
 
-/// Kerangka layar utama: empat tab di `NavBar` (Host, Sesi, Snippet, Pengaturan). Tab SFTP dihapus (keputusan pemilik
+/// Kerangka layar utama: lima tab di `NavBar` (Host, Sesi, Snippet, Streak, Pengaturan; Streak masih layar "segera hadir"). Tab SFTP dihapus (keputusan pemilik
 /// 2026-10-17): SFTP dibuka dari menu tekan lama host ("Sambung SFTP") atau tombol SFTP di terminal, dan sesinya muncul
 /// di Sesi. Tab dibangun
 /// saat pertama dibuka lalu dipertahankan, jadi pencarian dan gulir di daftar host tidak hilang saat berpindah tab.
@@ -28,7 +30,7 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
-  static const _ids = ['hosts', 'sessions', 'snippets', 'settings'];
+  static const _ids = ['hosts', 'sessions', 'snippets', 'streak', 'settings'];
 
   int _index = 0;
   final _visited = <int>{0};
@@ -46,6 +48,7 @@ class _MainShellState extends ConsumerState<MainShell> {
     0 => HostListScreen(onConnect: widget.onConnect),
     1 => const SessionsScreen(showBack: false),
     2 => const SnippetsScreen(),
+    3 => const StreakScreen(),
     _ => const SettingsScreen(showBack: false),
   };
 
@@ -65,6 +68,8 @@ class _MainShellState extends ConsumerState<MainShell> {
         semanticLabel: sessions > 0 ? l.hostsOpenSessions(sessions) : null,
       ),
       NavItem(id: 'snippets', label: l.navSnippets, icon: TermulIconName.snippets),
+      // Merah api (tier 3) supaya tab Streak mencolok dibanding tab lain; permintaan pemilik 2026-10-17.
+      NavItem(id: 'streak', label: l.navStreak, icon: TermulIconName.flame, highlight: TermulPalette.level3),
       NavItem(id: 'settings', label: l.navSettings, icon: TermulIconName.settings),
     ];
     final pages = IndexedStack(

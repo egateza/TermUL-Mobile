@@ -6,7 +6,7 @@ import 'termul_icon.dart';
 
 /// Satu tab di [TermulNavBar].
 class NavItem {
-  const NavItem({required this.id, required this.label, required this.icon, this.badge = 0, this.semanticLabel});
+  const NavItem({required this.id, required this.label, required this.icon, this.badge = 0, this.semanticLabel, this.highlight});
 
   final String id;
 
@@ -19,6 +19,10 @@ class NavItem {
 
   /// Nama untuk pembaca layar bila perlu lebih panjang dari [label] (mis. memuat jumlah lencana).
   final String? semanticLabel;
+
+  /// Warna sorot untuk tab yang ingin mencolok: ikon selalu berwarna ini, label berwarna ini saat tab aktif.
+  /// Tanpa nilai, tab memakai `accent` (aktif) dan `inkMuted` (tidak aktif).
+  final Color? highlight;
 }
 
 /// Bar navigasi bawah (`components/NavBar` di design system): tab dengan ikon dan label, tab aktif berwarna
@@ -134,7 +138,7 @@ class _NavTab extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final color = selected ? TermulPalette.accent : TermulPalette.inkMuted;
+    final color = selected ? item.highlight ?? TermulPalette.accent : TermulPalette.inkMuted;
     return Pressable(
       minHeight: minHeight,
       toggled: selected,
@@ -151,7 +155,7 @@ class _NavTab extends StatelessWidget {
             Stack(
               clipBehavior: Clip.none,
               children: [
-                TermulIcon(item.icon, size: 22, color: color),
+                TermulIcon(item.icon, size: 22, color: item.highlight ?? color),
                 if (item.badge > 0)
                   Positioned(
                     top: -6,

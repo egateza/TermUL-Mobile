@@ -15,7 +15,7 @@
    "y": 0,
    "w": 390,
    "h": 844,
-   "title": "1 · Daftar host (empat tab; SFTP dibuka dari menu host atau terminal)",
+   "title": "1 · Daftar host (lima tab: Host, Sesi, Snippet, Streak, Pengaturan; SFTP dibuka dari menu host atau terminal)",
    "is_interactive": true,
    "radius": 28
   },
@@ -608,6 +608,15 @@
    "title": "2o · Terminal: ikon Snippet di bilah membuka panel; ketuk menempel, tekan lama membuka detail",
    "is_interactive": true,
    "radius": 28
+  },
+  "StreakSoon.dc.html": {
+   "x": 4700,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "15 · Tab Streak: segera hadir (tab kelima, ikon api merah; fitur streak belum ada)",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -677,7 +686,8 @@
   "SnippetSort.dc.html",
   "SnippetDanger.dc.html",
   "SnippetDelete.dc.html",
-  "TerminalSnippets.dc.html"
+  "TerminalSnippets.dc.html",
+  "StreakSoon.dc.html"
  ],
  "notes": {
   "judul": {

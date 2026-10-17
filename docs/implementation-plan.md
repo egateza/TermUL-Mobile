@@ -1050,3 +1050,15 @@ Skrip bantu ada di `tool/` (pembuat token dari `tokens.json`, pembuat `docs/lice
 - AVD sementara `termul_uji_bersih` (buat dengan `avdmanager`): hapus dengan `avdmanager delete avd -n termul_uji_bersih`.
 - Emulator `hp_besar_pin_121212_` Anda masih memuat aplikasi spike lama `com.example.termul_spike` dengan kredensial uji terenkripsi di Keystore-nya; uninstall bila sudah tidak dipakai.
 - Server Ubuntu 24.04 dari spike: user `spike` di sana masih belum dibersihkan (tidak ada akses dari sesi ini).
+
+## Tab Streak (layar "segera hadir")
+
+Permintaan pemilik (2026-10-17): tab baru **Streak** di kiri Pengaturan, isinya pemberitahuan fitur yang akan datang. Urutan tab: Host, Sesi, Snippet, Streak, Pengaturan (`NavBar` dan `NavRail` landscape otomatis lima tab).
+
+- **Kode:** `lib/features/streak/streak_screen.dart` (judul "Streak" dan banner info "Segera hadir"; tanpa logika, penyimpanan, atau api berwarna tier), ikon `TermulIconName.flame` (garis, bukan komponen `Flame` desain), l10n `navStreak`, `streakTitle`, `streakSoonTitle`, `streakSoonBody`.
+- **Warna sorot (permintaan pemilik, 2026-10-17):** ikon tab Streak selalu merah api (`level3`, `#FF4D2E`) dan labelnya merah saat aktif, supaya mencolok dibanding tab lain; `NavItem.highlight` baru. **Penyimpangan dari desain:** desain hanya mengenal satu aksen untuk tab aktif; ini perlu masuk ke artifact (README: `NavItem.highlight`, prototipe tab Streak merah) sebelum commit.
+- **Tes:** `main_shell_test.dart` dan `main_shell_landscape_test.dart` diperbarui ke lima tab; tab Streak membuka `StreakScreen`.
+- **Belum teruji di HP:** tampilan lima tab di layar sempit (label "Pengaturan" paling panjang) dan di rel landscape.
+- **Artifact (sudah, 2026-10-17):** prototipe versi 61 (`1792253150-1905`) dan design system versi 61 (`1792253153-ee3d`); rincian di `docs/design/SUMBER.md`. Tab Streak masuk ke `Main`, `MainLandscape`, `Settings`, `Snippets`, contoh baru 15 (`StreakSoon`), README (butir `NavBar`), `NavBar/README.md` (`highlight`), dan `Icon/README.md` (`flame`). `Settings` sekaligus kehilangan tab SFTP lamanya (sisa keputusan 2026-10-17). Prototipe lain yang memuat bar navigasi (`ComingSoon`, `Sftp`, `SftpSources`) sudah tidak dipakai aplikasi dan tidak diubah.
+- **Uji HP (2026-10-17, dd3bf2af, build debug):** lima tab muat satu baris, perpindahan Host, Pengaturan, Streak berfungsi, ikon merah api dan label merah saat aktif; layar Streak sejajar dengan judul tab lain. Belum diuji: layar lebih sempit dan rel landscape.
+- **Belum dikerjakan:** streak sungguhan (api, chip, `streak.json`), tetap irisan tersendiri.

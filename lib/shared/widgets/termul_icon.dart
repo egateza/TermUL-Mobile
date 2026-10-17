@@ -36,6 +36,8 @@ enum TermulIconName {
   trash('M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3'),
   edit('M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4'),
   key('M11 12l9-9M16 7l3 3M14 9l2 2'),
+  // Api satu lidah bergaya garis untuk tab Streak; bukan `Flame` desain (api berwarna tier).
+  flame('M12 3c.5 3.2 5.5 5.3 5.5 10.2a5.5 5.5 0 0 1-11 0c0-2.2 1-3.6 2.3-4.7.1 1.8.9 2.8 2 3.2C10 8.8 10.5 5.7 12 3z'),
   star('M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'),
   refresh('M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4'),
   more('M12 6h.01M12 12h.01M12 18h.01'),
