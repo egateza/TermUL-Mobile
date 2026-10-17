@@ -141,6 +141,15 @@ void main() {
     expect(c.path, '/home');
   });
 
+  test('clearSelection melepas pilihan dan tidak apa-apa bila tidak ada', () async {
+    await c.start();
+    c.clearSelection();
+    c.select(c.entries.last);
+    expect(c.selected, isNotNull);
+    c.clearSelection();
+    expect(c.selected, isNull);
+  });
+
   test('pilihan: ketuk lagi membatalkan, pindah folder menghapusnya', () async {
     await c.start();
     final f = c.entries.last;

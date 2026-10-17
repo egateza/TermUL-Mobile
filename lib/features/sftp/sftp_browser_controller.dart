@@ -83,6 +83,13 @@ class SftpBrowserController extends ChangeNotifier {
     _notify();
   }
 
+  /// Melepas pilihan (setelah aksi pada berkas dijalankan).
+  void clearSelection() {
+    if (_selected == null) return;
+    _selected = null;
+    _notify();
+  }
+
   void _begin() {
     _loading = true;
     _failure = null;

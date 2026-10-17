@@ -782,9 +782,14 @@ class _Listing extends StatelessWidget {
                 ),
         ),
         if (link.transfers.isBusy) _TransferPanel(tracker: link.transfers),
-        if (browser.selected != null && !link.lost)
-          _SelectionBar(entry: browser.selected!, onDownload: () => onDownload(browser.selected!)),
-        if (browser.selected != null && link.lost) _SelectionBar(entry: browser.selected!),
+        if (browser.selected case final sel?)
+          _SelectionBar(
+            entry: sel,
+            // Pilihan dilepas begitu aksi ditekan: unduhan berjalan di panel transfer dan tombol tidak bisa ditekan
+            // berulang untuk berkas yang sama.
+            onDone: browser.clearSelection,
+            onDownload: link.lost ? null : () => onDownload(sel),
+          ),
       ],
     );
   }
@@ -921,9 +926,12 @@ class _EntryRow extends StatelessWidget {
 }
 
 class _SelectionBar extends StatelessWidget {
-  const _SelectionBar({required this.entry, this.onDownload});
+  const _SelectionBar({required this.entry, required this.onDone, this.onDownload});
 
   final SftpEntry entry;
+
+  /// Dipanggil begitu sebuah aksi ditekan (melepas pilihan).
+  final VoidCallback onDone;
 
   /// null bila sambungan putus (unduh tidak bisa dimulai).
   final VoidCallback? onDownload;
@@ -963,7 +971,10 @@ class _SelectionBar extends StatelessWidget {
                     label: l.sftpDownloadAction,
                     icon: TermulIconName.download,
                     variant: TermulButtonVariant.primary,
-                    onPressed: onDownload,
+                    onPressed: () {
+                      onDone();
+                      onDownload!();
+                    },
                   ),
                 ),
               Expanded(
@@ -973,6 +984,7 @@ class _SelectionBar extends StatelessWidget {
                   icon: TermulIconName.copy,
                   onPressed: () async {
                     final messenger = ScaffoldMessenger.of(context);
+                    onDone();
                     await Clipboard.setData(ClipboardData(text: entry.path));
                     showTermulToastOn(messenger, l.sftpPathCopied);
                   },

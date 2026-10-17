@@ -150,6 +150,7 @@ void main() {
     await tester.pump();
     expect(clip, '/home/u/catatan.txt');
     expect(find.text('Path disalin'), findsOneWidget);
+    expect(find.text('catatan.txt dipilih'), findsNothing, reason: 'pilihan dilepas setelah aksi');
     await tester.pump(const Duration(seconds: 3));
   });
 
@@ -180,6 +181,24 @@ void main() {
       expect(_saver.saved, ['catatan.txt']);
       expect(find.text('Diunduh ke Unduhan/TermUL · catatan.txt'), findsOneWidget);
       expect(lastLink.transfers.isBusy, isFalse);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('Unduh melepas pilihan: tombol tidak bisa ditekan berulang untuk berkas yang sama', (tester) async {
+      final fake = await pumpBrowser(tester);
+      fake.hold = Completer<void>();
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
+      await tester.tap(find.text('Unduh'));
+      await tester.pump(const Duration(milliseconds: 50));
+      expect(find.text('catatan.txt dipilih'), findsNothing);
+      expect(find.text('Unduh'), findsNothing, reason: 'bar pilihan hilang');
+      await settle(tester, rounds: 2);
+      expect(lastLink.transfers.active, hasLength(1));
+
+      fake.hold!.complete();
+      await settle(tester);
+      expect(_saver.saved, ['catatan.txt'], reason: 'satu unduhan saja');
       await tester.pump(const Duration(seconds: 3));
     });
 
@@ -265,6 +284,8 @@ void main() {
       await settle(tester);
       expect(_saver.saved, isEmpty);
 
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
       await tester.tap(find.text('Unduh'));
       await settle(tester);
       await tester.tap(find.text('Simpan sebagai catatan (2).txt'));
@@ -276,6 +297,8 @@ void main() {
       tester.state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger).first).hideCurrentSnackBar();
       await tester.pumpAndSettle();
 
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
       await tester.tap(find.text('Unduh'));
       await settle(tester);
       await tester.tap(find.text('Timpa berkas lama'));
