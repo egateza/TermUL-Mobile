@@ -5,6 +5,7 @@ import 'package:termul_mobile/core/models/auth_method.dart';
 import 'package:termul_mobile/core/storage/load_result.dart';
 import 'package:termul_mobile/core/vault/secret_type.dart';
 import 'package:termul_mobile/shared/widgets/host_row.dart';
+import 'package:termul_mobile/shared/widgets/termul_icon.dart';
 
 import 'hosts_ui_harness.dart';
 
@@ -205,6 +206,46 @@ void main() {
       await h.pump(tester);
       expect(find.text('Sidik jari server hilang'), findsOneWidget);
       expect(find.textContaining('dianggap host baru'), findsOneWidget);
+    });
+  });
+
+  group('penanda favorit', () {
+    Finder star(String hostName) => find.descendant(
+      of: find.widgetWithText(HostRow, hostName),
+      matching: find.byWidgetPredicate((w) => w is TermulIcon && w.name == TermulIconName.star),
+    );
+
+    testWidgets('hanya host favorit yang berbintang, dan bintang ikut hilang saat favorit dicabut', (tester) async {
+      final h = Harness();
+      await h.seed(
+        [host(id1, name: 'app-01'), host(id2, name: 'db-01')],
+        favorites: [id1],
+      );
+      await h.pump(tester);
+      expect(star('app-01'), findsOneWidget);
+      expect(star('db-01'), findsNothing);
+      expect(tester.widget<HostRow>(find.widgetWithText(HostRow, 'app-01')).favorite, isTrue);
+
+      await longPress(tester, 'app-01');
+      await tester.tap(find.text('Hapus dari favorit'));
+      await tester.pumpAndSettle();
+      expect(star('app-01'), findsNothing);
+
+      await longPress(tester, 'db-01');
+      await tester.tap(find.text('Jadikan favorit'));
+      await tester.pumpAndSettle();
+      expect(star('db-01'), findsOneWidget);
+    });
+
+    testWidgets('nama panjang tetap terpotong dan bintang tetap terlihat', (tester) async {
+      final h = Harness();
+      await h.seed(
+        [host(id1, name: 'nama-host-yang-sangat-panjang-sekali-untuk-menguji-pemotongan-teks')],
+        favorites: [id1],
+      );
+      await h.pump(tester);
+      expect(star('nama-host-yang-sangat-panjang-sekali-untuk-menguji-pemotongan-teks'), findsOneWidget);
+      expect(tester.takeException(), isNull);
     });
   });
 }

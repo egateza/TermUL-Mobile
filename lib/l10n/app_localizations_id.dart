@@ -1330,4 +1330,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get importFailed => 'Impor gagal. Daftar host tidak berubah.';
+
+  @override
+  String get hostFavoriteLabel => 'Favorit';
 }

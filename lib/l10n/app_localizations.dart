@@ -2364,6 +2364,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Impor gagal. Daftar host tidak berubah.'**
   String get importFailed;
+
+  /// Nama bintang penanda host favorit di baris daftar (untuk pembaca layar).
+  ///
+  /// In id, this message translates to:
+  /// **'Favorit'**
+  String get hostFavoriteLabel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

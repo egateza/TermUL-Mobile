@@ -1928,5 +1928,9 @@
   "importFailed": "Impor gagal. Daftar host tidak berubah.",
   "@importFailed": {
     "description": "Galat bila penulisan hasil impor gagal."
+  },
+  "hostFavoriteLabel": "Favorit",
+  "@hostFavoriteLabel": {
+    "description": "Nama bintang penanda host favorit di baris daftar (untuk pembaca layar)."
   }
 }
