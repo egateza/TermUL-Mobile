@@ -99,7 +99,10 @@ class _Track extends StatelessWidget {
       decoration: BoxDecoration(
         color: on ? onColor : Colors.transparent,
         borderRadius: BorderRadius.circular(TermulRadius.radiusPill),
-        border: Border.all(color: on ? onColor : (danger ? TermulPalette.badLine : TermulPalette.lineStrong), width: 1.5),
+        border: Border.all(
+          color: on ? onColor : (danger ? TermulPalette.badLine : TermulPalette.lineStrong),
+          width: 1.5,
+        ),
       ),
       child: Container(
         width: 20,

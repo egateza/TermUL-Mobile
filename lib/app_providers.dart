@@ -9,6 +9,7 @@ import 'core/import/profile_file_picker.dart';
 import 'core/keys/key_file_picker.dart';
 import 'core/models/app_settings.dart';
 import 'core/platform/downloads_saver.dart';
+import 'core/platform/file_sharer.dart';
 import 'core/platform/keepalive_platform.dart';
 import 'core/platform/screen_monitor.dart';
 import 'core/models/profile_snapshot.dart';
@@ -121,6 +122,9 @@ final downloadsSaverProvider = Provider<DownloadsSaver>((ref) => MethodChannelDo
 
 /// Pemilih berkas untuk unggahan SFTP; diganti di tes.
 final uploadPickerProvider = Provider<UploadPicker>((ref) => const FileSelectorUploadPicker());
+
+/// Menu bagikan bawaan Android untuk berkas ekspor; diganti di tes.
+final fileSharerProvider = Provider<FileSharer>((ref) => MethodChannelFileSharer());
 
 /// Folder berkas sementara unduhan (cache aplikasi); diganti di tes.
 final tempDirProvider = Provider<Future<Directory> Function()>((ref) => getTemporaryDirectory);

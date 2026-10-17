@@ -1932,5 +1932,47 @@
   "hostFavoriteLabel": "Favorit",
   "@hostFavoriteLabel": {
     "description": "Nama bintang penanda host favorit di baris daftar (untuk pembaca layar)."
+  },
+  "exportAction": "Ekspor profil",
+  "@exportAction": {
+    "description": "Label tombol ekspor di daftar host."
+  },
+  "exportTitle": "Ekspor profil",
+  "@exportTitle": {
+    "description": "Judul panel konfirmasi ekspor."
+  },
+  "exportConfirm": "Bagikan",
+  "@exportConfirm": {
+    "description": "Tombol konfirmasi ekspor."
+  },
+  "exportCount": "{n} profil akan diekspor",
+  "@exportCount": {
+    "description": "Ringkasan ekspor: jumlah profil.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "exportNote": "Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Menu bagikan Android akan terbuka: kirim ke aplikasi lain atau simpan ke penyimpanan. Password, passphrase, dan kunci tidak ikut.",
+  "@exportNote": {
+    "description": "Catatan di panel ekspor."
+  },
+  "exportKeyConverted": "{n} profil memakai kunci yang tersimpan di HP. Di berkas ekspor metodenya menjadi agen SSH supaya desktop tetap bisa memuat berkas ini; lengkapi kuncinya di desktop.",
+  "@exportKeyConverted": {
+    "description": "Catatan profil KEY yang diubah di ekspor.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "exportNothing": "Belum ada profil untuk diekspor.",
+  "@exportNothing": {
+    "description": "Galat bila daftar host kosong."
+  },
+  "exportFailed": "Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.",
+  "@exportFailed": {
+    "description": "Galat bila berkas ekspor tidak bisa disimpan."
   }
 }

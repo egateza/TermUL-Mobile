@@ -1333,4 +1333,33 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get hostFavoriteLabel => 'Favorit';
+
+  @override
+  String get exportAction => 'Ekspor profil';
+
+  @override
+  String get exportTitle => 'Ekspor profil';
+
+  @override
+  String get exportConfirm => 'Bagikan';
+
+  @override
+  String exportCount(int n) {
+    return '$n profil akan diekspor';
+  }
+
+  @override
+  String get exportNote =>
+      'Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Menu bagikan Android akan terbuka: kirim ke aplikasi lain atau simpan ke penyimpanan. Password, passphrase, dan kunci tidak ikut.';
+
+  @override
+  String exportKeyConverted(int n) {
+    return '$n profil memakai kunci yang tersimpan di HP. Di berkas ekspor metodenya menjadi agen SSH supaya desktop tetap bisa memuat berkas ini; lengkapi kuncinya di desktop.';
+  }
+
+  @override
+  String get exportNothing => 'Belum ada profil untuk diekspor.';
+
+  @override
+  String get exportFailed => 'Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.';
 }

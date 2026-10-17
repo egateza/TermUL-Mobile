@@ -90,6 +90,26 @@ class MainActivity : FlutterFragmentActivity() {
                 else -> result.notImplemented()
             }
         }
+        val share = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/share")
+        share.setMethodCallHandler { call, result ->
+            if (call.method != "shareFile") {
+                result.notImplemented()
+                return@setMethodCallHandler
+            }
+            val path = call.argument<String>("path")
+            val name = call.argument<String>("name")
+            val mime = call.argument<String>("mimeType")
+            if (path == null || name == null || mime == null) {
+                result.error("bad_args", "path, name, dan mimeType wajib", null)
+                return@setMethodCallHandler
+            }
+            try {
+                FileSharer.share(this, path, name, mime, call.argument<String>("title"))
+                result.success(null)
+            } catch (e: Exception) {
+                result.error("share_failed", e.javaClass.simpleName, null)
+            }
+        }
         ch.setMethodCallHandler { call, result ->
             when (call.method) {
                 "update" -> {

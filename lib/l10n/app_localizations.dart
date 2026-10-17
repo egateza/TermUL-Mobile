@@ -2370,6 +2370,54 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Favorit'**
   String get hostFavoriteLabel;
+
+  /// Label tombol ekspor di daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekspor profil'**
+  String get exportAction;
+
+  /// Judul panel konfirmasi ekspor.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekspor profil'**
+  String get exportTitle;
+
+  /// Tombol konfirmasi ekspor.
+  ///
+  /// In id, this message translates to:
+  /// **'Bagikan'**
+  String get exportConfirm;
+
+  /// Ringkasan ekspor: jumlah profil.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} profil akan diekspor'**
+  String exportCount(int n);
+
+  /// Catatan di panel ekspor.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Menu bagikan Android akan terbuka: kirim ke aplikasi lain atau simpan ke penyimpanan. Password, passphrase, dan kunci tidak ikut.'**
+  String get exportNote;
+
+  /// Catatan profil KEY yang diubah di ekspor.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} profil memakai kunci yang tersimpan di HP. Di berkas ekspor metodenya menjadi agen SSH supaya desktop tetap bisa memuat berkas ini; lengkapi kuncinya di desktop.'**
+  String exportKeyConverted(int n);
+
+  /// Galat bila daftar host kosong.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada profil untuk diekspor.'**
+  String get exportNothing;
+
+  /// Galat bila berkas ekspor tidak bisa disimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.'**
+  String get exportFailed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

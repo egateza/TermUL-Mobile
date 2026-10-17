@@ -20,6 +20,7 @@ import '../../shared/widgets/termul_toast.dart';
 import '../sftp/sftp_screen.dart' show openSftpOwn;
 import 'host_form_screen.dart';
 import 'host_list_model.dart';
+import 'profile_export_flow.dart';
 import 'profile_import_flow.dart';
 import 'vault_chip.dart';
 
@@ -48,6 +49,11 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
 
   void _openForm([HostProfile? existing]) {
     Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => HostFormScreen(existing: existing)));
+  }
+
+  Future<void> _export() async {
+    final error = await runProfileExport(context, ref);
+    if (mounted) setState(() => _error = error);
   }
 
   Future<void> _import() async {
@@ -285,6 +291,8 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                         child: Text(l.hostsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
                       ),
                     ),
+                    TermulIconButton(icon: TermulIconName.upload, label: l.exportAction, onPressed: _export),
+                    const SizedBox(width: TermulSpacing.space3),
                     TermulIconButton(icon: TermulIconName.download, label: l.importAction, onPressed: _import),
                     const SizedBox(width: TermulSpacing.space3),
                     TermulIconButton(

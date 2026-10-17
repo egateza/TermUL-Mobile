@@ -527,6 +527,15 @@
    "title": "1f · Impor profil dari TermUL desktop: pratinjau penggabungan (profil lama tidak dihapus)",
    "is_interactive": true,
    "radius": 28
+  },
+  "HostExport.dc.html": {
+   "x": 7520,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "1g · Ekspor profil: konfirmasi, lalu menu bagikan bawaan Android (berkas JSON tanpa rahasia)",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -587,7 +596,8 @@
   "SftpLeaveKeep.dc.html",
   "HostActions.dc.html",
   "MainVaultOpen.dc.html",
-  "HostImport.dc.html"
+  "HostImport.dc.html",
+  "HostExport.dc.html"
  ],
  "notes": {
   "judul": {

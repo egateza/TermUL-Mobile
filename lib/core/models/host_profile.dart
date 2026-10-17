@@ -163,6 +163,7 @@ final class HostProfile {
   HostProfile withId(String newId) => _with(id: newId);
   HostProfile withName(String newName) => _with(name: newName);
   HostProfile withoutPrivateKeyPath() => _with(privateKeyPath: () => null);
+  HostProfile withAuthMethod(AuthMethod method) => _with(authMethod: method);
 
   HostProfile _with({
     String? id,
@@ -171,6 +172,7 @@ final class HostProfile {
     ValueGetter<OsInfo?>? os,
     ValueGetter<String?>? jumpHostId,
     ValueGetter<String?>? privateKeyPath,
+    AuthMethod? authMethod,
   }) => HostProfile(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -178,7 +180,7 @@ final class HostProfile {
     host: host,
     port: port,
     username: username,
-    authMethod: authMethod,
+    authMethod: authMethod ?? this.authMethod,
     privateKeyPath: privateKeyPath != null ? privateKeyPath() : this.privateKeyPath,
     jumpHostId: jumpHostId != null ? jumpHostId() : this.jumpHostId,
     environment: environment,
