@@ -1784,5 +1784,149 @@
   "settingsDangerTag": "Berisiko",
   "@settingsDangerTag": {
     "description": "Tag kata di baris pengaturan berisiko (zona bahaya)."
+  },
+  "importAction": "Impor profil",
+  "@importAction": {
+    "description": "Label tombol impor di daftar host."
+  },
+  "importTitle": "Impor profil",
+  "@importTitle": {
+    "description": "Judul panel pratinjau impor."
+  },
+  "importConfirm": "Impor",
+  "@importConfirm": {
+    "description": "Tombol konfirmasi impor."
+  },
+  "importReadFailed": "Berkas tidak bisa dibaca.",
+  "@importReadFailed": {
+    "description": "Galat saat berkas impor gagal dibaca."
+  },
+  "importNothing": "Tidak ada profil yang bisa diimpor dari berkas ini.",
+  "@importNothing": {
+    "description": "Galat bila berkas tidak berisi profil valid."
+  },
+  "importKeepNote": "Profil yang sudah ada di HP tidak dihapus. Password dan kunci tidak ikut terimpor.",
+  "@importKeepNote": {
+    "description": "Catatan di pratinjau impor."
+  },
+  "importAdded": "{n} profil baru ditambahkan",
+  "@importAdded": {
+    "description": "Ringkasan impor: jumlah profil baru.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importUpdated": "{n} profil diperbarui",
+  "@importUpdated": {
+    "description": "Ringkasan impor: jumlah profil diganti.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importCopied": "{n} profil disimpan sebagai salinan",
+  "@importCopied": {
+    "description": "Ringkasan impor: jumlah salinan.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importSkipped": "{n} profil dilewati karena sudah ada",
+  "@importSkipped": {
+    "description": "Ringkasan impor: jumlah profil dilewati.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importRejected": "{n} entri tidak valid dan dilewati",
+  "@importRejected": {
+    "description": "Ringkasan impor: jumlah entri ditolak.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importRejectedItem": "#{index} {name}: {reason}",
+  "@importRejectedItem": {
+    "description": "Satu entri berkas yang ditolak.",
+    "placeholders": {
+      "index": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "importAgentNote": "{n} profil memakai agen SSH dan perlu dilengkapi di HP sebelum bisa tersambung.",
+  "@importAgentNote": {
+    "description": "Catatan profil agen di pratinjau impor.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importConflictLabel": "Bila profil sudah ada di HP",
+  "@importConflictLabel": {
+    "description": "Label pilihan penanganan id bentrok."
+  },
+  "importConflictSkip": "Lewati",
+  "@importConflictSkip": {
+    "description": "Pilihan: profil di HP dibiarkan."
+  },
+  "importConflictUpdate": "Perbarui",
+  "@importConflictUpdate": {
+    "description": "Pilihan: profil di HP diganti isi berkas."
+  },
+  "importConflictCopy": "Salinan",
+  "@importConflictCopy": {
+    "description": "Pilihan: profil berkas disimpan sebagai profil baru."
+  },
+  "importWarnJump": "{name}: jump host tidak ditemukan, dikosongkan.",
+  "@importWarnJump": {
+    "description": "Peringatan jump host hilang.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importWarnKeyPath": "{name}: path kunci dari perangkat asal dibuang, impor kunci lagi di HP.",
+  "@importWarnKeyPath": {
+    "description": "Peringatan path kunci dibuang.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "importDone": "Diimpor · {n} profil",
+  "@importDone": {
+    "description": "Toast setelah impor berhasil.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "importNoChange": "Tidak ada perubahan",
+  "@importNoChange": {
+    "description": "Toast bila impor tidak mengubah apa pun."
+  },
+  "importFailed": "Impor gagal. Daftar host tidak berubah.",
+  "@importFailed": {
+    "description": "Galat bila penulisan hasil impor gagal."
   }
 }

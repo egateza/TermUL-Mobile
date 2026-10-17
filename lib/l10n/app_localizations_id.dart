@@ -1244,4 +1244,90 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsDangerTag => 'Berisiko';
+
+  @override
+  String get importAction => 'Impor profil';
+
+  @override
+  String get importTitle => 'Impor profil';
+
+  @override
+  String get importConfirm => 'Impor';
+
+  @override
+  String get importReadFailed => 'Berkas tidak bisa dibaca.';
+
+  @override
+  String get importNothing => 'Tidak ada profil yang bisa diimpor dari berkas ini.';
+
+  @override
+  String get importKeepNote => 'Profil yang sudah ada di HP tidak dihapus. Password dan kunci tidak ikut terimpor.';
+
+  @override
+  String importAdded(int n) {
+    return '$n profil baru ditambahkan';
+  }
+
+  @override
+  String importUpdated(int n) {
+    return '$n profil diperbarui';
+  }
+
+  @override
+  String importCopied(int n) {
+    return '$n profil disimpan sebagai salinan';
+  }
+
+  @override
+  String importSkipped(int n) {
+    return '$n profil dilewati karena sudah ada';
+  }
+
+  @override
+  String importRejected(int n) {
+    return '$n entri tidak valid dan dilewati';
+  }
+
+  @override
+  String importRejectedItem(int index, String name, String reason) {
+    return '#$index $name: $reason';
+  }
+
+  @override
+  String importAgentNote(int n) {
+    return '$n profil memakai agen SSH dan perlu dilengkapi di HP sebelum bisa tersambung.';
+  }
+
+  @override
+  String get importConflictLabel => 'Bila profil sudah ada di HP';
+
+  @override
+  String get importConflictSkip => 'Lewati';
+
+  @override
+  String get importConflictUpdate => 'Perbarui';
+
+  @override
+  String get importConflictCopy => 'Salinan';
+
+  @override
+  String importWarnJump(String name) {
+    return '$name: jump host tidak ditemukan, dikosongkan.';
+  }
+
+  @override
+  String importWarnKeyPath(String name) {
+    return '$name: path kunci dari perangkat asal dibuang, impor kunci lagi di HP.';
+  }
+
+  @override
+  String importDone(int n) {
+    return 'Diimpor · $n profil';
+  }
+
+  @override
+  String get importNoChange => 'Tidak ada perubahan';
+
+  @override
+  String get importFailed => 'Impor gagal. Daftar host tidak berubah.';
 }

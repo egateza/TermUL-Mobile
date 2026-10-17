@@ -64,6 +64,9 @@ class JsonHostRepository implements HostRepository {
   Future<ProfileSnapshot> clearRecent() => _mutate((s) => s.recent.isEmpty ? s : s.withoutRecent());
 
   @override
+  Future<ProfileSnapshot> update(ProfileSnapshot Function(ProfileSnapshot current) change) => _mutate(change);
+
+  @override
   Future<ProfileSnapshot> addGroup(String group) => _mutate((s) => s.withGroups([...s.groups, group]));
 
   @override

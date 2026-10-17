@@ -1,3 +1,4 @@
+import '../../core/import/profile_import.dart';
 import '../../core/models/auth_method.dart';
 import '../../core/models/host_profile.dart';
 import '../../core/storage/host_repository.dart';
@@ -88,6 +89,18 @@ class HostService {
     await vault.removeProfile(profile.id);
     await hosts.delete(profile.id);
     await _removeKnownHostIfUnused(profile.host, profile.port);
+  }
+
+  /// Menggabungkan hasil baca berkas impor ke daftar host. Tidak ada profil yang dibuang; penggabungan dihitung
+  /// dari keadaan terkini dan ditulis sekali (atomik). Tidak menyentuh vault: profil impor tidak membawa rahasia,
+  /// dan rahasia profil yang diperbarui tetap terkait id-nya. Mengembalikan rencana yang benar-benar ditulis.
+  Future<ProfileImportPlan> importProfiles(ProfileImportSource source, ImportConflictPolicy policy) async {
+    late ProfileImportPlan applied;
+    await hosts.update((current) {
+      applied = source.plan(current, policy);
+      return applied.isEmpty ? current : applied.merged;
+    });
+    return applied;
   }
 
   /// Perawatan saat aplikasi mulai: membuang rahasia yatim. Dilewati bila `profiles.json` dikarantina pada start

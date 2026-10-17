@@ -518,6 +518,15 @@
    "title": "1e · Daftar host: vault terbuka (chip beraksen; ketuk mengunci lagi; Pengaturan punya saklar \"Jangan kunci vault\")",
    "is_interactive": true,
    "radius": 28
+  },
+  "HostImport.dc.html": {
+   "x": 7050,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "1f · Impor profil dari TermUL desktop: pratinjau penggabungan (profil lama tidak dihapus)",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -577,7 +586,8 @@
   "SftpLinks.dc.html",
   "SftpLeaveKeep.dc.html",
   "HostActions.dc.html",
-  "MainVaultOpen.dc.html"
+  "MainVaultOpen.dc.html",
+  "HostImport.dc.html"
  ],
  "notes": {
   "judul": {

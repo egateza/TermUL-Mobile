@@ -160,6 +160,9 @@ final class HostProfile {
   HostProfile withGroup(String? newGroup) => _with(group: normalizeGroup(newGroup));
   HostProfile withOs(OsInfo? newOs) => _with(os: () => newOs);
   HostProfile withJumpHostId(String? newJumpHostId) => _with(jumpHostId: () => newJumpHostId);
+  HostProfile withId(String newId) => _with(id: newId);
+  HostProfile withName(String newName) => _with(name: newName);
+  HostProfile withoutPrivateKeyPath() => _with(privateKeyPath: () => null);
 
   HostProfile _with({
     String? id,
@@ -167,6 +170,7 @@ final class HostProfile {
     String? group,
     ValueGetter<OsInfo?>? os,
     ValueGetter<String?>? jumpHostId,
+    ValueGetter<String?>? privateKeyPath,
   }) => HostProfile(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -175,7 +179,7 @@ final class HostProfile {
     port: port,
     username: username,
     authMethod: authMethod,
-    privateKeyPath: privateKeyPath,
+    privateKeyPath: privateKeyPath != null ? privateKeyPath() : this.privateKeyPath,
     jumpHostId: jumpHostId != null ? jumpHostId() : this.jumpHostId,
     environment: environment,
     initialDirectory: initialDirectory,

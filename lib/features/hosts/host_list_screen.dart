@@ -20,6 +20,7 @@ import '../../shared/widgets/termul_toast.dart';
 import '../sftp/sftp_screen.dart' show openSftpOwn;
 import 'host_form_screen.dart';
 import 'host_list_model.dart';
+import 'profile_import_flow.dart';
 import 'vault_chip.dart';
 
 /// Layar utama: daftar host berkelompok dengan pencarian dan filter. [onConnect] dipanggil untuk host yang
@@ -47,6 +48,11 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
 
   void _openForm([HostProfile? existing]) {
     Navigator.of(context).push<bool>(MaterialPageRoute(builder: (_) => HostFormScreen(existing: existing)));
+  }
+
+  Future<void> _import() async {
+    final error = await runProfileImport(context, ref);
+    if (mounted) setState(() => _error = error);
   }
 
   void _open(HostProfile p) {
@@ -279,6 +285,8 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                         child: Text(l.hostsTitle, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
                       ),
                     ),
+                    TermulIconButton(icon: TermulIconName.download, label: l.importAction, onPressed: _import),
+                    const SizedBox(width: TermulSpacing.space3),
                     TermulIconButton(
                       icon: TermulIconName.plus,
                       label: l.hostsAddHost,

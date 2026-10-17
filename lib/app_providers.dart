@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:flutter_riverpod/misc.dart' show Override;
 
 import 'bootstrap.dart';
+import 'core/import/profile_file_picker.dart';
 import 'core/keys/key_file_picker.dart';
 import 'core/models/app_settings.dart';
 import 'core/platform/downloads_saver.dart';
@@ -103,6 +104,9 @@ final bootReportProvider = Provider<BootReport>((ref) => const BootReport());
 
 /// Pemilih berkas kunci; diganti di test.
 final keyFilePickerProvider = Provider<KeyFilePicker>((ref) => const FileSelectorKeyPicker());
+
+/// Pemilih berkas daftar profil untuk impor; diganti di test.
+final profileFilePickerProvider = Provider<ProfileFilePicker>((ref) => const FileSelectorProfilePicker());
 
 /// Konektor SSH; memakai penyimpanan sidik jari yang sama dengan seluruh aplikasi.
 final sshConnectorProvider = Provider<SshConnector>(

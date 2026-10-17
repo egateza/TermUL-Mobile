@@ -8,6 +8,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app.dart';
 import 'package:termul_mobile/app_providers.dart';
 import 'package:termul_mobile/bootstrap.dart';
+import 'package:termul_mobile/core/import/profile_file_picker.dart';
 import 'package:termul_mobile/core/keys/key_file_picker.dart';
 import 'package:termul_mobile/core/models/auth_method.dart';
 import 'package:termul_mobile/core/models/app_settings.dart';
@@ -36,6 +37,17 @@ class FakeKeyPicker implements KeyFilePicker {
   @override
   Future<Uint8List?> pick() async {
     calls++;
+    if (error != null) throw error!;
+    return next;
+  }
+}
+
+class FakeProfilePicker implements ProfileFilePicker {
+  String? next;
+  Object? error;
+
+  @override
+  Future<String?> pick() async {
     if (error != null) throw error!;
     return next;
   }
@@ -80,6 +92,7 @@ class Harness {
   late final HostService service;
   late final AppDependencies deps;
   final picker = FakeKeyPicker();
+  final profilePicker = FakeProfilePicker();
   final connected = <HostProfile>[];
 
   Future<void> seed(List<HostProfile> profiles, {List<String> favorites = const []}) async {
@@ -102,7 +115,12 @@ class Harness {
     addTearDown(tester.view.reset);
     await tester.pumpWidget(
       ProviderScope(
-        overrides: [...deps.overrides, keyFilePickerProvider.overrideWithValue(picker), ...overrides],
+        overrides: [
+          ...deps.overrides,
+          keyFilePickerProvider.overrideWithValue(picker),
+          profileFilePickerProvider.overrideWithValue(profilePicker),
+          ...overrides,
+        ],
         child: TermulApp(onConnect: realConnect ? null : (context, profile) => connected.add(profile)),
       ),
     );

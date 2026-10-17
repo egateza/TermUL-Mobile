@@ -2232,6 +2232,138 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Berisiko'**
   String get settingsDangerTag;
+
+  /// Label tombol impor di daftar host.
+  ///
+  /// In id, this message translates to:
+  /// **'Impor profil'**
+  String get importAction;
+
+  /// Judul panel pratinjau impor.
+  ///
+  /// In id, this message translates to:
+  /// **'Impor profil'**
+  String get importTitle;
+
+  /// Tombol konfirmasi impor.
+  ///
+  /// In id, this message translates to:
+  /// **'Impor'**
+  String get importConfirm;
+
+  /// Galat saat berkas impor gagal dibaca.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas tidak bisa dibaca.'**
+  String get importReadFailed;
+
+  /// Galat bila berkas tidak berisi profil valid.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada profil yang bisa diimpor dari berkas ini.'**
+  String get importNothing;
+
+  /// Catatan di pratinjau impor.
+  ///
+  /// In id, this message translates to:
+  /// **'Profil yang sudah ada di HP tidak dihapus. Password dan kunci tidak ikut terimpor.'**
+  String get importKeepNote;
+
+  /// Ringkasan impor: jumlah profil baru.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} profil baru ditambahkan'**
+  String importAdded(int n);
+
+  /// Ringkasan impor: jumlah profil diganti.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} profil diperbarui'**
+  String importUpdated(int n);
+
+  /// Ringkasan impor: jumlah salinan.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} profil disimpan sebagai salinan'**
+  String importCopied(int n);
+
+  /// Ringkasan impor: jumlah profil dilewati.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} profil dilewati karena sudah ada'**
+  String importSkipped(int n);
+
+  /// Ringkasan impor: jumlah entri ditolak.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} entri tidak valid dan dilewati'**
+  String importRejected(int n);
+
+  /// Satu entri berkas yang ditolak.
+  ///
+  /// In id, this message translates to:
+  /// **'#{index} {name}: {reason}'**
+  String importRejectedItem(int index, String name, String reason);
+
+  /// Catatan profil agen di pratinjau impor.
+  ///
+  /// In id, this message translates to:
+  /// **'{n} profil memakai agen SSH dan perlu dilengkapi di HP sebelum bisa tersambung.'**
+  String importAgentNote(int n);
+
+  /// Label pilihan penanganan id bentrok.
+  ///
+  /// In id, this message translates to:
+  /// **'Bila profil sudah ada di HP'**
+  String get importConflictLabel;
+
+  /// Pilihan: profil di HP dibiarkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Lewati'**
+  String get importConflictSkip;
+
+  /// Pilihan: profil di HP diganti isi berkas.
+  ///
+  /// In id, this message translates to:
+  /// **'Perbarui'**
+  String get importConflictUpdate;
+
+  /// Pilihan: profil berkas disimpan sebagai profil baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Salinan'**
+  String get importConflictCopy;
+
+  /// Peringatan jump host hilang.
+  ///
+  /// In id, this message translates to:
+  /// **'{name}: jump host tidak ditemukan, dikosongkan.'**
+  String importWarnJump(String name);
+
+  /// Peringatan path kunci dibuang.
+  ///
+  /// In id, this message translates to:
+  /// **'{name}: path kunci dari perangkat asal dibuang, impor kunci lagi di HP.'**
+  String importWarnKeyPath(String name);
+
+  /// Toast setelah impor berhasil.
+  ///
+  /// In id, this message translates to:
+  /// **'Diimpor · {n} profil'**
+  String importDone(int n);
+
+  /// Toast bila impor tidak mengubah apa pun.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada perubahan'**
+  String get importNoChange;
+
+  /// Galat bila penulisan hasil impor gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Impor gagal. Daftar host tidak berubah.'**
+  String get importFailed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

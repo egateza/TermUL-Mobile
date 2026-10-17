@@ -28,6 +28,10 @@ abstract interface class HostRepository {
 
   Future<ProfileSnapshot> clearRecent();
 
+  /// Mengganti snapshot dengan hasil [change] yang dihitung dari keadaan terkini di dalam kunci tulis
+  /// (dipakai impor: penggabungan tidak boleh memakai salinan yang sudah usang).
+  Future<ProfileSnapshot> update(ProfileSnapshot Function(ProfileSnapshot current) change);
+
   Future<ProfileSnapshot> addGroup(String group);
 
   /// Menghapus grup dan subgrup kosong. Melempar [StateError] bila masih ada profil di dalamnya.
