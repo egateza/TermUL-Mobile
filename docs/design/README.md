@@ -45,7 +45,7 @@ Sebelum UI penuh dibangun, tumpukan Flutter (`dartssh2`, `xterm`) diuji ke serve
 
 ## Batasan yang berlaku
 
-- Hanya tema Gelap dan orientasi potret yang didefinisikan, kecuali terminal landscape (contoh 2f, 2g, 2m, 2n), layar utama landscape (contoh 1b), dan form host landscape (contoh 1c); lihat catatan implementasi.
+- Hanya tema Gelap dan orientasi potret yang didefinisikan. **Aplikasi dikunci ke potret (keputusan pemilik, 2026-10-17)**, supaya tampilan konsisten; contoh landscape di kanvas (terminal 2f, 2g, 2m, 2n, layar utama 1b, form host 1c) adalah tambahan implementasi yang tidak dipakai lagi, dibiarkan sebagai rujukan bila landscape diaktifkan kembali. Kodenya di aplikasi juga dibiarkan; mengaktifkannya lagi cukup mengganti daftar orientasi di `main.dart` dan `android:screenOrientation` di manifest.
 - Sembilan tier api, ambang harinya dan palet warnanya mengambil nilai dari artifact desktop "Streak Api TermUL"; jika `StreakTier` di kode desktop berbeda, kode itulah yang benar.
 - Tepi `line` pada input dan chip di prototipe tidak mencapai 3:1; sistem ini mencatatnya dan menyediakan `line-strong`.
 
