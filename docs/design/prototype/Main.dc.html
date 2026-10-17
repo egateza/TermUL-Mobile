@@ -129,7 +129,11 @@ class Component extends DCLogic {
     const s = this.state || {};
     const query = s.query || '';
     const filter = s.filter || 'all';
-    const closed = s.closed || {};
+    // Lipatan grup diingat permanen (aplikasi: ui_state.json); di prototipe lewat localStorage bila tersedia.
+    const CLOSED_KEY = 'termul.closedGroups';
+    const closed = s.closed || (() => {
+      try { return JSON.parse(localStorage.getItem(CLOSED_KEY) || '{}') || {}; } catch (e) { return {}; }
+    })();
     const q = query.trim().toLowerCase();
 
     const data = [
@@ -174,7 +178,11 @@ class Component extends DCLogic {
         open: open,
         rot: open ? 0 : -90,
         hosts: hosts,
-        toggle: () => this.setState({ closed: Object.assign({}, closed, { [g.name]: !closed[g.name] }) })
+        toggle: () => {
+          const next = Object.assign({}, closed, { [g.name]: !closed[g.name] });
+          try { localStorage.setItem(CLOSED_KEY, JSON.stringify(next)); } catch (e) {}
+          this.setState({ closed: next });
+        }
       };
     }).filter((g) => g.count > 0);
 

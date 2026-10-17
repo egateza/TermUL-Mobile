@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'dart:io';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -19,6 +20,7 @@ import 'core/ssh/ssh_connector.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/storage/snippet_repository.dart';
+import 'core/storage/ui_state_repository.dart';
 import 'core/vault/auth_gate.dart';
 import 'core/vault/credential_vault.dart';
 import 'core/vault/device_auth.dart';
@@ -41,6 +43,9 @@ final credentialVaultProvider = Provider<CredentialVault>(
 
 /// Snippet tersimpan. Bawaan di memori (tes); bootstrap menyuntikkan `JsonSnippetRepository`.
 final snippetRepositoryProvider = Provider<SnippetRepository>((ref) => MemorySnippetRepository());
+/// Keadaan tampilan yang diingat (`ui_state.json`). Bawaan di memori (tes); bootstrap menyuntikkan
+/// `JsonUiStateRepository`.
+final uiStateRepositoryProvider = Provider<UiStateRepository>((ref) => MemoryUiStateRepository());
 final hostServiceProvider = Provider<HostService>((ref) => throw UnimplementedError('Suntikkan lewat bootstrap'));
 
 /// Pengaturan yang dimuat dari `settings.json` saat mulai; nilai awal [appSettingsProvider].
@@ -154,6 +159,7 @@ extension AppDependenciesOverrides on AppDependencies {
     credentialVaultProvider.overrideWithValue(vault),
     hostServiceProvider.overrideWithValue(service),
     if (snippets != null) snippetRepositoryProvider.overrideWithValue(snippets!),
+    if (uiState != null) uiStateRepositoryProvider.overrideWithValue(uiState!),
     bootReportProvider.overrideWithValue(report),
     initialSettingsProvider.overrideWithValue(settings),
     if (saveSettings != null) settingsSaverProvider.overrideWithValue(saveSettings!),
@@ -196,7 +202,7 @@ class HostListState {
   final String query;
   final HostFilter filter;
 
-  /// Path grup yang sedang diciutkan (hanya di memori).
+  /// Path grup yang sedang diciutkan; diingat permanen lewat [uiStateRepositoryProvider].
   final Set<String> collapsed;
 
   HostListState copyWith({String? query, HostFilter? filter, Set<String>? collapsed}) =>
@@ -205,7 +211,12 @@ class HostListState {
 
 class HostListNotifier extends Notifier<HostListState> {
   @override
-  HostListState build() => const HostListState();
+  HostListState build() {
+    final saved = ref.read(uiStateRepositoryProvider).collapsedGroups;
+    final kept = _existing(saved);
+    if (kept.length != saved.length) _save(kept);
+    return HostListState(collapsed: kept);
+  }
 
   void setQuery(String q) => state = state.copyWith(query: q);
 
@@ -214,8 +225,21 @@ class HostListNotifier extends Notifier<HostListState> {
   void toggleGroup(String path) {
     final next = {...state.collapsed};
     if (!next.remove(path)) next.add(path);
-    state = state.copyWith(collapsed: next);
+    final kept = _existing(next);
+    state = state.copyWith(collapsed: kept);
+    _save(kept);
   }
+
+  /// Membuang path grup yang sudah tidak ada (dihapus atau diganti nama), supaya grup baru bernama sama tidak
+  /// langsung tampil terciut. `''` (Tanpa grup) selalu sah.
+  Set<String> _existing(Set<String> paths) {
+    final valid = {...ref.read(hostSnapshotProvider).allGroups, ''};
+    return {...paths.where(valid.contains)};
+  }
+
+  /// Gagal menulis tidak diberitahukan: lipatan tetap berlaku sampai aplikasi ditutup.
+  void _save(Set<String> paths) =>
+      unawaited(ref.read(uiStateRepositoryProvider).saveCollapsedGroups(paths).then((_) {}, onError: (Object _) {}));
 }
 
 final hostListProvider = NotifierProvider<HostListNotifier, HostListState>(HostListNotifier.new);

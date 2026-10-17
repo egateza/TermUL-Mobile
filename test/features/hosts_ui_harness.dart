@@ -15,6 +15,7 @@ import 'package:termul_mobile/core/models/app_settings.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
 import 'package:termul_mobile/core/storage/json/json_host_repository.dart';
 import 'package:termul_mobile/core/storage/json/json_known_hosts_repository.dart';
+import 'package:termul_mobile/core/storage/ui_state_repository.dart';
 import 'package:termul_mobile/core/vault/device_auth.dart';
 import 'package:termul_mobile/core/vault/keystore_credential_vault.dart';
 import 'package:termul_mobile/core/vault/vault_lock.dart';
@@ -61,7 +62,8 @@ class Harness {
     BootReport report = const BootReport(),
     AppSettings settings = const AppSettings(),
     Future<void> Function(AppSettings)? saveSettings,
-  }) {
+    MemoryUiStateRepository? uiState,
+  }) : uiState = uiState ?? MemoryUiStateRepository() {
     auth = FakeDeviceAuth(currentLevel: level);
     hosts = JsonHostRepository(File('tidak-dipakai-profiles.json'), writer: noWrite);
     known = JsonKnownHostsRepository(File('tidak-dipakai-known.json'), writer: noWrite);
@@ -79,8 +81,11 @@ class Harness {
       settings: settings,
       saveSettings: saveSettings,
       vaultLock: lock,
+      uiState: this.uiState,
     );
   }
+
+  final MemoryUiStateRepository uiState;
 
   late final FakeDeviceAuth auth;
   late final VaultLock lock;

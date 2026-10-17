@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/bootstrap.dart';
 import 'package:termul_mobile/core/models/auth_method.dart';
 import 'package:termul_mobile/core/storage/load_result.dart';
+import 'package:termul_mobile/core/storage/ui_state_repository.dart';
 import 'package:termul_mobile/core/vault/secret_type.dart';
 import 'package:termul_mobile/shared/widgets/host_row.dart';
 import 'package:termul_mobile/shared/widgets/termul_icon.dart';
@@ -87,6 +88,33 @@ void main() {
       await tester.enterText(inputByLabel('Cari host'), 'db');
       await tester.pump();
       expect(find.byType(HostRow), findsOneWidget);
+    });
+
+    testWidgets('lipatan grup disimpan dan dipulihkan saat aplikasi dibuka lagi', (tester) async {
+      final h = Harness();
+      await h.seed([host(id1, name: 'db-01', group: 'Produksi'), host(id2, name: 'lab-01')]);
+      await h.pump(tester);
+      await tester.tap(find.text('PRODUKSI'));
+      await tester.pump();
+      expect(h.uiState.collapsedGroups, {'Produksi'});
+      await tester.tap(find.text('TANPA GRUP'));
+      await tester.pump();
+      expect(h.uiState.collapsedGroups, {'Produksi', ''});
+      await tester.tap(find.text('PRODUKSI'));
+      await tester.pump();
+      expect(h.uiState.collapsedGroups, {''});
+      expect(find.widgetWithText(HostRow, 'db-01'), findsOneWidget);
+      expect(find.widgetWithText(HostRow, 'lab-01'), findsNothing);
+    });
+
+    testWidgets('dibuka dengan grup tersimpan terciut; path grup yang sudah tidak ada dibuang', (tester) async {
+      final h = Harness(uiState: MemoryUiStateRepository({'Produksi', 'Lama'}));
+      await h.seed([host(id1, name: 'db-01', group: 'Produksi'), host(id2, name: 'lab-01')]);
+      await h.pump(tester);
+      expect(find.text('PRODUKSI'), findsOneWidget);
+      expect(find.widgetWithText(HostRow, 'db-01'), findsNothing);
+      expect(find.widgetWithText(HostRow, 'lab-01'), findsOneWidget);
+      expect(h.uiState.collapsedGroups, {'Produksi'});
     });
 
     testWidgets('filter Online tidak ada sampai pengecekan status dibuat', (tester) async {

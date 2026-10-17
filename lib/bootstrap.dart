@@ -10,7 +10,9 @@ import 'core/storage/json/json_host_repository.dart';
 import 'core/storage/json/json_known_hosts_repository.dart';
 import 'core/storage/json/json_settings_repository.dart';
 import 'core/storage/json/json_snippet_repository.dart';
+import 'core/storage/json/json_ui_state_repository.dart';
 import 'core/storage/snippet_repository.dart';
+import 'core/storage/ui_state_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/storage/load_result.dart';
 import 'core/vault/credential_vault.dart';
@@ -60,6 +62,7 @@ class AppDependencies {
     this.screenMonitor,
     this.vaultLock,
     this.snippets,
+    this.uiState,
   });
 
   final HostRepository hosts;
@@ -86,6 +89,9 @@ class AppDependencies {
 
   /// Penyimpanan snippet. `null` di tes (memakai salinan di memori).
   final SnippetRepository? snippets;
+
+  /// Keadaan tampilan yang diingat. `null` di tes (memakai salinan di memori).
+  final UiStateRepository? uiState;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -105,6 +111,9 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
   final settingsLoad = await settingsRepo.load();
   final snippetRepo = JsonSnippetRepository(file('snippets.json'));
   final snippetsLoad = await snippetRepo.load();
+  // Rusak: disisihkan dan semua grup terbuka, tanpa banner (keadaan tampilan hilang tidak berbahaya).
+  final uiState = JsonUiStateRepository(file('ui_state.json'));
+  await uiState.load();
 
   final deviceAuth = auth ?? LocalAuthDeviceAuth();
   final screenMonitor = MethodChannelScreenMonitor();
@@ -137,6 +146,7 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     screenMonitor: screenMonitor,
     vaultLock: vaultLock,
     snippets: snippetRepo,
+    uiState: uiState,
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,
