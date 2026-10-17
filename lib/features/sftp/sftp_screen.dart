@@ -390,7 +390,7 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
         SheetAction(label: l.sftpLeaveKeep, primary: true, onSelected: _keepInBackground),
         SheetAction(
           label: busy ? l.sftpLeaveBusyConfirm : l.sftpLeaveDisconnect,
-          danger: busy,
+          danger: true,
           onSelected: () {
             link.transfers.cancelAll();
             navigator.pop();

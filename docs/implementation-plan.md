@@ -884,6 +884,7 @@ Keputusan pemilik: tab SFTP dihapus, semua sesi aktif di Sesi, SFTP dibuka dari 
 - **Menu host:** "Sambung SFTP" (profil agen yang belum lengkap diarahkan ke dialog yang sama dengan terminal). **Sesi:** baris sesi SFTP dengan chip "SFTP", status berkata sama, tombol putuskan, "Putuskan semua" dan lencana tab menghitung keduanya. **Tab SFTP dan `SftpScreen` dihapus**; `NavBar` empat tab.
 - **Tes:** menu host, tidak ada tab SFTP, sheet keluar (Tetap terhubung, Putuskan, transfer), sesi di tab Sesi dan dibuka lagi, putuskan dari Sesi (foreground service ikut), tab-tab diperbarui.
 - **Teruji di HP [T]:** tekan lama WSL Uji menampilkan "Sambung SFTP" dengan ikon baru; Sambung SFTP tersambung dan membuka daftar folder; sheet keluar tampil; Tetap terhubung memunculkan baris "WSL Uji [SFTP] Tersambung" di Sesi dengan lencana tab 1, dan di server `sshd: termul_t@notty` dan `sftp-server` tetap hidup; Home 45 detik lalu buka lagi: koneksi masih hidup (`KeepAliveService` berjalan) dan baris sesi membuka penjelajah lagi tanpa login; Putuskan menutup koneksi di server dan mengosongkan Sesi.
+- **Putuskan merah (permintaan pemilik):** tombol Putuskan di sheet keluar SFTP mandiri kini `danger` (merah) seperti di terminal, juga tanpa transfer berjalan; contoh 4n dan README diperbarui (prototipe versi 53, design system versi 53).
 - **Belum teruji di HP:** transfer yang berjalan saat sesi di latar belakang, layar mati lama, sambung ulang otomatis sesi SFTP kept setelah soket diputus Android, banyak sesi SFTP ke host yang sama. Teks Sesi kosong sudah diperbarui menyebut terminal dan SFTP ("Tekan kembali di terminal atau SFTP ...").
 
 ## 12. Status terkini dan cara melanjutkan
@@ -898,7 +899,7 @@ Terakhir diperbarui: 2026-10-17. **SFTP selesai untuk menjelajah, sambung ulang 
 
 **Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan saklarnya (sudah dikerjakan di 11f dan 11i; saklar sudah dicoba pemilik di HP), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] [popover Tempel dan saklar konfirmasi tempel: sudah dikerjakan di 11j, teruji di HP] [landscape layar utama: sudah dikerjakan di 11k, teruji di HP; banner sambungan, label profil, dan form host landscape: 11l dan 11m, teruji di HP, desain sudah sinkron] snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
 
-**Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 52, prototipe versi 52; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
+**Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 53, prototipe versi 53; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
 Cara menjalankan tes:
 
