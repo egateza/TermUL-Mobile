@@ -29,6 +29,7 @@ Sistem desain TermUL Mobile: klien SSH pribadi untuk ponsel (Android dan iOS), t
 - Jangan memakai emoji. Glyph teks hanya untuk tombol-khusus di `KeyButton` (panah, backspace, enter).
 - Ikon mandiri wajib punya label aksesibilitas; ikon yang menyertai teks disembunyikan dari pembaca layar.
 - Api streak digambar oleh `Flame`, bukan ikon biasa, karena bentuknya berganti menurut state.
+- **Ikon aplikasi "T-kursor"** (ditambahkan 2026-10-18; aset `assets/AppIcon/app-icon.svg`): huruf T untuk TermUL, palang `ink` dan batang tegak berupa kursor blok `accent` yang terlepas dari palang. Latar `ground`, tanpa gradien, bayangan, atau api (warna `level-*` hanya untuk api streak). Kanvas adaptive icon 108; semua bentuk di dalam lingkaran aman 66 sehingga tidak terpotong masker lingkaran, squircle, atau kotak membulat. Ikon bertema Android 13+ memakai bentuk yang sama dalam satu warna. Android 7.x (tanpa adaptive icon) memakai kotak membulat berisi gambar yang sama. Lihat contoh 16 di prototipe.
 
 ## Komponen
 

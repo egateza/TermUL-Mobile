@@ -626,6 +626,14 @@
    "title": "8d · Pengaturan streak (ikon pengaturan di tab Streak; tidak lagi di tab Pengaturan)",
    "is_interactive": true,
    "radius": 28
+  },
+  "AppIcon.dc.html": {
+   "x": 5640,
+   "y": 964,
+   "w": 720,
+   "h": 440,
+   "title": "16 · Ikon aplikasi T-kursor: masker launcher, layar utama, ikon bertema (Android 13+)",
+   "radius": 12
   }
  },
  "order": [
@@ -697,7 +705,8 @@
   "SnippetDelete.dc.html",
   "TerminalSnippets.dc.html",
   "StreakSoon.dc.html",
-  "StreakSettings.dc.html"
+  "StreakSettings.dc.html",
+  "AppIcon.dc.html"
  ],
  "notes": {
   "judul": {

@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikon aplikasi "T-kursor" (lapisan depan adaptive icon, kanvas 108 dp, semua bentuk di dalam lingkaran aman 66 dp).
+     Palang T warna `ink`, batang tegaknya kursor blok warna `accent`; sumber: docs/design/assets/AppIcon/app-icon.svg. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <path
+        android:fillColor="#E8EEF0"
+        android:pathData="M35,35h38a2,2 0 0 1 2,2v5a2,2 0 0 1 -2,2h-38a2,2 0 0 1 -2,-2v-5a2,2 0 0 1 2,-2z" />
+    <path
+        android:fillColor="#F0B34A"
+        android:pathData="M50,48h8a2,2 0 0 1 2,2v23a2,2 0 0 1 -2,2h-8a2,2 0 0 1 -2,-2v-23a2,2 0 0 1 2,-2z" />
+</vector>

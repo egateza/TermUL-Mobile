@@ -1154,3 +1154,13 @@ Permintaan pemilik: ikuti versi terbaru artifact desktop "Streak Api TermUL" (`1
 - **Tes:** `test/shared/flame_wind_test.dart` diperbarui (tenang sebelum 1,5 detik, hembusan sepoi-sepoi, jadwal 4,5-8 detik, arah dan batas, tenang tanpa hembusan, jeda lapis, angin dasar kencang, urutan naik bertahap, hujan dan kilat lalu reda, `FlameWeather` menggambar hujan dan diam saat reduce motion); 751 tes.
 - **Uji HP (dd3bf2af, profile):** di tab Streak, sekitar 28 detik setelah dibuka, hujan badai tampil di kartu api: tetes miring, uap di atas bara, garis hembusan, bara condong; logcat tanpa galat Flutter. Belum diamati: kilat (tidak tertangkap di tangkapan layar), splash saat hujan, tier tinggi saat badai, dan reduce motion sistem.
 - **Artifact:** prototipe versi 68 (`FlameArt` `wind` `bertahap`, bawaan: siklus CSS 41 detik dengan hujan dan kilat di kotak api, tanpa uap) dan design system versi 69 (`README.md`, `motion.md` bagian "Hujan badai", `components/Flame/README.md`).
+
+## Ikon aplikasi T-kursor (2026-10-18)
+
+Pemilik meminta ikon launcher sendiri, menggantikan ikon bawaan Flutter. Tiga konsep dibandingkan (Prompt `>_`, T-kursor, Jendela); pemilik memilih **T-kursor**: palang T warna `ink`, batang tegaknya kursor blok `accent`, latar `ground`. Tanpa api, karena warna api khusus untuk streak.
+
+- **Kode Android:** `res/mipmap-anydpi-v26/ic_launcher.xml` (adaptive icon: latar `@color/termul_ground`, depan `drawable/ic_launcher_foreground.xml`, lapisan `drawable/ic_launcher_monochrome.xml` untuk ikon bertema Android 13+). Semua bentuk di dalam lingkaran aman 66 dari kanvas 108. Android 7.x (`minSdk` 24, belum ada adaptive icon) memakai `mipmap-*dpi/ic_launcher.png` (48 sampai 192 px, kotak membulat dengan sudut transparan), dirender dari SVG yang sama lewat Chrome headless lalu diperkecil; skripnya tidak masuk repo. Manifest tidak berubah (`@mipmap/ic_launcher`). Tanpa paket baru (tidak memakai `flutter_launcher_icons`).
+- **Sumber:** `docs/design/assets/AppIcon/app-icon.svg`.
+- **Pemeriksaan:** resource ikon lolos `aapt2 compile` dan `aapt2 link` (build-tools 36, android-36) dengan manifest minimal. `flutter build apk` belum bisa dipakai untuk memeriksanya karena `android/app/build.gradle.kts` yang sedang diubah (belum di-commit, di luar irisan ini) gagal dikompilasi.
+- **Belum teruji di HP:** tampilan di launcher (masker produsen), ikon bertema Android 13+, dan PNG Android 7.x.
+- **Artifact:** design system versi 70 (butir "Ikon aplikasi" di Ikonografi, aset grup `AppIcon`) dan prototipe versi 69 (contoh 16 `AppIcon`, dirender di Chrome).
