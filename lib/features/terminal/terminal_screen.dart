@@ -57,6 +57,7 @@ class TerminalScreen extends StatefulWidget {
     this.onKeepInBackground,
     this.keepAliveEnabled = true,
     this.onOpenSettings,
+    this.onOpenSftp,
   });
 
   final HostProfile profile;
@@ -95,6 +96,9 @@ class TerminalScreen extends StatefulWidget {
 
   /// Membuka Pengaturan (dari catatan di dialog keluar).
   final VoidCallback? onOpenSettings;
+
+  /// Membuka SFTP lewat sambungan sesi ini (tombol folder di header). Kosong = tombol tidak ditampilkan.
+  final VoidCallback? onOpenSftp;
 
   static const compactBelowDp = 480.0;
 
@@ -509,6 +513,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                           status: status,
                           word: word,
                           onBack: Navigator.of(context).maybePop,
+                          onOpenSftp: widget.onOpenSftp,
                         ),
                       if (widget.link != TerminalLink.up)
                         Padding(
@@ -606,12 +611,19 @@ class _TerminalScreenState extends State<TerminalScreen> {
 }
 
 class _Header extends StatelessWidget {
-  const _Header({required this.profile, required this.status, required this.word, required this.onBack});
+  const _Header({
+    required this.profile,
+    required this.status,
+    required this.word,
+    required this.onBack,
+    this.onOpenSftp,
+  });
 
   final HostProfile profile;
   final HostStatus status;
   final String word;
   final VoidCallback onBack;
+  final VoidCallback? onOpenSftp;
 
   @override
   Widget build(BuildContext context) {
@@ -619,10 +631,10 @@ class _Header extends StatelessWidget {
     return SafeArea(
       bottom: false,
       child: Padding(
-        padding: const EdgeInsets.fromLTRB(
+        padding: EdgeInsets.fromLTRB(
           TermulSpacing.space3,
           TermulSpacing.space5,
-          TermulSpacing.space8,
+          onOpenSftp == null ? TermulSpacing.space8 : TermulSpacing.space3,
           TermulSpacing.space3,
         ),
         child: Row(
@@ -649,6 +661,8 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
+            if (onOpenSftp != null)
+              TermulIconButton(icon: TermulIconName.folder, label: l.terminalOpenSftp, onPressed: onOpenSftp),
           ],
         ),
       ),

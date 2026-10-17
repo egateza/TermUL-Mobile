@@ -68,6 +68,7 @@ Future<TermRig> pumpTerminal(
   bool needsAuth = false,
   TerminalStyle? textStyle,
   bool confirmSingleLinePaste = true,
+  VoidCallback? onOpenSftp,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -91,6 +92,7 @@ Future<TermRig> pumpTerminal(
               needsAuth: needsAuth,
               textStyle: textStyle,
               confirmSingleLinePaste: confirmSingleLinePaste,
+              onOpenSftp: onOpenSftp,
             ),
           ),
         ),
@@ -114,6 +116,21 @@ void expectRowsFit(WidgetTester tester) {
 }
 
 void main() {
+  testWidgets('tombol SFTP di header tidak ada bila onOpenSftp tidak diberikan', (tester) async {
+    await pumpTerminal(tester);
+    expect(find.bySemanticsLabel('Buka panel SFTP'), findsNothing);
+  });
+
+  testWidgets('tombol SFTP di header memanggil onOpenSftp', (tester) async {
+    var opened = 0;
+    await pumpTerminal(tester, onOpenSftp: () => opened++);
+    final button = find.bySemanticsLabel('Buka panel SFTP');
+    expect(button, findsOneWidget);
+    expect(tester.getSize(button).height, greaterThanOrEqualTo(44));
+    await tester.tap(button);
+    expect(opened, 1);
+  });
+
   testWidgets('potret: header dengan nama dan status berkata; shell dibuka dengan ukuran layar sebenarnya', (
     tester,
   ) async {

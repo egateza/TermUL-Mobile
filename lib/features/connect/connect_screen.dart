@@ -20,6 +20,7 @@ import '../../shared/widgets/termul_text_field.dart';
 import '../terminal/terminal_palette.dart';
 import '../terminal/terminal_screen.dart';
 import '../settings/settings_screen.dart';
+import '../sftp/sftp_screen.dart' show openSftpFromSession;
 import 'connect_flow.dart';
 import 'host_key_prompt.dart';
 import 'session_controller.dart';
@@ -157,6 +158,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               onKeepInBackground: _keepInBackground,
               keepAliveEnabled: keepAlive,
               onOpenSettings: _openSettings,
+              onOpenSftp: () => openSftpFromSession(context, c, confirmLeave: false),
             );
           }
           if (state is ConnectPreparing || state is ConnectConnecting) {

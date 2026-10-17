@@ -29,6 +29,27 @@ import 'sftp_transfer_actions.dart';
 import 'unique_name.dart';
 import 'sftp_transfers.dart';
 
+void _pushLink(BuildContext context, SftpLink link, {bool confirmLeave = true}) {
+  unawaited(link.start());
+  Navigator.of(context).push<void>(
+    MaterialPageRoute(
+      builder: (_) => SftpBrowserScreen(link: link, confirmLeave: confirmLeave),
+    ),
+  );
+}
+
+/// Membuka penjelajah SFTP lewat sambungan [session] (sesi terminal), tanpa login ulang dan tanpa sesi baru. Sambungan
+/// sesi tidak ditutup saat penjelajah ditutup; hanya kanal SFTP-nya. Dengan [confirmLeave] false (dibuka dari
+/// terminal), keluar kembali ke terminal tanpa konfirmasi kecuali ada transfer berjalan.
+void openSftpFromSession(BuildContext context, SessionController session, {bool confirmLeave = true}) {
+  final connection = session.connection;
+  if (connection == null || connection.isClosed) {
+    showTermulToast(context, AppLocalizations.of(context).sftpErrLost, icon: TermulIconName.warning);
+    return;
+  }
+  _pushLink(context, SftpLink.borrowed(session: session), confirmLeave: confirmLeave);
+}
+
 /// Tab SFTP: memilih sumber sambungan. Sesi terminal yang sedang hidup di latar belakang bisa dipinjam
 /// (sambungannya dipakai langsung, tanpa login lagi); host mana pun bisa dibuka dengan koneksi SFTP sendiri.
 class SftpScreen extends ConsumerWidget {
@@ -53,19 +74,9 @@ class SftpScreen extends ConsumerWidget {
     _push(context, link);
   }
 
-  void _openBorrowed(BuildContext context, SessionController session) {
-    final connection = session.connection;
-    if (connection == null || connection.isClosed) {
-      showTermulToast(context, AppLocalizations.of(context).sftpErrLost, icon: TermulIconName.warning);
-      return;
-    }
-    _push(context, SftpLink.borrowed(session: session));
-  }
+  void _openBorrowed(BuildContext context, SessionController session) => openSftpFromSession(context, session);
 
-  void _push(BuildContext context, SftpLink link) {
-    unawaited(link.start());
-    Navigator.of(context).push<void>(MaterialPageRoute(builder: (_) => SftpBrowserScreen(link: link)));
-  }
+  void _push(BuildContext context, SftpLink link) => _pushLink(context, link);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -205,9 +216,12 @@ class _SourceRow extends StatelessWidget {
 /// Penjelajah folder satu sambungan ([SftpLink]). Menutup layar menutup koneksi SFTP sendiri (sesi yang dipinjam
 /// tetap hidup).
 class SftpBrowserScreen extends ConsumerStatefulWidget {
-  const SftpBrowserScreen({super.key, required this.link});
+  const SftpBrowserScreen({super.key, required this.link, this.confirmLeave = true});
 
   final SftpLink link;
+
+  /// false: keluar tanpa sheet konfirmasi bila tidak ada transfer berjalan (SFTP dibuka dari terminal yang sama).
+  final bool confirmLeave;
 
   @override
   ConsumerState<SftpBrowserScreen> createState() => _SftpBrowserScreenState();
@@ -436,7 +450,7 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
   /// menyebut transfer itu dan akibat membatalkannya; pilihan aman (tetap di sini) menjadi tombol utama.
   Future<void> _requestLeave() async {
     final link = widget.link;
-    if (link.service == null) {
+    if (link.service == null || (!widget.confirmLeave && !link.transfers.isBusy)) {
       _leave();
       return;
     }

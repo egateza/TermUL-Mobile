@@ -1675,5 +1675,9 @@
   "sftpLinkTag": "Tautan",
   "@sftpLinkTag": {
     "description": "Penanda di baris berkas atau folder yang berupa tautan simbolik (symlink)."
+  },
+  "terminalOpenSftp": "Buka panel SFTP",
+  "@terminalOpenSftp": {
+    "description": "Tombol folder di header terminal: membuka SFTP lewat sambungan sesi yang sama."
   }
 }

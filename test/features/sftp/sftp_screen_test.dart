@@ -75,6 +75,7 @@ Future<FakeFiles> pumpBrowser(
   WidgetTester tester, {
   Size size = const Size(390, 844),
   List<SftpEntry> extra = const [],
+  bool confirmLeave = true,
 }) async {
   _tmp = Directory.systemTemp.createTempSync('termul_layar_');
   addTearDown(() {
@@ -123,7 +124,11 @@ Future<FakeFiles> pumpBrowser(
   lastLink = SftpLink.ready(profile: profile(), service: fake);
   tester
       .state<NavigatorState>(find.byType(Navigator))
-      .push<void>(MaterialPageRoute(builder: (_) => SftpBrowserScreen(link: lastLink)));
+      .push<void>(
+        MaterialPageRoute(
+          builder: (_) => SftpBrowserScreen(link: lastLink, confirmLeave: confirmLeave),
+        ),
+      );
   await tester.pumpAndSettle();
   return fake;
 }
@@ -597,6 +602,26 @@ void main() {
       await tester.pumpAndSettle();
       expect(find.byType(SftpBrowserScreen), findsNothing);
       expect(find.text('akar'), findsOneWidget);
+    });
+
+    testWidgets('dibuka dari terminal (confirmLeave false): kembali langsung ke terminal tanpa konfirmasi', (
+      tester,
+    ) async {
+      await pumpBrowser(tester, confirmLeave: false);
+      await tester.tap(find.bySemanticsLabel('Kembali'));
+      await tester.pumpAndSettle();
+      expect(find.text('Keluar dari SFTP?'), findsNothing);
+      expect(find.byType(SftpBrowserScreen), findsNothing);
+      expect(find.text('akar'), findsOneWidget);
+    });
+
+    testWidgets('dibuka dari terminal tetapi ada transfer: konfirmasi tetap muncul', (tester) async {
+      await pumpBrowser(tester, confirmLeave: false);
+      lastLink.transfers.start(name: 'besar.iso', upload: false, total: 200);
+      await tester.tap(find.bySemanticsLabel('Kembali'));
+      await tester.pumpAndSettle();
+      expect(find.text('Transfer masih berjalan'), findsOneWidget);
+      expect(find.byType(SftpBrowserScreen), findsOneWidget);
     });
 
     testWidgets('tombol kembali sistem juga meminta konfirmasi', (tester) async {

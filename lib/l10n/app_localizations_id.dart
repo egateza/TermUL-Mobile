@@ -1161,4 +1161,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get sftpLinkTag => 'Tautan';
+
+  @override
+  String get terminalOpenSftp => 'Buka panel SFTP';
 }

@@ -2076,6 +2076,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Tautan'**
   String get sftpLinkTag;
+
+  /// Tombol folder di header terminal: membuka SFTP lewat sambungan sesi yang sama.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka panel SFTP'**
+  String get terminalOpenSftp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {
