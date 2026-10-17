@@ -357,6 +357,24 @@
    "is_interactive": true,
    "radius": 28
   },
+  "TerminalLandscapeWaiting.dc.html": {
+   "x": 4340,
+   "y": 6202,
+   "w": 844,
+   "h": 390,
+   "title": "2n · Landscape, keyboard terbuka: terputus, menunggu server (banner satu baris)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "HostFormLandscape.dc.html": {
+   "x": 2000,
+   "y": 6672,
+   "w": 844,
+   "h": 390,
+   "title": "1c · Form host landscape, keyboard terbuka (Simpan di baris judul)",
+   "is_interactive": true,
+   "radius": 28
+  },
   "Boot.dc.html": {
    "x": 4230,
    "y": 964,
@@ -407,7 +425,9 @@
   "ComingSoon.dc.html",
   "Boot.dc.html",
   "MainLandscape.dc.html",
-  "TerminalLandscapePaste.dc.html"
+  "TerminalLandscapePaste.dc.html",
+  "TerminalLandscapeWaiting.dc.html",
+  "HostFormLandscape.dc.html"
  ],
  "notes": {
   "judul": {

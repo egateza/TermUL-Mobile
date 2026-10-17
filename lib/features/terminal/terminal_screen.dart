@@ -403,9 +403,11 @@ class _TerminalScreenState extends State<TerminalScreen> {
     );
   }
 
-  Widget _linkBanner(AppLocalizations l) {
+  Widget _linkBanner(AppLocalizations l, {required bool compact, required bool showBody}) {
     if (widget.link == TerminalLink.reconnecting) {
       return TermulBanner(
+        compact: compact,
+        showBody: showBody,
         tone: BannerTone.warn,
         title: l.reconnectingTitle,
         icon: TermulIconName.refresh,
@@ -414,6 +416,8 @@ class _TerminalScreenState extends State<TerminalScreen> {
     }
     if (widget.needsAuth) {
       return TermulBanner(
+        compact: compact,
+        showBody: showBody,
         tone: BannerTone.warn,
         title: l.reconnectAuthTitle,
         action: widget.onReconnect == null
@@ -431,6 +435,8 @@ class _TerminalScreenState extends State<TerminalScreen> {
     final failure = widget.failureText;
     final retry = widget.retryInSeconds;
     return TermulBanner(
+      compact: compact,
+      showBody: showBody,
       tone: failure == null || retry != null ? BannerTone.warn : BannerTone.risk,
       title: retry != null
           ? l.reconnectWaitingTitle
@@ -506,13 +512,13 @@ class _TerminalScreenState extends State<TerminalScreen> {
                         ),
                       if (widget.link != TerminalLink.up)
                         Padding(
-                          padding: const EdgeInsets.fromLTRB(
+                          padding: EdgeInsets.fromLTRB(
                             TermulSpacing.space5,
                             0,
                             TermulSpacing.space5,
-                            TermulSpacing.space3,
+                            compact && keyboardOpen ? TermulSpacing.space1 : TermulSpacing.space3,
                           ),
-                          child: _linkBanner(l),
+                          child: _linkBanner(l, compact: compact, showBody: !(compact && keyboardOpen)),
                         ),
                       Expanded(
                         // TerminalView mengurangi MediaQuery.padding dari tinggi barisnya; buang padding atas dan bawah
@@ -529,22 +535,26 @@ class _TerminalScreenState extends State<TerminalScreen> {
                               children: [
                                 // Tekan-tahan dibaca dari pointer mentah: tidak ikut arena gestur, jadi ketuk, gulir, dan seleksi
                                 // xterm tidak terganggu (`TerminalView.onTapUp` juga tidak pernah dipanggil di xterm 4.0.0).
-                                Listener(
-                                  behavior: HitTestBehavior.translucent,
-                                  onPointerDown: _onPointerDown,
-                                  onPointerMove: _onPointerMove,
-                                  onPointerCancel: _onPointerEnd,
-                                  onPointerUp: _onPointerEnd,
-                                  child: TerminalView(
-                                    _session.terminal,
-                                    key: _viewKey,
-                                    controller: _controller,
-                                    scrollController: _scrollController,
-                                    theme: termulTerminalTheme,
-                                    textStyle: widget.textStyle ?? termulTerminalStyle,
-                                    padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
-                                    autofocus: true,
-                                    backgroundOpacity: 1,
+                                // ClipRect: saat area menyusut (keyboard di landscape) xterm menggambar barisnya sampai melewati
+                                // batas atas, menimpa label profil di bar atas.
+                                ClipRect(
+                                  child: Listener(
+                                    behavior: HitTestBehavior.translucent,
+                                    onPointerDown: _onPointerDown,
+                                    onPointerMove: _onPointerMove,
+                                    onPointerCancel: _onPointerEnd,
+                                    onPointerUp: _onPointerEnd,
+                                    child: TerminalView(
+                                      _session.terminal,
+                                      key: _viewKey,
+                                      controller: _controller,
+                                      scrollController: _scrollController,
+                                      theme: termulTerminalTheme,
+                                      textStyle: widget.textStyle ?? termulTerminalStyle,
+                                      padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
+                                      autofocus: true,
+                                      backgroundOpacity: 1,
+                                    ),
                                   ),
                                 ),
                                 SelectionHandles(

@@ -308,6 +308,36 @@ void main() {
     expect(find.text('daftar'), findsOneWidget);
   });
 
+  testWidgets('gambar terminal dipotong di batas areanya (tidak menimpa label profil saat keyboard terbuka)', (
+    tester,
+  ) async {
+    await pumpTerminal(tester, size: const Size(844, 390), keyboard: 209, padding: const EdgeInsets.only(top: 24));
+    final clip = find.ancestor(of: find.byType(TerminalView), matching: find.byType(ClipRect));
+    expect(clip, findsWidgets);
+    // Batas potong berhimpit dengan area terminal: tidak lebih tinggi daripadanya dan di bawah bar atas.
+    final area = tester.getRect(clip.first);
+    final bar = tester.getRect(find.text('app-01'));
+    expect(area.top, greaterThanOrEqualTo(bar.bottom - 1));
+  });
+
+  testWidgets('landscape dengan keyboard: banner putus tidak meluap dan tombol Sambung sekarang tetap bisa diketuk', (
+    tester,
+  ) async {
+    var calls = 0;
+    await pumpTerminal(
+      tester,
+      size: const Size(844, 390),
+      keyboard: 209,
+      padding: const EdgeInsets.only(top: 24),
+      link: TerminalLink.lost,
+      onReconnect: () => calls++,
+    );
+    expect(tester.takeException(), isNull);
+    expect(find.text('Koneksi terputus'), findsOneWidget);
+    await tester.tap(find.text('Sambung sekarang'));
+    expect(calls, 1);
+  });
+
   testWidgets('sambung ulang butuh verifikasi: peringatan dengan kata dan tombol Tampilkan prompt', (tester) async {
     var calls = 0;
     await pumpTerminal(tester, link: TerminalLink.lost, needsAuth: true, onReconnect: () => calls++);

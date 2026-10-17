@@ -18,6 +18,7 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_segmented.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../../shared/widgets/termul_toast.dart';
+import '../terminal/terminal_screen.dart';
 import 'host_service.dart';
 
 /// Form tambah atau ubah host. Metode login hanya Password atau Kunci (profil agen dari desktop dilengkapi di sini).
@@ -187,6 +188,16 @@ class _HostFormScreenState extends ConsumerState<HostFormScreen> {
     final l = AppLocalizations.of(context);
     final level = ref.watch(authLevelProvider).value;
     final editing = widget.existing != null;
+    // Layar pendek (landscape, apalagi dengan keyboard): Simpan pindah ke baris judul supaya kolom form tetap terlihat.
+    final mq = MediaQuery.of(context);
+    final compact = mq.size.height - mq.viewInsets.bottom < TerminalScreen.compactBelowDp;
+    final saveButton = TermulButton(
+      label: l.actionSave,
+      variant: TermulButtonVariant.primary,
+      size: compact ? TermulButtonSize.sm : TermulButtonSize.lg,
+      expand: !compact,
+      onPressed: _saving ? null : _save,
+    );
     return Scaffold(
       body: SafeArea(
         child: Column(
@@ -215,6 +226,7 @@ class _HostFormScreenState extends ConsumerState<HostFormScreen> {
                       ),
                     ),
                   ),
+                  if (compact) saveButton,
                 ],
               ),
             ),
@@ -316,24 +328,20 @@ class _HostFormScreenState extends ConsumerState<HostFormScreen> {
                 ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.fromLTRB(
-                TermulSpacing.space8,
-                TermulSpacing.space5,
-                TermulSpacing.space8,
-                TermulSpacing.space8,
+            if (!compact)
+              Container(
+                padding: const EdgeInsets.fromLTRB(
+                  TermulSpacing.space8,
+                  TermulSpacing.space5,
+                  TermulSpacing.space8,
+                  TermulSpacing.space8,
+                ),
+                decoration: const BoxDecoration(
+                  color: TermulPalette.ground,
+                  border: Border(top: BorderSide(color: TermulPalette.line)),
+                ),
+                child: saveButton,
               ),
-              decoration: const BoxDecoration(
-                color: TermulPalette.ground,
-                border: Border(top: BorderSide(color: TermulPalette.line)),
-              ),
-              child: TermulButton(
-                label: l.actionSave,
-                variant: TermulButtonVariant.primary,
-                size: TermulButtonSize.lg,
-                onPressed: _saving ? null : _save,
-              ),
-            ),
           ],
         ),
       ),

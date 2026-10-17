@@ -76,6 +76,24 @@ void main() {
     });
   }
 
+  testWidgets('landscape dengan keyboard: kolom form tetap terlihat dan Simpan ada di baris judul', (tester) async {
+    final h = Harness();
+    await h.pump(tester, size: const Size(844, 390));
+    await tester.tap(find.byKey(const ValueKey('landscape-add')));
+    await tester.pumpAndSettle();
+    tester.view.viewInsets = const FakeViewPadding(bottom: 209);
+    tester.view.padding = const FakeViewPadding(top: 24);
+    await tester.pumpAndSettle();
+    expect(tester.takeException(), isNull);
+    // Simpan sejajar dengan judul (bukan bar bawah), dan kolom Nama punya tinggi.
+    final title = tester.getRect(find.text('Host baru'));
+    final saveRect = tester.getRect(find.text('Simpan'));
+    expect((saveRect.center.dy - title.center.dy).abs(), lessThan(24));
+    expect(tester.getRect(inputByLabel('Nama')).height, greaterThan(20));
+    await tester.enterText(inputByLabel('Nama'), 'app-01');
+    expect(tester.takeException(), isNull);
+  });
+
   group('validasi', () {
     testWidgets('semua kolom wajib kosong: setiap galat tampil dan tidak ada yang tersimpan', (tester) async {
       final h = Harness();

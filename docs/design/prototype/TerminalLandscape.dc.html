@@ -24,9 +24,9 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </a>
 </sc-if>
 <span style="font-size: 13px; font-weight: 600">app-01</span>
-<span style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #5ED3A6">
-<span style="width: 8px; height: 8px; border-radius: 50%; background: #5ED3A6"></span>
-terhubung · 18 ms
+<span style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: {{statusColor}}">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: {{statusColor}}"></span>
+{{statusText}}
 </span>
 <span style="flex: 1"></span>
 <sc-if value="{{keyboardClosed}}" hint-placeholder-val="{{ true }}">
@@ -35,6 +35,19 @@ terhubung · 18 ms
 </button>
 </sc-if>
 </div>
+
+<sc-if value="{{waiting}}" hint-placeholder-val="{{ false }}">
+<div style="flex: none; display: flex; align-items: center; gap: 12px; margin: 0 12px {{bannerMb}}px 12px; padding: {{bannerPad}}; border-radius: 12px; border: 1px solid #5A4720; background: #231C0E">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F0B34A" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 3l10 18H2z"/><path d="M12 10v5M12 18v.01"/></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<span style="font-size: 15px; font-weight: 600; color: #F0B34A">Menunggu server terjangkau…</span>
+<sc-if value="{{bannerBody}}" hint-placeholder-val="{{ false }}">
+<span style="font-size: 13px; line-height: 1.4; color: #C5D0D5">Mencoba lagi dalam 5 detik.</span>
+</sc-if>
+</span>
+<button type="button" style="flex: none; min-height: 44px; padding: 0 16px; border-radius: 10px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 600; cursor: pointer">Sambung sekarang</button>
+</div>
+</sc-if>
 
 <div style="flex: 1; min-height: 0; overflow: hidden; padding: 4px 12px 0 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; line-height: 17px; color: #E8EEF0">
 <sc-for list="{{lines}}" as="ln" hint-placeholder-count="6">
@@ -66,7 +79,7 @@ terhubung · 18 ms
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"keyboard":{"editor":"boolean","default":false,"section":"Tampilan"},"paste":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":844,"height":390}}'>
+<script type="text/x-dc" data-dc-script data-props='{"keyboard":{"editor":"boolean","default":false,"section":"Tampilan"},"paste":{"editor":"boolean","default":false,"section":"Tampilan"},"waiting":{"editor":"boolean","default":false,"section":"Status"},"$preview":{"width":844,"height":390}}'>
 class Component extends DCLogic {
   renderVals() {
     const open = this.props.keyboard === true || this.props.keyboard === 'true';
@@ -91,11 +104,20 @@ class Component extends DCLogic {
       { text: 'deploy', color: '#9AA8AF' }
     ];
     // layar penuh baris terakhir; ruang tersisa menentukan jumlahnya
-    const rows = open ? 4 : 17;
+    const waiting = this.props.waiting === true || this.props.waiting === 'true';
+    // banner "menunggu" memakai sebagian tinggi: dengan keyboard hanya satu baris terminal tersisa
+    const rows = waiting ? (open ? 1 : 12) : (open ? 4 : 17);
     const lines = all.slice(Math.max(0, all.length - rows));
     const labels = ['Esc', 'Tab', 'Ctrl', 'Alt', '^C', '^D', '\u2190', '\u2193', '\u2191', '\u2192', 'Home', 'End', 'PgUp', 'PgDn', '|', '~', '/', '-', 'Fn'];
     return {
       pasteOpen: this.props.paste === true || this.props.paste === 'true',
+      waiting: waiting,
+      // keyboard terbuka: hanya judul dan tombol, padding vertikal 4 dp; tertutup: judul, keterangan, tombol
+      bannerBody: !open,
+      bannerPad: open ? '4px 10px' : '10px 12px',
+      bannerMb: open ? 4 : 8,
+      statusColor: waiting ? '#FF7F70' : '#5ED3A6',
+      statusText: waiting ? 'terputus · mencoba lagi 5 dtk' : 'terhubung · 18 ms',
       keyboardOpen: open,
       keyboardClosed: !open,
       statusH: open ? 20 : 32,

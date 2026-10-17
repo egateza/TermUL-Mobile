@@ -2,7 +2,7 @@
 
 Tanggal salin: 2026-10-15
 
-**Versi terkini (dicek 2026-10-16):** design system versi 38 (`1792167505-69e0`, hanya `README.md` yang berubah dari versi 37), prototipe versi 43 (`1792167502-ed31`). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
+**Versi terkini (dicek 2026-10-17):** design system versi 40 (`1792196865-8415`; dari versi 38 hanya `README.md` dan `components/Banner/README.md` yang berubah: banner dan form host di layar pendek), prototipe versi 45 (`1792196856-20b9`; dari versi 43 berubah `TerminalLandscape.dc.html` (prop `waiting`), `canvas.json`, dan dua berkas baru `TerminalLandscapeWaiting.dc.html` (contoh 2n) dan `HostFormLandscape.dc.html` (contoh 1c)). Salinan di `docs/design/` sama dengan kedua artifact untuk semua berkas yang diubah sejak salinan awal (dibandingkan dengan berkas yang dipublish); daftar "Versi artifact" di bawah adalah versi **salinan awal**, perubahannya tercatat di bagian "Perubahan lokal". Aturan: desain diikuti, tambahan masuk ke artifact, yang belum bisa diterapkan hanya diberi catatan (`CLAUDE.md` butir 8).
 
 ## Design system
 
