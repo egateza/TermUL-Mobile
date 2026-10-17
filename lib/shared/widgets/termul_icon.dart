@@ -38,7 +38,8 @@ enum TermulIconName {
   refresh('M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4'),
   more('M12 6h.01M12 12h.01M12 18h.01'),
   copy('M5 15V6a2 2 0 0 1 2-2h8'),
-  selectAll('M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M8 12h8');
+  selectAll('M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M8 12h8'),
+  file('M6 3h8l5 5v13H6zM14 3v5h5');
 
   const TermulIconName(this._extra);
 

@@ -890,4 +890,153 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get terminalLeaveChoiceTitle => 'Keluar dari terminal?';
+
+  @override
+  String get sftpIntro =>
+      'Pilih host untuk menjelajah berkasnya. Koneksi SFTP dibuka sendiri, atau pakai sesi terminal yang sedang terhubung.';
+
+  @override
+  String get sftpSessionsHeading => 'Sesi terbuka';
+
+  @override
+  String get sftpHostsHeading => 'Koneksi sendiri';
+
+  @override
+  String get sftpUseSession => 'Pakai sesi terbuka';
+
+  @override
+  String get sftpNoHosts => 'Belum ada host. Tambahkan dulu di tab Host.';
+
+  @override
+  String sftpConnectedTo(String name) {
+    return '$name · terhubung';
+  }
+
+  @override
+  String get sftpUpTitle => '..';
+
+  @override
+  String get sftpUpMeta => 'Naik satu level';
+
+  @override
+  String get sftpFolderMeta => 'Folder';
+
+  @override
+  String get sftpEmptyFolder => 'Folder ini kosong';
+
+  @override
+  String get sftpLoading => 'Memuat…';
+
+  @override
+  String sftpSelected(String name) {
+    return '$name dipilih';
+  }
+
+  @override
+  String get sftpCopyPath => 'Salin path';
+
+  @override
+  String get sftpPathCopied => 'Path disalin';
+
+  @override
+  String get sftpRefresh => 'Muat ulang';
+
+  @override
+  String get sftpErrNotFound => 'Folder atau berkas tidak ditemukan.';
+
+  @override
+  String get sftpErrDenied => 'Izin ditolak untuk folder ini.';
+
+  @override
+  String get sftpErrLost => 'Sambungan terputus.';
+
+  @override
+  String get sftpErrOther => 'Operasi SFTP gagal.';
+
+  @override
+  String get sftpLostTitle => 'Sambungan SFTP terputus';
+
+  @override
+  String get sftpLostBorrowedBody => 'Sesi terminalnya terputus. Kembali, lalu buka lagi setelah sesinya tersambung.';
+
+  @override
+  String get sftpLostOwnBody => 'Android bisa menutup sambungan di latar belakang. Sambung ulang untuk melanjutkan.';
+
+  @override
+  String get sftpReconnect => 'Sambung ulang';
+
+  @override
+  String get sftpUnavailableTitle => 'SFTP tidak tersedia di server ini';
+
+  @override
+  String get sftpUnavailableBody => 'Server tidak mengaktifkan subsistem SFTP, atau menolaknya untuk akun ini.';
+
+  @override
+  String sftpAgoMinutes(int count) {
+    return '$count menit lalu';
+  }
+
+  @override
+  String sftpAgoHours(int count) {
+    return '$count jam lalu';
+  }
+
+  @override
+  String get sftpYesterday => 'kemarin';
+
+  @override
+  String get sftpJustNow => 'baru saja';
+
+  @override
+  String get sftpLeaveTitle => 'Keluar dari SFTP?';
+
+  @override
+  String sftpLeaveBodyOwn(String name) {
+    return 'Koneksi SFTP ke $name akan ditutup. Sesi terminal tidak terpengaruh.';
+  }
+
+  @override
+  String sftpLeaveBodyBorrowed(String name) {
+    return 'Hanya layar SFTP yang ditutup. Sesi terminal $name tetap berjalan.';
+  }
+
+  @override
+  String get sftpLeaveConfirm => 'Keluar';
+
+  @override
+  String get sftpLeaveBusyTitle => 'Transfer masih berjalan';
+
+  @override
+  String sftpLeaveBusyBody(int count) {
+    return '$count transfer belum selesai. Bila keluar, semuanya dibatalkan.';
+  }
+
+  @override
+  String get sftpLeaveBusyUploadNote => 'Berkas unggahan yang belum lengkap dihapus dari server.';
+
+  @override
+  String get sftpLeaveBusyDownloadNote => 'Berkas unduhan yang belum lengkap dihapus dari perangkat.';
+
+  @override
+  String get sftpLeaveBusyConfirm => 'Batalkan transfer dan keluar';
+
+  @override
+  String sftpTransferUpload(String name) {
+    return 'Unggah $name';
+  }
+
+  @override
+  String sftpTransferDownload(String name) {
+    return 'Unduh $name';
+  }
+
+  @override
+  String sftpTransferPercent(int percent) {
+    return '$percent%';
+  }
+
+  @override
+  String sftpDisconnectedFrom(String name) {
+    return '$name · terputus';
+  }
 }

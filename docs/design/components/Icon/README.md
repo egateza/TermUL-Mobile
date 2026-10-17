@@ -6,3 +6,4 @@ Ikon garis SVG inline, viewBox 24, tebal 1,75, warna mengikuti `currentColor`.
 - Ikon tanpa `label` disembunyikan dari pembaca layar; ikon yang menjadi satu-satunya isi tombol memberi label pada tombolnya (`IconButton` melakukannya).
 - Prop `fill` mengisi bentuk (api, bintang) dengan `currentColor`.
 - Warna diatur lewat `color` pada pembungkus, bukan pada ikon.
+- Tambahan di aplikasi Flutter (2026-10-17): ikon `file` (selembar berkas dengan sudut terlipat, path `M6 3h8l5 5v13H6zM14 3v5h5`) untuk baris berkas di SFTP, sama dengan yang dipakai di prototipe 4. Belum ada di `Icon.names` kode web.

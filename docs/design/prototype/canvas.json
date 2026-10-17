@@ -383,6 +383,42 @@
    "title": "14 · Memuat aplikasi",
    "is_interactive": true,
    "radius": 28
+  },
+  "SftpSources.dc.html": {
+   "x": 0,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4b · SFTP: pilih sumber sambungan (sesi terbuka dan koneksi sendiri)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SftpLeave.dc.html": {
+   "x": 470,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4c · SFTP: konfirmasi keluar",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SftpLeaveBusy.dc.html": {
+   "x": 940,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4d · SFTP: konfirmasi keluar saat transfer berjalan",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SftpLost.dc.html": {
+   "x": 1410,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4e · SFTP: sambungan terputus (Sambung ulang)",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -427,7 +463,11 @@
   "MainLandscape.dc.html",
   "TerminalLandscapePaste.dc.html",
   "TerminalLandscapeWaiting.dc.html",
-  "HostFormLandscape.dc.html"
+  "HostFormLandscape.dc.html",
+  "SftpSources.dc.html",
+  "SftpLeave.dc.html",
+  "SftpLeaveBusy.dc.html",
+  "SftpLost.dc.html"
  ],
  "notes": {
   "judul": {

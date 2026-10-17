@@ -9,6 +9,7 @@ import '../connect/session_manager.dart';
 import '../hosts/host_list_screen.dart';
 import '../sessions/sessions_screen.dart';
 import '../settings/settings_screen.dart';
+import '../sftp/sftp_screen.dart';
 import 'coming_soon_screen.dart';
 
 /// Kerangka layar utama: lima tab di `NavBar` (Host, Sesi, SFTP, Snippet, Pengaturan; desain `Main`). Tab dibangun
@@ -42,7 +43,7 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget _page(int i, AppLocalizations l) => switch (i) {
     0 => HostListScreen(onConnect: widget.onConnect),
     1 => const SessionsScreen(showBack: false),
-    2 => ComingSoonScreen(title: l.navSftp, heading: l.comingSoonHeading, body: l.comingSoonSftp),
+    2 => const SftpScreen(),
     3 => ComingSoonScreen(title: l.navSnippets, heading: l.comingSoonHeading, body: l.comingSoonSnippets),
     _ => const SettingsScreen(showBack: false),
   };

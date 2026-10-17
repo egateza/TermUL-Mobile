@@ -88,18 +88,27 @@ int compareEntries(SftpEntry a, SftpEntry b) {
   return a.name.toLowerCase().compareTo(b.name.toLowerCase());
 }
 
+/// Bagian SFTP yang dipakai penjelajah folder; dipisah supaya penjelajah bisa dites tanpa server.
+abstract interface class SftpBrowsing {
+  Future<String> home();
+
+  Future<List<SftpEntry>> list(String dir);
+}
+
 /// Operasi SFTP di atas satu [SftpClient]. Tidak memegang kredensial dan tidak menyambung sendiri; pemanggil
 /// yang membuka dan menutup sambungan SSH-nya (lihat `SftpSession` bila dipakai UI).
-class SftpService {
+class SftpService implements SftpBrowsing {
   SftpService(this._client);
 
   final SftpClient _client;
 
   /// Folder awal (biasanya folder rumah), jalur mutlak.
+  @override
   Future<String> home() => _guard(() => _client.absolute('.'));
 
   /// Isi folder, folder dulu. Entri `.` dan `..` dibuang. Tautan simbolik diperiksa: bila menunjuk ke folder
   /// ia dihitung folder supaya bisa dibuka.
+  @override
   Future<List<SftpEntry>> list(String dir) => _guard(() async {
     final names = await _client.listdir(dir);
     final entries = <SftpEntry>[];
@@ -245,12 +254,16 @@ class SftpService {
     } on SftpFailure {
       rethrow;
     } on SftpStatusError catch (e) {
-      throw SftpFailure(switch (e.code) {
-        SftpStatusCode.noSuchFile => SftpFailureKind.notFound,
-        SftpStatusCode.permissionDenied => SftpFailureKind.permissionDenied,
-        SftpStatusCode.noConnection || SftpStatusCode.connectionLost => SftpFailureKind.connectionLost,
-        _ => SftpFailureKind.other,
-      }, e.message, e);
+      throw SftpFailure(
+        switch (e.code) {
+          SftpStatusCode.noSuchFile => SftpFailureKind.notFound,
+          SftpStatusCode.permissionDenied => SftpFailureKind.permissionDenied,
+          SftpStatusCode.noConnection || SftpStatusCode.connectionLost => SftpFailureKind.connectionLost,
+          _ => SftpFailureKind.other,
+        },
+        e.message,
+        e,
+      );
     } on SSHError catch (e) {
       throw SftpFailure(SftpFailureKind.connectionLost, 'Sambungan terputus', e);
     } on Object catch (e) {

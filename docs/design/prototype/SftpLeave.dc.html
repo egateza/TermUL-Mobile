@@ -1,0 +1,55 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Contoh: keluar dari SFTP</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; position: relative; overflow: hidden; font-family: 'IBM Plex Sans', system-ui, sans-serif">
+<dc-import name="Sftp" hint-size="390px,844px"></dc-import>
+<div style="position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: rgba(0, 0, 0, 0.6)"></div>
+<div style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 12px; padding: 12px 20px 24px 20px; border-radius: 28px 28px 0 0; border: 1px solid #2A343A; border-bottom: none; background: #161C20; color: #E8EEF0">
+<div style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #5C6A71"></div>
+<sc-if value="{{busy}}" hint-placeholder-val="{{ false }}">
+<h2 style="margin: 8px 0 0 0; font-size: 20px; font-weight: 600">Transfer masih berjalan</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #C5D0D5">2 transfer belum selesai. Bila keluar, semuanya dibatalkan.</p>
+<div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; gap: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13.5px"><span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Unggah besar.iso</span><span style="color: #F0B34A">25%</span></div>
+<div style="display: flex; gap: 12px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13.5px"><span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">Unduh log.txt</span><span style="color: #F0B34A">60%</span></div>
+</div>
+<span style="font-size: 12.5px; color: #9AA8AF">Berkas unggahan yang belum lengkap dihapus dari server.</span>
+<span style="font-size: 12.5px; color: #9AA8AF">Berkas unduhan yang belum lengkap dihapus dari perangkat.</span>
+<div style="display: flex; gap: 8px; margin-top: 4px">
+<a href="Sftp.dc.html" style="flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 10px; box-sizing: border-box; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; font-weight: 600; font-size: 15px; line-height: 1.25">Batal</a><a href="Sftp.dc.html" style="flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 10px; box-sizing: border-box; border-radius: 12px; border: 1px solid #FF7F70; background: transparent; color: #FF7F70; font-size: 15px; line-height: 1.25">Batalkan transfer dan keluar</a>
+</div>
+</sc-if>
+<sc-if value="{{idle}}" hint-placeholder-val="{{ true }}">
+<h2 style="margin: 8px 0 0 0; font-size: 20px; font-weight: 600">Keluar dari SFTP?</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #C5D0D5">Koneksi SFTP ke app-01 akan ditutup. Sesi terminal tidak terpengaruh.</p>
+<div style="display: flex; gap: 8px; margin-top: 4px">
+<a href="Sftp.dc.html" style="flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 10px; box-sizing: border-box; border-radius: 12px; border: 1px solid #5C6A71; background: transparent; color: #E8EEF0; font-size: 15px; line-height: 1.25">Batal</a><a href="Sftp.dc.html" style="flex: 1; min-height: 52px; display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 10px; box-sizing: border-box; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; font-weight: 600; font-size: 15px; line-height: 1.25">Keluar</a>
+</div>
+</sc-if>
+</div>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"busy":{"editor":"boolean","default":false,"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const busy = this.props.busy === true || this.props.busy === 'true';
+    return { busy: busy, idle: !busy };
+  }
+}
+</script>
+</body>
+</html>

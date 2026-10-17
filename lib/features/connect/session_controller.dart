@@ -102,6 +102,9 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
   DateTime? _backgroundSince;
 
   TerminalSession? get session => _session;
+
+  /// Sambungan SSH yang sedang dipakai sesi ini (berganti saat sambung ulang); null sebelum tersambung.
+  SshConnection? get connection => _current;
   bool get lost => _lost;
 
   /// Ada layar yang sedang menampilkan sesi ini.

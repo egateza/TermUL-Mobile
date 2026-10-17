@@ -20,7 +20,7 @@ void main() {
     expect(bar.active, 'hosts');
   });
 
-  testWidgets('tab Sesi dan Pengaturan tanpa tombol Kembali; SFTP dan Snippet menyatakan belum tersedia', (
+  testWidgets('tab Sesi dan Pengaturan tanpa tombol Kembali; SFTP menampilkan pilihan host dan Snippet menyatakan belum tersedia', (
     tester,
   ) async {
     await Harness().pump(tester);
@@ -32,8 +32,8 @@ void main() {
 
     await tester.tap(tab('SFTP'));
     await tester.pumpAndSettle();
-    expect(find.text('Belum tersedia'), findsOneWidget);
-    expect(find.textContaining('SFTP belum ada'), findsOneWidget);
+    expect(find.textContaining('Pilih host untuk menjelajah berkasnya'), findsOneWidget);
+    expect(find.text('Belum ada host. Tambahkan dulu di tab Host.'), findsOneWidget);
 
     await tester.tap(tab('Snippet'));
     await tester.pumpAndSettle();

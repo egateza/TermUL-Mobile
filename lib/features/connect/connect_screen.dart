@@ -256,16 +256,19 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     }
   }
 
-  static (String, String) _failureText(AppLocalizations l, SshFailure f) => switch (f) {
-    SshNetworkFailure() => (l.failNetworkTitle, l.failNetworkBody),
-    SshHandshakeFailure() => (l.failHandshakeTitle, l.failHandshakeBody),
-    SshAuthFailure() => (l.failAuthTitle, l.failAuthBody),
-    SshHostKeyRejected(changed: true) => (l.failRejectedChangedTitle, l.failRejectedChangedBody),
-    SshHostKeyRejected() => (l.failRejectedTitle, l.failRejectedBody),
-    SshHostKeyStoreFailure() => (l.failStoreTitle, l.failStoreBody),
-    SshKeyUnusable() || SshUnknownFailure() => (l.failUnknownTitle, l.failUnknownBody),
-  };
+  static (String, String) _failureText(AppLocalizations l, SshFailure f) => connectFailureText(l, f);
 }
+
+/// Judul dan keterangan untuk kegagalan menyambung; dipakai juga oleh layar SFTP.
+(String, String) connectFailureText(AppLocalizations l, SshFailure f) => switch (f) {
+  SshNetworkFailure() => (l.failNetworkTitle, l.failNetworkBody),
+  SshHandshakeFailure() => (l.failHandshakeTitle, l.failHandshakeBody),
+  SshAuthFailure() => (l.failAuthTitle, l.failAuthBody),
+  SshHostKeyRejected(changed: true) => (l.failRejectedChangedTitle, l.failRejectedChangedBody),
+  SshHostKeyRejected() => (l.failRejectedTitle, l.failRejectedBody),
+  SshHostKeyStoreFailure() => (l.failStoreTitle, l.failStoreBody),
+  SshKeyUnusable() || SshUnknownFailure() => (l.failUnknownTitle, l.failUnknownBody),
+};
 
 class _Header extends StatelessWidget {
   const _Header({required this.profile, required this.onBack});

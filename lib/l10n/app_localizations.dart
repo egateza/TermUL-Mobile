@@ -1644,6 +1644,258 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Keluar dari terminal?'**
   String get terminalLeaveChoiceTitle;
+
+  /// Pengantar layar pilih host SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih host untuk menjelajah berkasnya. Koneksi SFTP dibuka sendiri, atau pakai sesi terminal yang sedang terhubung.'**
+  String get sftpIntro;
+
+  /// Judul bagian sesi di layar pilih host SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi terbuka'**
+  String get sftpSessionsHeading;
+
+  /// Judul bagian host di layar pilih host SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi sendiri'**
+  String get sftpHostsHeading;
+
+  /// Keterangan baris sesi: SFTP memakai sambungan sesi itu.
+  ///
+  /// In id, this message translates to:
+  /// **'Pakai sesi terbuka'**
+  String get sftpUseSession;
+
+  /// Keadaan kosong layar pilih host SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada host. Tambahkan dulu di tab Host.'**
+  String get sftpNoHosts;
+
+  /// Subjudul layar SFTP bila tersambung.
+  ///
+  /// In id, this message translates to:
+  /// **'{name} · terhubung'**
+  String sftpConnectedTo(String name);
+
+  /// Nama baris naik satu level.
+  ///
+  /// In id, this message translates to:
+  /// **'..'**
+  String get sftpUpTitle;
+
+  /// Keterangan baris naik satu level.
+  ///
+  /// In id, this message translates to:
+  /// **'Naik satu level'**
+  String get sftpUpMeta;
+
+  /// Keterangan baris folder.
+  ///
+  /// In id, this message translates to:
+  /// **'Folder'**
+  String get sftpFolderMeta;
+
+  /// Keadaan kosong daftar berkas.
+  ///
+  /// In id, this message translates to:
+  /// **'Folder ini kosong'**
+  String get sftpEmptyFolder;
+
+  /// Status memuat folder.
+  ///
+  /// In id, this message translates to:
+  /// **'Memuat…'**
+  String get sftpLoading;
+
+  /// Bar aksi berkas yang dipilih.
+  ///
+  /// In id, this message translates to:
+  /// **'{name} dipilih'**
+  String sftpSelected(String name);
+
+  /// Tombol menyalin path berkas.
+  ///
+  /// In id, this message translates to:
+  /// **'Salin path'**
+  String get sftpCopyPath;
+
+  /// Toast setelah path disalin.
+  ///
+  /// In id, this message translates to:
+  /// **'Path disalin'**
+  String get sftpPathCopied;
+
+  /// Nama aksi muat ulang folder.
+  ///
+  /// In id, this message translates to:
+  /// **'Muat ulang'**
+  String get sftpRefresh;
+
+  /// Galat SFTP: tidak ada.
+  ///
+  /// In id, this message translates to:
+  /// **'Folder atau berkas tidak ditemukan.'**
+  String get sftpErrNotFound;
+
+  /// Galat SFTP: izin ditolak.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin ditolak untuk folder ini.'**
+  String get sftpErrDenied;
+
+  /// Galat SFTP: sambungan putus.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambungan terputus.'**
+  String get sftpErrLost;
+
+  /// Galat SFTP lainnya.
+  ///
+  /// In id, this message translates to:
+  /// **'Operasi SFTP gagal.'**
+  String get sftpErrOther;
+
+  /// Judul banner sambungan SFTP putus.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambungan SFTP terputus'**
+  String get sftpLostTitle;
+
+  /// Keterangan bila sesi yang dipinjam putus.
+  ///
+  /// In id, this message translates to:
+  /// **'Sesi terminalnya terputus. Kembali, lalu buka lagi setelah sesinya tersambung.'**
+  String get sftpLostBorrowedBody;
+
+  /// Keterangan bila koneksi SFTP sendiri putus.
+  ///
+  /// In id, this message translates to:
+  /// **'Android bisa menutup sambungan di latar belakang. Sambung ulang untuk melanjutkan.'**
+  String get sftpLostOwnBody;
+
+  /// Tombol menyambung ulang SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambung ulang'**
+  String get sftpReconnect;
+
+  /// Judul bila subsistem SFTP gagal dibuka.
+  ///
+  /// In id, this message translates to:
+  /// **'SFTP tidak tersedia di server ini'**
+  String get sftpUnavailableTitle;
+
+  /// Keterangan bila subsistem SFTP gagal dibuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Server tidak mengaktifkan subsistem SFTP, atau menolaknya untuk akun ini.'**
+  String get sftpUnavailableBody;
+
+  /// Waktu ubah berkas dalam menit.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} menit lalu'**
+  String sftpAgoMinutes(int count);
+
+  /// Waktu ubah berkas dalam jam.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} jam lalu'**
+  String sftpAgoHours(int count);
+
+  /// Waktu ubah berkas: kemarin.
+  ///
+  /// In id, this message translates to:
+  /// **'kemarin'**
+  String get sftpYesterday;
+
+  /// Waktu ubah berkas: kurang dari semenit.
+  ///
+  /// In id, this message translates to:
+  /// **'baru saja'**
+  String get sftpJustNow;
+
+  /// Judul konfirmasi keluar dari layar SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Keluar dari SFTP?'**
+  String get sftpLeaveTitle;
+
+  /// Isi konfirmasi keluar (koneksi sendiri).
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi SFTP ke {name} akan ditutup. Sesi terminal tidak terpengaruh.'**
+  String sftpLeaveBodyOwn(String name);
+
+  /// Isi konfirmasi keluar (sesi dipinjam).
+  ///
+  /// In id, this message translates to:
+  /// **'Hanya layar SFTP yang ditutup. Sesi terminal {name} tetap berjalan.'**
+  String sftpLeaveBodyBorrowed(String name);
+
+  /// Tombol konfirmasi keluar dari SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Keluar'**
+  String get sftpLeaveConfirm;
+
+  /// Judul konfirmasi keluar bila ada transfer.
+  ///
+  /// In id, this message translates to:
+  /// **'Transfer masih berjalan'**
+  String get sftpLeaveBusyTitle;
+
+  /// Isi konfirmasi keluar bila ada transfer.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} transfer belum selesai. Bila keluar, semuanya dibatalkan.'**
+  String sftpLeaveBusyBody(int count);
+
+  /// Catatan akibat membatalkan unggahan.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas unggahan yang belum lengkap dihapus dari server.'**
+  String get sftpLeaveBusyUploadNote;
+
+  /// Catatan akibat membatalkan unduhan.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas unduhan yang belum lengkap dihapus dari perangkat.'**
+  String get sftpLeaveBusyDownloadNote;
+
+  /// Tombol konfirmasi keluar bila ada transfer.
+  ///
+  /// In id, this message translates to:
+  /// **'Batalkan transfer dan keluar'**
+  String get sftpLeaveBusyConfirm;
+
+  /// Baris transfer unggahan di konfirmasi keluar.
+  ///
+  /// In id, this message translates to:
+  /// **'Unggah {name}'**
+  String sftpTransferUpload(String name);
+
+  /// Baris transfer unduhan di konfirmasi keluar.
+  ///
+  /// In id, this message translates to:
+  /// **'Unduh {name}'**
+  String sftpTransferDownload(String name);
+
+  /// Persen kemajuan transfer.
+  ///
+  /// In id, this message translates to:
+  /// **'{percent}%'**
+  String sftpTransferPercent(int percent);
+
+  /// Subjudul layar SFTP bila sambungan putus.
+  ///
+  /// In id, this message translates to:
+  /// **'{name} · terputus'**
+  String sftpDisconnectedFrom(String name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

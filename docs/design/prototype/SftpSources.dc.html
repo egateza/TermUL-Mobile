@@ -1,0 +1,102 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Contoh: SFTP, pilih sumber sambungan</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 32px 20px 12px 20px; display: flex; flex-direction: column; gap: 8px">
+<h1 style="margin: 0 0 4px 12px; font-size: 28px; line-height: 1.2; font-weight: 600; letter-spacing: -0.01em">SFTP</h1>
+<p style="margin: 0 12px 4px 12px; font-size: 13.5px; line-height: 1.5; color: #C5D0D5">Pilih host untuk menjelajah berkasnya. Koneksi SFTP dibuka sendiri, atau pakai sesi terminal yang sedang terhubung.</p>
+<sc-if value="{{withSessions}}" hint-placeholder-val="{{ true }}">
+<span style="margin: 12px 0 0 12px; font-size: 12.5px; color: #9AA8AF">Sesi terbuka</span>
+<button type="button" style="width: 100%; min-height: 56px; flex: none; display: flex; align-items: center; gap: 14px; padding: 12px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5D0D5" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 16px; font-weight: 500">app-01</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">Pakai sesi terbuka</span>
+</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+<button type="button" style="width: 100%; min-height: 56px; flex: none; display: flex; align-items: center; gap: 14px; padding: 12px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5D0D5" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 16px; font-weight: 500">db-01 · 2</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">Pakai sesi terbuka</span>
+</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+</sc-if>
+<span style="margin: 12px 0 0 12px; font-size: 12.5px; color: #9AA8AF">Koneksi sendiri</span>
+<button type="button" style="width: 100%; min-height: 56px; flex: none; display: flex; align-items: center; gap: 14px; padding: 12px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5D0D5" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 16px; font-weight: 500">app-01</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">deploy@192.0.2.11:22</span>
+</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+<button type="button" style="width: 100%; min-height: 56px; flex: none; display: flex; align-items: center; gap: 14px; padding: 12px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5D0D5" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 16px; font-weight: 500">db-01</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">deploy@192.0.2.20:22</span>
+</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+<button type="button" style="width: 100%; min-height: 56px; flex: none; display: flex; align-items: center; gap: 14px; padding: 12px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="#C5D0D5" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 3px">
+<span style="font-size: 16px; font-weight: 500">staging</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF">ega@192.0.2.31:2222</span>
+</span>
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M9 6l6 6-6 6"/></svg>
+</button>
+</div>
+<nav aria-label="Navigasi utama" style="flex: none; display: flex; border-top: 1px solid #2A343A; background: #0F1316; padding: 6px 12px 10px 12px">
+<a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
+Host
+</a>
+<a href="Terminal.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<span style="position: relative; display: flex">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9l3 3-3 3M13 15h4"/></svg>
+<span style="position: absolute; top: -6px; right: -12px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 9px; background: #F0B34A; color: #1B1406; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center">2</span>
+</span>
+Sesi
+</a>
+<a href="Sftp.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #F0B34A; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+SFTP
+</a>
+<a href="Snippets.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3"/></svg>
+Snippet
+</a>
+<a href="Settings.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
+Pengaturan
+</a>
+</nav>
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"withSessions":{"editor":"boolean","default":true,"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    return { withSessions: this.props.withSessions !== false };
+  }
+}
+</script>
+</body>
+</html>

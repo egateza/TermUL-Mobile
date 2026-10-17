@@ -72,7 +72,11 @@
   "filterDropdownLabel": "Filter host: {current}",
   "@filterDropdownLabel": {
     "description": "Nama tombol dropdown filter untuk pembaca layar.",
-    "placeholders": { "current": { "type": "String" } }
+    "placeholders": {
+      "current": {
+        "type": "String"
+      }
+    }
   },
   "filterAll": "Semua",
   "@filterAll": {
@@ -1230,5 +1234,228 @@
   "terminalLeaveChoiceTitle": "Keluar dari terminal?",
   "@terminalLeaveChoiceTitle": {
     "description": "Judul dialog keluar dari terminal dengan pilihan tetap terhubung."
+  },
+  "sftpIntro": "Pilih host untuk menjelajah berkasnya. Koneksi SFTP dibuka sendiri, atau pakai sesi terminal yang sedang terhubung.",
+  "@sftpIntro": {
+    "description": "Pengantar layar pilih host SFTP."
+  },
+  "sftpSessionsHeading": "Sesi terbuka",
+  "@sftpSessionsHeading": {
+    "description": "Judul bagian sesi di layar pilih host SFTP."
+  },
+  "sftpHostsHeading": "Koneksi sendiri",
+  "@sftpHostsHeading": {
+    "description": "Judul bagian host di layar pilih host SFTP."
+  },
+  "sftpUseSession": "Pakai sesi terbuka",
+  "@sftpUseSession": {
+    "description": "Keterangan baris sesi: SFTP memakai sambungan sesi itu."
+  },
+  "sftpNoHosts": "Belum ada host. Tambahkan dulu di tab Host.",
+  "@sftpNoHosts": {
+    "description": "Keadaan kosong layar pilih host SFTP."
+  },
+  "sftpConnectedTo": "{name} · terhubung",
+  "@sftpConnectedTo": {
+    "description": "Subjudul layar SFTP bila tersambung.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpUpTitle": "..",
+  "@sftpUpTitle": {
+    "description": "Nama baris naik satu level."
+  },
+  "sftpUpMeta": "Naik satu level",
+  "@sftpUpMeta": {
+    "description": "Keterangan baris naik satu level."
+  },
+  "sftpFolderMeta": "Folder",
+  "@sftpFolderMeta": {
+    "description": "Keterangan baris folder."
+  },
+  "sftpEmptyFolder": "Folder ini kosong",
+  "@sftpEmptyFolder": {
+    "description": "Keadaan kosong daftar berkas."
+  },
+  "sftpLoading": "Memuat…",
+  "@sftpLoading": {
+    "description": "Status memuat folder."
+  },
+  "sftpSelected": "{name} dipilih",
+  "@sftpSelected": {
+    "description": "Bar aksi berkas yang dipilih.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpCopyPath": "Salin path",
+  "@sftpCopyPath": {
+    "description": "Tombol menyalin path berkas."
+  },
+  "sftpPathCopied": "Path disalin",
+  "@sftpPathCopied": {
+    "description": "Toast setelah path disalin."
+  },
+  "sftpRefresh": "Muat ulang",
+  "@sftpRefresh": {
+    "description": "Nama aksi muat ulang folder."
+  },
+  "sftpErrNotFound": "Folder atau berkas tidak ditemukan.",
+  "@sftpErrNotFound": {
+    "description": "Galat SFTP: tidak ada."
+  },
+  "sftpErrDenied": "Izin ditolak untuk folder ini.",
+  "@sftpErrDenied": {
+    "description": "Galat SFTP: izin ditolak."
+  },
+  "sftpErrLost": "Sambungan terputus.",
+  "@sftpErrLost": {
+    "description": "Galat SFTP: sambungan putus."
+  },
+  "sftpErrOther": "Operasi SFTP gagal.",
+  "@sftpErrOther": {
+    "description": "Galat SFTP lainnya."
+  },
+  "sftpLostTitle": "Sambungan SFTP terputus",
+  "@sftpLostTitle": {
+    "description": "Judul banner sambungan SFTP putus."
+  },
+  "sftpLostBorrowedBody": "Sesi terminalnya terputus. Kembali, lalu buka lagi setelah sesinya tersambung.",
+  "@sftpLostBorrowedBody": {
+    "description": "Keterangan bila sesi yang dipinjam putus."
+  },
+  "sftpLostOwnBody": "Android bisa menutup sambungan di latar belakang. Sambung ulang untuk melanjutkan.",
+  "@sftpLostOwnBody": {
+    "description": "Keterangan bila koneksi SFTP sendiri putus."
+  },
+  "sftpReconnect": "Sambung ulang",
+  "@sftpReconnect": {
+    "description": "Tombol menyambung ulang SFTP."
+  },
+  "sftpUnavailableTitle": "SFTP tidak tersedia di server ini",
+  "@sftpUnavailableTitle": {
+    "description": "Judul bila subsistem SFTP gagal dibuka."
+  },
+  "sftpUnavailableBody": "Server tidak mengaktifkan subsistem SFTP, atau menolaknya untuk akun ini.",
+  "@sftpUnavailableBody": {
+    "description": "Keterangan bila subsistem SFTP gagal dibuka."
+  },
+  "sftpAgoMinutes": "{count} menit lalu",
+  "@sftpAgoMinutes": {
+    "description": "Waktu ubah berkas dalam menit.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpAgoHours": "{count} jam lalu",
+  "@sftpAgoHours": {
+    "description": "Waktu ubah berkas dalam jam.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpYesterday": "kemarin",
+  "@sftpYesterday": {
+    "description": "Waktu ubah berkas: kemarin."
+  },
+  "sftpJustNow": "baru saja",
+  "@sftpJustNow": {
+    "description": "Waktu ubah berkas: kurang dari semenit."
+  },
+  "sftpLeaveTitle": "Keluar dari SFTP?",
+  "@sftpLeaveTitle": {
+    "description": "Judul konfirmasi keluar dari layar SFTP."
+  },
+  "sftpLeaveBodyOwn": "Koneksi SFTP ke {name} akan ditutup. Sesi terminal tidak terpengaruh.",
+  "@sftpLeaveBodyOwn": {
+    "description": "Isi konfirmasi keluar (koneksi sendiri).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpLeaveBodyBorrowed": "Hanya layar SFTP yang ditutup. Sesi terminal {name} tetap berjalan.",
+  "@sftpLeaveBodyBorrowed": {
+    "description": "Isi konfirmasi keluar (sesi dipinjam).",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpLeaveConfirm": "Keluar",
+  "@sftpLeaveConfirm": {
+    "description": "Tombol konfirmasi keluar dari SFTP."
+  },
+  "sftpLeaveBusyTitle": "Transfer masih berjalan",
+  "@sftpLeaveBusyTitle": {
+    "description": "Judul konfirmasi keluar bila ada transfer."
+  },
+  "sftpLeaveBusyBody": "{count} transfer belum selesai. Bila keluar, semuanya dibatalkan.",
+  "@sftpLeaveBusyBody": {
+    "description": "Isi konfirmasi keluar bila ada transfer.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpLeaveBusyUploadNote": "Berkas unggahan yang belum lengkap dihapus dari server.",
+  "@sftpLeaveBusyUploadNote": {
+    "description": "Catatan akibat membatalkan unggahan."
+  },
+  "sftpLeaveBusyDownloadNote": "Berkas unduhan yang belum lengkap dihapus dari perangkat.",
+  "@sftpLeaveBusyDownloadNote": {
+    "description": "Catatan akibat membatalkan unduhan."
+  },
+  "sftpLeaveBusyConfirm": "Batalkan transfer dan keluar",
+  "@sftpLeaveBusyConfirm": {
+    "description": "Tombol konfirmasi keluar bila ada transfer."
+  },
+  "sftpTransferUpload": "Unggah {name}",
+  "@sftpTransferUpload": {
+    "description": "Baris transfer unggahan di konfirmasi keluar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpTransferDownload": "Unduh {name}",
+  "@sftpTransferDownload": {
+    "description": "Baris transfer unduhan di konfirmasi keluar.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpTransferPercent": "{percent}%",
+  "@sftpTransferPercent": {
+    "description": "Persen kemajuan transfer.",
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpDisconnectedFrom": "{name} · terputus",
+  "@sftpDisconnectedFrom": {
+    "description": "Subjudul layar SFTP bila sambungan putus.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }
