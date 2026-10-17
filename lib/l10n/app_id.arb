@@ -1780,5 +1780,9 @@
   "vaultAlwaysOpenAuthFailed": "Dibatalkan. Vault tetap terkunci.",
   "@vaultAlwaysOpenAuthFailed": {
     "description": "Pesan bila autentikasi saat menyalakan saklar gagal."
+  },
+  "settingsDangerTag": "Berisiko",
+  "@settingsDangerTag": {
+    "description": "Tag kata di baris pengaturan berisiko (zona bahaya)."
   }
 }

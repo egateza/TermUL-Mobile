@@ -251,7 +251,7 @@ void main() {
       await tester.pumpAndSettle();
       await tester.tap(find.text('Buka pengaturan'));
       expect(setup.keepAlive.settingsOpened, 1);
-      await tester.drag(find.byType(ListView), const Offset(0, 400));
+      await tester.scrollUntilVisible(find.text('Pertahankan koneksi di latar belakang'), -200);
       await tester.pumpAndSettle();
       await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
       await tester.pumpAndSettle();

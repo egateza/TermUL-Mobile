@@ -1241,4 +1241,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get vaultAlwaysOpenAuthFailed => 'Dibatalkan. Vault tetap terkunci.';
+
+  @override
+  String get settingsDangerTag => 'Berisiko';
 }

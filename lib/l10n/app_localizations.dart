@@ -2226,6 +2226,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Dibatalkan. Vault tetap terkunci.'**
   String get vaultAlwaysOpenAuthFailed;
+
+  /// Tag kata di baris pengaturan berisiko (zona bahaya).
+  ///
+  /// In id, this message translates to:
+  /// **'Berisiko'**
+  String get settingsDangerTag;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -124,6 +124,18 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </div>
 
 </div>
+<button type="button" onClick="{{vopen.toggle}}" aria-pressed="{{vopen.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #6B2C25; background: #1D1210; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">Jangan kunci vault</span>
+<span style="padding: 2px 8px; border-radius: 8px; border: 1px solid #6B2C25; background: #1D1210; color: #FF7F70; font-size: 12px; font-weight: 500">Berisiko</span>
+</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #FFB3A9">Host tersambung tanpa biometrik atau PIN. Siapa pun yang memegang HP yang sedang terbuka bisa menyambung ke semua server Anda.</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{vopen.bg}}; display: flex; justify-content: {{vopen.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{vopen.knob}}"></span>
+</span>
+</button>
 </div>
 
 </sc-if>
@@ -361,10 +373,20 @@ class Component extends DCLogic {
     });
 
     const fgSw = mkSwitch('fg', 'Pertahankan koneksi di latar belakang', '');
+    // Saklar berisiko ("zona bahaya"): menyala berwarna bad, bukan accent.
+    const vopenOn = sw.vopen;
+    const vopenSw = {
+      on: vopenOn,
+      bg: vopenOn ? '#FF7F70' : '#6B2C25',
+      align: vopenOn ? 'flex-end' : 'flex-start',
+      knob: vopenOn ? '#1D1210' : '#FFB3A9',
+      toggle: () => this.setState({ sw: Object.assign({}, sw, { vopen: !vopenOn }) })
+    };
 
     return {
       showTop: showTop,
       fg: fgSw,
+      vopen: vopenSw,
       fontPx: font,
       pvBg: pv.bg,
       pvFg: pv.fg,
@@ -386,7 +408,6 @@ class Component extends DCLogic {
       hsDot: handle === 'dot',
       secSwitches: [
         mkSwitch('bio', 'Biometrik untuk membuka vault', 'Sidik jari atau wajah'),
-        mkSwitch('vopen', 'Jangan kunci vault', 'Host tersambung tanpa biometrik atau PIN. Siapa pun yang memegang HP yang sedang terbuka bisa menyambung ke semua server Anda.'),
         mkSwitch('sudo', 'Isi sudo otomatis', 'Hanya setelah konfirmasi pertama di tiap sesi'),
         mkSwitch('shot', 'Blokir screenshot di terminal', 'Layar terminal tidak bisa direkam atau di-screenshot')
       ],

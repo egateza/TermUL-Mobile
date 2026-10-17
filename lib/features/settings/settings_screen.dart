@@ -488,6 +488,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                     label: l.settingsVaultAlwaysOpenLabel,
                     description: l.settingsVaultAlwaysOpenDesc,
                     value: vaultAlwaysOpen,
+                    dangerTag: l.settingsDangerTag,
                     onChanged: _setVaultAlwaysOpen,
                   ),
                 ],
