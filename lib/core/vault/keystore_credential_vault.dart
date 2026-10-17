@@ -8,6 +8,7 @@ import 'secret_store.dart';
 import 'secret_type.dart';
 import 'vault_exceptions.dart';
 import 'vault_index.dart';
+import 'vault_lock.dart';
 
 /// [CredentialVault] di atas Android Keystore ([SecretStore]) dengan gerbang [DeviceAuth].
 ///
@@ -16,13 +17,16 @@ import 'vault_index.dart';
 /// - Urutan tulis: nama masuk indeks, lalu rahasia disimpan. Urutan hapus: rahasia dihapus, lalu nama keluar
 ///   dari indeks. Kegagalan di tengah hanya meninggalkan nama tanpa rahasia.
 class KeystoreCredentialVault implements CredentialVault {
-  KeystoreCredentialVault({required this._auth, required this._store, required this._index});
+  KeystoreCredentialVault({required this._auth, required this._store, required this._index, this._lock});
 
   static const keyPrefix = 'termul.secret.';
 
   final DeviceAuth _auth;
   final SecretStore _store;
   final VaultIndex _index;
+
+  /// Bila terbuka (sementara atau selalu), pembacaan tidak meminta autentikasi.
+  final VaultLock? _lock;
 
   /// Nama kunci penyimpanan untuk pasangan (profil, tipe). Stabil dan tidak mengungkap id profil.
   static String keyName(String profileId, SecretType type) {
@@ -35,6 +39,7 @@ class KeystoreCredentialVault implements CredentialVault {
 
   Future<void> _gate(String reason) async {
     if (await _auth.level() == AuthLevel.none) return;
+    if (await _lock?.isOpen() ?? false) return;
     final bool ok;
     try {
       ok = await _auth.authenticate(reason);

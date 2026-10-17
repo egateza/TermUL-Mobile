@@ -16,6 +16,7 @@ import 'core/vault/device_auth.dart';
 import 'core/vault/keystore_credential_vault.dart';
 import 'core/vault/secret_store.dart';
 import 'core/vault/vault_index.dart';
+import 'core/vault/vault_lock.dart';
 import 'features/hosts/host_service.dart';
 
 /// Ringkasan keadaan penyimpanan saat aplikasi mulai, untuk ditampilkan ke pengguna.
@@ -51,6 +52,7 @@ class AppDependencies {
     this.saveSettings,
     this.keepAlive,
     this.screenMonitor,
+    this.vaultLock,
   });
 
   final HostRepository hosts;
@@ -71,6 +73,9 @@ class AppDependencies {
 
   /// Pemantau layar mati. `null` di tes (memakai `NoopScreenMonitor`).
   final ScreenMonitor? screenMonitor;
+
+  /// Status vault terbuka. `null` di tes (provider memakai kunci yang selalu terkunci).
+  final VaultLock? vaultLock;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -89,10 +94,18 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
   final settingsRepo = JsonSettingsRepository(file('settings.json'));
   final settingsLoad = await settingsRepo.load();
 
+  final deviceAuth = auth ?? LocalAuthDeviceAuth();
+  final screenMonitor = MethodChannelScreenMonitor();
+  final vaultLock = VaultLock(
+    auth: deviceAuth,
+    screen: screenMonitor,
+    alwaysOpen: settingsRepo.settings.security.vaultAlwaysOpen,
+  );
   final vault = KeystoreCredentialVault(
-    auth: auth ?? LocalAuthDeviceAuth(),
+    auth: deviceAuth,
     store: store ?? FlutterSecureSecretStore(),
     index: index,
+    lock: vaultLock,
   );
   final service = HostService(hosts: hosts, knownHosts: known, vault: vault);
   final swept = await service.runStartupMaintenance(profilesWereQuarantined: hostsLoad.hadCorruptFile);
@@ -109,7 +122,8 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     },
     saveSettings: settingsRepo.save,
     keepAlive: MethodChannelKeepAlive(),
-    screenMonitor: MethodChannelScreenMonitor(),
+    screenMonitor: screenMonitor,
+    vaultLock: vaultLock,
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,

@@ -1708,5 +1708,77 @@
   "actionConnectSftp": "Sambung SFTP",
   "@actionConnectSftp": {
     "description": "Aksi di menu tekan lama host: membuka sesi SFTP mandiri."
+  },
+  "vaultChipLocked": "Vault terkunci",
+  "@vaultChipLocked": {
+    "description": "Chip di header daftar host saat vault terkunci."
+  },
+  "vaultChipOpen": "Vault terbuka",
+  "@vaultChipOpen": {
+    "description": "Chip di header daftar host saat vault terbuka."
+  },
+  "vaultChipLockedHint": "Vault terkunci. Ketuk untuk membuka dengan biometrik.",
+  "@vaultChipLockedHint": {
+    "description": "Label pembaca layar chip saat terkunci."
+  },
+  "vaultChipOpenHint": "Vault terbuka. Ketuk untuk mengunci.",
+  "@vaultChipOpenHint": {
+    "description": "Label pembaca layar chip saat terbuka sementara."
+  },
+  "vaultChipAlwaysOpenHint": "Vault terbuka permanen. Ketuk untuk keterangan.",
+  "@vaultChipAlwaysOpenHint": {
+    "description": "Label pembaca layar chip saat selalu terbuka."
+  },
+  "vaultUnlockReason": "Buka vault supaya host tersambung tanpa prompt",
+  "@vaultUnlockReason": {
+    "description": "Alasan yang tampil di prompt autentikasi saat membuka vault."
+  },
+  "vaultUnlockedToast": "Vault terbuka sampai layar mati",
+  "@vaultUnlockedToast": {
+    "description": "Toast setelah vault dibuka sementara."
+  },
+  "vaultLockedToast": "Vault terkunci",
+  "@vaultLockedToast": {
+    "description": "Toast setelah vault dikunci."
+  },
+  "vaultUnlockFailedToast": "Vault tetap terkunci",
+  "@vaultUnlockFailedToast": {
+    "description": "Toast bila autentikasi dibatalkan atau gagal."
+  },
+  "vaultAlwaysOpenToast": "Vault terbuka permanen. Matikan di Pengaturan, bagian Keamanan.",
+  "@vaultAlwaysOpenToast": {
+    "description": "Toast bila chip diketuk saat vault selalu terbuka."
+  },
+  "settingsSecuritySection": "Keamanan",
+  "@settingsSecuritySection": {
+    "description": "Judul bagian pengaturan keamanan."
+  },
+  "settingsVaultAlwaysOpenLabel": "Jangan kunci vault",
+  "@settingsVaultAlwaysOpenLabel": {
+    "description": "Label saklar vault selalu terbuka."
+  },
+  "settingsVaultAlwaysOpenDesc": "Host tersambung tanpa biometrik atau PIN. Siapa pun yang memegang HP yang sedang terbuka bisa menyambung ke semua server Anda.",
+  "@settingsVaultAlwaysOpenDesc": {
+    "description": "Keterangan saklar vault selalu terbuka."
+  },
+  "vaultAlwaysOpenConfirmTitle": "Jangan kunci vault?",
+  "@vaultAlwaysOpenConfirmTitle": {
+    "description": "Judul dialog konfirmasi vault selalu terbuka."
+  },
+  "vaultAlwaysOpenConfirmBody": "Password dan kunci privat tetap terenkripsi, tetapi aplikasi akan memakainya tanpa meminta biometrik atau PIN. Bila HP hilang saat terbuka, server Anda ikut terbuka. Anda bisa mematikannya kapan saja.",
+  "@vaultAlwaysOpenConfirmBody": {
+    "description": "Isi dialog konfirmasi vault selalu terbuka."
+  },
+  "vaultAlwaysOpenConfirmAction": "Jangan kunci",
+  "@vaultAlwaysOpenConfirmAction": {
+    "description": "Tombol konfirmasi vault selalu terbuka."
+  },
+  "vaultAlwaysOpenReason": "Konfirmasi untuk tidak mengunci vault",
+  "@vaultAlwaysOpenReason": {
+    "description": "Alasan di prompt autentikasi saat menyalakan saklar."
+  },
+  "vaultAlwaysOpenAuthFailed": "Dibatalkan. Vault tetap terkunci.",
+  "@vaultAlwaysOpenAuthFailed": {
+    "description": "Pesan bila autentikasi saat menyalakan saklar gagal."
   }
 }

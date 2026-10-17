@@ -16,6 +16,7 @@ import 'package:termul_mobile/core/storage/json/json_host_repository.dart';
 import 'package:termul_mobile/core/storage/json/json_known_hosts_repository.dart';
 import 'package:termul_mobile/core/vault/device_auth.dart';
 import 'package:termul_mobile/core/vault/keystore_credential_vault.dart';
+import 'package:termul_mobile/core/vault/vault_lock.dart';
 import 'package:termul_mobile/features/hosts/host_service.dart';
 import 'package:termul_mobile/shared/widgets/termul_text_field.dart';
 
@@ -54,7 +55,8 @@ class Harness {
     known = JsonKnownHostsRepository(File('tidak-dipakai-known.json'), writer: noWrite);
     store = MemorySecretStore();
     index = MemoryVaultIndex();
-    vault = KeystoreCredentialVault(auth: auth, store: store, index: index);
+    lock = VaultLock(auth: auth, alwaysOpen: settings.security.vaultAlwaysOpen);
+    vault = KeystoreCredentialVault(auth: auth, store: store, index: index, lock: lock);
     service = HostService(hosts: hosts, knownHosts: known, vault: vault);
     deps = AppDependencies(
       hosts: hosts,
@@ -64,10 +66,12 @@ class Harness {
       report: report,
       settings: settings,
       saveSettings: saveSettings,
+      vaultLock: lock,
     );
   }
 
   late final FakeDeviceAuth auth;
+  late final VaultLock lock;
   late final JsonHostRepository hosts;
   late final JsonKnownHostsRepository known;
   late final MemorySecretStore store;

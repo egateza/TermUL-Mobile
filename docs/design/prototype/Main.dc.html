@@ -25,9 +25,9 @@ input::placeholder{color:#7F8D94}
 <dc-import name="FlameArt" count="{{chipCount}}" mode="{{chipMode}}" size="18" cracks="0" need="5" hint-size="24px,23px"></dc-import>
 {{chipLabel}}
 </a>
-<a href="SudoSheet.dc.html" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid #2A343A; background: #161C20; font-size: 13px; color: #9AA8AF">
-<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
-Vault terkunci
+<a href="{{vaultHref}}" aria-label="{{vaultAria}}" style="display: flex; align-items: center; gap: 8px; min-height: 44px; padding: 0 14px; border-radius: 22px; border: 1px solid {{vaultBd}}; background: #161C20; font-size: 13px; color: {{vaultFg}}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="{{vaultShackle}}"/></svg>
+{{vaultLabel}}
 </a>
 </div>
 </div>
@@ -106,7 +106,7 @@ Pengaturan
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"streakState":{"editor":"enum","default":"aktif","options":["aktif","bara","padam","beku"],"section":"Streak"},"$preview":{"width":390,"height":844}}'>
+<script type="text/x-dc" data-dc-script data-props='{"streakState":{"editor":"enum","default":"aktif","options":["aktif","bara","padam","beku"],"section":"Streak"},"vault":{"editor":"enum","default":"terkunci","options":["terkunci","terbuka","permanen"],"section":"Vault"},"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
   renderVals() {
     const s = this.state || {};
@@ -187,7 +187,21 @@ class Component extends DCLogic {
     const HREFS = { aktif: 'Streak.dc.html', bara: 'Streak.dc.html', padam: 'StreakScreenPadam.dc.html', beku: 'StreakScreenBeku.dc.html' };
     const chipHref = HREFS[this.props.streakState] || 'Streak.dc.html';
 
+    // Vault: terkunci (ketuk membuka dengan biometrik), terbuka sampai layar mati (ketuk mengunci), permanen (Pengaturan).
+    const VAULTS = {
+      terkunci: { label: 'Vault terkunci', shackle: 'M8 11V8a4 4 0 0 1 8 0v3', fg: '#9AA8AF', bd: '#2A343A', href: 'SudoSheet.dc.html', aria: 'Vault terkunci. Ketuk untuk membuka dengan biometrik.' },
+      terbuka: { label: 'Vault terbuka', shackle: 'M8 11V8a4 4 0 0 1 7.5-2', fg: '#F0B34A', bd: '#F0B34A', href: 'Main.dc.html', aria: 'Vault terbuka. Ketuk untuk mengunci.' },
+      permanen: { label: 'Vault terbuka', shackle: 'M8 11V8a4 4 0 0 1 7.5-2', fg: '#F0B34A', bd: '#F0B34A', href: 'Settings.dc.html', aria: 'Vault terbuka permanen. Ketuk untuk keterangan.' }
+    };
+    const vault = VAULTS[this.props.vault] || VAULTS.terkunci;
+
     return {
+      vaultLabel: vault.label,
+      vaultShackle: vault.shackle,
+      vaultFg: vault.fg,
+      vaultBd: vault.bd,
+      vaultHref: vault.href,
+      vaultAria: vault.aria,
       chipLabel: chip.n,
       chipCount: chip.count,
       chipMode: chip.mode,

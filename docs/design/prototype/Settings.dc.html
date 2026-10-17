@@ -304,7 +304,7 @@ class Component extends DCLogic {
     const ka = s.ka || '30';
     const fgDefault = this.props.fgOn === true || this.props.fgOn === 'true';
     const showTop = this.props.view !== 'koneksi';
-    const sw = Object.assign({ bio: true, sudo: false, shot: true, recon: true, paste: true, streak: true, noprod: true, remind: true, wstatus: true, fg: fgDefault }, s.sw || {});
+    const sw = Object.assign({ bio: true, sudo: false, shot: true, recon: true, paste: true, streak: true, noprod: true, vopen: false, remind: true, wstatus: true, fg: fgDefault }, s.sw || {});
 
     const themeDefs = {
       ops: { label: 'Ops', bg: '#0A0E10', fg: '#C9D4D9', prompt: '#5ED3A6' },
@@ -386,6 +386,7 @@ class Component extends DCLogic {
       hsDot: handle === 'dot',
       secSwitches: [
         mkSwitch('bio', 'Biometrik untuk membuka vault', 'Sidik jari atau wajah'),
+        mkSwitch('vopen', 'Jangan kunci vault', 'Host tersambung tanpa biometrik atau PIN. Siapa pun yang memegang HP yang sedang terbuka bisa menyambung ke semua server Anda.'),
         mkSwitch('sudo', 'Isi sudo otomatis', 'Hanya setelah konfirmasi pertama di tiap sesi'),
         mkSwitch('shot', 'Blokir screenshot di terminal', 'Layar terminal tidak bisa direkam atau di-screenshot')
       ],

@@ -17,6 +17,8 @@ import 'core/storage/host_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/vault/auth_gate.dart';
 import 'core/vault/credential_vault.dart';
+import 'core/vault/device_auth.dart';
+import 'core/vault/vault_lock.dart';
 import 'features/connect/keepalive_sync.dart';
 import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
@@ -70,6 +72,24 @@ final keepAlivePlatformProvider = Provider<KeepAlivePlatform>((ref) => const Noo
 
 /// Gerbang prompt biometrik bersama semua sesi (satu prompt pada satu waktu, jeda setelah dibatalkan).
 final authGateProvider = Provider<AuthGate>((ref) => AuthGate());
+
+/// Status vault terbuka (chip di daftar host dan saklar di Pengaturan). Bootstrap memasang yang nyata; bawaan
+/// (tes) memakai autentikasi yang selalu gagal sehingga vault tetap terkunci.
+final vaultLockProvider = Provider<VaultLock>((ref) {
+  final lock = VaultLock(auth: const _DeniedAuth());
+  ref.onDispose(lock.dispose);
+  return lock;
+});
+
+class _DeniedAuth implements DeviceAuth {
+  const _DeniedAuth();
+
+  @override
+  Future<AuthLevel> level() async => AuthLevel.biometric;
+
+  @override
+  Future<bool> authenticate(String reason) async => false;
+}
 
 /// Pemantau layar mati; diganti `NoopScreenMonitor` di tes (bootstrap memasang yang nyata).
 final screenMonitorProvider = Provider<ScreenMonitor>((ref) => const NoopScreenMonitor());
@@ -125,6 +145,7 @@ extension AppDependenciesOverrides on AppDependencies {
     if (saveSettings != null) settingsSaverProvider.overrideWithValue(saveSettings!),
     if (keepAlive != null) keepAlivePlatformProvider.overrideWithValue(keepAlive!),
     if (screenMonitor != null) screenMonitorProvider.overrideWithValue(screenMonitor!),
+    if (vaultLock != null) vaultLockProvider.overrideWithValue(vaultLock!),
     if (reloadSettings != null) settingsLoaderProvider.overrideWithValue(reloadSettings!),
   ];
 }

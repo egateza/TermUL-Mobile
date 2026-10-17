@@ -2118,6 +2118,114 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Sambung SFTP'**
   String get actionConnectSftp;
+
+  /// Chip di header daftar host saat vault terkunci.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terkunci'**
+  String get vaultChipLocked;
+
+  /// Chip di header daftar host saat vault terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terbuka'**
+  String get vaultChipOpen;
+
+  /// Label pembaca layar chip saat terkunci.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terkunci. Ketuk untuk membuka dengan biometrik.'**
+  String get vaultChipLockedHint;
+
+  /// Label pembaca layar chip saat terbuka sementara.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terbuka. Ketuk untuk mengunci.'**
+  String get vaultChipOpenHint;
+
+  /// Label pembaca layar chip saat selalu terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terbuka permanen. Ketuk untuk keterangan.'**
+  String get vaultChipAlwaysOpenHint;
+
+  /// Alasan yang tampil di prompt autentikasi saat membuka vault.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka vault supaya host tersambung tanpa prompt'**
+  String get vaultUnlockReason;
+
+  /// Toast setelah vault dibuka sementara.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terbuka sampai layar mati'**
+  String get vaultUnlockedToast;
+
+  /// Toast setelah vault dikunci.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terkunci'**
+  String get vaultLockedToast;
+
+  /// Toast bila autentikasi dibatalkan atau gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault tetap terkunci'**
+  String get vaultUnlockFailedToast;
+
+  /// Toast bila chip diketuk saat vault selalu terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Vault terbuka permanen. Matikan di Pengaturan, bagian Keamanan.'**
+  String get vaultAlwaysOpenToast;
+
+  /// Judul bagian pengaturan keamanan.
+  ///
+  /// In id, this message translates to:
+  /// **'Keamanan'**
+  String get settingsSecuritySection;
+
+  /// Label saklar vault selalu terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Jangan kunci vault'**
+  String get settingsVaultAlwaysOpenLabel;
+
+  /// Keterangan saklar vault selalu terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Host tersambung tanpa biometrik atau PIN. Siapa pun yang memegang HP yang sedang terbuka bisa menyambung ke semua server Anda.'**
+  String get settingsVaultAlwaysOpenDesc;
+
+  /// Judul dialog konfirmasi vault selalu terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Jangan kunci vault?'**
+  String get vaultAlwaysOpenConfirmTitle;
+
+  /// Isi dialog konfirmasi vault selalu terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Password dan kunci privat tetap terenkripsi, tetapi aplikasi akan memakainya tanpa meminta biometrik atau PIN. Bila HP hilang saat terbuka, server Anda ikut terbuka. Anda bisa mematikannya kapan saja.'**
+  String get vaultAlwaysOpenConfirmBody;
+
+  /// Tombol konfirmasi vault selalu terbuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Jangan kunci'**
+  String get vaultAlwaysOpenConfirmAction;
+
+  /// Alasan di prompt autentikasi saat menyalakan saklar.
+  ///
+  /// In id, this message translates to:
+  /// **'Konfirmasi untuk tidak mengunci vault'**
+  String get vaultAlwaysOpenReason;
+
+  /// Pesan bila autentikasi saat menyalakan saklar gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Dibatalkan. Vault tetap terkunci.'**
+  String get vaultAlwaysOpenAuthFailed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

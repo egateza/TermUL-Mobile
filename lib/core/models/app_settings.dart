@@ -117,26 +117,59 @@ class ConnectionSettings {
   int get hashCode => Object.hash(keepAlive, autoReconnect);
 }
 
+/// Pengaturan keamanan. [vaultAlwaysOpen]: rahasia dibaca untuk sambung tanpa prompt autentikasi perangkat
+/// (default mati; keputusan pemilik 2026-10-17, melonggarkan gerbang biometrik).
+class SecuritySettings {
+  const SecuritySettings({this.vaultAlwaysOpen = false});
+
+  final bool vaultAlwaysOpen;
+
+  SecuritySettings copyWith({bool? vaultAlwaysOpen}) =>
+      SecuritySettings(vaultAlwaysOpen: vaultAlwaysOpen ?? this.vaultAlwaysOpen);
+
+  factory SecuritySettings.fromJson(Map<String, Object?> json) =>
+      SecuritySettings(vaultAlwaysOpen: optBool(json, 'vaultAlwaysOpen') ?? false);
+
+  Map<String, Object?> toJson() => {'vaultAlwaysOpen': vaultAlwaysOpen};
+
+  @override
+  bool operator ==(Object other) => other is SecuritySettings && other.vaultAlwaysOpen == vaultAlwaysOpen;
+
+  @override
+  int get hashCode => vaultAlwaysOpen.hashCode;
+}
+
 /// Isi `settings.json`:
 /// `{"version": 1, "terminal": {"fontSize": 13, "lineHeight": 1.3, "handleStyle": "drop"}, "connection": {"keepAlive": false, "autoReconnect": true}}`.
 /// Properti yang tidak dikenal diabaikan; bagian yang hilang memakai bawaan.
 class AppSettings {
-  const AppSettings({this.terminal = const TerminalSettings(), this.connection = const ConnectionSettings()});
+  const AppSettings({
+    this.terminal = const TerminalSettings(),
+    this.connection = const ConnectionSettings(),
+    this.security = const SecuritySettings(),
+  });
 
   static const currentVersion = 1;
 
   final TerminalSettings terminal;
   final ConnectionSettings connection;
+  final SecuritySettings security;
 
-  AppSettings copyWith({TerminalSettings? terminal, ConnectionSettings? connection}) =>
-      AppSettings(terminal: terminal ?? this.terminal, connection: connection ?? this.connection);
+  AppSettings copyWith({TerminalSettings? terminal, ConnectionSettings? connection, SecuritySettings? security}) =>
+      AppSettings(
+        terminal: terminal ?? this.terminal,
+        connection: connection ?? this.connection,
+        security: security ?? this.security,
+      );
 
   factory AppSettings.fromJson(Map<String, Object?> json) {
     final t = optObject(json, 'terminal');
     final c = optObject(json, 'connection');
+    final s = optObject(json, 'security');
     return AppSettings(
       terminal: t == null ? const TerminalSettings() : TerminalSettings.fromJson(t),
       connection: c == null ? const ConnectionSettings() : ConnectionSettings.fromJson(c),
+      security: s == null ? const SecuritySettings() : SecuritySettings.fromJson(s),
     );
   }
 
@@ -144,5 +177,6 @@ class AppSettings {
     'version': currentVersion,
     'terminal': terminal.toJson(),
     'connection': connection.toJson(),
+    'security': security.toJson(),
   };
 }

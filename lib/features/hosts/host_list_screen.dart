@@ -20,6 +20,7 @@ import '../../shared/widgets/termul_toast.dart';
 import '../sftp/sftp_screen.dart' show openSftpOwn;
 import 'host_form_screen.dart';
 import 'host_list_model.dart';
+import 'vault_chip.dart';
 
 /// Layar utama: daftar host berkelompok dengan pencarian dan filter. [onConnect] dipanggil untuk host yang
 /// siap disambung; host bermetode agen SSH (dari desktop) lebih dulu diarahkan ke form untuk dilengkapi.
@@ -239,21 +240,28 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                   TermulSpacing.space8,
                   TermulSpacing.space1,
                 ),
-                child: Semantics(
-                  label: 'termul',
-                  excludeSemantics: true,
-                  child: Text.rich(
-                    TextSpan(
-                      style: TermulText.wordmark.copyWith(color: TermulPalette.ink),
-                      children: const [
-                        TextSpan(text: 'termul'),
-                        TextSpan(
-                          text: '_',
-                          style: TextStyle(color: TermulPalette.accent),
+                child: Row(
+                  children: [
+                    Expanded(
+                      child: Semantics(
+                        label: 'termul',
+                        excludeSemantics: true,
+                        child: Text.rich(
+                          TextSpan(
+                            style: TermulText.wordmark.copyWith(color: TermulPalette.ink),
+                            children: const [
+                              TextSpan(text: 'termul'),
+                              TextSpan(
+                                text: '_',
+                                style: TextStyle(color: TermulPalette.accent),
+                              ),
+                            ],
+                          ),
                         ),
-                      ],
+                      ),
                     ),
-                  ),
+                    const VaultChip(),
+                  ],
                 ),
               ),
               Padding(

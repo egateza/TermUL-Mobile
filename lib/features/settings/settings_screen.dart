@@ -12,7 +12,9 @@ import '../../shared/widgets/termul_card.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_segmented.dart';
+import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_stepper.dart';
+import '../../shared/widgets/termul_toast.dart';
 import '../terminal/selection_overlay.dart' show SelectionHandleShape;
 import '../terminal/terminal_palette.dart';
 
@@ -107,6 +109,52 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     }
   }
 
+  /// Menyalakan meminta konfirmasi (peringatan) lalu satu kali autentikasi perangkat; mematikan langsung berlaku.
+  Future<void> _setVaultAlwaysOpen(bool on) async {
+    if (!on) {
+      await _saveVaultAlwaysOpen(false);
+      return;
+    }
+    final l = AppLocalizations.of(context);
+    showTermulSheet<void>(
+      context,
+      title: l.vaultAlwaysOpenConfirmTitle,
+      child: Text(l.vaultAlwaysOpenConfirmBody, style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
+      cancelLabel: l.actionCancel,
+      confirmLabel: l.vaultAlwaysOpenConfirmAction,
+      confirmIsDanger: true,
+      cancelIsPrimary: true,
+      onConfirm: _confirmVaultAlwaysOpen,
+    );
+  }
+
+  Future<void> _confirmVaultAlwaysOpen() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final lock = ref.read(vaultLockProvider);
+    final reason = l.vaultAlwaysOpenReason;
+    final ok = await ref.read(authGateProvider).run(() => lock.authenticate(reason));
+    if (!ok) {
+      showTermulToastOn(messenger, l.vaultAlwaysOpenAuthFailed, icon: TermulIconName.lock);
+      return;
+    }
+    await _saveVaultAlwaysOpen(true);
+  }
+
+  Future<void> _saveVaultAlwaysOpen(bool on) async {
+    // Status vault berubah lebih dulu; bila berkas gagal disimpan, nilai tetap berlaku sampai aplikasi ditutup.
+    ref.read(vaultLockProvider).alwaysOpen = on;
+    try {
+      final current = ref.read(appSettingsProvider);
+      await ref
+          .read(appSettingsProvider.notifier)
+          .update(current.copyWith(security: current.security.copyWith(vaultAlwaysOpen: on)));
+      if (mounted && _saveFailed) setState(() => _saveFailed = false);
+    } on Object {
+      if (mounted) setState(() => _saveFailed = true);
+    }
+  }
+
   /// Langkah ukuran huruf (px) dan tinggi baris (kelipatan).
   static const _fontStep = 1.0;
   static const _lineStep = 0.1;
@@ -133,6 +181,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     final isDefault = t == const TerminalSettings();
     final keepAlive = ref.watch(appSettingsProvider).connection.keepAlive;
     final autoReconnect = ref.watch(appSettingsProvider).connection.autoReconnect;
+    final vaultAlwaysOpen = ref.watch(appSettingsProvider).security.vaultAlwaysOpen;
 
     TerminalSettings Function(TerminalSettings) fontBy(double d) =>
         (c) => c.copyWith(fontSize: (c.fontSize + d).clamp(TerminalSettings.minFontSize, TerminalSettings.maxFontSize));
@@ -419,6 +468,28 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                       ),
                     ),
                   ],
+                  const SizedBox(height: TermulSpacing.space8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      TermulSpacing.space3,
+                      0,
+                      TermulSpacing.space3,
+                      TermulSpacing.space3,
+                    ),
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        l.settingsSecuritySection.toUpperCase(),
+                        style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
+                      ),
+                    ),
+                  ),
+                  SwitchRow(
+                    label: l.settingsVaultAlwaysOpenLabel,
+                    description: l.settingsVaultAlwaysOpenDesc,
+                    value: vaultAlwaysOpen,
+                    onChanged: _setVaultAlwaysOpen,
+                  ),
                 ],
               ),
             ),

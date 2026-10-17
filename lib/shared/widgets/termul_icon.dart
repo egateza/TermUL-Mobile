@@ -24,6 +24,8 @@ enum TermulIconName {
   warning('M12 4l10 17H2zM12 10v5M12 18h.01'),
   shield('M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6zM9 12l2 2 4-4'),
   lock('M8 11V8a4 4 0 0 1 8 0v3'),
+  // Gembok terbuka: pengait terangkat di sisi kanan (vault terbuka).
+  lockOpen('M8 11V8a4 4 0 0 1 7.5-2'),
   hosts('M7 7.5h.01M7 16.5h.01'),
   terminal('M7 9l3 3-3 3M13 15h4'),
   folder('M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z'),
@@ -59,7 +61,7 @@ enum TermulIconName {
   /// Bentuk dasar yang dihasilkan dari persegi dan lingkaran, digabung dengan [_extra].
   String get pathData => switch (this) {
     search => '${_circle(11, 11, 7)} $_extra',
-    lock => '${_rect(5, 11, 14, 9, 2)} $_extra',
+    lock || lockOpen => '${_rect(5, 11, 14, 9, 2)} $_extra',
     hosts => '${_rect(3, 4, 18, 7, 2)} ${_rect(3, 13, 18, 7, 2)} $_extra',
     terminal => '${_rect(3, 4, 18, 16, 2)} $_extra',
     key => '${_circle(8, 15, 4)} $_extra',

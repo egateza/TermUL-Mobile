@@ -509,6 +509,15 @@
    "title": "1d · Menu tekan lama host: Sambung (terminal) dan Sambung SFTP",
    "is_interactive": true,
    "radius": 28
+  },
+  "MainVaultOpen.dc.html": {
+   "x": 6580,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "1e · Daftar host: vault terbuka (chip beraksen; ketuk mengunci lagi; Pengaturan punya saklar \"Jangan kunci vault\")",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -567,7 +576,8 @@
   "SftpTransferFolder.dc.html",
   "SftpLinks.dc.html",
   "SftpLeaveKeep.dc.html",
-  "HostActions.dc.html"
+  "HostActions.dc.html",
+  "MainVaultOpen.dc.html"
  ],
  "notes": {
   "judul": {

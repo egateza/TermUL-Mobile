@@ -1185,4 +1185,60 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get actionConnectSftp => 'Sambung SFTP';
+
+  @override
+  String get vaultChipLocked => 'Vault terkunci';
+
+  @override
+  String get vaultChipOpen => 'Vault terbuka';
+
+  @override
+  String get vaultChipLockedHint => 'Vault terkunci. Ketuk untuk membuka dengan biometrik.';
+
+  @override
+  String get vaultChipOpenHint => 'Vault terbuka. Ketuk untuk mengunci.';
+
+  @override
+  String get vaultChipAlwaysOpenHint => 'Vault terbuka permanen. Ketuk untuk keterangan.';
+
+  @override
+  String get vaultUnlockReason => 'Buka vault supaya host tersambung tanpa prompt';
+
+  @override
+  String get vaultUnlockedToast => 'Vault terbuka sampai layar mati';
+
+  @override
+  String get vaultLockedToast => 'Vault terkunci';
+
+  @override
+  String get vaultUnlockFailedToast => 'Vault tetap terkunci';
+
+  @override
+  String get vaultAlwaysOpenToast => 'Vault terbuka permanen. Matikan di Pengaturan, bagian Keamanan.';
+
+  @override
+  String get settingsSecuritySection => 'Keamanan';
+
+  @override
+  String get settingsVaultAlwaysOpenLabel => 'Jangan kunci vault';
+
+  @override
+  String get settingsVaultAlwaysOpenDesc =>
+      'Host tersambung tanpa biometrik atau PIN. Siapa pun yang memegang HP yang sedang terbuka bisa menyambung ke semua server Anda.';
+
+  @override
+  String get vaultAlwaysOpenConfirmTitle => 'Jangan kunci vault?';
+
+  @override
+  String get vaultAlwaysOpenConfirmBody =>
+      'Password dan kunci privat tetap terenkripsi, tetapi aplikasi akan memakainya tanpa meminta biometrik atau PIN. Bila HP hilang saat terbuka, server Anda ikut terbuka. Anda bisa mematikannya kapan saja.';
+
+  @override
+  String get vaultAlwaysOpenConfirmAction => 'Jangan kunci';
+
+  @override
+  String get vaultAlwaysOpenReason => 'Konfirmasi untuk tidak mengunci vault';
+
+  @override
+  String get vaultAlwaysOpenAuthFailed => 'Dibatalkan. Vault tetap terkunci.';
 }
