@@ -1146,7 +1146,7 @@
   "@sessionsEmptyTitle": {
     "description": "Judul keadaan kosong daftar sesi aktif."
   },
-  "sessionsEmptyBody": "Tekan kembali di terminal lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.",
+  "sessionsEmptyBody": "Tekan kembali di terminal atau SFTP lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.",
   "@sessionsEmptyBody": {
     "description": "Isi keadaan kosong daftar sesi aktif."
   },

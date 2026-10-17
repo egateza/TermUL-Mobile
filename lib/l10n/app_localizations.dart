@@ -1564,7 +1564,7 @@ abstract class AppLocalizations {
   /// Isi keadaan kosong daftar sesi aktif.
   ///
   /// In id, this message translates to:
-  /// **'Tekan kembali di terminal lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.'**
+  /// **'Tekan kembali di terminal atau SFTP lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.'**
   String get sessionsEmptyBody;
 
   /// Petunjuk di atas daftar sesi aktif.

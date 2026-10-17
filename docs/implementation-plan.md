@@ -884,7 +884,7 @@ Keputusan pemilik: tab SFTP dihapus, semua sesi aktif di Sesi, SFTP dibuka dari 
 - **Menu host:** "Sambung SFTP" (profil agen yang belum lengkap diarahkan ke dialog yang sama dengan terminal). **Sesi:** baris sesi SFTP dengan chip "SFTP", status berkata sama, tombol putuskan, "Putuskan semua" dan lencana tab menghitung keduanya. **Tab SFTP dan `SftpScreen` dihapus**; `NavBar` empat tab.
 - **Tes:** menu host, tidak ada tab SFTP, sheet keluar (Tetap terhubung, Putuskan, transfer), sesi di tab Sesi dan dibuka lagi, putuskan dari Sesi (foreground service ikut), tab-tab diperbarui.
 - **Teruji di HP [T]:** tekan lama WSL Uji menampilkan "Sambung SFTP" dengan ikon baru; Sambung SFTP tersambung dan membuka daftar folder; sheet keluar tampil; Tetap terhubung memunculkan baris "WSL Uji [SFTP] Tersambung" di Sesi dengan lencana tab 1, dan di server `sshd: termul_t@notty` dan `sftp-server` tetap hidup; Home 45 detik lalu buka lagi: koneksi masih hidup (`KeepAliveService` berjalan) dan baris sesi membuka penjelajah lagi tanpa login; Putuskan menutup koneksi di server dan mengosongkan Sesi.
-- **Belum teruji di HP:** transfer yang berjalan saat sesi di latar belakang, layar mati lama, sambung ulang otomatis sesi SFTP kept setelah soket diputus Android, banyak sesi SFTP ke host yang sama. Teks Sesi kosong masih menyebut hanya terminal ("Tekan kembali di terminal ...").
+- **Belum teruji di HP:** transfer yang berjalan saat sesi di latar belakang, layar mati lama, sambung ulang otomatis sesi SFTP kept setelah soket diputus Android, banyak sesi SFTP ke host yang sama. Teks Sesi kosong sudah diperbarui menyebut terminal dan SFTP ("Tekan kembali di terminal atau SFTP ...").
 
 ## 12. Status terkini dan cara melanjutkan
 

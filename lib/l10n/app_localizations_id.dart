@@ -837,7 +837,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get sessionsEmptyBody =>
-      'Tekan kembali di terminal lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.';
+      'Tekan kembali di terminal atau SFTP lalu pilih \"Tetap terhubung di latar belakang\" untuk membiarkan sesi berjalan dan melanjutkannya dari sini.';
 
   @override
   String get sessionsHint => 'Ketuk sesi untuk melanjutkannya.';
