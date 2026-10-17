@@ -1671,5 +1671,9 @@
   "sftpRefreshed": "Daftar file diperbarui",
   "@sftpRefreshed": {
     "description": "Toast setelah daftar folder berhasil dimuat ulang (tombol atau tarik ke bawah)."
+  },
+  "sftpLinkTag": "Tautan",
+  "@sftpLinkTag": {
+    "description": "Penanda di baris berkas atau folder yang berupa tautan simbolik (symlink)."
   }
 }

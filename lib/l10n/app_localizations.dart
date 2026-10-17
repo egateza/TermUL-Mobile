@@ -2070,6 +2070,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Daftar file diperbarui'**
   String get sftpRefreshed;
+
+  /// Penanda di baris berkas atau folder yang berupa tautan simbolik (symlink).
+  ///
+  /// In id, this message translates to:
+  /// **'Tautan'**
+  String get sftpLinkTag;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -15,6 +15,7 @@ class SftpEntry {
     this.size,
     this.modified,
     this.permissions,
+    this.isLink = false,
   });
 
   final String name;
@@ -25,6 +26,9 @@ class SftpEntry {
 
   /// Mode Unix 9 bit (mis. `0o644`), bila dilaporkan.
   final int? permissions;
+
+  /// Entri ini tautan simbolik (symlink); [kind] sudah menunjuk ke sumbernya bila bisa diperiksa.
+  final bool isLink;
 
   bool get isDirectory => kind == SftpEntryKind.directory;
 }
@@ -159,7 +163,8 @@ class SftpService implements SftpBrowsing, SftpFileOps {
       final path = joinRemote(dir, n.filename);
       var kind = _kindOf(n.attr);
       var attr = n.attr;
-      if (kind == SftpEntryKind.symlink) {
+      final isLink = kind == SftpEntryKind.symlink;
+      if (isLink) {
         try {
           attr = await _client.stat(path);
           kind = attr.isDirectory ? SftpEntryKind.directory : SftpEntryKind.symlink;
@@ -177,6 +182,7 @@ class SftpService implements SftpBrowsing, SftpFileOps {
               ? null
               : DateTime.fromMillisecondsSinceEpoch(attr.modifyTime! * 1000, isUtc: true).toLocal(),
           permissions: attr.mode == null ? null : attr.mode!.value & 0x1FF,
+          isLink: isLink,
         ),
       );
     }

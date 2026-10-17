@@ -340,6 +340,18 @@ void main() {
     expect(find.text('Daftar file diperbarui'), findsNothing, reason: 'gagal: galat tampil di banner');
   });
 
+  testWidgets('tautan simbolik: lencana tautan dan kata "Tautan" hanya di entri tautan', (tester) async {
+    await pumpBrowser(
+      tester,
+      extra: [file('/home/u', 'pintasan.txt', size: 2048, link: true), dir('/home/u', 'jalan', link: true)],
+    );
+    expect(find.byKey(const ValueKey('lencana-tautan')), findsNWidgets(2));
+    expect(find.text('2,0 KB · Tautan'), findsOneWidget);
+    expect(find.text('Folder · Tautan'), findsOneWidget);
+    expect(find.textContaining('Tautan'), findsNWidgets(2));
+    expect(find.text('Folder'), findsOneWidget, reason: 'folder biasa tanpa penanda');
+  });
+
   testWidgets('landscape pendek: daftar tidak meluap', (tester) async {
     await pumpBrowser(tester, size: const Size(844, 390));
     expect(tester.takeException(), isNull);

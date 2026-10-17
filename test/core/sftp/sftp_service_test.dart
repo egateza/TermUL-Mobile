@@ -166,6 +166,16 @@ void main() {
           }
         }
 
+        final listed = {for (final e in await sftp.list(root)) e.name: e};
+        expect(listed['lnk.txt']!.isLink, isTrue);
+        expect(
+          listed['up']!.isLink && listed['up']!.isDirectory,
+          isTrue,
+          reason: 'tautan ke folder tampil sebagai folder',
+        );
+        expect(listed['a.txt']!.isLink, isFalse);
+        expect(listed['sub']!.isLink, isFalse);
+
         // Berkas dari tautan bisa diunduh dari sumbernya.
         final out = File('${tmp.path}${Platform.pathSeparator}lnk.bin');
         final sink = out.openWrite();

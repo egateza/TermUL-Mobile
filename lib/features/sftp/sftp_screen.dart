@@ -848,12 +848,16 @@ class _Listing extends StatelessWidget {
         _EntryRow(
           key: ValueKey(e.path),
           name: e.name,
-          meta: e.isDirectory
-              ? l.sftpFolderMeta
-              : [
-                  if (e.size != null) formatSize(e.size!),
-                  if (e.modified != null) formatModified(l, e.modified!, now),
-                ].join(' · '),
+          meta: [
+            if (e.isDirectory)
+              l.sftpFolderMeta
+            else ...[
+              if (e.size != null) formatSize(e.size!),
+              if (e.modified != null) formatModified(l, e.modified!, now),
+            ],
+            if (e.isLink) l.sftpLinkTag,
+          ].join(' · '),
+          isLink: e.isLink,
           icon: e.isDirectory ? TermulIconName.folder : TermulIconName.file,
           iconColor: e.isDirectory ? TermulPalette.info : TermulPalette.inkSoft,
           selected: browser.isSelected(e),
@@ -994,6 +998,7 @@ class _EntryRow extends StatelessWidget {
     required this.onPressed,
     this.onLongPress,
     this.selected = false,
+    this.isLink = false,
   });
 
   final String name;
@@ -1003,6 +1008,9 @@ class _EntryRow extends StatelessWidget {
   final bool selected;
   final VoidCallback onPressed;
   final VoidCallback? onLongPress;
+
+  /// Tautan simbolik: lencana tautan kecil di pojok kanan bawah ikon.
+  final bool isLink;
 
   @override
   Widget build(BuildContext context) {
@@ -1025,7 +1033,33 @@ class _EntryRow extends StatelessWidget {
           ),
           child: Row(
             children: [
-              TermulIcon(icon, size: 22, color: iconColor),
+              SizedBox(
+                width: 22,
+                height: 22,
+                child: Stack(
+                  clipBehavior: Clip.none,
+                  children: [
+                    TermulIcon(icon, size: 22, color: iconColor),
+                    if (isLink)
+                      Positioned(
+                        key: const ValueKey('lencana-tautan'),
+                        right: -6,
+                        bottom: -6,
+                        child: Container(
+                          width: 14,
+                          height: 14,
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(
+                            color: selected ? TermulPalette.surfaceRaised : TermulPalette.surface,
+                            shape: BoxShape.circle,
+                            border: Border.all(color: TermulPalette.lineStrong),
+                          ),
+                          child: const TermulIcon(TermulIconName.link, size: 9, color: TermulPalette.ink),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
               const SizedBox(width: TermulSpacing.space6),
               Expanded(
                 child: Column(

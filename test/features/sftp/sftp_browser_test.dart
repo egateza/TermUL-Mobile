@@ -9,10 +9,10 @@ import 'package:termul_mobile/features/sftp/sftp_format.dart';
 import 'package:termul_mobile/features/sftp/sftp_link.dart';
 import 'package:termul_mobile/l10n/app_localizations_id.dart';
 
-SftpEntry dir(String parent, String name) =>
-    SftpEntry(name: name, path: joinRemote(parent, name), kind: SftpEntryKind.directory);
-SftpEntry file(String parent, String name, {int size = 10}) =>
-    SftpEntry(name: name, path: joinRemote(parent, name), kind: SftpEntryKind.file, size: size);
+SftpEntry dir(String parent, String name, {bool link = false}) =>
+    SftpEntry(name: name, path: joinRemote(parent, name), kind: SftpEntryKind.directory, isLink: link);
+SftpEntry file(String parent, String name, {int size = 10, bool link = false}) =>
+    SftpEntry(name: name, path: joinRemote(parent, name), kind: SftpEntryKind.file, size: size, isLink: link);
 
 /// Pohon folder palsu; `gate` menahan muatan sampai dilepas (untuk menguji balapan).
 class FakeBrowsing implements SftpBrowsing {

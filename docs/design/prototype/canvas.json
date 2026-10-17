@@ -482,6 +482,15 @@
    "title": "4l · SFTP: unduh folder berjalan (satu transfer)",
    "is_interactive": true,
    "radius": 28
+  },
+  "SftpLinks.dc.html": {
+   "x": 5170,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4m · SFTP: tautan simbolik (lencana tautan dan kata \"Tautan\")",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -537,7 +546,8 @@
   "SftpOverwrite.dc.html",
   "SftpConflictDownload.dc.html",
   "SftpSelect.dc.html",
-  "SftpTransferFolder.dc.html"
+  "SftpTransferFolder.dc.html",
+  "SftpLinks.dc.html"
  ],
  "notes": {
   "judul": {

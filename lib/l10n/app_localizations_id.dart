@@ -1158,4 +1158,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get sftpRefreshed => 'Daftar file diperbarui';
+
+  @override
+  String get sftpLinkTag => 'Tautan';
 }
