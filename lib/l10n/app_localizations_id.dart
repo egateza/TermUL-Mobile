@@ -955,6 +955,53 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
+  String get streakSplashHeader => 'Streak harian';
+
+  @override
+  String get streakSplashReplay => 'Putar ulang';
+
+  @override
+  String get streakSplashUnit => 'hari streak';
+
+  @override
+  String streakSplashLit(String tier) {
+    return 'Streak menyala · $tier';
+  }
+
+  @override
+  String streakSplashLevelUp(String tier) {
+    return 'Naik level · $tier';
+  }
+
+  @override
+  String streakSplashCracks(int cracks, int need) {
+    return 'Retak $cracks/$need';
+  }
+
+  @override
+  String get streakSplashRelit => 'Api menyala lagi. Streak lanjut, hari ini ikut dihitung.';
+
+  @override
+  String streakSplashExpired(int missed, int lost) {
+    return 'Kamu absen $missed hari. Streak $lost hari hangus.';
+  }
+
+  @override
+  String get streakSplashRestart => 'Mulai lagi hari ini. Buka TermUL 3 hari berturut-turut untuk menyalakan streak.';
+
+  @override
+  String get streakSplashStageGray => 'Ketuk api tiga kali cepat untuk menyalakan';
+
+  @override
+  String get streakSplashStageFrozen => 'Ketuk api untuk memecahkan es';
+
+  @override
+  String get streakSplashContinue => 'Lanjut';
+
+  @override
+  String get streakSplashLater => 'Nanti saja';
+
+  @override
   String get settingsStreakSection => 'Streak';
 
   @override

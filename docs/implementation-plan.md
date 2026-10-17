@@ -1096,3 +1096,11 @@ Permintaan pemilik: lengkapi fitur streak sesuai design system, irisan 1 sampai 
 - **Belum teruji di HP:** seluruh irisan. HP tidak terdeteksi adb saat build profile selesai (2026-10-18). Padam, beku, dan hangus di HP butuh tanggal sungguhan berganti (atau `streak.json` yang diatur lewat build debug); sejauh ini hanya teruji dengan jam palsu di tes.
 - **Artifact:** prototipe versi 64 dan design system versi 64 (`docs/design/SUMBER.md`).
 
+### Irisan 2: splash saat aplikasi dibuka
+
+- **Kode:** `lib/features/streak/streak_splash.dart` (`showStreakSplash`, rute penuh layar dengan transisi pudar 200 ms). `MainShell` memutarnya untuk setiap peristiwa selain "hari yang sama", bila "Tampilkan streak api" menyala dan kerangka utama adalah rute teratas (terminal, form, dan sheet tidak disela). Ketukan di splash memakai `StreakController.tap` yang sama dengan tab Streak.
+- **Ditemukan dan diperbaiki saat render:** `Pressable` nonaktif meredupkan isinya (40%), sehingga api yang tidak menunggu ketukan tampak redup di splash dan di hero tab Streak; kini hanya api yang menunggu ketukan yang dibungkus `Pressable`. Nilai "Level api" di statistik dibiarkan membungkus seperti prototipe (sebelumnya diperkecil).
+- **Tes:** `streak_screen_test.dart` grup "splash saat aplikasi dibuka" (hari pertama bara, hari ke-3 "Streak menyala", naik level, bertambah tanpa lencana, padam diketuk di splash, beku dengan "Retak c/M" dan "Nanti saja", hangus, saklar tampil mati). Harness tes memakai streak yang sudah dihitung hari ini supaya splash tidak muncul di tes lain. Pratinjau render (font asli, golden sementara, tidak di-commit) dicocokkan dengan prototipe 8 dan 9.
+- **Belum teruji di HP:** splash, gerak (goyangan, percikan, guncangan) dan kelancarannya di build profile, dan reduce motion sistem.
+- **Artifact:** design system versi 65 (`docs/design/SUMBER.md`); prototipe tidak berubah.
+

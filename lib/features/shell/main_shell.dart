@@ -3,6 +3,7 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app_providers.dart';
 import '../../core/models/host_profile.dart';
 import '../../core/streak/streak.dart';
 import '../../core/theme/termul_theme.dart';
@@ -17,6 +18,7 @@ import '../settings/settings_screen.dart';
 import '../snippets/snippets_screen.dart';
 import '../streak/streak_controller.dart';
 import '../streak/streak_screen.dart';
+import '../streak/streak_splash.dart';
 import 'main_tab.dart';
 
 /// Kerangka layar utama: lima tab di `NavBar` (Host, Sesi, Snippet, Streak, Pengaturan). Tab SFTP dihapus (keputusan
@@ -76,8 +78,14 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
     if (event != null) _onStreakEvent(event);
   }
 
-  /// Peristiwa streak saat hari dihitung (splash dan pengingat menyusul di irisan berikutnya).
-  void _onStreakEvent(StreakEvent event) {}
+  /// Peristiwa streak saat hari dihitung: splash bila streak ditampilkan dan tidak ada layar lain di atas kerangka
+  /// (terminal, form, sheet); chip dan tab Streak tetap memperlihatkan keadaannya.
+  void _onStreakEvent(StreakEvent event) {
+    if (event is StreakSameDay || !mounted) return;
+    if (!ref.read(appSettingsProvider).streak.show) return;
+    if (ModalRoute.of(context)?.isCurrent == false) return;
+    showStreakSplash(context, event);
+  }
 
   void _select(String id) => ref.read(mainTabProvider.notifier).select(id);
 

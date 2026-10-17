@@ -1783,6 +1783,84 @@ abstract class AppLocalizations {
   /// **'Berkas streak tidak bisa dibaca dan disimpan sebagai {name}. Streak dimulai lagi dari awal; berkas lama tidak dihapus.'**
   String streakCorruptBody(String name);
 
+  /// Judul kecil di atas splash streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak harian'**
+  String get streakSplashHeader;
+
+  /// Tombol memutar ulang animasi splash.
+  ///
+  /// In id, this message translates to:
+  /// **'Putar ulang'**
+  String get streakSplashReplay;
+
+  /// Satuan angka di splash setelah streak menyala.
+  ///
+  /// In id, this message translates to:
+  /// **'hari streak'**
+  String get streakSplashUnit;
+
+  /// Lencana saat streak mencapai hari ke-3.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak menyala · {tier}'**
+  String streakSplashLit(String tier);
+
+  /// Lencana saat level api naik.
+  ///
+  /// In id, this message translates to:
+  /// **'Naik level · {tier}'**
+  String streakSplashLevelUp(String tier);
+
+  /// Progres retakan es di splash (mono).
+  ///
+  /// In id, this message translates to:
+  /// **'Retak {cracks}/{need}'**
+  String streakSplashCracks(int cracks, int need);
+
+  /// Pesan setelah api dinyalakan di splash.
+  ///
+  /// In id, this message translates to:
+  /// **'Api menyala lagi. Streak lanjut, hari ini ikut dihitung.'**
+  String get streakSplashRelit;
+
+  /// Pesan hangus di splash.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu absen {missed} hari. Streak {lost} hari hangus.'**
+  String streakSplashExpired(int missed, int lost);
+
+  /// Pesan setelah hangus di splash.
+  ///
+  /// In id, this message translates to:
+  /// **'Mulai lagi hari ini. Buka TermUL 3 hari berturut-turut untuk menyalakan streak.'**
+  String get streakSplashRestart;
+
+  /// Nama tombol api padam di splash.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk api tiga kali cepat untuk menyalakan'**
+  String get streakSplashStageGray;
+
+  /// Nama tombol api beku di splash.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk api untuk memecahkan es'**
+  String get streakSplashStageFrozen;
+
+  /// Tombol menutup splash.
+  ///
+  /// In id, this message translates to:
+  /// **'Lanjut'**
+  String get streakSplashContinue;
+
+  /// Tombol menutup splash padam atau beku tanpa menyalakan api.
+  ///
+  /// In id, this message translates to:
+  /// **'Nanti saja'**
+  String get streakSplashLater;
+
   /// Judul bagian Streak di Pengaturan.
   ///
   /// In id, this message translates to:

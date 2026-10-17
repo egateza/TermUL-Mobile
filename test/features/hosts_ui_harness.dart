@@ -16,6 +16,8 @@ import 'package:termul_mobile/core/models/host_profile.dart';
 import 'package:termul_mobile/core/storage/json/json_host_repository.dart';
 import 'package:termul_mobile/core/storage/json/json_known_hosts_repository.dart';
 import 'package:termul_mobile/core/storage/streak_repository.dart';
+import 'package:termul_mobile/core/streak/streak.dart';
+import 'package:termul_mobile/core/streak/streak_record.dart';
 import 'package:termul_mobile/core/storage/ui_state_repository.dart';
 import 'package:termul_mobile/core/vault/device_auth.dart';
 import 'package:termul_mobile/core/vault/keystore_credential_vault.dart';
@@ -66,7 +68,8 @@ class Harness {
     MemoryUiStateRepository? uiState,
     MemoryStreakRepository? streak,
   }) : uiState = uiState ?? MemoryUiStateRepository(),
-       streak = streak ?? MemoryStreakRepository() {
+       // Bawaan: hari ini sudah dihitung, jadi splash streak tidak muncul di tes yang tidak membahasnya.
+       streak = streak ?? MemoryStreakRepository(StreakRecord(streak: Streak(5, DateTime.now()))) {
     auth = FakeDeviceAuth(currentLevel: level);
     hosts = JsonHostRepository(File('tidak-dipakai-profiles.json'), writer: noWrite);
     known = JsonKnownHostsRepository(File('tidak-dipakai-known.json'), writer: noWrite);

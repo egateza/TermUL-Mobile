@@ -305,11 +305,9 @@ class _Hero extends StatelessWidget {
                       child: Transform.rotate(angle: shakeLeft ? rot : -rot, child: child),
                     );
                   },
-                  child: Pressable(
-                    key: const ValueKey('streak-hero-flame'),
-                    onPressed: waiting ? onTap : null,
-                    semanticLabel: stageLabel,
-                    builder: (context, pressed) => SizedBox(
+                  // Hanya api yang menunggu ketukan yang menjadi tombol; Pressable nonaktif akan meredupkan api.
+                  child: () {
+                    final stage = SizedBox(
                       width: 150,
                       height: 140,
                       child: Stack(
@@ -328,8 +326,21 @@ class _Hero extends StatelessWidget {
                           ),
                         ],
                       ),
-                    ),
-                  ),
+                    );
+                    return waiting
+                        ? Pressable(
+                            key: const ValueKey('streak-hero-flame'),
+                            onPressed: onTap,
+                            semanticLabel: stageLabel,
+                            builder: (context, pressed) => stage,
+                          )
+                        : Semantics(
+                            key: const ValueKey('streak-hero-flame'),
+                            label: stageLabel,
+                            image: true,
+                            child: stage,
+                          );
+                  }(),
                 ),
                 AnimatedBuilder(
                   animation: shards,

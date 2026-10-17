@@ -272,11 +272,7 @@ class StreakStatsRow extends StatelessWidget {
             spacing: TermulSpacing.space1,
             children: [
               Text(label, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
-              FittedBox(
-                fit: BoxFit.scaleDown,
-                alignment: Alignment.centerLeft,
-                child: Text(value, style: streakMono(18).copyWith(color: TermulPalette.ink)),
-              ),
+              Text(value, style: streakMono(18).copyWith(color: TermulPalette.ink)),
             ],
           ),
         ),

@@ -1378,6 +1378,84 @@
       }
     }
   },
+  "streakSplashHeader": "Streak harian",
+  "@streakSplashHeader": {
+    "description": "Judul kecil di atas splash streak."
+  },
+  "streakSplashReplay": "Putar ulang",
+  "@streakSplashReplay": {
+    "description": "Tombol memutar ulang animasi splash."
+  },
+  "streakSplashUnit": "hari streak",
+  "@streakSplashUnit": {
+    "description": "Satuan angka di splash setelah streak menyala."
+  },
+  "streakSplashLit": "Streak menyala · {tier}",
+  "@streakSplashLit": {
+    "description": "Lencana saat streak mencapai hari ke-3.",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "streakSplashLevelUp": "Naik level · {tier}",
+  "@streakSplashLevelUp": {
+    "description": "Lencana saat level api naik.",
+    "placeholders": {
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "streakSplashCracks": "Retak {cracks}/{need}",
+  "@streakSplashCracks": {
+    "description": "Progres retakan es di splash (mono).",
+    "placeholders": {
+      "cracks": {
+        "type": "int"
+      },
+      "need": {
+        "type": "int"
+      }
+    }
+  },
+  "streakSplashRelit": "Api menyala lagi. Streak lanjut, hari ini ikut dihitung.",
+  "@streakSplashRelit": {
+    "description": "Pesan setelah api dinyalakan di splash."
+  },
+  "streakSplashExpired": "Kamu absen {missed} hari. Streak {lost} hari hangus.",
+  "@streakSplashExpired": {
+    "description": "Pesan hangus di splash.",
+    "placeholders": {
+      "missed": {
+        "type": "int"
+      },
+      "lost": {
+        "type": "int"
+      }
+    }
+  },
+  "streakSplashRestart": "Mulai lagi hari ini. Buka TermUL 3 hari berturut-turut untuk menyalakan streak.",
+  "@streakSplashRestart": {
+    "description": "Pesan setelah hangus di splash."
+  },
+  "streakSplashStageGray": "Ketuk api tiga kali cepat untuk menyalakan",
+  "@streakSplashStageGray": {
+    "description": "Nama tombol api padam di splash."
+  },
+  "streakSplashStageFrozen": "Ketuk api untuk memecahkan es",
+  "@streakSplashStageFrozen": {
+    "description": "Nama tombol api beku di splash."
+  },
+  "streakSplashContinue": "Lanjut",
+  "@streakSplashContinue": {
+    "description": "Tombol menutup splash."
+  },
+  "streakSplashLater": "Nanti saja",
+  "@streakSplashLater": {
+    "description": "Tombol menutup splash padam atau beku tanpa menyalakan api."
+  },
   "settingsStreakSection": "Streak",
   "@settingsStreakSection": {
     "description": "Judul bagian Streak di Pengaturan."
