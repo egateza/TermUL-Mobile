@@ -14,17 +14,45 @@ body{margin:0}
 a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible,input:focus-visible,textarea:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
 input::placeholder,textarea::placeholder{color:#7F8D94}
+.sheet>*{flex:none}
 </style>
 </helmet>
 <div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
 
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 12px 20px">
 <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.01em">Snippet</h1>
+<div style="display: flex; align-items: center; gap: 6px">
+<sc-if value="{{canSort}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{toggleSort}}" aria-label="{{sortLabel}}" aria-pressed="{{sorting}}" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: {{sortBg}}; color: {{sortFg}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<sc-if value="{{sorting}}" hint-placeholder-val="{{ false }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
+</sc-if>
+<sc-if value="{{notSorting}}" hint-placeholder-val="{{ true }}">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M4 17l3 3 3-3M17 20V4M14 7l3-3 3 3"/></svg>
+</sc-if>
+</button>
+</sc-if>
+<button type="button" onClick="{{openCats}}" aria-label="Kelola kategori" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: transparent; color: #E8EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4"/></svg>
+</button>
 <button type="button" onClick="{{newSnip}}" aria-label="Snippet baru" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; display: flex; align-items: center; justify-content: center; cursor: pointer">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
 </button>
 </div>
+</div>
 
+<sc-if value="{{noSnippets}}" hint-placeholder-val="{{ false }}">
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 32px 20px 8px 20px; display: flex; flex-direction: column; gap: 12px; text-align: center">
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">Belum ada snippet</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #9AA8AF">Simpan perintah yang sering dipakai di sini, lengkap dengan variabel yang diisi saat dipakai.</p>
+<button type="button" onClick="{{newSnip}}" style="margin-top: 12px; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+Snippet baru
+</button>
+</div>
+</sc-if>
+
+<sc-if value="{{showList}}" hint-placeholder-val="{{ true }}">
 <div style="padding: 0 20px 12px 20px">
 <label for="cari-snip" style="position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0)">Cari snippet</label>
 <div style="display: flex; align-items: center; gap: 10px; height: 48px; padding: 0 14px; border-radius: 12px; border: 1px solid #2A343A; background: #161C20; color: #9AA8AF">
@@ -50,13 +78,15 @@ input::placeholder,textarea::placeholder{color:#7F8D94}
 </span>
 <span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{cd.first}}</span>
 <span style="display: flex; flex-wrap: wrap; gap: 6px">
+<sc-if value="{{cd.hasTag}}" hint-placeholder-val="{{ true }}">
 <span style="padding: 2px 8px; border-radius: 10px; border: 1px solid #2A343A; font-size: 11.5px; color: #C5D0D5">{{cd.tag}}</span>
+</sc-if>
 <span style="padding: 2px 8px; border-radius: 10px; border: 1px solid #2A343A; font-size: 11.5px; color: #C5D0D5">{{cd.scope}}</span>
 <sc-if value="{{cd.hasVars}}" hint-placeholder-val="{{ false }}">
 <span style="padding: 2px 8px; border-radius: 10px; border: 1px solid #5A4720; font-size: 11.5px; color: #F0B34A">{{cd.varText}}</span>
 </sc-if>
-<sc-if value="{{cd.risky}}" hint-placeholder-val="{{ false }}">
-<span style="padding: 2px 8px; border-radius: 10px; border: 1px solid #6B2C25; font-size: 11.5px; color: #FF7F70">berisiko</span>
+<sc-if value="{{cd.danger}}" hint-placeholder-val="{{ false }}">
+<span style="padding: 2px 8px; border-radius: 10px; border: 1px solid #6B2C25; font-size: 11.5px; color: #FF7F70">berbahaya</span>
 </sc-if>
 </span>
 </button>
@@ -65,6 +95,30 @@ input::placeholder,textarea::placeholder{color:#7F8D94}
 <div style="padding: 40px 16px; text-align: center; color: #9AA8AF; font-size: 14px; line-height: 1.5">Tidak ada snippet yang cocok.<br>Ubah kata kunci atau filter.</div>
 </sc-if>
 </div>
+</sc-if>
+
+<sc-if value="{{sorting}}" hint-placeholder-val="{{ false }}">
+<p style="margin: 0; padding: 0 20px 12px 20px; font-size: 13px; line-height: 1.45; color: #9AA8AF">Tahan dan geser ikon titik di kiri untuk mengubah urutan snippet. Semua snippet tampil selama mengurutkan.</p>
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 0 12px 8px 12px; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{sortRows}}" as="sr" hint-placeholder-count="4">
+<div style="flex: none; display: flex; align-items: center; gap: 4px; min-height: 64px; box-sizing: border-box; padding: 0 8px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<span role="img" aria-label="{{sr.dragLabel}}" style="flex: none; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF; cursor: grab">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/></svg>
+</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px; padding: 8px 0">
+<span style="font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{sr.title}}</span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{sr.first}}</span>
+</span>
+<sc-if value="{{sr.fav}}" hint-placeholder-val="{{ false }}">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="#F0B34A" stroke="#F0B34A" stroke-width="1.5" stroke-linejoin="round" role="img" aria-label="Favorit" style="flex: none"><path d="M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z"/></svg>
+</sc-if>
+<button type="button" onClick="{{sr.askDel}}" aria-label="{{sr.delLabel}}" style="flex: none; width: 44px; height: 44px; border: none; background: transparent; color: #E8EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+</button>
+</div>
+</sc-for>
+</div>
+</sc-if>
 
 <sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
 <div style="position: absolute; left: 12px; right: 12px; bottom: 84px; display: flex; justify-content: center; pointer-events: none">
@@ -75,7 +129,7 @@ input::placeholder,textarea::placeholder{color:#7F8D94}
 </div>
 </sc-if>
 
-<nav aria-label="Navigasi utama" style="flex: none; display: flex; border-top: 1px solid #2A343A; background: #0F1316; padding: 6px 8px 10px 8px">
+<nav aria-label="Navigasi utama" style="flex: none; margin-top: auto; display: flex; border-top: 1px solid #2A343A; background: #0F1316; padding: 6px 12px 10px 12px">
 <a href="Main.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="7" rx="2"/><rect x="3" y="13" width="18" height="7" rx="2"/><path d="M7 7.5h.01M7 16.5h.01"/></svg>
 Host
@@ -86,10 +140,6 @@ Host
 <span style="position: absolute; top: -6px; right: -12px; min-width: 18px; height: 18px; box-sizing: border-box; padding: 0 5px; border-radius: 9px; background: #F0B34A; color: #1B1406; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; font-weight: 500; display: flex; align-items: center; justify-content: center">2</span>
 </span>
 Sesi
-</a>
-<a href="Sftp.dc.html" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #9AA8AF; font-size: 12px; font-weight: 500">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
-SFTP
 </a>
 <a href="Snippets.dc.html" aria-current="page" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; color: #F0B34A; font-size: 12px; font-weight: 500">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3"/></svg>
@@ -104,14 +154,17 @@ Pengaturan
 <sc-if value="{{detail}}" hint-placeholder-val="{{ false }}">
 <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
 <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(5, 8, 10, 0.62)"></div>
-<div style="position: absolute; left: 0; right: 0; bottom: 0; max-height: 84%; overflow-y: auto; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; max-height: 84%; overflow-y: auto; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
 <div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto" aria-hidden="true"></div>
 
-<div style="display: flex; align-items: center; gap: 8px">
+<div style="display: flex; align-items: center; gap: 0">
 <div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
 <h2 style="margin: 0; font-size: 20px; font-weight: 600">{{dTitle}}</h2>
 <span style="font-size: 13px; color: #9AA8AF">{{dMeta}}</span>
 </div>
+<button type="button" onClick="{{askDelete}}" aria-label="Hapus" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #E8EEF0; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+</button>
 <button type="button" onClick="{{closeDetail}}" aria-label="Tutup" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #E8EEF0; cursor: pointer">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
 </button>
@@ -129,27 +182,30 @@ Pengaturan
 <sc-if value="{{dRisky}}" hint-placeholder-val="{{ false }}">
 <div style="display: flex; align-items: center; gap: 10px; padding: 8px 10px; border-radius: 10px; border: 1px solid #6B2C25; background: #1D1210; color: #FFB3A9; font-size: 13px; line-height: 1.4">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M12 4l10 17H2z"/><path d="M12 10v5M12 18h.01"/></svg>
-<span>Perintah berisiko. Tidak bisa dijalankan langsung: tempel dulu, periksa, lalu tekan Enter sendiri.</span>
+<span>Perintah berbahaya. Periksa dulu sebelum dipakai: tempel, periksa, lalu tekan Enter sendiri.</span>
 </div>
 </sc-if>
 
 <sc-if value="{{dNotReady}}" hint-placeholder-val="{{ false }}">
-<span style="font-size: 13px; color: #9AA8AF">Isi semua variabel untuk menempel.</span>
+<span style="font-size: 13px; color: #9AA8AF">Isi semua variabel untuk menempel atau menyalin.</span>
 </sc-if>
 
-<div style="display: flex; align-items: center; gap: 8px">
+<div style="display: flex; flex-direction: column; gap: 8px">
 <span style="font-size: 13px; color: #9AA8AF">Kirim ke</span>
+<div style="display: flex; flex-wrap: wrap; gap: 8px">
 <sc-for list="{{targets}}" as="t" hint-placeholder-count="2">
 <button type="button" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid {{t.bd}}; background: {{t.bg}}; color: {{t.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; cursor: pointer">{{t.label}}</button>
 </sc-for>
+</div>
 </div>
 
 <div style="display: flex; flex-direction: column; gap: 8px">
 <button type="button" onClick="{{pasteIt}}" disabled="{{dNotReady}}" style="min-height: 52px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; opacity: {{pasteOpacity}}">Tempel ke {{targetLabel}}</button>
 <div style="display: flex; gap: 8px">
 <button type="button" onClick="{{runIt}}" disabled="{{cantRun}}" style="flex: 2; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer; opacity: {{runOpacity}}">Tempel &amp; jalankan</button>
-<button type="button" onClick="{{editIt}}" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Edit</button>
+<button type="button" onClick="{{copyIt}}" disabled="{{dNotReady}}" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer; opacity: {{pasteOpacity}}">Salin</button>
 </div>
+<button type="button" onClick="{{editIt}}" style="min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Edit</button>
 </div>
 
 </div>
@@ -159,7 +215,7 @@ Pengaturan
 <sc-if value="{{editing}}" hint-placeholder-val="{{ false }}">
 <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
 <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(5, 8, 10, 0.62)"></div>
-<div style="position: absolute; left: 0; right: 0; bottom: 0; max-height: 92%; overflow-y: auto; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; max-height: 92%; overflow-y: auto; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
 <div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto" aria-hidden="true"></div>
 <h2 style="margin: 0; font-size: 20px; font-weight: 600">{{eHeading}}</h2>
 
@@ -174,9 +230,14 @@ Pengaturan
 </label>
 
 <div style="display: flex; flex-direction: column; gap: 8px">
+<div style="display: flex; align-items: center; justify-content: space-between">
 <span style="font-size: 13px; color: #9AA8AF">Kategori</span>
+<button type="button" onClick="{{openCats}}" aria-label="Kelola kategori" style="width: 44px; height: 44px; margin: -8px 0; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #E8EEF0; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4"/></svg>
+</button>
+</div>
 <div style="display: flex; flex-wrap: wrap; gap: 8px">
-<sc-for list="{{tagOpts}}" as="o" hint-placeholder-count="4">
+<sc-for list="{{tagOpts}}" as="o" hint-placeholder-count="5">
 <button type="button" onClick="{{o.pick}}" aria-pressed="{{o.on}}" style="min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid {{o.bd}}; background: {{o.bg}}; color: {{o.fg}}; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 14px; font-weight: 500; cursor: pointer">{{o.label}}</button>
 </sc-for>
 </div>
@@ -191,12 +252,29 @@ Pengaturan
 </div>
 </div>
 
-<button type="button" onClick="{{toggleFav}}" aria-pressed="{{eFav}}" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 4px; border: none; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
+<button type="button" onClick="{{toggleFav}}" aria-pressed="{{eFav}}" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 12px; box-sizing: border-box; border-radius: 12px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
 <span style="flex: 1; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">Tandai favorit</span>
 <span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{favBg}}; display: flex; justify-content: {{favAlign}}">
 <span style="width: 22px; height: 22px; border-radius: 50%; background: {{favKnob}}"></span>
 </span>
 </button>
+
+<button type="button" onClick="{{toggleDanger}}" aria-pressed="{{eDanger}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 12px; box-sizing: border-box; border-radius: 12px; border: 1px solid #6B2C25; background: #1D1210; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 4px">
+<span style="display: flex; flex-wrap: wrap; align-items: center; gap: 8px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">Tandai sebagai perintah berbahaya</span>
+<span style="padding: 1px 8px; border-radius: 10px; border: 1px solid #6B2C25; font-size: 11.5px; color: #FF7F70">berbahaya</span>
+</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 13px; line-height: 1.4; color: #FFB3A9">{{dangerDesc}}</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{dangerBg}}; display: flex; justify-content: {{dangerAlign}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{dangerKnob}}"></span>
+</span>
+</button>
+
+<sc-if value="{{canDeleteEdit}}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{deleteFromEdit}}" style="min-height: 48px; border-radius: 12px; border: 1px solid #6B2C25; background: transparent; color: #FF7F70; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Hapus</button>
+</sc-if>
 
 <div style="display: flex; gap: 8px">
 <button type="button" onClick="{{cancelEdit}}" style="flex: 1; min-height: 52px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Batal</button>
@@ -207,16 +285,131 @@ Pengaturan
 </div>
 </sc-if>
 
+<sc-if value="{{warn}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(5, 8, 10, 0.72)"></div>
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto" aria-hidden="true"></div>
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">Perintah berbahaya</h2>
+<div style="display: flex; align-items: center; gap: 10px; padding: 10px 12px; border-radius: 10px; border: 1px solid #6B2C25; background: #1D1210; color: #FFB3A9; font-size: 13px; line-height: 1.45">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M12 4l10 17H2z"/><path d="M12 10v5M12 18h.01"/></svg>
+<span>Perintah ini bisa merusak data atau layanan di server bila salah dipakai. Periksa isinya sebelum menyalin dan menjalankannya.</span>
+</div>
+<div style="padding: 12px; border-radius: 10px; background: #0A0E10; border: 1px solid #6B2C25; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; line-height: 1.5; color: #C9D4D9; white-space: pre-wrap; word-break: break-all">{{preview}}</div>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{cancelWarn}}" style="flex: 2; min-height: 52px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">Batal</button>
+<button type="button" onClick="{{confirmWarn}}" style="flex: 3; min-height: 52px; border-radius: 14px; border: 1px solid #FF7F70; background: transparent; color: #FF7F70; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">{{warnConfirm}}</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{delOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(5, 8, 10, 0.72)"></div>
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto" aria-hidden="true"></div>
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">{{delTitle}}</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #C5D0D5">Snippet ini dihapus permanen dari perangkat.</p>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{cancelDelete}}" style="flex: 2; min-height: 52px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Batal</button>
+<button type="button" onClick="{{confirmDelete}}" style="flex: 3; min-height: 52px; border-radius: 14px; border: 1px solid #FF7F70; background: transparent; color: #FF7F70; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Hapus</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{catsOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(5, 8, 10, 0.62)"></div>
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; max-height: 84%; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 10px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto" aria-hidden="true"></div>
+<div style="display: flex; align-items: center">
+<h2 style="flex: 1; margin: 0; font-size: 20px; font-weight: 600">Kelola kategori</h2>
+<button type="button" onClick="{{closeCats}}" aria-label="Tutup" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #E8EEF0; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+</button>
+</div>
+<sc-if value="{{catsHint}}" hint-placeholder-val="{{ true }}">
+<span style="font-size: 13px; line-height: 1.45; color: #9AA8AF">Tahan dan geser ikon titik di kiri untuk mengubah urutan. Urutan ini dipakai di filter dan di editor.</span>
+</sc-if>
+<sc-if value="{{catsEmpty}}" hint-placeholder-val="{{ false }}">
+<span style="padding: 16px 0; text-align: center; font-size: 15px; color: #9AA8AF">Belum ada kategori. Tambahkan satu untuk mengelompokkan snippet.</span>
+</sc-if>
+<div style="flex: 0 1 auto; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{catRows}}" as="cr" hint-placeholder-count="4">
+<div style="flex: none; display: flex; align-items: center; min-height: 64px; box-sizing: border-box; padding: 0 4px 0 8px; border-radius: 12px; border: 1px solid #2A343A; background: #161C20">
+<span role="img" aria-label="{{cr.dragLabel}}" style="flex: none; width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF; cursor: grab">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 6h.01M9 12h.01M9 18h.01M15 6h.01M15 12h.01M15 18h.01"/></svg>
+</span>
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; padding: 8px 0">
+<span style="font-size: 16px">{{cr.name}}</span>
+<span style="font-size: 12.5px; color: #9AA8AF">{{cr.countText}}</span>
+</span>
+<button type="button" onClick="{{cr.edit}}" aria-label="{{cr.editLabel}}" style="flex: none; width: 44px; height: 44px; border: none; background: transparent; color: #E8EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4"/></svg>
+</button>
+<button type="button" onClick="{{cr.askDel}}" aria-label="{{cr.delLabel}}" style="flex: none; width: 44px; height: 44px; border: none; background: transparent; color: #E8EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h16M10 11v6M14 11v6M6 7l1 12a2 2 0 0 0 2 2h6a2 2 0 0 0 2-2l1-12M9 7V4h6v3"/></svg>
+</button>
+</div>
+</sc-for>
+</div>
+<button type="button" onClick="{{newCat}}" style="margin-top: 6px; min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 8px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
+Kategori baru
+</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{catDelOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(5, 8, 10, 0.72)"></div>
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto" aria-hidden="true"></div>
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">{{catDelTitle}}</h2>
+<p style="margin: 0; font-size: 15px; line-height: 1.5; color: #C5D0D5">{{catDelBody}}</p>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{cancelCatDel}}" style="flex: 2; min-height: 52px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Batal</button>
+<button type="button" onClick="{{confirmCatDel}}" style="flex: 3; min-height: 52px; border-radius: 14px; border: 1px solid #FF7F70; background: transparent; color: #FF7F70; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Hapus</button>
+</div>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{nameOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; background: rgba(5, 8, 10, 0.72)"></div>
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 14px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto" aria-hidden="true"></div>
+<h2 style="margin: 0; font-size: 20px; font-weight: 600">{{nameHeading}}</h2>
+<label style="display: flex; flex-direction: column; gap: 6px">
+<span style="font-size: 13px; color: #9AA8AF">Nama kategori</span>
+<input id="nama-kategori" type="text" value="{{nameVal}}" onChange="{{setName}}" style="width: 100%; height: 48px; box-sizing: border-box; padding: 0 14px; border-radius: 12px; border: 1px solid {{nameBd}}; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">
+<sc-if value="{{nameErr}}" hint-placeholder-val="{{ false }}">
+<span style="font-size: 12.5px; color: #FF7F70">{{nameErrText}}</span>
+</sc-if>
+</label>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{cancelName}}" style="flex: 2; min-height: 52px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Batal</button>
+<button type="button" onClick="{{saveName}}" disabled="{{cantSaveName}}" style="flex: 3; min-height: 52px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; opacity: {{saveNameOpacity}}">Simpan</button>
+</div>
+</div>
+</div>
+</sc-if>
+
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"startAt":{"editor":"enum","default":"list","options":["list","new"],"section":"Keadaan awal"},"prefill":{"editor":"text","default":"","section":"Keadaan awal"},"$preview":{"width":390,"height":844}}'>
+<script type="text/x-dc" data-dc-script data-props='{"startAt":{"editor":"enum","default":"list","options":["list","new","edit","empty","sort","categories","categoryName","warn","delete"],"section":"Keadaan awal"},"prefill":{"editor":"text","default":"","section":"Keadaan awal"},"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
   renderVals() {
     const s = this.state || {};
-    const startAt = this.props.startAt === 'new' ? 'new' : 'list';
+    const STARTS = ['list', 'new', 'edit', 'empty', 'sort', 'categories', 'categoryName', 'warn', 'delete'];
+    const startAt = STARTS.indexOf(this.props.startAt) >= 0 ? this.props.startAt : 'list';
     const prefill = this.props.prefill || '';
     const riskRe = /\brm\s+-[a-z]*[rf]|\bdd\s+if=|\bmkfs|\bshutdown\b|\breboot\b|\bchmod\s+-R|\bchown\s+-R|\btruncate\b|\bdrop\s+(table|database)\b/i;
-    const TAGS = ['Sistem', 'Nginx', 'Docker', 'Database'];
+    const cats = s.cats || ['Sistem', 'Nginx', 'Docker', 'Database'];
     const scopeLabel = (id) => (id === 'app' ? 'app-01' : (id === 'db' ? 'db-01' : 'Semua host'));
 
     const DEFAULTS = [
@@ -226,9 +419,10 @@ class Component extends DCLogic {
       { id: 's4', title: 'Pemakaian disk', cmd: 'df -h /\ndu -sh /var/log/* | sort -h | tail -5', tag: 'Sistem', scope: 'all', fav: true },
       { id: 's5', title: 'Log container (ikuti)', cmd: 'docker logs --tail 100 -f ${container}', tag: 'Docker', scope: 'app', fav: false },
       { id: 's6', title: 'Koneksi aktif PostgreSQL', cmd: 'psql -c "select count(*) from pg_stat_activity;"', tag: 'Database', scope: 'db', fav: false },
-      { id: 's7', title: 'Bersihkan cache Nginx', cmd: 'sudo rm -rf /var/cache/nginx/*', tag: 'Nginx', scope: 'app', fav: false }
+      { id: 's7', title: 'Bersihkan cache Nginx', cmd: 'sudo rm -rf /var/cache/nginx/*', tag: 'Nginx', scope: 'app', fav: false },
+      { id: 's8', title: 'Restart Nginx', cmd: 'sudo systemctl restart nginx', tag: 'Nginx', scope: 'all', fav: false, danger: true }
     ];
-    const list = s.list || DEFAULTS;
+    const list = s.list || (startAt === 'empty' ? [] : DEFAULTS);
     const query = (s.query || '').trim().toLowerCase();
     const filter = s.filter || 'all';
 
@@ -243,10 +437,13 @@ class Component extends DCLogic {
       return out;
     };
     const fill = (cmd, vars) => cmd.replace(/\$\{([a-z_]+)\}/g, (all, n) => (vars[n] ? vars[n] : all));
+    const looksDangerous = (cmd) => cmd.split('\n').some((l) => riskRe.test(l));
+    const isDanger = (sn) => !!sn.danger || looksDangerous(sn.cmd);
     const flash = (msg) => {
       this.setState({ toast: msg });
       setTimeout(() => this.setState({ toast: null }), 2200);
     };
+    const firstLine = (cmd) => cmd.split('\n')[0] + (cmd.indexOf('\n') >= 0 ? ' …' : '');
 
     const match = (sn) => {
       if (query && (sn.title + ' ' + sn.cmd).toLowerCase().indexOf(query) === -1) return false;
@@ -254,17 +451,20 @@ class Component extends DCLogic {
       if (filter !== 'all') return sn.tag === filter;
       return true;
     };
+    const noSnippets = list.length === 0;
+    const sorting = (s.sorting === undefined ? startAt === 'sort' : !!s.sorting) && list.length > 1;
     const cards = list.filter(match).map((sn) => {
       const names = varNames(sn.cmd);
       return {
         title: sn.title,
         fav: !!sn.fav,
-        first: sn.cmd.split('\n')[0] + (sn.cmd.indexOf('\n') >= 0 ? ' \u2026' : ''),
+        first: firstLine(sn.cmd),
+        hasTag: !!sn.tag,
         tag: sn.tag,
         scope: scopeLabel(sn.scope),
         hasVars: names.length > 0,
         varText: names.length + ' variabel',
-        risky: riskRe.test(sn.cmd),
+        danger: isDanger(sn),
         open: () => this.setState({
           openId: sn.id,
           vars: Object.assign({}, sn.defaults || {}),
@@ -273,7 +473,7 @@ class Component extends DCLogic {
       };
     });
 
-    const chipDefs = [{ id: 'all', label: 'Semua' }, { id: 'fav', label: 'Favorit' }].concat(TAGS.map((t) => ({ id: t, label: t })));
+    const chipDefs = [{ id: 'all', label: 'Semua' }, { id: 'fav', label: 'Favorit' }].concat(cats.map((t) => ({ id: t, label: t })));
     const chips = chipDefs.map((c) => {
       const on = filter === c.id;
       return {
@@ -286,19 +486,24 @@ class Component extends DCLogic {
       };
     });
 
-    const newEdit = (cmd) => ({ id: null, title: '', cmd: cmd, tag: 'Sistem', scope: 'all', fav: false, defaults: {} });
-    const edit = s.edit === undefined ? (startAt === 'new' ? newEdit(prefill) : null) : s.edit;
+    const newEdit = (cmd) => ({ id: null, title: '', cmd: cmd, tag: cats[0] || '', scope: 'all', fav: false, danger: false, defaults: {} });
+    let edit = s.edit;
+    if (edit === undefined) {
+      if (startAt === 'new') edit = newEdit(prefill);
+      else if (startAt === 'edit') edit = Object.assign({}, list.filter((x) => x.id === 's8')[0]);
+      else edit = null;
+    }
     const setField = (key, val) => this.setState({ edit: Object.assign({}, edit, { [key]: val }) });
 
-    const openId = s.openId || null;
+    const openId = s.openId === undefined ? (startAt === 'warn' ? 's8' : (startAt === 'delete' ? 's2' : null)) : s.openId;
     const openSn = openId ? list.filter((x) => x.id === openId)[0] : null;
-    const vars = s.vars || {};
-    const target = s.target || 'app';
+    const vars = s.vars === undefined ? (openSn ? Object.assign({}, openSn.defaults || {}) : {}) : s.vars;
+    const target = s.target || (openSn && openSn.scope === 'db' ? 'db' : 'app');
     const targetLabel = target === 'db' ? 'db-01' : 'app-01';
     const names = openSn ? varNames(openSn.cmd) : [];
     const preview = openSn ? fill(openSn.cmd, vars) : '';
     const ready = names.every((n) => !!vars[n]);
-    const risky = openSn ? riskRe.test(preview) : false;
+    const risky = openSn ? (!!openSn.danger || looksDangerous(preview)) : false;
     const varRows = names.map((n) => ({
       name: n,
       value: vars[n] || '',
@@ -315,6 +520,15 @@ class Component extends DCLogic {
         pick: () => this.setState({ target: t.id })
       };
     });
+    const warnKind = s.warn === undefined ? (startAt === 'warn' ? 'paste' : null) : s.warn;
+    const doPaste = () => {
+      this.setState({ openId: null, warn: null });
+      flash('Ditempel ke ' + targetLabel + ' · belum dijalankan');
+    };
+    const doCopy = () => {
+      this.setState({ openId: null, warn: null });
+      flash('Disalin · ' + preview.length + ' karakter');
+    };
 
     const optChips = (defs, current, key) => defs.map((d) => {
       const on = current === d.id;
@@ -330,22 +544,68 @@ class Component extends DCLogic {
     const eTitle = edit ? edit.title : '';
     const eCmd = edit ? edit.cmd : '';
     const eFav = edit ? !!edit.fav : false;
+    const eDanger = edit ? !!edit.danger : false;
     const canSave = !!edit && eTitle.trim().length > 0 && eCmd.trim().length > 0;
     const toast = s.toast || null;
+
+    const delId = s.delId === undefined ? (startAt === 'delete' ? 's2' : null) : s.delId;
+    const delSn = delId ? list.filter((x) => x.id === delId)[0] : null;
+
+    const catsOpen = s.catsOpen === undefined ? (startAt === 'categories' || startAt === 'categoryName') : !!s.catsOpen;
+    const catDel = s.catDel || null;
+    const catDelCount = catDel ? list.filter((x) => x.tag === catDel).length : 0;
+    const catRows = cats.map((name) => {
+      const count = list.filter((x) => x.tag === name).length;
+      return {
+        name: name,
+        countText: count + ' snippet',
+        dragLabel: 'Geser untuk mengurutkan ' + name,
+        editLabel: 'Ubah ' + name,
+        delLabel: 'Hapus ' + name,
+        edit: () => this.setState({ nameOpen: true, nameFor: name, nameVal: name }),
+        askDel: () => this.setState({ catDel: name })
+      };
+    });
+    const nameOpen = s.nameOpen === undefined ? startAt === 'categoryName' : !!s.nameOpen;
+    const nameFor = s.nameFor === undefined ? null : s.nameFor;
+    const nameVal = s.nameVal === undefined ? (startAt === 'categoryName' ? 'docker' : '') : s.nameVal;
+    const nameTrim = nameVal.trim();
+    const nameTaken = nameTrim.length > 0 && cats.some((c) => c.toLowerCase() === nameTrim.toLowerCase() && c !== nameFor);
+    const nameTooLong = nameTrim.length > 24;
+    const nameErrText = nameTooLong ? 'Nama kategori maksimal 24 karakter.' : (nameTaken ? 'Nama kategori sudah dipakai.' : '');
+    const canSaveName = nameTrim.length > 0 && !nameErrText;
 
     return {
       query: s.query || '',
       setQuery: (e) => this.setState({ query: e.target.value }),
       chips: chips,
       cards: cards,
-      empty: cards.length === 0,
+      empty: cards.length === 0 && !noSnippets,
+      noSnippets: noSnippets,
+      showList: !noSnippets && !sorting,
+      sorting: sorting,
+      notSorting: !sorting,
+      canSort: list.length > 1,
+      sortLabel: sorting ? 'Selesai mengurutkan' : 'Urutkan snippet',
+      sortBg: sorting ? '#F0B34A' : 'transparent',
+      sortFg: sorting ? '#1B1406' : '#E8EEF0',
+      toggleSort: () => this.setState({ sorting: !sorting }),
+      sortRows: list.map((sn) => ({
+        title: sn.title,
+        first: firstLine(sn.cmd),
+        fav: !!sn.fav,
+        dragLabel: 'Geser untuk mengurutkan ' + sn.title,
+        delLabel: 'Hapus ' + sn.title,
+        askDel: () => this.setState({ delId: sn.id })
+      })),
+      openCats: () => this.setState({ catsOpen: true }),
       newSnip: () => this.setState({ edit: newEdit('') }),
       hasToast: !!toast,
       toast: toast,
 
       detail: !!openSn && !edit,
       dTitle: openSn ? openSn.title : '',
-      dMeta: openSn ? (openSn.tag + ' \u00b7 ' + scopeLabel(openSn.scope)) : '',
+      dMeta: openSn ? ([openSn.tag, scopeLabel(openSn.scope)].filter((x) => !!x).join(' · ')) : '',
       varRows: varRows,
       preview: preview,
       dRisky: risky,
@@ -356,10 +616,9 @@ class Component extends DCLogic {
       cantRun: !ready || risky,
       runOpacity: (!ready || risky) ? '0.4' : '1',
       closeDetail: () => this.setState({ openId: null }),
-      pasteIt: () => {
-        this.setState({ openId: null });
-        flash('Ditempel ke ' + targetLabel + ' \u00b7 belum dijalankan');
-      },
+      askDelete: () => this.setState({ delId: openSn.id }),
+      pasteIt: () => (risky ? this.setState({ warn: 'paste' }) : doPaste()),
+      copyIt: () => (risky ? this.setState({ warn: 'copy' }) : doCopy()),
       runIt: () => {
         this.setState({ openId: null });
         flash('Dijalankan di ' + targetLabel);
@@ -367,23 +626,46 @@ class Component extends DCLogic {
       editIt: () => this.setState({
         edit: {
           id: openSn.id, title: openSn.title, cmd: openSn.cmd, tag: openSn.tag,
-          scope: openSn.scope, fav: !!openSn.fav, defaults: openSn.defaults || {}
+          scope: openSn.scope, fav: !!openSn.fav, danger: !!openSn.danger, defaults: openSn.defaults || {}
         }
       }),
+
+      warn: !!warnKind && !!openSn,
+      warnConfirm: warnKind === 'copy' ? 'Tetap salin' : 'Tetap tempel',
+      cancelWarn: () => this.setState({ warn: null }),
+      confirmWarn: () => (warnKind === 'copy' ? doCopy() : doPaste()),
+
+      delOpen: !!delSn,
+      delTitle: delSn ? 'Hapus ' + delSn.title + '?' : '',
+      cancelDelete: () => this.setState({ delId: null }),
+      confirmDelete: () => {
+        this.setState({ list: list.filter((x) => x.id !== delId), delId: null, openId: null });
+        flash('Snippet dihapus');
+      },
 
       editing: !!edit,
       eHeading: edit && edit.id ? 'Edit snippet' : 'Snippet baru',
       eTitle: eTitle,
       eCmd: eCmd,
       eFav: eFav,
+      eDanger: eDanger,
       setTitle: (e) => setField('title', e.target.value),
       setCmd: (e) => setField('cmd', e.target.value),
-      tagOpts: optChips(TAGS.map((t) => ({ id: t, label: t })), edit ? edit.tag : '', 'tag'),
+      tagOpts: optChips([{ id: '', label: 'Tanpa kategori' }].concat(cats.map((t) => ({ id: t, label: t }))), edit ? edit.tag : '', 'tag'),
       scopeOpts: optChips([{ id: 'all', label: 'Semua host' }, { id: 'app', label: 'app-01' }, { id: 'db', label: 'db-01' }], edit ? edit.scope : '', 'scope'),
       toggleFav: () => setField('fav', !eFav),
       favBg: eFav ? '#F0B34A' : '#2A343A',
       favAlign: eFav ? 'flex-end' : 'flex-start',
       favKnob: eFav ? '#1B1406' : '#9AA8AF',
+      toggleDanger: () => setField('danger', !eDanger),
+      dangerBg: eDanger ? '#FF7F70' : '#2A343A',
+      dangerAlign: eDanger ? 'flex-end' : 'flex-start',
+      dangerKnob: eDanger ? '#1B1406' : '#9AA8AF',
+      dangerDesc: looksDangerous(eCmd)
+        ? 'Perintah ini juga terdeteksi berbahaya (mis. rm -rf, dd, mkfs), jadi peringatan tetap muncul walau penanda ini mati.'
+        : 'Setiap kali dipakai, aplikasi memperingatkan dulu dan meminta Anda memastikan.',
+      canDeleteEdit: !!edit && !!edit.id,
+      deleteFromEdit: () => this.setState({ edit: null, openId: null, delId: edit.id }),
       cantSave: !canSave,
       saveOpacity: canSave ? '1' : '0.4',
       cancelEdit: () => this.setState({ edit: null }),
@@ -396,11 +678,59 @@ class Component extends DCLogic {
           tag: e.tag,
           scope: e.scope,
           fav: !!e.fav,
+          danger: !!e.danger,
           defaults: e.defaults || {}
         };
         const next = e.id ? list.map((x) => (x.id === e.id ? item : x)) : [item].concat(list);
         this.setState({ list: next, edit: null, openId: null });
         flash('Snippet disimpan');
+      },
+
+      catsOpen: catsOpen,
+      catRows: catRows,
+      catsHint: cats.length > 1,
+      catsEmpty: cats.length === 0,
+      closeCats: () => this.setState({ catsOpen: false }),
+      newCat: () => this.setState({ nameOpen: true, nameFor: null, nameVal: '' }),
+      catDelOpen: !!catDel,
+      catDelTitle: catDel ? 'Hapus kategori ' + catDel + '?' : '',
+      catDelBody: catDelCount > 0
+        ? catDelCount + ' snippet di dalamnya dipindah ke Tanpa kategori; snippet tidak ikut terhapus.'
+        : 'Kategori ini dihapus dari perangkat.',
+      cancelCatDel: () => this.setState({ catDel: null }),
+      confirmCatDel: () => {
+        this.setState({
+          cats: cats.filter((c) => c !== catDel),
+          list: list.map((x) => (x.tag === catDel ? Object.assign({}, x, { tag: '' }) : x)),
+          filter: filter === catDel ? 'all' : filter,
+          catDel: null
+        });
+        flash('Kategori dihapus');
+      },
+
+      nameOpen: nameOpen,
+      nameHeading: nameFor ? 'Ubah kategori' : 'Kategori baru',
+      nameVal: nameVal,
+      setName: (e) => this.setState({ nameVal: e.target.value }),
+      nameErr: !!nameErrText,
+      nameErrText: nameErrText,
+      nameBd: nameErrText ? '#FF7F70' : '#F0B34A',
+      cantSaveName: !canSaveName,
+      saveNameOpacity: canSaveName ? '1' : '0.4',
+      cancelName: () => this.setState({ nameOpen: false }),
+      saveName: () => {
+        const v = nameTrim;
+        if (nameFor) {
+          this.setState({
+            cats: cats.map((c) => (c === nameFor ? v : c)),
+            list: list.map((x) => (x.tag === nameFor ? Object.assign({}, x, { tag: v }) : x)),
+            filter: filter === nameFor ? v : filter,
+            nameOpen: false
+          });
+        } else {
+          this.setState({ cats: cats.concat([v]), nameOpen: false });
+        }
+        flash('Kategori disimpan');
       }
     };
   }

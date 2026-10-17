@@ -87,7 +87,7 @@
    "y": 0,
    "w": 390,
    "h": 844,
-   "title": "7 · Snippet",
+   "title": "7 · Snippet (urutkan, kelola kategori, hapus; perintah berbahaya diperingatkan)",
    "is_interactive": true,
    "radius": 28
   },
@@ -536,6 +536,78 @@
    "title": "1g · Ekspor profil: konfirmasi, lalu menu bagikan bawaan Android (berkas JSON tanpa rahasia)",
    "is_interactive": true,
    "radius": 28
+  },
+  "SnippetEmpty.dc.html": {
+   "x": 3290,
+   "y": 1928,
+   "w": 390,
+   "h": 844,
+   "title": "7c · Snippet: belum ada snippet (judul, ajakan, tombol Snippet baru)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SnippetEditor.dc.html": {
+   "x": 3290,
+   "y": 2892,
+   "w": 390,
+   "h": 844,
+   "title": "7d · Editor snippet: kategori (ikon kelola, Tanpa kategori), cakupan, favorit, saklar berbahaya, Hapus",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SnippetCategories.dc.html": {
+   "x": 3760,
+   "y": 1928,
+   "w": 390,
+   "h": 844,
+   "title": "7e · Kelola kategori: pegangan geser untuk urutan, jumlah snippet, ubah nama, hapus, Kategori baru",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SnippetCategoryName.dc.html": {
+   "x": 3760,
+   "y": 2892,
+   "w": 390,
+   "h": 844,
+   "title": "7f · Nama kategori: galat \"sudah dipakai\" (juga \"terlalu panjang\"), Simpan nonaktif",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SnippetSort.dc.html": {
+   "x": 4230,
+   "y": 1928,
+   "w": 390,
+   "h": 844,
+   "title": "7g · Urutkan snippet: pegangan geser, ikon hapus per baris, tombol Selesai mengurutkan",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SnippetDanger.dc.html": {
+   "x": 4230,
+   "y": 2892,
+   "w": 390,
+   "h": 844,
+   "title": "7h · Perintah berbahaya: peringatan sebelum Tempel atau Salin (Batal jadi tombol utama)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SnippetDelete.dc.html": {
+   "x": 4700,
+   "y": 1928,
+   "w": 390,
+   "h": 844,
+   "title": "7i · Hapus snippet: konfirmasi dari ikon tempat sampah di detail (juga dari baris mode urut dan dari editor)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalSnippets.dc.html": {
+   "x": 4700,
+   "y": 2892,
+   "w": 390,
+   "h": 844,
+   "title": "2o · Terminal: ikon Snippet di bilah membuka panel; ketuk menempel, tekan lama membuka detail",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -597,7 +669,15 @@
   "HostActions.dc.html",
   "MainVaultOpen.dc.html",
   "HostImport.dc.html",
-  "HostExport.dc.html"
+  "HostExport.dc.html",
+  "SnippetEmpty.dc.html",
+  "SnippetEditor.dc.html",
+  "SnippetCategories.dc.html",
+  "SnippetCategoryName.dc.html",
+  "SnippetSort.dc.html",
+  "SnippetDanger.dc.html",
+  "SnippetDelete.dc.html",
+  "TerminalSnippets.dc.html"
  ],
  "notes": {
   "judul": {
