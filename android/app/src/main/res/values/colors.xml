@@ -2,4 +2,6 @@
 <resources>
     <!-- Nilai token `ground` dari docs/design/tokens.json; untuk jendela saat aplikasi mulai dan latar ikon aplikasi. -->
     <color name="termul_ground">#0F1316</color>
+    <!-- Token `accent`: warna ikon notifikasi (setColor). -->
+    <color name="termul_accent">#F0B34A</color>
 </resources>

@@ -109,7 +109,8 @@ object StreakReminder {
             )
         }
         builder
-            .setSmallIcon(R.drawable.ic_stat_streak)
+            .setSmallIcon(R.drawable.ic_stat_termul)
+            .setColor(context.getColor(R.color.termul_accent))
             .setContentTitle(title)
             .setContentText(text)
             .setAutoCancel(true)

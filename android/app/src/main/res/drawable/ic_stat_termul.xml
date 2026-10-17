@@ -1,0 +1,12 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Ikon notifikasi (sesi aktif dan pengingat streak): siluet T-kursor dari ikon aplikasi, putih tunggal seperti syarat ikon status bar.
+     Proporsi sama dengan docs/design/assets/AppIcon/app-icon.svg (skala 18/42, di tengah kanvas 24). -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="24dp"
+    android:height="24dp"
+    android:viewportWidth="24"
+    android:viewportHeight="24">
+    <path
+        android:fillColor="#FFFFFF"
+        android:pathData="M3.9,3.4h16.2a0.9,0.9 0 0 1 0.9,0.9v2.1a0.9,0.9 0 0 1 -0.9,0.9H3.9a0.9,0.9 0 0 1 -0.9,-0.9V4.3a0.9,0.9 0 0 1 0.9,-0.9zM10.3,9h3.4a0.9,0.9 0 0 1 0.9,0.9v9.8a0.9,0.9 0 0 1 -0.9,0.9h-3.4a0.9,0.9 0 0 1 -0.9,-0.9V9.9a0.9,0.9 0 0 1 0.9,-0.9z" />
+</vector>

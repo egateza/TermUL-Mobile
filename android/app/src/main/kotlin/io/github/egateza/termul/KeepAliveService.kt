@@ -83,7 +83,8 @@ class KeepAliveService : Service() {
         val disconnectIntent = PendingIntent.getService(this, 1, disconnect, flagsImmutable)
 
         builder
-            .setSmallIcon(R.drawable.ic_stat_session)
+            .setSmallIcon(R.drawable.ic_stat_termul)
+            .setColor(getColor(R.color.termul_accent))
             .setContentTitle(title)
             .setContentText(text)
             .setOngoing(true)

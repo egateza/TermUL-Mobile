@@ -1166,6 +1166,14 @@ Pemilik meminta ikon launcher sendiri, menggantikan ikon bawaan Flutter. Tiga ko
 - **Belum teruji di HP:** ikon bertema Android 13+ (belum dinyalakan di HP), masker launcher lain, dan PNG Android 7.x (tidak ada perangkat).
 - **Artifact:** design system versi 70 (butir "Ikon aplikasi" di Ikonografi, aset grup `AppIcon`) dan prototipe versi 69 (contoh 16 `AppIcon`, dirender di Chrome).
 
+### Ikon notifikasi T-kursor (2026-10-18)
+
+Pemilik melihat ikon notifikasi belum berubah (glyph terminal `ic_stat_session`). Keputusan pemilik: notifikasi sesi **dan** pengingat streak memakai T-kursor, dengan warna notifikasi amber.
+
+- **Kode:** `res/drawable/ic_stat_termul.xml` (siluet T-kursor putih, kanvas 24, proporsi sama dengan ikon aplikasi) menggantikan `ic_stat_session.xml` dan `ic_stat_streak.xml` (dihapus). `KeepAliveService` dan `StreakReminder` memanggil `setColor` dengan `@color/termul_accent` (#F0B34A, baru di `colors.xml`).
+- **Uji HP (dd3bf2af, Android 16 HyperOS, build debug):** notifikasi "1 sesi tersambung" menampilkan T di lingkaran amber; HyperOS menggelapkan amber di kartu terang. Belum diamati: notifikasi pengingat streak (baru muncul pukul 20.00) dan ikon di status bar.
+- **Artifact:** design system versi 72 (README butir "Ikon aplikasi"), prototipe versi 71 (contoh 16 ditambah notifikasi). Kalimat README dan lebar papan di `canvas.json` sudah ikut tercommit di `b086058` (sesi pembaruan) karena berkasnya bersama.
+
 ## Pembaruan dari GitHub Releases dan kunci rilis (2026-10-18)
 
 Permintaan pemilik: rilis tanpa Play Store. Aplikasi memeriksa pembaruan di GitHub **setiap kali dibuka** dan lewat tombol **Periksa**; bila ada versi baru, tab Pengaturan diberi lencana; versi dan build terpasang tampil di baris paling bawah Pengaturan. Pemilik juga meminta kunci rilis sungguhan, bukan kunci debug. Langkah rilis dan pengelolaan kunci ada di `docs/release.md`.
