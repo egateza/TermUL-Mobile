@@ -6,6 +6,7 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 - Paket berlisensi copyleft (GPL, LGPL, AGPL, MPL): **0**.
 - Paket SDK (flutter, flutter_driver, flutter_localizations, flutter_test, flutter_web_plugins, fuchsia_remote_debug_protocol, integration_test, sky_engine) mengikuti lisensi Flutter SDK (BSD-3-Clause); `sky_engine` memuat Apache-2.0.
 - `xterm` 4.0.0 (MIT) dipakai, bukan `xterm3` (AGPL-3.0).
+- `pinenacl` 0.6.0 (MIT) menjadi dependensi langsung pada 2026-10-18 untuk memverifikasi tanda tangan Ed25519 `manifest.json` rilis (lihat `docs/release.md`). Versinya sama dengan yang sudah dipakai `dartssh2`, jadi `pubspec.lock` tidak menambah paket; lisensi dibaca ulang dari arsip paket (`LICENSE`: MIT).
 - Font (dibundel di `assets/fonts`, diambil dari repo google/fonts commit `94301472b4d809299b4775bc6502592b83dd6934`, berkas lisensi dibaca): IBM Plex Sans (`IBMPlexSans-Variable.ttf`, SIL OFL 1.1, hak cipta IBM Corp., nama font cadangan "Plex") dan JetBrains Mono (`JetBrainsMono-Variable.ttf`, SIL OFL 1.1, JetBrains Mono Project Authors). Berkas lisensi: `assets/fonts/OFL-*.txt`. Font dipakai tanpa modifikasi.
   - sha256 `IBMPlexSans-Variable.ttf`: `3b031aa4216174205bd8471f88a49b91f093169e9e87bd5262242bc5967fe2e3`
   - sha256 `JetBrainsMono-Variable.ttf`: `48715a42ec242c21e9f02692891e147d022299a52e48d5e413e1a942193ffeda`
@@ -22,6 +23,7 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 | `intl` | 0.20.3 | direct | bsd-3-clause | bsd-3-clause | ya |
 | `local_auth` | 3.0.2 | direct | bsd-3-clause | bsd-3-clause | ya |
 | `path_drawing` | 1.0.1 | direct | mit | mit | ya |
+| `pinenacl` | 0.6.0 | direct | mit | mit | ya |
 | `path_provider` | 2.1.6 | direct | bsd-3-clause | bsd-3-clause | ya |
 | `uuid` | 4.6.0 | direct | mit | mit | ya |
 | `xterm` | 4.0.0 | direct | mit | mit | ya |
@@ -83,7 +85,6 @@ Dihasilkan dari `pubspec.lock` pada 2026-10-15. Setiap paket hosted diperiksa du
 | `path_provider_linux` | 2.2.2 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `path_provider_platform_interface` | 2.1.3 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `path_provider_windows` | 2.3.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
-| `pinenacl` | 0.6.0 | transitive | mit | mit | ya |
 | `platform` | 3.2.0 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `plugin_platform_interface` | 2.1.8 | transitive | bsd-3-clause | bsd-3-clause | ya |
 | `pointycastle` | 4.0.0 | transitive | mit | mit | ya |

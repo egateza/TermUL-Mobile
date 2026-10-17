@@ -2,7 +2,9 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app_providers.dart' show appSettingsProvider, uiStateRepositoryProvider;
 import '../../core/platform/update_platform.dart';
+import '../../core/storage/ui_state_repository.dart';
 import '../../core/update/release.dart';
 import '../../core/update/update_service.dart';
 
@@ -106,7 +108,7 @@ class UpdateController extends Notifier<UpdateState> {
       final installed = await ref.read(installedVersionProvider.future);
       final latest = await ref.read(updateServiceProvider).latest();
       if (!ref.mounted) return;
-      state = latest != null && latest.version.isNewerThan(installed)
+      state = latest != null && latest.isNewerThan(installed)
           ? UpdateAvailable(latest)
           : UpdateUpToDate(latest);
     } on UpdateException catch (e) {
@@ -118,7 +120,8 @@ class UpdateController extends Notifier<UpdateState> {
     }
   }
 
-  /// Mengunduh APK rilis yang tersedia; selesai di [UpdateReady] bila checksum cocok.
+  /// Mengunduh APK rilis yang tersedia; selesai di [UpdateReady] bila SHA-256 dan ukuran cocok dengan manifest dan
+  /// APK-nya untuk aplikasi ini (nama paket, versionCode, sertifikat penandatangan sama dengan yang terpasang).
   Future<void> download() async {
     final release = switch (state) {
       UpdateAvailable(:final release) => release,
@@ -145,7 +148,21 @@ class UpdateController extends Notifier<UpdateState> {
               state = UpdateDownloading(release, received: received, total: total, cancel: cancel);
             },
           );
-      if (_owns(cancel)) state = UpdateReady(release, path);
+      if (!_owns(cancel)) return;
+      final apk = await ref.read(updatePlatformProvider).inspectApk(path);
+      if (!_owns(cancel)) return;
+      if (apk.packageName != appPackageName || !apk.sameSigner || apk.versionCode != release.versionCode) {
+        debugPrint(
+          '[termul] APK pembaruan ditolak: paket ${apk.packageName}, versionCode ${apk.versionCode}, '
+          'sertifikat sama ${apk.sameSigner}',
+        );
+        state = UpdateFailed(UpdateFailure.signer, release: release);
+        return;
+      }
+      state = UpdateReady(release, path);
+    } on PlatformException catch (e) {
+      debugPrint('[termul] memeriksa APK pembaruan gagal: ${e.code}');
+      if (_owns(cancel)) state = UpdateFailed(UpdateFailure.signer, release: release);
     } on UpdateCancelled {
       // Keadaan sudah dikembalikan oleh [cancelDownload].
     } on UpdateException catch (e) {
@@ -181,6 +198,7 @@ class UpdateController extends Notifier<UpdateState> {
     final platform = ref.read(updatePlatformProvider);
     try {
       if (!await platform.canInstall()) return false;
+      await _rememberNotes(release);
       await platform.install(path);
       if (ref.mounted) state = UpdateReady(release, path);
     } on PlatformException catch (e) {
@@ -189,6 +207,71 @@ class UpdateController extends Notifier<UpdateState> {
     }
     return true;
   }
+
+  /// Menyimpan catatan rilis sebelum penginstal dibuka, untuk "Yang baru" setelah update. Gagal menulis diabaikan:
+  /// catatan masih bisa diambil dari manifest rilis itu.
+  Future<void> _rememberNotes(ReleaseInfo release) async {
+    final repo = ref.read(uiStateRepositoryProvider);
+    try {
+      await repo.saveUpdateState(
+        seenVersionCode: repo.seenVersionCode,
+        pendingNotes: PendingNotes(versionCode: release.versionCode, version: release.version, notes: release.notes),
+      );
+    } on Object catch (e) {
+      debugPrint('[termul] menyimpan catatan rilis gagal: ${e.runtimeType}');
+    }
+  }
+
+  /// Pemeriksaan otomatis (saat aplikasi dibuka dan tiap [autoCheckInterval]); tidak berjalan bila saklar
+  /// "Periksa update otomatis" mati.
+  Future<void> autoCheck() async {
+    if (!ref.read(appSettingsProvider).update.autoCheck) return;
+    await check();
+  }
+
+  /// "Yang baru" sekali setelah update: catatan rilis versi terpasang bila versionCode-nya lebih tinggi dari yang
+  /// terakhir dibuka. Pemasangan baru (belum ada catatan versi) hanya mencatat versi. Catatan diambil dari yang
+  /// disimpan sebelum memasang, atau dari manifest bertanda tangan rilis itu; bila keduanya tidak ada, tidak tampil.
+  Future<WhatsNew?> takeWhatsNew() async {
+    final repo = ref.read(uiStateRepositoryProvider);
+    try {
+      final installed = await ref.read(installedVersionProvider.future);
+      final seen = repo.seenVersionCode;
+      final pending = repo.pendingNotes;
+      if (seen != null && installed.build <= seen) return null;
+      String? notes;
+      if (pending != null && pending.versionCode == installed.build) {
+        notes = pending.notes;
+      } else if (seen != null) {
+        try {
+          final release = await ref.read(updateServiceProvider).release(_releaseName(installed.name));
+          if (release != null && release.versionCode == installed.build) notes = release.notes;
+        } on UpdateException catch (e) {
+          debugPrint('[termul] catatan rilis tidak terambil: $e');
+        }
+      }
+      await repo.saveUpdateState(seenVersionCode: installed.build, pendingNotes: null);
+      if (notes == null || notes.isEmpty) return null;
+      return WhatsNew(version: _releaseName(installed.name), notes: notes);
+    } on Object catch (e) {
+      debugPrint('[termul] Yang baru gagal: ${e.runtimeType}');
+      return null;
+    }
+  }
+
+  /// Nama versi tanpa akhiran `-dirty` build uji.
+  static String _releaseName(String name) => name.split('-').first;
 }
+
+/// Isi sheet "Yang baru".
+class WhatsNew {
+  const WhatsNew({required this.version, required this.notes});
+
+  final String version;
+  final String notes;
+}
+
+/// Selang pemeriksaan otomatis selama aplikasi terbuka (desktop: 12 jam).
+const autoCheckInterval = Duration(hours: 12);
 
 final updateControllerProvider = NotifierProvider<UpdateController, UpdateState>(UpdateController.new);

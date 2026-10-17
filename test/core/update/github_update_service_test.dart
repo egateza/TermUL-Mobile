@@ -1,18 +1,29 @@
-import 'dart:convert';
 import 'dart:io';
 
 import 'package:crypto/crypto.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:termul_mobile/core/update/release.dart';
+import 'package:termul_mobile/core/update/manifest.dart';
 import 'package:termul_mobile/core/update/update_service.dart';
 
-/// Server HTTP lokal yang meniru GitHub: `/repos/.../releases/latest` dan berkas aset.
+import 'test_keys.dart';
+
+const _repo = 'egateza/TermUL-Mobile';
+
+/// Server HTTP lokal yang meniru alamat unduhan GitHub Releases: `latest/download/manifest.json` dialihkan ke tag
+/// terbaru, lalu `download/v<versi>/...`.
 class _FakeGitHub {
   late HttpServer server;
-  int latestStatus = 200;
-  String? latestBody;
+  String version = '0.1.120';
+  int code = 120;
   List<int> apk = List.generate(200 * 1024, (i) => i % 251);
-  String? checksumOverride;
+  bool hasRelease = true;
+  bool hasSignature = true;
+
+  /// Mengganti isi manifest setelah ditandatangani (manifest palsu).
+  List<int>? manifestOverride;
+
+  /// Mengganti isi APK yang dilayani (manifest tetap menyebut APK asli).
+  List<int>? apkOverride;
   int apkStatus = 200;
 
   /// Dipanggil sebelum mengirim tiap potongan APK (untuk membatalkan di tengah).
@@ -20,54 +31,47 @@ class _FakeGitHub {
 
   Uri get base => Uri.parse('http://${server.address.host}:${server.port}');
 
+  String get apkName => 'termul-mobile-$version.apk';
+
+  List<int> get manifestBytes => UpdateManifest(
+    version: version,
+    versionCode: code,
+    notes: '## Perbaikan\n- Sambung ulang lebih cepat',
+    apk: ManifestFile(name: apkName, sha256: sha256.convert(apk).toString(), size: apk.length),
+  ).encode();
+
   Future<void> start() async {
     server = await HttpServer.bind(InternetAddress.loopbackIPv4, 0);
     server.listen((req) async {
       final res = req.response;
-      switch (req.uri.path) {
-        case '/repos/egateza/TermUL-Mobile/releases/latest':
-          res.statusCode = latestStatus;
-          res.write(latestBody ?? jsonEncode(releaseJson()));
-        case '/dl/termul.apk':
-          res.statusCode = apkStatus;
-          if (apkStatus == 200) {
-            res.contentLength = apk.length;
-            for (var i = 0; i < apk.length; i += 16 * 1024) {
-              onApkChunk?.call(i);
-              res.add(apk.sublist(i, i + 16 * 1024 > apk.length ? apk.length : i + 16 * 1024));
-              await res.flush();
-            }
+      final dl = '/$_repo/releases/download/v$version/';
+      final path = req.uri.path;
+      if (!hasRelease) {
+        res.statusCode = 404;
+      } else if (path == '/$_repo/releases/latest/download/manifest.json') {
+        res.redirect(base.resolve('${dl}manifest.json'));
+        return;
+      } else if (path == '${dl}manifest.json') {
+        res.add(manifestOverride ?? manifestBytes);
+      } else if (path == '${dl}manifest.json.sig' && hasSignature) {
+        res.write(signManifest(manifest: manifestBytes, seed: testSeed));
+      } else if (path == '$dl$apkName') {
+        final body = apkOverride ?? apk;
+        res.statusCode = apkStatus;
+        if (apkStatus == 200) {
+          res.contentLength = body.length;
+          for (var i = 0; i < body.length; i += 16 * 1024) {
+            onApkChunk?.call(i);
+            res.add(body.sublist(i, i + 16 * 1024 > body.length ? body.length : i + 16 * 1024));
+            await res.flush();
           }
-        case '/dl/termul.apk.sha256':
-          res.write(checksumOverride ?? '${sha256.convert(apk)}  termul.apk\n');
-        case '/redirect/termul.apk':
-          res.redirect(base.resolve('/dl/termul.apk'));
-          return;
-        default:
-          res.statusCode = 404;
+        }
+      } else {
+        res.statusCode = 404;
       }
       await res.close();
     });
   }
-
-  Map<String, Object?> releaseJson() => {
-    'tag_name': 'v0.2.0',
-    'body': 'Catatan',
-    'assets': [
-      // parseRelease menolak selain https; tes memakai URL lokal lewat [localRelease].
-      {'name': 'termul.apk', 'browser_download_url': 'https://example.invalid/termul.apk', 'size': apk.length},
-      {'name': 'termul.apk.sha256', 'browser_download_url': 'https://example.invalid/termul.apk.sha256', 'size': 80},
-    ],
-  };
-
-  ReleaseInfo localRelease({String apkPath = '/dl/termul.apk'}) => ReleaseInfo(
-    tag: 'v0.2.0',
-    version: ReleaseVersion.tryParse('v0.2.0')!,
-    notes: '',
-    page: null,
-    apk: ReleaseAsset(name: 'termul.apk', url: base.resolve(apkPath), size: apk.length),
-    checksum: ReleaseAsset(name: 'termul.apk.sha256', url: base.resolve('/dl/termul.apk.sha256'), size: 80),
-  );
 }
 
 void main() {
@@ -80,9 +84,10 @@ void main() {
     await gh.start();
     temp = await Directory.systemTemp.createTemp('termul_update_test');
     service = GitHubUpdateService(
-      repo: 'egateza/TermUL-Mobile',
+      repo: _repo,
       tempDir: () async => temp,
-      apiBase: gh.base,
+      webBase: gh.base,
+      publicKey: testPublicKey,
       timeout: const Duration(seconds: 5),
     );
   });
@@ -92,129 +97,121 @@ void main() {
     if (await temp.exists()) await temp.delete(recursive: true);
   });
 
-  File? readyFile() {
-    final f = File('${temp.path}${Platform.pathSeparator}update${Platform.pathSeparator}termul-update.apk');
-    return f.existsSync() ? f : null;
-  }
-
   List<FileSystemEntity> updateDir() {
     final d = Directory('${temp.path}${Platform.pathSeparator}update');
     return d.existsSync() ? d.listSync() : const [];
   }
 
+  Matcher fails(UpdateFailure f) => throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', f));
+
   group('latest', () {
-    test('rilis terbaru dibaca', () async {
+    test('manifest bertanda tangan sah: rilis dengan alamat per tag', () async {
       final r = await service.latest();
-      expect(r!.version.name, '0.2.0');
-      expect(r.notes, 'Catatan');
+      expect(r!.version, '0.1.120');
+      expect(r.versionCode, 120);
+      expect(r.notes, contains('Sambung ulang'));
+      expect(r.apk.url.path, '/$_repo/releases/download/v0.1.120/termul-mobile-0.1.120.apk');
+      expect(r.apk.size, gh.apk.length);
     });
 
-    test('404: belum ada rilis', () async {
-      gh.latestStatus = 404;
+    test('belum ada rilis (404): null', () async {
+      gh.hasRelease = false;
       expect(await service.latest(), isNull);
     });
 
-    test('403 (batas permintaan): server', () async {
-      gh.latestStatus = 403;
-      await expectLater(
-        service.latest(),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.server)),
-      );
+    test('manifest diubah setelah ditandatangani: signature', () async {
+      gh.manifestOverride = UpdateManifest(
+        version: '0.1.120',
+        versionCode: 120,
+        notes: 'palsu',
+        apk: ManifestFile(name: gh.apkName, sha256: 'b' * 64, size: 10),
+      ).encode();
+      await expectLater(service.latest(), fails(UpdateFailure.signature));
     });
 
-    test('JSON rusak atau rilis tanpa APK: badRelease', () async {
-      gh.latestBody = '{tidak json';
-      await expectLater(
-        service.latest(),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.badRelease)),
+    test('tanpa berkas .sig: signature', () async {
+      gh.hasSignature = false;
+      await expectLater(service.latest(), fails(UpdateFailure.signature));
+    });
+
+    test('kunci publik lain: signature', () async {
+      final other = GitHubUpdateService(
+        repo: _repo,
+        tempDir: () async => temp,
+        webBase: gh.base,
+        publicKey: publicKeyOf(List<int>.generate(32, (i) => 99)),
       );
-      gh.latestBody = jsonEncode({'tag_name': 'v0.2.0', 'assets': []});
-      await expectLater(
-        service.latest(),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.badRelease)),
-      );
+      await expectLater(other.latest(), fails(UpdateFailure.signature));
+    });
+
+    test('manifest rusak: badRelease', () async {
+      gh.manifestOverride = [123, 1, 2];
+      await expectLater(service.latest(), fails(UpdateFailure.badRelease));
     });
 
     test('server tidak terjangkau: network', () async {
       await gh.server.close(force: true);
-      await expectLater(
-        service.latest(),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.network)),
-      );
+      await expectLater(service.latest(), fails(UpdateFailure.network));
+    });
+
+    test('rilis versi tertentu untuk Yang baru', () async {
+      expect((await service.release('0.1.120'))!.versionCode, 120);
+      expect(await service.release('0.1.99'), isNull);
     });
   });
 
   group('download', () {
-    test('checksum cocok: berkas siap pasang dengan kemajuan sampai 100%', () async {
+    test('cocok dengan manifest: berkas siap dengan kemajuan sampai 100%', () async {
+      final release = (await service.latest())!;
       final progress = <int>[];
-      final path = await service.download(gh.localRelease(), onProgress: (r, t) => progress.add(r * 100 ~/ t));
-      expect(path, readyFile()!.path);
+      final path = await service.download(release, onProgress: (r, t) => progress.add(r * 100 ~/ t));
       expect(await File(path).readAsBytes(), gh.apk);
       expect(progress.first, 0);
       expect(progress.last, 100);
       expect(updateDir(), hasLength(1));
     });
 
-    test('mengikuti pengalihan (aset GitHub dialihkan ke penyimpanan)', () async {
-      final path = await service.download(gh.localRelease(apkPath: '/redirect/termul.apk'));
-      expect(await File(path).readAsBytes(), gh.apk);
-    });
-
-    test('checksum tidak cocok: ditolak dan berkas dihapus', () async {
-      gh.checksumOverride = '${'0' * 64}  termul.apk';
-      await expectLater(
-        service.download(gh.localRelease()),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.checksum)),
-      );
-      expect(readyFile(), isNull);
+    test('isi APK berbeda dari manifest: checksum, berkas dihapus', () async {
+      final release = (await service.latest())!;
+      gh.apkOverride = List.generate(gh.apk.length, (i) => 7);
+      await expectLater(service.download(release), fails(UpdateFailure.checksum));
       expect(updateDir(), isEmpty);
     });
 
-    test('berkas checksum tanpa hex: badRelease', () async {
-      gh.checksumOverride = 'kosong';
-      await expectLater(
-        service.download(gh.localRelease()),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.badRelease)),
-      );
+    test('APK lebih besar dari manifest: checksum', () async {
+      final release = (await service.latest())!;
+      gh.apkOverride = [...gh.apk, 1, 2, 3];
+      await expectLater(service.download(release), fails(UpdateFailure.checksum));
+      expect(updateDir(), isEmpty);
     });
 
     test('APK 500: server, tanpa sisa berkas', () async {
+      final release = (await service.latest())!;
       gh.apkStatus = 500;
-      await expectLater(
-        service.download(gh.localRelease()),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.server)),
-      );
+      await expectLater(service.download(release), fails(UpdateFailure.server));
       expect(updateDir(), isEmpty);
     });
 
     test('dibatalkan di tengah: UpdateCancelled, tanpa sisa berkas', () async {
+      final release = (await service.latest())!;
       final cancel = UpdateCancelToken();
       gh.onApkChunk = (sent) {
         if (sent >= 64 * 1024) cancel.cancel();
       };
-      await expectLater(service.download(gh.localRelease(), cancel: cancel), throwsA(isA<UpdateCancelled>()));
+      await expectLater(service.download(release, cancel: cancel), throwsA(isA<UpdateCancelled>()));
       expect(updateDir(), isEmpty);
     });
 
     test('APK melebihi batas ukuran ditolak sebelum diunduh', () async {
       final small = GitHubUpdateService(
-        repo: 'egateza/TermUL-Mobile',
+        repo: _repo,
         tempDir: () async => temp,
-        apiBase: gh.base,
+        webBase: gh.base,
+        publicKey: testPublicKey,
         maxApkBytes: 1024,
       );
-      await expectLater(
-        small.download(gh.localRelease()),
-        throwsA(isA<UpdateException>().having((e) => e.failure, 'failure', UpdateFailure.badRelease)),
-      );
-    });
-
-    test('unduhan baru menggantikan berkas lama', () async {
-      await service.download(gh.localRelease());
-      gh.apk = List.generate(1000, (i) => 7);
-      final path = await service.download(gh.localRelease());
-      expect(await File(path).readAsBytes(), gh.apk);
-      expect(updateDir(), hasLength(1));
+      final release = (await small.latest())!;
+      await expectLater(small.download(release), fails(UpdateFailure.badRelease));
     });
   });
 }

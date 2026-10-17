@@ -162,6 +162,27 @@ class StreakSettings {
   int get hashCode => Object.hash(show, reminder);
 }
 
+/// Pembaruan dari GitHub Releases. [autoCheck]: periksa saat aplikasi dibuka dan tiap 12 jam selama terbuka (seperti
+/// desktop "Periksa update otomatis"); bawaan menyala. Memasang selalu manual.
+class UpdateSettings {
+  const UpdateSettings({this.autoCheck = true});
+
+  final bool autoCheck;
+
+  UpdateSettings copyWith({bool? autoCheck}) => UpdateSettings(autoCheck: autoCheck ?? this.autoCheck);
+
+  factory UpdateSettings.fromJson(Map<String, Object?> json) =>
+      UpdateSettings(autoCheck: optBool(json, 'autoCheck') ?? true);
+
+  Map<String, Object?> toJson() => {'autoCheck': autoCheck};
+
+  @override
+  bool operator ==(Object other) => other is UpdateSettings && other.autoCheck == autoCheck;
+
+  @override
+  int get hashCode => autoCheck.hashCode;
+}
+
 /// Isi `settings.json`:
 /// `{"version": 1, "terminal": {"fontSize": 13, "lineHeight": 1.3, "handleStyle": "drop"}, "connection": {"keepAlive": false, "autoReconnect": true}}`.
 /// Properti yang tidak dikenal diabaikan; bagian yang hilang memakai bawaan.
@@ -171,6 +192,7 @@ class AppSettings {
     this.connection = const ConnectionSettings(),
     this.security = const SecuritySettings(),
     this.streak = const StreakSettings(),
+    this.update = const UpdateSettings(),
   });
 
   static const currentVersion = 1;
@@ -179,17 +201,20 @@ class AppSettings {
   final ConnectionSettings connection;
   final SecuritySettings security;
   final StreakSettings streak;
+  final UpdateSettings update;
 
   AppSettings copyWith({
     TerminalSettings? terminal,
     ConnectionSettings? connection,
     SecuritySettings? security,
     StreakSettings? streak,
+    UpdateSettings? update,
   }) => AppSettings(
     terminal: terminal ?? this.terminal,
     connection: connection ?? this.connection,
     security: security ?? this.security,
     streak: streak ?? this.streak,
+    update: update ?? this.update,
   );
 
   factory AppSettings.fromJson(Map<String, Object?> json) {
@@ -197,11 +222,13 @@ class AppSettings {
     final c = optObject(json, 'connection');
     final s = optObject(json, 'security');
     final k = optObject(json, 'streak');
+    final u = optObject(json, 'update');
     return AppSettings(
       terminal: t == null ? const TerminalSettings() : TerminalSettings.fromJson(t),
       connection: c == null ? const ConnectionSettings() : ConnectionSettings.fromJson(c),
       security: s == null ? const SecuritySettings() : SecuritySettings.fromJson(s),
       streak: k == null ? const StreakSettings() : StreakSettings.fromJson(k),
+      update: u == null ? const UpdateSettings() : UpdateSettings.fromJson(u),
     );
   }
 
@@ -211,5 +238,6 @@ class AppSettings {
     'connection': connection.toJson(),
     'security': security.toJson(),
     'streak': streak.toJson(),
+    'update': update.toJson(),
   };
 }

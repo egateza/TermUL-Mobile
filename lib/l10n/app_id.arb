@@ -3134,7 +3134,7 @@
   "@updateFailureServer": {
     "description": "Alasan gagal: jawaban server (mis. batas permintaan)."
   },
-  "updateFailureBadRelease": "Rilis terbaru tidak berisi APK dan checksum yang dibutuhkan.",
+  "updateFailureBadRelease": "Rilis terbaru tidak berisi manifest yang bisa dibaca aplikasi ini.",
   "@updateFailureBadRelease": {
     "description": "Alasan gagal: isi rilis tidak sesuai."
   },
@@ -3220,6 +3220,31 @@
       },
       "build": {
         "type": "int"
+      }
+    }
+  },
+  "updateFailureSignature": "Tanda tangan rilis tidak sah, jadi pembaruan ditolak.",
+  "@updateFailureSignature": {
+    "description": "Alasan gagal: tanda tangan manifest tidak sah."
+  },
+  "updateFailureSigner": "APK ini ditandatangani kunci lain atau bukan untuk aplikasi ini, jadi tidak dipasang.",
+  "@updateFailureSigner": {
+    "description": "Alasan gagal: sertifikat, paket, atau versi APK tidak cocok."
+  },
+  "updateAutoCheckLabel": "Periksa update otomatis",
+  "@updateAutoCheckLabel": {
+    "description": "Saklar pemeriksaan pembaruan otomatis."
+  },
+  "updateAutoCheckDesc": "Saat aplikasi dibuka dan tiap 12 jam selama terbuka. Memasang tetap manual.",
+  "@updateAutoCheckDesc": {
+    "description": "Keterangan saklar pemeriksaan otomatis."
+  },
+  "whatsNewTitle": "Yang baru di {version}",
+  "@whatsNewTitle": {
+    "description": "Judul sheet catatan rilis setelah update.",
+    "placeholders": {
+      "version": {
+        "type": "String"
       }
     }
   }

@@ -2130,7 +2130,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get updateFailureServer => 'GitHub menolak permintaan saat ini. Coba lagi nanti.';
 
   @override
-  String get updateFailureBadRelease => 'Rilis terbaru tidak berisi APK dan checksum yang dibutuhkan.';
+  String get updateFailureBadRelease => 'Rilis terbaru tidak berisi manifest yang bisa dibaca aplikasi ini.';
 
   @override
   String get updateFailureChecksum => 'Berkas yang diunduh tidak sama dengan checksum rilis, jadi tidak dipasang.';
@@ -2186,5 +2186,23 @@ class AppLocalizationsId extends AppLocalizations {
   @override
   String updateVersionFooter(String name, int build) {
     return 'TermUL Mobile $name · build $build';
+  }
+
+  @override
+  String get updateFailureSignature => 'Tanda tangan rilis tidak sah, jadi pembaruan ditolak.';
+
+  @override
+  String get updateFailureSigner =>
+      'APK ini ditandatangani kunci lain atau bukan untuk aplikasi ini, jadi tidak dipasang.';
+
+  @override
+  String get updateAutoCheckLabel => 'Periksa update otomatis';
+
+  @override
+  String get updateAutoCheckDesc => 'Saat aplikasi dibuka dan tiap 12 jam selama terbuka. Memasang tetap manual.';
+
+  @override
+  String whatsNewTitle(String version) {
+    return 'Yang baru di $version';
   }
 }

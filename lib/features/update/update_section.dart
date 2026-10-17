@@ -1,17 +1,21 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import '../../app_providers.dart' show appSettingsProvider;
 import '../../core/theme/termul_theme.dart';
 import '../../core/update/release.dart';
 import '../../core/update/update_service.dart';
 import '../../l10n/app_localizations.dart';
+import '../../shared/widgets/switch_row.dart';
 import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
 import '../sftp/sftp_format.dart' show formatSize;
+import 'release_notes.dart';
 import 'update_controller.dart';
 
 /// Bagian "Pembaruan" di paling bawah Pengaturan: status rilis GitHub, catatan rilis, unduh dengan kemajuan, pasang,
-/// penjelasan izin "Pasang aplikasi tidak dikenal", lalu keterangan versi dan build terpasang sebagai baris terakhir.
+/// penjelasan izin "Pasang aplikasi tidak dikenal", saklar "Periksa update otomatis", lalu keterangan versi dan build
+/// terpasang sebagai baris terakhir.
 class UpdateSection extends ConsumerStatefulWidget {
   const UpdateSection({super.key});
 
@@ -22,6 +26,19 @@ class UpdateSection extends ConsumerStatefulWidget {
 class _UpdateSectionState extends ConsumerState<UpdateSection> with WidgetsBindingObserver {
   /// "Pasang" diketuk tetapi izin pasang aplikasi belum diberikan.
   bool _needsPermission = false;
+
+  /// Saklar "Periksa update otomatis" gagal disimpan; nilainya tetap berlaku sampai aplikasi ditutup.
+  bool _saveFailed = false;
+
+  Future<void> _setAutoCheck(bool on) async {
+    try {
+      final current = ref.read(appSettingsProvider);
+      await ref.read(appSettingsProvider.notifier).update(current.copyWith(update: current.update.copyWith(autoCheck: on)));
+      if (mounted && _saveFailed) setState(() => _saveFailed = false);
+    } on Object {
+      if (mounted) setState(() => _saveFailed = true);
+    }
+  }
 
   @override
   void initState() {
@@ -61,6 +78,7 @@ class _UpdateSectionState extends ConsumerState<UpdateSection> with WidgetsBindi
     final state = ref.watch(updateControllerProvider);
     final version = ref.watch(installedVersionProvider).value;
     final controller = ref.read(updateControllerProvider.notifier);
+    final autoCheck = ref.watch(appSettingsProvider.select((s) => s.update.autoCheck));
 
     final (status, statusColor) = _status(l, state);
     final reason = state is UpdateFailed ? _reason(l, state.failure) : null;
@@ -146,6 +164,21 @@ class _UpdateSectionState extends ConsumerState<UpdateSection> with WidgetsBindi
             ),
           ),
         ),
+        const SizedBox(height: TermulSpacing.space3),
+        SwitchRow(
+          label: l.updateAutoCheckLabel,
+          description: l.updateAutoCheckDesc,
+          value: autoCheck,
+          onChanged: _setAutoCheck,
+        ),
+        if (_saveFailed) ...[
+          const SizedBox(height: TermulSpacing.space3),
+          TermulBanner(
+            tone: BannerTone.warn,
+            title: l.settingsSaveFailedTitle,
+            child: Text(l.settingsSaveFailedBody),
+          ),
+        ],
         const SizedBox(height: TermulSpacing.space6),
         Padding(
           padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space4),
@@ -175,12 +208,7 @@ class _UpdateSectionState extends ConsumerState<UpdateSection> with WidgetsBindi
               color: TermulPalette.groundDeep,
               borderRadius: BorderRadius.circular(TermulRadius.radiusMd),
             ),
-            child: Text(
-              release.notes,
-              maxLines: 8,
-              overflow: TextOverflow.ellipsis,
-              style: TermulText.bodySm.copyWith(color: TermulPalette.inkSoft),
-            ),
+            child: ReleaseNotes(release.notes, maxLines: 8),
           ),
         ),
       ...switch (state) {
@@ -256,19 +284,21 @@ class _UpdateSectionState extends ConsumerState<UpdateSection> with WidgetsBindi
     UpdateChecking() => (l.updateStatusChecking, TermulPalette.inkMuted),
     UpdateUpToDate(latest: null) => (l.updateStatusNoRelease, TermulPalette.inkMuted),
     UpdateUpToDate() => (l.updateStatusUpToDate, TermulPalette.ok),
-    UpdateAvailable(:final release) => (l.updateStatusAvailable(release.version.name), TermulPalette.accent),
-    UpdateDownloading(:final release) => (l.updateStatusDownloading(release.version.name), TermulPalette.accent),
-    UpdateReady(:final release) => (l.updateStatusReady(release.version.name), TermulPalette.accent),
+    UpdateAvailable(:final release) => (l.updateStatusAvailable(release.version), TermulPalette.accent),
+    UpdateDownloading(:final release) => (l.updateStatusDownloading(release.version), TermulPalette.accent),
+    UpdateReady(:final release) => (l.updateStatusReady(release.version), TermulPalette.accent),
     UpdateFailed(release: null) => (l.updateStatusCheckFailed, TermulPalette.bad),
     UpdateFailed(failure: UpdateFailure.install) => (l.updateStatusInstallFailed, TermulPalette.bad),
-    UpdateFailed(:final release?) => (l.updateStatusDownloadFailed(release.version.name), TermulPalette.bad),
+    UpdateFailed(:final release?) => (l.updateStatusDownloadFailed(release.version), TermulPalette.bad),
   };
 
   static String _reason(AppLocalizations l, UpdateFailure failure) => switch (failure) {
     UpdateFailure.network => l.updateFailureNetwork,
     UpdateFailure.server => l.updateFailureServer,
     UpdateFailure.badRelease => l.updateFailureBadRelease,
+    UpdateFailure.signature => l.updateFailureSignature,
     UpdateFailure.checksum => l.updateFailureChecksum,
+    UpdateFailure.signer => l.updateFailureSigner,
     UpdateFailure.storage => l.updateFailureStorage,
     UpdateFailure.install => l.updateFailureInstall,
   };

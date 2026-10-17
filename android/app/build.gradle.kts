@@ -6,11 +6,28 @@ plugins {
     id("dev.flutter.flutter-gradle-plugin")
 }
 
-// Kunci rilis dari android/key.properties (diabaikan git; keystore di luar repo, lihat docs/release.md). Tanpa berkas itu
-// (mis. hasil clone) build rilis memakai kunci debug dan APK-nya tidak bisa menjadi update versi yang terpasang.
+// Kunci rilis dari android/key.properties (diabaikan git; keystore di %USERPROFILE%\.termul-release\, lihat
+// docs/release.md). Semua jenis build (debug, profile, release) ditandatangani kunci ini supaya build uji yang dipasang
+// lewat adb bisa menimpa aplikasi rilis di HP dan sebaliknya. Tanpa berkas itu (mis. hasil clone) debug dan profile
+// memakai kunci debug, dan build rilis ditolak.
 val releaseKey: Properties? = rootProject.file("key.properties").takeIf { it.exists() }?.let { props ->
     Properties().apply { props.inputStream().use { load(it) } }
 }
+
+// Versi seperti TermUL desktop: major.minor dari `version` di pubspec.yaml, angka ketiga = jumlah commit
+// (`git rev-list --count HEAD`), versionCode = jumlah commit sehingga selalu naik. Working tree yang belum di-commit
+// diberi akhiran `-dirty`; skrip rilis menolaknya. Tanpa git, nilai dari pubspec dipakai apa adanya.
+fun git(vararg args: String): String? = try {
+    providers.exec {
+        commandLine("git", *args)
+        workingDir = rootProject.projectDir.parentFile
+        isIgnoreExitValue = true
+    }.standardOutput.asText.get().trim()
+} catch (e: Exception) {
+    null
+}
+val commitCount: Int? = git("rev-list", "--count", "HEAD")?.toIntOrNull()
+val dirtyTree: Boolean = !git("status", "--porcelain").isNullOrEmpty()
 
 android {
     namespace = "io.github.egateza.termul"
@@ -29,12 +46,14 @@ android {
         // Dikunci 24: local_auth butuh 24 (flutter_secure_storage 23). Keputusan tetap di CLAUDE.md.
         minSdk = 24
         targetSdk = flutter.targetSdkVersion
-        // Uses the version code from pubspec.yaml. When using split APKs, 1000 * ABI_VERSION
-        // is added automatically by Flutter. (https://developer.android.com/studio/build/configure-apk-splits#configure-APK-versions)
-        // You can force using the value of versionCode by specifying the `-P force-version-code-ignoring-abi=true`
-        // flag during build.
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        if (commitCount != null) {
+            val base = flutter.versionName.split(".").take(2).joinToString(".")
+            versionCode = commitCount
+            versionName = "$base.$commitCount" + if (dirtyTree) "-dirty" else ""
+        } else {
+            versionCode = flutter.versionCode
+            versionName = flutter.versionName
+        }
     }
 
     signingConfigs {
@@ -49,12 +68,25 @@ android {
     }
 
     buildTypes {
-        release {
+        // `all` juga mengenai build type `profile` yang ditambahkan plugin Flutter.
+        all {
             signingConfig = if (releaseKey != null) {
                 signingConfigs.getByName("release")
             } else {
-                logger.warn("key.properties tidak ada: build rilis ditandatangani kunci debug")
                 signingConfigs.getByName("debug")
+            }
+        }
+    }
+}
+
+// Build rilis tidak boleh jatuh ke kunci debug: APK seperti itu tidak bisa menjadi update aplikasi yang terpasang.
+if (releaseKey == null) {
+    tasks.configureEach {
+        if (name == "assembleRelease" || name == "bundleRelease") {
+            doFirst {
+                throw GradleException(
+                    "android/key.properties tidak ada: build rilis harus ditandatangani kunci rilis (docs/release.md)",
+                )
             }
         }
     }

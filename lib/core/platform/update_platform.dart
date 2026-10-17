@@ -11,12 +11,24 @@ abstract interface class UpdatePlatform {
   /// Aplikasi boleh meminta pemasangan paket ("Pasang aplikasi tidak dikenal" diizinkan untuk TermUL).
   Future<bool> canInstall();
 
+  /// Isi APK di [path]: nama paket, versionCode, dan apakah sertifikatnya sama dengan aplikasi terpasang.
+  Future<ApkInfo> inspectApk(String path);
+
   /// Membuka halaman izin "Pasang aplikasi tidak dikenal" untuk TermUL.
   Future<void> openInstallSettings();
 
   /// Membuka penginstal sistem untuk APK di [path] (harus di `cache/update/`). Melempar [PlatformException] bila
   /// tidak bisa dibuka.
   Future<void> install(String path);
+}
+
+/// Hasil [UpdatePlatform.inspectApk]. [packageName] null bila berkas bukan APK yang bisa dibaca.
+class ApkInfo {
+  const ApkInfo({required this.packageName, required this.versionCode, required this.sameSigner});
+
+  final String? packageName;
+  final int versionCode;
+  final bool sameSigner;
 }
 
 class MethodChannelUpdatePlatform implements UpdatePlatform {
@@ -37,11 +49,26 @@ class MethodChannelUpdatePlatform implements UpdatePlatform {
   Future<bool> canInstall() async => await _channel.invokeMethod<bool>('canInstall') ?? false;
 
   @override
+  Future<ApkInfo> inspectApk(String path) async {
+    final v = await _channel.invokeMapMethod<String, Object?>('inspect', {'path': path});
+    final package = v?['package'];
+    final code = v?['code'];
+    return ApkInfo(
+      packageName: package is String ? package : null,
+      versionCode: code is int ? code : 0,
+      sameSigner: v?['sameSigner'] == true,
+    );
+  }
+
+  @override
   Future<void> openInstallSettings() => _channel.invokeMethod<void>('openInstallSettings');
 
   @override
   Future<void> install(String path) => _channel.invokeMethod<void>('install', {'path': path});
 }
+
+/// Nama paket aplikasi (`applicationId`).
+const appPackageName = 'io.github.egateza.termul';
 
 /// Untuk tes: versi tetap, izin bisa diatur, dan mencatat permintaan pasang.
 class FakeUpdatePlatform implements UpdatePlatform {
@@ -49,6 +76,11 @@ class FakeUpdatePlatform implements UpdatePlatform {
 
   AppVersion version;
   bool allowed;
+
+  /// Hasil [inspectApk]; tes mengisi [apkCode] dengan versionCode rilis supaya APK dianggap cocok.
+  int apkCode = 0;
+  bool apkSameSigner = true;
+  String? apkPackage = appPackageName;
   Object? installError;
   final installed = <String>[];
   int settingsOpened = 0;
@@ -58,6 +90,10 @@ class FakeUpdatePlatform implements UpdatePlatform {
 
   @override
   Future<bool> canInstall() async => allowed;
+
+  @override
+  Future<ApkInfo> inspectApk(String path) async =>
+      ApkInfo(packageName: apkPackage, versionCode: apkCode, sameSigner: apkSameSigner);
 
   @override
   Future<void> openInstallSettings() async => settingsOpened++;

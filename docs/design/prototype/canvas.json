@@ -652,6 +652,15 @@
    "title": "6d · Pengaturan: pembaruan siap dipasang, izin \"Pasang aplikasi tidak dikenal\" belum diberikan",
    "is_interactive": true,
    "radius": 28
+  },
+  "SettingsWhatsNew.dc.html": {
+   "x": 4700,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "6e - Lembar Yang baru setelah pembaruan dipasang",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -726,7 +735,8 @@
   "StreakSettings.dc.html",
   "AppIcon.dc.html",
   "SettingsUpdate.dc.html",
-  "SettingsUpdateInstall.dc.html"
+  "SettingsUpdateInstall.dc.html",
+  "SettingsWhatsNew.dc.html"
  ],
  "notes": {
   "judul": {

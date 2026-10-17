@@ -3748,7 +3748,7 @@ abstract class AppLocalizations {
   /// Alasan gagal: isi rilis tidak sesuai.
   ///
   /// In id, this message translates to:
-  /// **'Rilis terbaru tidak berisi APK dan checksum yang dibutuhkan.'**
+  /// **'Rilis terbaru tidak berisi manifest yang bisa dibaca aplikasi ini.'**
   String get updateFailureBadRelease;
 
   /// Alasan gagal: checksum tidak cocok.
@@ -3846,6 +3846,36 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'TermUL Mobile {name} · build {build}'**
   String updateVersionFooter(String name, int build);
+
+  /// Alasan gagal: tanda tangan manifest tidak sah.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanda tangan rilis tidak sah, jadi pembaruan ditolak.'**
+  String get updateFailureSignature;
+
+  /// Alasan gagal: sertifikat, paket, atau versi APK tidak cocok.
+  ///
+  /// In id, this message translates to:
+  /// **'APK ini ditandatangani kunci lain atau bukan untuk aplikasi ini, jadi tidak dipasang.'**
+  String get updateFailureSigner;
+
+  /// Saklar pemeriksaan pembaruan otomatis.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa update otomatis'**
+  String get updateAutoCheckLabel;
+
+  /// Keterangan saklar pemeriksaan otomatis.
+  ///
+  /// In id, this message translates to:
+  /// **'Saat aplikasi dibuka dan tiap 12 jam selama terbuka. Memasang tetap manual.'**
+  String get updateAutoCheckDesc;
+
+  /// Judul sheet catatan rilis setelah update.
+  ///
+  /// In id, this message translates to:
+  /// **'Yang baru di {version}'**
+  String whatsNewTitle(String version);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -109,6 +109,17 @@ void main() {
       expect(AppSettings.fromJson(s.toJson()).terminal, s.terminal);
     });
 
+    test('periksa update otomatis: bawaan nyala; nilai dibaca dan ditulis; bagian hilang memakai bawaan', () {
+      expect(const AppSettings().update.autoCheck, isTrue);
+      expect(AppSettings.fromJson({}).update.autoCheck, isTrue);
+      final off = AppSettings.fromJson({
+        'update': {'autoCheck': false},
+      });
+      expect(off.update.autoCheck, isFalse);
+      expect(AppSettings.fromJson(off.toJson()).update, const UpdateSettings(autoCheck: false));
+      expect(() => AppSettings.fromJson({'update': {'autoCheck': 'ya'}}), throwsFormatException);
+    });
+
     test('toJson lalu fromJson menghasilkan nilai yang sama', () {
       const s = AppSettings(terminal: TerminalSettings(fontSize: 11.5, lineHeight: 1.1));
       expect(AppSettings.fromJson(s.toJson()).terminal, s.terminal);

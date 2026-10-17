@@ -20,6 +20,7 @@ import '../streak/streak_controller.dart';
 import '../streak/streak_screen.dart';
 import '../streak/streak_reminder.dart';
 import '../streak/streak_splash.dart';
+import '../update/release_notes.dart';
 import '../update/update_controller.dart';
 import 'main_tab.dart';
 
@@ -50,6 +51,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
 
   final _visited = <int>{0};
   Timer? _dayCheck;
+  Timer? _updateCheck;
   late final _reminder = StreakReminderSync(ref);
 
   @override
@@ -60,8 +62,12 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
       if (!mounted) return;
       _onStreakEvent(ref.read(streakControllerProvider.notifier).openToday());
       _syncReminder();
-      // Sekali tiap aplikasi dibuka (bukan saat kembali dari latar belakang); hasilnya lencana di tab Pengaturan.
-      unawaited(ref.read(updateControllerProvider.notifier).check());
+      // Pembaruan seperti desktop: saat aplikasi dibuka lalu tiap 12 jam selama terbuka (bila saklar "Periksa update
+      // otomatis" menyala); hasilnya lencana di tab Pengaturan. Memasang tetap manual.
+      final updates = ref.read(updateControllerProvider.notifier);
+      unawaited(updates.autoCheck());
+      _updateCheck = Timer.periodic(autoCheckInterval, (_) => unawaited(updates.autoCheck()));
+      unawaited(_whatsNew());
       _dayCheck = Timer.periodic(dayCheckInterval, (_) => _checkDay());
     });
   }
@@ -69,6 +75,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
   @override
   void dispose() {
     _dayCheck?.cancel();
+    _updateCheck?.cancel();
     WidgetsBinding.instance.removeObserver(this);
     super.dispose();
   }
@@ -91,6 +98,22 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
     if (!ref.read(appSettingsProvider).streak.show) return;
     if (ModalRoute.of(context)?.isCurrent == false) return;
     showStreakSplash(context, event);
+  }
+
+  /// "Yang baru" sekali setelah update. Menunggu sampai tidak ada layar lain di atas kerangka (splash streak, terminal,
+  /// sheet) supaya tidak menumpuk, paling lama sekitar satu menit. Versinya sudah dicatat sebagai dilihat, jadi sheet
+  /// tidak muncul lagi di pembukaan berikutnya.
+  Future<void> _whatsNew() async {
+    final news = await ref.read(updateControllerProvider.notifier).takeWhatsNew();
+    if (news == null) return;
+    for (var i = 0; i < 120; i++) {
+      if (!mounted) return;
+      if (ModalRoute.of(context)?.isCurrent != false) {
+        await showWhatsNew(context, version: news.version, notes: news.notes);
+        return;
+      }
+      await Future<void>.delayed(const Duration(milliseconds: 500));
+    }
   }
 
   void _syncReminder() {

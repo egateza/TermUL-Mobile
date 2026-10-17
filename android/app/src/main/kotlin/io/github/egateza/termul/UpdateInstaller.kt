@@ -3,6 +3,8 @@ package io.github.egateza.termul
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
@@ -19,18 +21,56 @@ object UpdateInstaller {
 
     fun version(context: Context): Map<String, Any> {
         val info = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            context.packageManager.getPackageInfo(context.packageName, android.content.pm.PackageManager.PackageInfoFlags.of(0))
+            context.packageManager.getPackageInfo(context.packageName, PackageManager.PackageInfoFlags.of(0))
         } else {
             @Suppress("DEPRECATION")
             context.packageManager.getPackageInfo(context.packageName, 0)
         }
-        val code = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+        return mapOf("name" to (info.versionName ?: "?"), "code" to versionCode(info))
+    }
+
+    /**
+     * Isi APK di [path] sebelum dipasang: nama paket dan versionCode, dan apakah sertifikat penandatangannya sama
+     * dengan aplikasi yang terpasang. Android sendiri menolak update dengan sertifikat lain; pemeriksaan ini hanya
+     * memberi pesan yang jelas sebelum penginstal dibuka.
+     */
+    fun inspect(context: Context, path: String): Map<String, Any?> {
+        val pm = context.packageManager
+        @Suppress("DEPRECATION")
+        val flags = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            PackageManager.GET_SIGNING_CERTIFICATES
+        } else {
+            PackageManager.GET_SIGNATURES
+        }
+        val archive = pm.getPackageArchiveInfo(path, flags)
+            ?: return mapOf("package" to null, "code" to 0, "sameSigner" to false)
+        val installed = pm.getPackageInfo(context.packageName, flags)
+        val archiveCerts = signers(archive)
+        return mapOf(
+            "package" to archive.packageName,
+            "code" to versionCode(archive),
+            "sameSigner" to (archiveCerts.isNotEmpty() && archiveCerts == signers(installed)),
+        )
+    }
+
+    private fun versionCode(info: PackageInfo): Int =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             info.longVersionCode.toInt()
         } else {
             @Suppress("DEPRECATION")
             info.versionCode
         }
-        return mapOf("name" to (info.versionName ?: "?"), "code" to code)
+
+    /** Sertifikat penandatangan (byte DER) sebagai himpunan heks, supaya urutan tidak berpengaruh. */
+    private fun signers(info: PackageInfo): Set<String> {
+        val certs = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            val signing = info.signingInfo ?: return emptySet()
+            if (signing.hasMultipleSigners()) signing.apkContentsSigners else signing.signingCertificateHistory
+        } else {
+            @Suppress("DEPRECATION")
+            info.signatures
+        } ?: return emptySet()
+        return certs.map { it.toCharsString() }.toSet()
     }
 
     /** Android 7 (API 24-25) memakai saklar global "Sumber tidak dikenal"; penginstal menanyakannya sendiri. */

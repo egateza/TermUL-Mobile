@@ -305,6 +305,16 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </div>
 </div>
 
+<button type="button" onClick="{{autoCheck.toggle}}" role="switch" aria-checked="{{autoCheck.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">Periksa update otomatis</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">Periksa saat aplikasi dibuka dan setiap 12 jam selama aplikasi terbuka.</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{autoCheck.bg}}; display: flex; justify-content: {{autoCheck.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{autoCheck.knob}}"></span>
+</span>
+</button>
+
 <div style="padding: 0 8px 4px 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #7F8D94">TermUL Mobile 0.1.0 · build 1</div>
 
 </div>
@@ -342,7 +352,7 @@ Pengaturan
 
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"fgOn":{"editor":"boolean","default":false,"section":"Tampilan"},"view":{"editor":"enum","default":"semua","options":["semua","koneksi","pembaruan"],"section":"Tampilan"},"update":{"editor":"enum","default":"terbaru","options":["belum","terbaru","tersedia","mengunduh","siap","izin","gagal"],"section":"Pembaruan"},"$preview":{"width":390,"height":844}}'>
+<script type="text/x-dc" data-dc-script data-props='{"fgOn":{"editor":"boolean","default":false,"section":"Tampilan"},"view":{"editor":"enum","default":"semua","options":["semua","koneksi","pembaruan"],"section":"Tampilan"},"update":{"editor":"enum","default":"terbaru","options":["belum","terbaru","tersedia","mengunduh","siap","izin","gagal"],"section":"Pembaruan"},"autoCheck":{"editor":"boolean","default":true,"section":"Pembaruan"},"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
   renderVals() {
     const s = this.state || {};
@@ -353,6 +363,7 @@ class Component extends DCLogic {
     const lock = s.lock || '60';
     const ka = s.ka || '30';
     const fgDefault = this.props.fgOn === true || this.props.fgOn === 'true';
+    const autoCheckOn = s.autoCheck === undefined ? this.props.autoCheck !== false && this.props.autoCheck !== 'false' : s.autoCheck;
     const showTop = this.props.view !== 'koneksi' && this.props.view !== 'pembaruan';
     const showMid = this.props.view !== 'pembaruan';
     // Keadaan pembaruan: prop awal, lalu tombol di bagian Pembaruan memindahkannya (tanpa unduhan sungguhan; Pasang memperlihatkan banner izin).
@@ -454,11 +465,20 @@ class Component extends DCLogic {
       toggle: () => this.setState({ sw: Object.assign({}, sw, { vopen: !vopenOn }) })
     };
 
+    const autoCheckSw = {
+      on: autoCheckOn,
+      bg: autoCheckOn ? '#F0B34A' : '#5C6A71',
+      align: autoCheckOn ? 'flex-end' : 'flex-start',
+      knob: autoCheckOn ? '#1B1406' : '#C5D0D5',
+      toggle: () => this.setState({ autoCheck: !autoCheckOn })
+    };
+
     return {
       showTop: showTop,
       showMid: showMid,
       up: up,
       hasUpdate: hasRelease,
+      autoCheck: autoCheckSw,
       navSettingsLabel: hasRelease ? 'Pengaturan, pembaruan tersedia' : 'Pengaturan',
       fg: fgSw,
       vopen: vopenSw,

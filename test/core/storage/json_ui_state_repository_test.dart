@@ -4,6 +4,7 @@ import 'dart:io';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/core/io/storage_exception.dart';
 import 'package:termul_mobile/core/storage/json/json_ui_state_repository.dart';
+import 'package:termul_mobile/core/storage/ui_state_repository.dart';
 
 void main() {
   late Directory dir;
@@ -70,5 +71,40 @@ void main() {
     await r.load();
     await expectLater(r.saveCollapsedGroups({'Produksi'}), throwsA(isA<StorageException>()));
     expect(r.collapsedGroups, isEmpty);
+  });
+
+  test('versi terlihat dan catatan rilis tertunda: disimpan, dibaca ulang, dan tidak menghapus grup yang diciutkan', () async {
+    final a = JsonUiStateRepository(file);
+    await a.load();
+    expect(a.seenVersionCode, isNull);
+    expect(a.pendingNotes, isNull);
+    await a.saveCollapsedGroups({'Lab'});
+    const notes = PendingNotes(versionCode: 120, version: '0.1.120', notes: '- Perbaikan');
+    await a.saveUpdateState(seenVersionCode: 111, pendingNotes: notes);
+    final b = JsonUiStateRepository(file);
+    await b.load();
+    expect(b.collapsedGroups, {'Lab'});
+    expect(b.seenVersionCode, 111);
+    expect(b.pendingNotes, notes);
+
+    await b.saveUpdateState(seenVersionCode: 120, pendingNotes: null);
+    final json = jsonDecode(await file.readAsString()) as Map<String, Object?>;
+    expect(json, {
+      'version': 1,
+      'collapsedGroups': ['Lab'],
+      'seenVersionCode': 120,
+    });
+  });
+
+  test('catatan tertunda tidak lengkap diabaikan', () async {
+    await file.writeAsString(jsonEncode({
+      'version': 1,
+      'seenVersionCode': 5,
+      'pendingNotes': {'versionCode': 6},
+    }));
+    final r = JsonUiStateRepository(file);
+    await r.load();
+    expect(r.seenVersionCode, 5);
+    expect(r.pendingNotes, isNull);
   });
 }

@@ -123,6 +123,22 @@ class MainActivity : FlutterFragmentActivity() {
                 when (call.method) {
                     "version" -> result.success(UpdateInstaller.version(applicationContext))
                     "canInstall" -> result.success(UpdateInstaller.canInstall(applicationContext))
+                    "inspect" -> {
+                        val path = call.argument<String>("path")
+                        if (path == null) {
+                            result.error("bad_args", "path wajib", null)
+                        } else {
+                            // Membaca APK puluhan MB: di thread latar belakang, jawab di thread utama.
+                            Thread {
+                                try {
+                                    val info = UpdateInstaller.inspect(applicationContext, path)
+                                    runOnUiThread { result.success(info) }
+                                } catch (e: Exception) {
+                                    runOnUiThread { result.error("inspect_failed", e.javaClass.simpleName, null) }
+                                }
+                            }.start()
+                        }
+                    }
                     "openInstallSettings" -> {
                         UpdateInstaller.openInstallSettings(this)
                         result.success(null)

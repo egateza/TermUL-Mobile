@@ -156,4 +156,14 @@ Berkas artifact dibaca dulu lewat `read` dan hash-nya sama dengan salinan lokal 
 - **Prototipe versi 59 (`1792250992-35d1`):** `Snippets.dc.html` ditulis ulang dengan `startAt` baru (`edit`, `empty`, `sort`, `categories`, `categoryName`, `warn`, `delete`): ikon Urutkan dan Kelola kategori di header; kartu bertag "berbahaya"; detail dengan ikon Hapus, tombol Salin, dan peringatan sebelum Tempel atau Salin untuk perintah berbahaya; editor dengan ikon pensil di label Kategori, chip "Tanpa kategori", saklar berbahaya (baris merah), dan tombol Hapus; keadaan kosong; mode urut (baris dengan pegangan titik dan ikon hapus); pengelola kategori (pegangan, jumlah, ubah nama, hapus dengan konfirmasi, Kategori baru) dan sheet nama (galat "sudah dipakai" dan "terlalu panjang"); bar navigasi empat tab (tanpa SFTP, sama dengan `Main`). `Terminal.dc.html`: panel snippet memakai kata "berbahaya", dua baris contoh baru (Restart Nginx ditandai berbahaya, Status layanan berisi variabel yang membuka detail), `startAt` `snippets`. `canvas.json`: judul papan 7 dan delapan papan baru (7c sampai 7i, 2o) di kolom sendiri tanpa menimpa papan lain. Papan 13 (`ComingSoon`) dan 7b (`SnippetNew`) tidak diubah; 13 tidak dipakai lagi oleh aplikasi.
 - **Design system versi 59 (`1792251008-13ee`):** `README.md`: butir Snippet ("tambahan sementara") diganti uraian Snippet yang dibangun (perbedaan, tambahan, dan yang belum ada); `components/Icon/README.md`: ikon `grip` dan `sort`; `design-system.json`: `lastChange`.
 
+## Sinkronisasi lokal alur pembaruan (2026-10-18)
+
+Atas arahan pemilik, perubahan desain ini hanya disinkronkan ke salinan lokal di `docs/design/`; tidak ada akses atau publikasi ke artifact Claude. Versi artifact di atas tetap mencatat salinan terakhir yang diketahui (design system 72, prototipe 71).
+
+- `README.md`: tambahan rincian yang menggantikan mekanisme rilis awal: tiga aset rilis, manifest Ed25519, validasi APK, versi berbasis jumlah commit, saklar pemeriksaan otomatis, dan lembar "Yang baru".
+- `prototype/Settings.dc.html`: saklar **Periksa update otomatis**, bawaan aktif, dengan keterangan pemeriksaan saat aplikasi dibuka dan setiap 12 jam selama aplikasi terbuka.
+- `prototype/SettingsWhatsNew.dc.html`: contoh baru 6e, lembar "Yang baru di X" dengan catatan rilis dan tombol Mengerti.
+- `prototype/canvas.json`: papan 6e didaftarkan di kanvas dan urutan halaman.
+- Render dan pemeriksaan visual browser belum dilakukan pada perubahan lokal ini.
+
 - **Perubahan 2026-10-17 (permintaan pemilik):** "Kirim ke" dan tempel ke sesi dihapus dari detail snippet di tab Snippet (prototipe 7 semula punya chip host); ikon Snippet di bilah tombol terminal kuning dan paling kiri. Hash berkas yang dibaca balik dari artifact sama dengan salinan lokal.
