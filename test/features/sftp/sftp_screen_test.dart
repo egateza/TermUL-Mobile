@@ -12,7 +12,9 @@ import 'package:termul_mobile/core/models/host_profile.dart';
 import 'package:termul_mobile/core/sftp/sftp_service.dart';
 import 'package:termul_mobile/core/theme/termul_theme.dart';
 import 'package:termul_mobile/features/sftp/sftp_link.dart';
+import 'package:termul_mobile/features/sessions/sessions_screen.dart';
 import 'package:termul_mobile/features/sftp/sftp_screen.dart';
+import 'package:termul_mobile/features/sftp/sftp_session_manager.dart';
 import 'package:termul_mobile/features/sftp/upload_picker.dart';
 import 'package:termul_mobile/l10n/app_localizations.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
@@ -24,6 +26,7 @@ HostProfile profile() =>
     HostProfile(id: '11111111-1111-4111-8111-111111111111', name: 'app-01', host: 'h', port: 22, username: 'u');
 
 late SftpLink lastLink;
+SftpSession? lastSession;
 
 class _Saver implements DownloadsSaver {
   final saved = <String>[];
@@ -76,6 +79,7 @@ Future<FakeFiles> pumpBrowser(
   Size size = const Size(390, 844),
   List<SftpEntry> extra = const [],
   bool confirmLeave = true,
+  bool asSession = false,
 }) async {
   _tmp = Directory.systemTemp.createTempSync('termul_layar_');
   addTearDown(() {
@@ -122,11 +126,16 @@ Future<FakeFiles> pumpBrowser(
     ),
   );
   lastLink = SftpLink.ready(profile: profile(), service: fake);
+  lastSession = asSession
+      ? ProviderScope.containerOf(tester.element(find.byType(MaterialApp)))
+            .read(sftpSessionManagerProvider.notifier)
+            .adopt(profile(), lastLink)
+      : null;
   tester
       .state<NavigatorState>(find.byType(Navigator))
       .push<void>(
         MaterialPageRoute(
-          builder: (_) => SftpBrowserScreen(link: lastLink, confirmLeave: confirmLeave),
+          builder: (_) => SftpBrowserScreen(link: lastLink, confirmLeave: confirmLeave, session: lastSession),
         ),
       );
   await tester.pumpAndSettle();
@@ -357,21 +366,120 @@ void main() {
     expect(find.text('Folder'), findsOneWidget, reason: 'folder biasa tanpa penanda');
   });
 
+  group('sesi SFTP mandiri', () {
+    ProviderContainer container(WidgetTester tester) =>
+        ProviderScope.containerOf(tester.element(find.byType(MaterialApp)));
+    List<SftpSession> kept(WidgetTester tester) => container(tester).read(sftpSessionManagerProvider);
+    bool disposed(SftpLink link) {
+      try {
+        link.addListener(() {});
+        return false;
+      } on FlutterError {
+        return true;
+      }
+    }
+
+    /// Dari folder awal: kembali membuka sheet keluar.
+    Future<void> openLeaveSheet(WidgetTester tester) async {
+      await tester.tap(find.bySemanticsLabel('Kembali'));
+      await tester.pumpAndSettle();
+    }
+
+    testWidgets('keluar menawarkan Tetap terhubung; pilihannya menutup layar dan sesi hidup di daftar', (tester) async {
+      await pumpBrowser(tester, asSession: true);
+      await openLeaveSheet(tester);
+      expect(find.text('Keluar dari SFTP?'), findsOneWidget);
+      expect(find.text('Tetap terhubung di latar belakang'), findsOneWidget);
+      expect(find.text('Putuskan'), findsOneWidget);
+
+      await tester.tap(find.text('Tetap terhubung di latar belakang'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SftpBrowserScreen), findsNothing);
+      expect(kept(tester), [lastSession]);
+      expect(disposed(lastLink), isFalse, reason: 'sambungan dibiarkan hidup');
+    });
+
+    testWidgets('Putuskan menutup sesi dan sambungannya', (tester) async {
+      await pumpBrowser(tester, asSession: true);
+      await openLeaveSheet(tester);
+      await tester.tap(find.text('Putuskan'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SftpBrowserScreen), findsNothing);
+      expect(kept(tester), isEmpty);
+      expect(disposed(lastLink), isTrue);
+    });
+
+    testWidgets('ada transfer: Tetap terhubung tidak membatalkan transfer', (tester) async {
+      await pumpBrowser(tester, asSession: true);
+      final t = lastLink.transfers.start(name: 'besar.iso', upload: false, total: 100);
+      await openLeaveSheet(tester);
+      expect(find.text('Transfer masih berjalan'), findsOneWidget);
+      expect(find.textContaining('Transfer tetap berjalan bila Anda memilih Tetap terhubung'), findsOneWidget);
+      await tester.tap(find.text('Tetap terhubung di latar belakang'));
+      await tester.pumpAndSettle();
+      expect(t.cancel.isCancelled, isFalse);
+      expect(kept(tester), [lastSession]);
+    });
+
+    testWidgets('tab Sesi memuat sesi SFTP dengan tanda SFTP; dibuka lagi dan keluar dari daftar latar belakang', (
+      tester,
+    ) async {
+      await pumpBrowser(tester, asSession: true);
+      await openLeaveSheet(tester);
+      await tester.tap(find.text('Tetap terhubung di latar belakang'));
+      await tester.pumpAndSettle();
+      expect(kept(tester), [lastSession]);
+
+      tester
+          .state<NavigatorState>(find.byType(Navigator))
+          .push<void>(MaterialPageRoute(builder: (_) => const SessionsScreen()));
+      await tester.pumpAndSettle();
+      expect(find.text('app-01'), findsOneWidget);
+      expect(find.text('SFTP'), findsOneWidget, reason: 'tanda jenis sesi');
+      expect(find.text('Tersambung'), findsOneWidget);
+
+      await tester.tap(find.bySemanticsLabel(RegExp('app-01 · SFTP, Tersambung')));
+      await tester.pumpAndSettle();
+      expect(find.byType(SftpBrowserScreen), findsOneWidget);
+      expect(kept(tester), isEmpty, reason: 'sesi yang dibuka tidak lagi di daftar latar belakang');
+      expect(find.text('app-01 · terhubung'), findsOneWidget);
+    });
+
+    testWidgets('Sesi: Putuskan menutup sesi SFTP dan melepasnya dari foreground service', (tester) async {
+      await pumpBrowser(tester, asSession: true);
+      final c = container(tester);
+      expect(c.read(activeSessionsProvider).map((s) => s.name), ['app-01 · SFTP']);
+      expect(c.read(activeSessionsProvider).single.id, isNegative);
+      c.read(sftpSessionManagerProvider.notifier).keep(lastSession!);
+      tester
+          .state<NavigatorState>(find.byType(Navigator))
+          .push<void>(MaterialPageRoute(builder: (_) => const SessionsScreen()));
+      await tester.pumpAndSettle();
+      await tester.tap(find.bySemanticsLabel(RegExp('Putuskan app-01 · SFTP')));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Putuskan').last);
+      await tester.pumpAndSettle();
+      expect(kept(tester), isEmpty);
+      expect(disposed(lastLink), isTrue);
+      expect(c.read(activeSessionsProvider), isEmpty);
+    });
+  });
+
   testWidgets('landscape pendek: daftar tidak meluap', (tester) async {
     await pumpBrowser(tester, size: const Size(844, 390));
     expect(tester.takeException(), isNull);
     expect(find.text('proyek'), findsOneWidget);
   });
 
-  testWidgets('tab SFTP: host tersimpan tampil sebagai sumber koneksi sendiri', (tester) async {
+  testWidgets('tidak ada tab SFTP; tekan lama host menawarkan Sambung SFTP di samping Sambung', (tester) async {
     final h = Harness();
     await h.seed([host('11111111-1111-4111-8111-111111111111', name: 'app-01')]);
     await h.pump(tester);
-    await tester.tap(find.descendant(of: find.byType(Navigator), matching: find.text('SFTP')).last);
+    expect(find.descendant(of: find.byType(Navigator), matching: find.text('SFTP')), findsNothing);
+    await tester.longPress(find.text('app-01'));
     await tester.pumpAndSettle();
-    expect(find.text('Koneksi sendiri'), findsOneWidget);
-    expect(find.text('app-01'), findsOneWidget);
-    expect(find.text('Sesi terbuka'), findsNothing);
+    expect(find.text('Sambung SFTP'), findsOneWidget);
+    expect(find.text('Sambung'), findsOneWidget);
   });
 
   group('transfer', () {

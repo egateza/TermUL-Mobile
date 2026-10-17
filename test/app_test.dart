@@ -23,7 +23,7 @@ void main() {
     final context = tester.element(find.byType(Scaffold).first);
     expect(AppLocalizations.of(context).appTitle, 'TermUL');
     expect(find.byType(TermulNavBar), findsOneWidget);
-    for (final tab in ['Host', 'Sesi', 'SFTP', 'Snippet', 'Pengaturan']) {
+    for (final tab in ['Host', 'Sesi', 'Snippet', 'Pengaturan']) {
       expect(
         find.descendant(of: find.byType(TermulNavBar), matching: find.text(tab)),
         findsOneWidget,

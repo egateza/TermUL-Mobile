@@ -17,6 +17,7 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../../shared/widgets/termul_toast.dart';
+import '../sftp/sftp_screen.dart' show openSftpOwn;
 import 'host_form_screen.dart';
 import 'host_list_model.dart';
 
@@ -63,6 +64,15 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
     widget.onConnect(context, p);
   }
 
+  /// "Sambung SFTP": sesi SFTP mandiri (bukan terminal). Profil agen yang belum lengkap ditolak seperti di terminal.
+  void _openSftp(HostProfile p) {
+    if (p.authMethod == AuthMethod.agent) {
+      _open(p);
+      return;
+    }
+    openSftpOwn(context, ref, p);
+  }
+
   void _showActions(HostProfile p) {
     final l = AppLocalizations.of(context);
     final fav = ref.read(hostSnapshotProvider).isFavorite(p.id);
@@ -71,6 +81,7 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
       title: l.hostActionsTitle(p.name),
       actions: [
         SheetAction(label: l.actionConnect, icon: TermulIconName.terminal, onSelected: () => _open(p)),
+        SheetAction(label: l.actionConnectSftp, icon: TermulIconName.sftp, onSelected: () => _openSftp(p)),
         SheetAction(label: l.actionEdit, icon: TermulIconName.edit, onSelected: () => _openForm(p)),
         SheetAction(
           label: fav ? l.actionUnfavorite : l.actionFavorite,

@@ -21,10 +21,10 @@ import '../connect/connect_flow.dart';
 import '../connect/connect_screen.dart' show connectFailureText;
 import '../connect/host_key_prompt.dart';
 import '../connect/session_controller.dart';
-import '../connect/session_manager.dart';
 import 'sftp_browser_controller.dart';
 import 'sftp_format.dart';
 import 'sftp_link.dart';
+import 'sftp_session_manager.dart';
 import 'sftp_transfer_actions.dart';
 import 'unique_name.dart';
 import 'sftp_transfers.dart';
@@ -50,175 +50,41 @@ void openSftpFromSession(BuildContext context, SessionController session, {bool 
   _pushLink(context, SftpLink.borrowed(session: session), confirmLeave: confirmLeave);
 }
 
-/// Tab SFTP: memilih sumber sambungan. Sesi terminal yang sedang hidup di latar belakang bisa dipinjam
-/// (sambungannya dipakai langsung, tanpa login lagi); host mana pun bisa dibuka dengan koneksi SFTP sendiri.
-class SftpScreen extends ConsumerWidget {
-  const SftpScreen({super.key});
-
-  void _openOwn(BuildContext context, WidgetRef ref, HostProfile profile) {
-    final l = AppLocalizations.of(context);
-    final link = SftpLink.own(
-      profile: profile,
-      flow: ConnectFlow(
-        profile: profile,
-        vault: ref.read(credentialVaultProvider),
-        hosts: ref.read(hostRepositoryProvider),
-        connect: ref.read(connectFunctionProvider),
-        unlockReason: l.unlockReason(profile.name),
-        gate: ref.read(authGateProvider),
-      ),
-      probe: ref.read(hostProbeProvider),
-      screenMonitor: ref.read(screenMonitorProvider),
-      autoReconnect: () => ref.read(appSettingsProvider).connection.autoReconnect,
-    );
-    _push(context, link);
-  }
-
-  void _openBorrowed(BuildContext context, SessionController session) => openSftpFromSession(context, session);
-
-  void _push(BuildContext context, SftpLink link) => _pushLink(context, link);
-
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
-    final l = AppLocalizations.of(context);
-    final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
-    final sessions = ref.watch(sessionManagerProvider);
-    final hosts = ref.watch(hostSnapshotProvider).profiles;
-    Widget heading(String text) => Padding(
-      padding: const EdgeInsets.fromLTRB(TermulSpacing.space3, TermulSpacing.space5, 0, TermulSpacing.space3),
-      child: Semantics(
-        header: true,
-        child: Text(text, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
-      ),
-    );
-    return Scaffold(
-      body: SafeArea(
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Padding(
-              padding: EdgeInsets.fromLTRB(
-                TermulSpacing.space8,
-                landscape ? TermulSpacing.space3 : TermulSpacing.space8,
-                TermulSpacing.space8,
-                TermulSpacing.space3,
-              ),
-              child: Semantics(
-                header: true,
-                child: Text(
-                  l.navSftp,
-                  style: (landscape ? TermulText.h2 : TermulText.h1).copyWith(color: TermulPalette.ink),
-                ),
-              ),
-            ),
-            Expanded(
-              child: ListView(
-                padding: const EdgeInsets.fromLTRB(TermulSpacing.space5, 0, TermulSpacing.space5, TermulSpacing.space8),
-                children: [
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3),
-                    child: Text(l.sftpIntro, style: TermulText.bodySm.copyWith(color: TermulPalette.inkSoft)),
-                  ),
-                  if (sessions.isNotEmpty) ...[
-                    heading(l.sftpSessionsHeading),
-                    for (final s in sessions)
-                      _SourceRow(
-                        key: ValueKey('sesi-${s.id}'),
-                        title: s.ordinal > 1 ? '${s.profile.name} · ${s.ordinal}' : s.profile.name,
-                        subtitle: l.sftpUseSession,
-                        icon: TermulIconName.terminal,
-                        onPressed: () => _openBorrowed(context, s),
-                      ),
-                  ],
-                  heading(l.sftpHostsHeading),
-                  if (hosts.isEmpty)
-                    Padding(
-                      padding: const EdgeInsets.all(TermulSpacing.space3),
-                      child: Text(l.sftpNoHosts, style: TermulText.body.copyWith(color: TermulPalette.inkMuted)),
-                    ),
-                  for (final h in hosts)
-                    _SourceRow(
-                      key: ValueKey('host-${h.id}'),
-                      title: h.name,
-                      subtitle: '${h.username}@${h.host}:${h.port}',
-                      icon: TermulIconName.hosts,
-                      onPressed: () => _openOwn(context, ref, h),
-                    ),
-                ],
-              ),
-            ),
-          ],
-        ),
-      ),
-    );
-  }
+/// Membuka sesi SFTP mandiri ke [profile] (menu tekan lama host: "Sambung SFTP"): koneksi SFTP sendiri dengan vault,
+/// biometrik, dan verifikasi host key yang sama dengan terminal. Sesinya dikelola [SftpSessionManager] dan bisa
+/// dibiarkan hidup di latar belakang.
+void openSftpOwn(BuildContext context, WidgetRef ref, HostProfile profile) {
+  final l = AppLocalizations.of(context);
+  final session = ref
+      .read(sftpSessionManagerProvider.notifier)
+      .create(profile, unlockReason: l.unlockReason(profile.name));
+  _pushSession(context, session);
 }
 
-class _SourceRow extends StatelessWidget {
-  const _SourceRow({super.key, required this.title, required this.subtitle, required this.icon, this.onPressed});
+/// Membuka lagi sesi SFTP yang hidup di latar belakang (dari tab Sesi).
+void openSftpSession(BuildContext context, WidgetRef ref, SftpSession session) {
+  ref.read(sftpSessionManagerProvider.notifier).take(session);
+  _pushSession(context, session);
+}
 
-  final String title;
-  final String subtitle;
-  final TermulIconName icon;
-  final VoidCallback? onPressed;
-
-  @override
-  Widget build(BuildContext context) {
-    return Padding(
-      padding: const EdgeInsets.only(bottom: TermulSpacing.space3),
-      child: Pressable(
-        onPressed: onPressed,
-        semanticLabel: '$title, $subtitle',
-        radius: TermulRadius.radiusXl,
-        minHeight: TermulSize.rowMin,
-        builder: (context, pressed) => Container(
-          constraints: const BoxConstraints(minHeight: TermulSize.rowMin),
-          padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space6, vertical: TermulSpacing.space4),
-          decoration: BoxDecoration(
-            color: TermulPalette.surface,
-            borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
-            border: Border.all(color: pressed ? TermulPalette.accent : TermulPalette.line),
-          ),
-          child: Row(
-            children: [
-              TermulIcon(icon, size: 22, color: TermulPalette.inkSoft),
-              const SizedBox(width: TermulSpacing.space6),
-              Expanded(
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.min,
-                  children: [
-                    Text(
-                      title,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TermulText.title.copyWith(color: TermulPalette.ink),
-                    ),
-                    const SizedBox(height: 3),
-                    Text(
-                      subtitle,
-                      maxLines: 1,
-                      overflow: TextOverflow.ellipsis,
-                      style: TermulText.caption.copyWith(fontFamily: TermulFonts.mono, color: TermulPalette.inkMuted),
-                    ),
-                  ],
-                ),
-              ),
-              const TermulIcon(TermulIconName.chevronRight, size: 20, color: TermulPalette.inkMuted),
-            ],
-          ),
-        ),
-      ),
-    );
-  }
+void _pushSession(BuildContext context, SftpSession session) {
+  Navigator.of(context).push<void>(
+    MaterialPageRoute(
+      builder: (_) => SftpBrowserScreen(link: session.link, session: session),
+    ),
+  );
 }
 
 /// Penjelajah folder satu sambungan ([SftpLink]). Menutup layar menutup koneksi SFTP sendiri (sesi yang dipinjam
 /// tetap hidup).
 class SftpBrowserScreen extends ConsumerStatefulWidget {
-  const SftpBrowserScreen({super.key, required this.link, this.confirmLeave = true});
+  const SftpBrowserScreen({super.key, required this.link, this.confirmLeave = true, this.session});
 
   final SftpLink link;
+
+  /// Sesi SFTP mandiri yang dikelola [SftpSessionManager]: sheet keluar menawarkan "Tetap terhubung", dan sesi
+  /// ditutup atau dibiarkan hidup saat layar ditutup. Kosong = sambungan pinjaman atau tes: ditutup bersama layar.
+  final SftpSession? session;
 
   /// false: keluar tanpa sheet konfirmasi bila tidak ada transfer berjalan (SFTP dibuka dari terminal yang sama).
   final bool confirmLeave;
@@ -235,10 +101,13 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
   );
   SftpBrowserController? _browser;
   SftpBrowsing? _boundTo;
+  SftpSessionManager? _sessions;
+  bool _keep = false;
 
   @override
   void initState() {
     super.initState();
+    _sessions = widget.session == null ? null : ref.read(sftpSessionManagerProvider.notifier);
     widget.link.addListener(_onLink);
     _bind();
   }
@@ -249,8 +118,8 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     if (service == null || identical(service, _boundTo)) return;
     _boundTo = service;
     // Setelah sambung ulang, kembali ke folder yang sedang dibuka.
-    final restore = _browser?.path;
-    final history = _browser?.history ?? const <String>[];
+    final restore = _browser?.path ?? widget.link.resumePath;
+    final history = _browser?.history ?? widget.link.resumeHistory;
     _browser?.dispose();
     _browser = SftpBrowserController(service);
     unawaited(_browser!.start(restore: restore, history: history));
@@ -265,7 +134,14 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
   void dispose() {
     widget.link.removeListener(_onLink);
     _browser?.dispose();
-    widget.link.dispose();
+    final session = widget.session;
+    if (session == null) {
+      widget.link.dispose();
+    } else if (_keep) {
+      _sessions!.keep(session);
+    } else {
+      _sessions!.release(session);
+    }
     super.dispose();
   }
 
@@ -359,8 +235,9 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
       if (overwrite) saveAs.clear();
     }
     final outcomes = <TransferOutcome>[];
+    // Tanpa pemeriksaan `mounted` dari sini: transfer terus berjalan (dan toast hasilnya tampil) walau layar SFTP ditutup
+    // dengan "Tetap terhubung".
     for (final e in entries) {
-      if (!mounted) return;
       final replace = overwrite && conflicts.contains(e);
       final outcome = e.isDirectory
           ? await _actions.downloadFolder(e, saveAs: saveAs[e.path], overwrite: replace)
@@ -368,7 +245,6 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
       outcomes.add(outcome);
       if (outcome is TransferCancelled) break;
     }
-    if (!mounted) return;
     if (outcomes.length == 1) {
       _toastOutcome(messenger, l, outcomes.single, upload: false);
       return;
@@ -457,6 +333,10 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     final l = AppLocalizations.of(context);
     final navigator = Navigator.of(context);
     final busy = link.transfers.isBusy;
+    if (widget.session != null) {
+      await _askLeaveOwn(busy);
+      return;
+    }
     await showTermulSheet<void>(
       context,
       title: busy ? l.sftpLeaveBusyTitle : l.sftpLeaveTitle,
@@ -474,6 +354,50 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
         link.transfers.cancelAll();
         navigator.pop();
       },
+    );
+  }
+
+  /// "Tetap terhubung": layar ditutup, sesi SFTP dibiarkan hidup (folder yang dibuka diingat untuk dibuka lagi).
+  void _keepInBackground() {
+    widget.link.resumePath = _browser?.path;
+    widget.link.resumeHistory = _browser?.history ?? const [];
+    _keep = true;
+    Navigator.of(context).pop();
+  }
+
+  /// Sheet keluar untuk sesi SFTP mandiri: Tetap terhubung (utama; transfer tetap berjalan), Putuskan, atau Batal.
+  Future<void> _askLeaveOwn(bool busy) async {
+    final l = AppLocalizations.of(context);
+    final link = widget.link;
+    final navigator = Navigator.of(context);
+    final keepAlive = ref.read(appSettingsProvider).connection.keepAlive;
+    await showTermulActions(
+      context,
+      title: busy ? l.sftpLeaveBusyTitle : l.sftpLeaveTitle,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: TermulSpacing.space3,
+        children: [
+          if (busy) _BusyTransfers(tracker: link.transfers),
+          Text(
+            busy ? l.sftpLeaveBusyKeepNote : l.sftpLeaveChoiceBody(link.profile.name),
+            style: TermulText.body.copyWith(color: TermulPalette.inkSoft),
+          ),
+          if (!keepAlive) TermulBanner(tone: BannerTone.warn, child: Text(l.terminalLeaveKeepAliveOff)),
+        ],
+      ),
+      actions: [
+        SheetAction(label: l.sftpLeaveKeep, primary: true, onSelected: _keepInBackground),
+        SheetAction(
+          label: busy ? l.sftpLeaveBusyConfirm : l.sftpLeaveDisconnect,
+          danger: busy,
+          onSelected: () {
+            link.transfers.cancelAll();
+            navigator.pop();
+          },
+        ),
+        SheetAction(label: l.actionCancel, onSelected: () {}),
+      ],
     );
   }
 

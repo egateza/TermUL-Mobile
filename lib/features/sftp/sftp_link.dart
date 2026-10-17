@@ -102,6 +102,11 @@ class SftpLink extends ChangeNotifier with WidgetsBindingObserver {
   bool _probing = false;
   int _screenOffBaseline = 0;
 
+  /// Folder yang sedang dibuka saat layar ditutup dengan "Tetap terhubung", dan riwayat folder sebelumnya, supaya
+  /// penjelajah yang dibuka lagi melanjutkan dari sana.
+  String? resumePath;
+  List<String> resumeHistory = const [];
+
   SftpBrowsing? get service => _service;
   bool get lost => _lost;
   bool get isOwn => flow != null;

@@ -662,7 +662,7 @@ class _Header extends StatelessWidget {
               ),
             ),
             if (onOpenSftp != null)
-              TermulIconButton(icon: TermulIconName.folder, label: l.terminalOpenSftp, onPressed: onOpenSftp),
+              TermulIconButton(icon: TermulIconName.sftp, label: l.terminalOpenSftp, onPressed: onOpenSftp),
           ],
         ),
       ),

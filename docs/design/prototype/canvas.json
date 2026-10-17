@@ -15,7 +15,7 @@
    "y": 0,
    "w": 390,
    "h": 844,
-   "title": "1 · Daftar host",
+   "title": "1 · Daftar host (empat tab; SFTP dibuka dari menu host atau terminal)",
    "is_interactive": true,
    "radius": 28
   },
@@ -491,6 +491,24 @@
    "title": "4m · SFTP: tautan simbolik (lencana tautan dan kata \"Tautan\")",
    "is_interactive": true,
    "radius": 28
+  },
+  "SftpLeaveKeep.dc.html": {
+   "x": 5640,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4n · SFTP mandiri: keluar dengan Tetap terhubung (ada varian transfer berjalan)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "HostActions.dc.html": {
+   "x": 6110,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "1d · Menu tekan lama host: Sambung (terminal) dan Sambung SFTP",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -547,7 +565,9 @@
   "SftpConflictDownload.dc.html",
   "SftpSelect.dc.html",
   "SftpTransferFolder.dc.html",
-  "SftpLinks.dc.html"
+  "SftpLinks.dc.html",
+  "SftpLeaveKeep.dc.html",
+  "HostActions.dc.html"
  ],
  "notes": {
   "judul": {

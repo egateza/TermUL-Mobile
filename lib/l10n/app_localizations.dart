@@ -2082,6 +2082,42 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Buka panel SFTP'**
   String get terminalOpenSftp;
+
+  /// Isi sheet keluar SFTP mandiri.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap terhubung membiarkan koneksi SFTP ke {name} di latar belakang; buka lagi dari tab Sesi. Putuskan menutup koneksinya.'**
+  String sftpLeaveChoiceBody(String name);
+
+  /// Tombol utama sheet keluar SFTP mandiri.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap terhubung di latar belakang'**
+  String get sftpLeaveKeep;
+
+  /// Tombol menutup koneksi SFTP mandiri saat keluar.
+  ///
+  /// In id, this message translates to:
+  /// **'Putuskan'**
+  String get sftpLeaveDisconnect;
+
+  /// Catatan sheet keluar SFTP mandiri saat ada transfer.
+  ///
+  /// In id, this message translates to:
+  /// **'Transfer tetap berjalan bila Anda memilih Tetap terhubung. Memutuskan membatalkan semuanya.'**
+  String get sftpLeaveBusyKeepNote;
+
+  /// Tanda jenis sesi SFTP di daftar Sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'SFTP'**
+  String get sessionsSftpTag;
+
+  /// Aksi di menu tekan lama host: membuka sesi SFTP mandiri.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambung SFTP'**
+  String get actionConnectSftp;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

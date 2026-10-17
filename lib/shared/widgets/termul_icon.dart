@@ -42,7 +42,11 @@ enum TermulIconName {
   file('M6 3h8l5 5v13H6zM14 3v5h5'),
   upload('M12 16V5M7 10l5-5 5 5M5 19h14'),
   download('M12 5v11M7 11l5 5 5-5M5 19h14'),
-  link('M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1');
+  link('M10 14a4 4 0 0 0 5.7 0l3-3a4 4 0 0 0-5.7-5.7l-1 1M14 10a4 4 0 0 0-5.7 0l-3 3a4 4 0 0 0 5.7 5.7l1-1'),
+  // Folder berpanah naik-turun: folder di server jauh (SFTP), berbeda dari `folder` polos.
+  sftp(
+    'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9.5 16v-5.5M7.5 12.5l2-2 2 2M14.5 10.5V16M12.5 14l2 2 2-2',
+  );
 
   const TermulIconName(this._extra);
 

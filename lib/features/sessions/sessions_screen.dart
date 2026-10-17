@@ -13,6 +13,9 @@ import '../../shared/widgets/termul_sheet.dart';
 import '../connect/connect_screen.dart';
 import '../connect/session_controller.dart';
 import '../connect/session_manager.dart';
+import '../sftp/sftp_link.dart';
+import '../sftp/sftp_screen.dart' show openSftpSession;
+import '../sftp/sftp_session_manager.dart';
 
 /// Daftar sesi yang dibiarkan hidup di latar belakang ("Tetap terhubung"). Mengetuk sesi membukanya lagi untuk
 /// dilanjutkan; beberapa sesi ke profil yang sama dibedakan nomor dan jam mulainya. Tab "Sesi" di `NavBar`
@@ -56,6 +59,22 @@ class SessionsScreen extends ConsumerWidget {
     );
   }
 
+  Future<void> _confirmDisconnectSftp(BuildContext context, WidgetRef ref, SftpSession s) {
+    final l = AppLocalizations.of(context);
+    return showTermulSheet<void>(
+      context,
+      title: l.sessionsDisconnectTitle,
+      child: Text(
+        l.sessionsDisconnectBody(s.profile.name),
+        style: TermulText.body.copyWith(color: TermulPalette.inkSoft),
+      ),
+      cancelLabel: l.actionCancel,
+      confirmLabel: l.actionDisconnect,
+      confirmIsDanger: true,
+      onConfirm: () => ref.read(sftpSessionManagerProvider.notifier).release(s),
+    );
+  }
+
   Future<void> _confirmDisconnectAll(BuildContext context, WidgetRef ref, int count) {
     final l = AppLocalizations.of(context);
     return showTermulSheet<void>(
@@ -65,7 +84,10 @@ class SessionsScreen extends ConsumerWidget {
       cancelLabel: l.actionCancel,
       confirmLabel: l.actionDisconnect,
       confirmIsDanger: true,
-      onConfirm: ref.read(sessionManagerProvider.notifier).disconnectAllKept,
+      onConfirm: () {
+        ref.read(sessionManagerProvider.notifier).disconnectAllKept();
+        ref.read(sftpSessionManagerProvider.notifier).disconnectAllKept();
+      },
     );
   }
 
@@ -73,6 +95,8 @@ class SessionsScreen extends ConsumerWidget {
   Widget build(BuildContext context, WidgetRef ref) {
     final l = AppLocalizations.of(context);
     final sessions = ref.watch(sessionManagerProvider);
+    final sftp = ref.watch(sftpSessionManagerProvider);
+    final total = sessions.length + sftp.length;
     final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     return Scaffold(
       body: SafeArea(
@@ -109,7 +133,7 @@ class SessionsScreen extends ConsumerWidget {
               ),
             ),
             Expanded(
-              child: sessions.isEmpty
+              child: total == 0
                   ? Padding(
                       padding: const EdgeInsets.all(TermulSpacing.space8),
                       child: Center(
@@ -159,11 +183,19 @@ class SessionsScreen extends ConsumerWidget {
                           ),
                           const SizedBox(height: TermulSpacing.space3),
                         ],
-                        if (sessions.length > 1) ...[
+                        for (final s in sftp) ...[
+                          _SftpSessionRow(
+                            session: s,
+                            onOpen: () => openSftpSession(context, ref, s),
+                            onDisconnect: () => _confirmDisconnectSftp(context, ref, s),
+                          ),
+                          const SizedBox(height: TermulSpacing.space3),
+                        ],
+                        if (total > 1) ...[
                           const SizedBox(height: TermulSpacing.space5),
                           TermulButton(
                             label: l.sessionsDisconnectAll,
-                            onPressed: () => _confirmDisconnectAll(context, ref, sessions.length),
+                            onPressed: () => _confirmDisconnectAll(context, ref, total),
                           ),
                         ],
                       ],
@@ -227,6 +259,100 @@ class _SessionRow extends StatelessWidget {
               TermulIconButton(
                 icon: TermulIconName.close,
                 label: l.sessionsDisconnectLabel(title),
+                onPressed: onDisconnect,
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
+}
+
+/// Sesi SFTP mandiri yang hidup di latar belakang: tanda "SFTP" di samping nama, status dengan kata yang sama dengan
+/// sesi terminal.
+class _SftpSessionRow extends StatelessWidget {
+  const _SftpSessionRow({required this.session, required this.onOpen, required this.onDisconnect});
+
+  final SftpSession session;
+  final VoidCallback onOpen;
+  final VoidCallback onDisconnect;
+
+  static SessionPhase _phase(SftpLink link) {
+    if (link.lost) {
+      if (link.reconnecting) return SessionPhase.reconnecting;
+      if (link.needsAuth) return SessionPhase.needsAttention;
+      return SessionPhase.lost;
+    }
+    return link.service == null ? SessionPhase.connecting : SessionPhase.connected;
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return ListenableBuilder(
+      listenable: session.link,
+      builder: (context, _) {
+        final p = session.profile;
+        final (status, word) = SessionsScreen.statusOf(l, _phase(session.link));
+        final title = session.ordinal > 1 ? '${p.name} · ${l.sessionsNumber(session.ordinal)}' : p.name;
+        final label = '$title · ${l.sessionsSftpTag}';
+        return TermulCard(
+          child: Row(
+            children: [
+              Expanded(
+                child: Pressable(
+                  onPressed: onOpen,
+                  semanticLabel: l.sessionsOpenLabel(label, word),
+                  radius: TermulRadius.radiusMd,
+                  minHeight: 56,
+                  builder: (context, pressed) => Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    spacing: TermulSpacing.space2,
+                    children: [
+                      Row(
+                        spacing: TermulSpacing.space3,
+                        children: [
+                          Flexible(
+                            child: Text(
+                              title,
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TermulText.title.copyWith(
+                                color: pressed ? TermulPalette.accent : TermulPalette.ink,
+                              ),
+                            ),
+                          ),
+                          Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 1),
+                            decoration: BoxDecoration(
+                              borderRadius: BorderRadius.circular(TermulRadius.radiusSm),
+                              border: Border.all(color: TermulPalette.lineStrong),
+                            ),
+                            child: Text(
+                              l.sessionsSftpTag,
+                              style: TermulText.caption.copyWith(
+                                fontFamily: TermulFonts.mono,
+                                color: TermulPalette.inkSoft,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                      Text(
+                        '${p.username}@${p.host}:${p.port} · ${l.sessionsStarted(SessionsScreen._time(session.startedAt))}',
+                        maxLines: 1,
+                        overflow: TextOverflow.ellipsis,
+                        style: TermulText.terminalSm.copyWith(color: TermulPalette.inkMuted),
+                      ),
+                      StatusDot(status: status, label: word),
+                    ],
+                  ),
+                ),
+              ),
+              TermulIconButton(
+                icon: TermulIconName.close,
+                label: l.sessionsDisconnectLabel(label),
                 onPressed: onDisconnect,
               ),
             ],

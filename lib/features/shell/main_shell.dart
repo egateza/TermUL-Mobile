@@ -8,11 +8,13 @@ import '../../shared/widgets/termul_nav_bar.dart';
 import '../connect/session_manager.dart';
 import '../hosts/host_list_screen.dart';
 import '../sessions/sessions_screen.dart';
+import '../sftp/sftp_session_manager.dart';
 import '../settings/settings_screen.dart';
-import '../sftp/sftp_screen.dart';
 import 'coming_soon_screen.dart';
 
-/// Kerangka layar utama: lima tab di `NavBar` (Host, Sesi, SFTP, Snippet, Pengaturan; desain `Main`). Tab dibangun
+/// Kerangka layar utama: empat tab di `NavBar` (Host, Sesi, Snippet, Pengaturan). Tab SFTP dihapus (keputusan pemilik
+/// 2026-10-17): SFTP dibuka dari menu tekan lama host ("Sambung SFTP") atau tombol SFTP di terminal, dan sesinya muncul
+/// di Sesi. Tab dibangun
 /// saat pertama dibuka lalu dipertahankan, jadi pencarian dan gulir di daftar host tidak hilang saat berpindah tab.
 /// Layar terminal dan form dibuka di atas kerangka ini sehingga bar tidak tampil di sana. Bar disembunyikan selagi
 /// keyboard terbuka supaya ruang isian tidak terpotong.
@@ -26,7 +28,7 @@ class MainShell extends ConsumerStatefulWidget {
 }
 
 class _MainShellState extends ConsumerState<MainShell> {
-  static const _ids = ['hosts', 'sessions', 'sftp', 'snippets', 'settings'];
+  static const _ids = ['hosts', 'sessions', 'snippets', 'settings'];
 
   int _index = 0;
   final _visited = <int>{0};
@@ -43,15 +45,14 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget _page(int i, AppLocalizations l) => switch (i) {
     0 => HostListScreen(onConnect: widget.onConnect),
     1 => const SessionsScreen(showBack: false),
-    2 => const SftpScreen(),
-    3 => ComingSoonScreen(title: l.navSnippets, heading: l.comingSoonHeading, body: l.comingSoonSnippets),
+    2 => ComingSoonScreen(title: l.navSnippets, heading: l.comingSoonHeading, body: l.comingSoonSnippets),
     _ => const SettingsScreen(showBack: false),
   };
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final sessions = ref.watch(sessionManagerProvider).length;
+    final sessions = ref.watch(sessionManagerProvider).length + ref.watch(sftpSessionManagerProvider).length;
     final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
     final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     final items = [
@@ -63,7 +64,6 @@ class _MainShellState extends ConsumerState<MainShell> {
         badge: sessions,
         semanticLabel: sessions > 0 ? l.hostsOpenSessions(sessions) : null,
       ),
-      NavItem(id: 'sftp', label: l.navSftp, icon: TermulIconName.folder),
       NavItem(id: 'snippets', label: l.navSnippets, icon: TermulIconName.snippets),
       NavItem(id: 'settings', label: l.navSettings, icon: TermulIconName.settings),
     ];

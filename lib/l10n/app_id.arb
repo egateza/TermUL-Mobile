@@ -1679,5 +1679,34 @@
   "terminalOpenSftp": "Buka panel SFTP",
   "@terminalOpenSftp": {
     "description": "Tombol folder di header terminal: membuka SFTP lewat sambungan sesi yang sama."
+  },
+  "sftpLeaveChoiceBody": "Tetap terhubung membiarkan koneksi SFTP ke {name} di latar belakang; buka lagi dari tab Sesi. Putuskan menutup koneksinya.",
+  "@sftpLeaveChoiceBody": {
+    "description": "Isi sheet keluar SFTP mandiri.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpLeaveKeep": "Tetap terhubung di latar belakang",
+  "@sftpLeaveKeep": {
+    "description": "Tombol utama sheet keluar SFTP mandiri."
+  },
+  "sftpLeaveDisconnect": "Putuskan",
+  "@sftpLeaveDisconnect": {
+    "description": "Tombol menutup koneksi SFTP mandiri saat keluar."
+  },
+  "sftpLeaveBusyKeepNote": "Transfer tetap berjalan bila Anda memilih Tetap terhubung. Memutuskan membatalkan semuanya.",
+  "@sftpLeaveBusyKeepNote": {
+    "description": "Catatan sheet keluar SFTP mandiri saat ada transfer."
+  },
+  "sessionsSftpTag": "SFTP",
+  "@sessionsSftpTag": {
+    "description": "Tanda jenis sesi SFTP di daftar Sesi."
+  },
+  "actionConnectSftp": "Sambung SFTP",
+  "@actionConnectSftp": {
+    "description": "Aksi di menu tekan lama host: membuka sesi SFTP mandiri."
   }
 }

@@ -1164,4 +1164,25 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get terminalOpenSftp => 'Buka panel SFTP';
+
+  @override
+  String sftpLeaveChoiceBody(String name) {
+    return 'Tetap terhubung membiarkan koneksi SFTP ke $name di latar belakang; buka lagi dari tab Sesi. Putuskan menutup koneksinya.';
+  }
+
+  @override
+  String get sftpLeaveKeep => 'Tetap terhubung di latar belakang';
+
+  @override
+  String get sftpLeaveDisconnect => 'Putuskan';
+
+  @override
+  String get sftpLeaveBusyKeepNote =>
+      'Transfer tetap berjalan bila Anda memilih Tetap terhubung. Memutuskan membatalkan semuanya.';
+
+  @override
+  String get sessionsSftpTag => 'SFTP';
+
+  @override
+  String get actionConnectSftp => 'Sambung SFTP';
 }
