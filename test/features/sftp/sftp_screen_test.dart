@@ -319,6 +319,27 @@ void main() {
     });
   });
 
+  testWidgets('muat ulang (tombol dan tarik ke bawah): toast bila berhasil, tanpa toast bila gagal', (tester) async {
+    final fake = await pumpBrowser(tester);
+    await tester.tap(find.bySemanticsLabel('Muat ulang'));
+    await tester.pumpAndSettle();
+    expect(find.text('Daftar file diperbarui'), findsOneWidget);
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+    expect(find.text('Daftar file diperbarui'), findsNothing);
+
+    await tester.fling(find.text('catatan.txt'), const Offset(0, 400), 1000);
+    await tester.pumpAndSettle();
+    expect(find.text('Daftar file diperbarui'), findsOneWidget, reason: 'tarik ke bawah');
+    await tester.pump(const Duration(seconds: 4));
+    await tester.pumpAndSettle();
+
+    fake.failures['/home/u'] = const SftpFailure(SftpFailureKind.permissionDenied, 'ditolak');
+    await tester.tap(find.bySemanticsLabel('Muat ulang'));
+    await tester.pumpAndSettle();
+    expect(find.text('Daftar file diperbarui'), findsNothing, reason: 'gagal: galat tampil di banner');
+  });
+
   testWidgets('landscape pendek: daftar tidak meluap', (tester) async {
     await pumpBrowser(tester, size: const Size(844, 390));
     expect(tester.takeException(), isNull);

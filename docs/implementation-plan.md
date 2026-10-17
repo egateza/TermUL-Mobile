@@ -847,9 +847,15 @@ Permintaan pemilik: multi seleksi di SFTP lewat tekan lama (berkas maupun folder
 - **Belum teruji di HP:** Timpa semuanya pada folder, unduh folder besar dan lama, pembatalan di tengah folder, sambungan putus di tengah folder, Android di bawah 10.
 - **Desain (sudah di artifact):** contoh baru 4k (seleksi ganda) dan 4l (unduh folder berjalan) di prototipe dan canvas; catatan di README design system (butir SFTP). Sheet "N item sudah ada" belum punya contoh sendiri (bentuknya sama dengan 4i dan 4j).
 
+## 11v. SFTP: toast saat daftar dimuat ulang (2026-10-17)
+
+**Selesai (480 tes). Belum diuji di HP. Design system versi 48 (`1792235871-a469`, catatan di README); prototipe tidak berubah (toast memakai komponen yang ada).**
+
+Permintaan pemilik: toast saat muat ulang lewat tombol header maupun tarik ke bawah. `_refresh()` di layar SFTP memuat ulang lalu menampilkan "Daftar file diperbarui" **hanya bila berhasil**; bila gagal tidak ada toast karena galat sudah tampil di banner. Tombol Coba lagi di banner galat dan muat ulang otomatis setelah unggah tidak menampilkan toast. Tes: tombol, tarik ke bawah, dan kegagalan tanpa toast.
+
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-17. **SFTP selesai untuk menjelajah, sambung ulang otomatis, unduh, unggah, seleksi ganda, dan unduh folder (11n sampai 11u; 11u belum diuji di HP); edit berkas, buat folder, ganti nama, dan hapus belum.** Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), sesi di latar belakang (11e), sambung ulang menunggu jaringan (11f), layar pemuatan dan gulir seleksi (11g), `NavBar` lima tab (11h), saklar sambung ulang otomatis (11i), popover Tempel dan saklarnya (11j), dan landscape layar utama (11k). 479 tes lulus (2 dilewati), `flutter analyze` bersih. **Dua perbaikan landscape (banner status sambungan dan label profil, 11l; form host dengan keyboard, 11m) teruji di HP dan artifact desainnya sudah diperbarui.** Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-17. **SFTP selesai untuk menjelajah, sambung ulang otomatis, unduh, unggah, seleksi ganda, dan unduh folder (11n sampai 11u; 11u belum diuji di HP); edit berkas, buat folder, ganti nama, dan hapus belum.** Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), sesi di latar belakang (11e), sambung ulang menunggu jaringan (11f), layar pemuatan dan gulir seleksi (11g), `NavBar` lima tab (11h), saklar sambung ulang otomatis (11i), popover Tempel dan saklarnya (11j), dan landscape layar utama (11k). 480 tes lulus (2 dilewati), `flutter analyze` bersih. **Dua perbaikan landscape (banner status sambungan dan label profil, 11l; form host dengan keyboard, 11m) teruji di HP dan artifact desainnya sudah diperbarui.** Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
 **Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Tempel (11c, 11j) dan landscape (11k) sudah dicoba di HP lewat adb (2026-10-16).** **Landscape: banner, label profil, form host, pencarian, dan dropdown teruji di HP (2026-10-17).** **Teruji di HP 2026-10-17:** tempel isi papan klip panjang (91 baris), "Putuskan semua" dari notifikasi, dan layar mati sekitar 25 menit (sesi tetap hidup; HP masih tercolok kabel). **Belum diuji di HP:** layar mati 30 menit atau lebih tanpa kabel, efek HyperOS. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
@@ -859,13 +865,13 @@ Terakhir diperbarui: 2026-10-17. **SFTP selesai untuk menjelajah, sambung ulang 
 
 **Kandidat irisan berikutnya (menunggu persetujuan):** sambung ulang berulang dengan jeda dan saklarnya (sudah dikerjakan di 11f dan 11i; saklar sudah dicoba pemilik di HP), [gulir otomatis seleksi dan layar pemuatan: sudah dikerjakan di 11g, belum diuji di HP] [popover Tempel dan saklar konfirmasi tempel: sudah dikerjakan di 11j, teruji di HP] [landscape layar utama: sudah dikerjakan di 11k, teruji di HP; banner sambungan, label profil, dan form host landscape: 11l dan 11m, teruji di HP, desain sudah sinkron] snippet, sisa pengaturan (tema terminal dan lainnya). **Di luar irisan pertama (belum dibuat):** status host online/offline, profil agen, ekspor profil KEY ke desktop (10.2 nomor 1).
 
-**Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 47, prototipe versi 50; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
+**Tindakan:** pembersihan sumber daya sementara (daftar di bawah, butuh persetujuan pengguna). Sinkron desain: salinan lokal `docs/design/` sama dengan kedua artifact (design system versi 48, prototipe versi 50; lihat `docs/design/SUMBER.md`). `PRIVATE_KEY_PEM` kode 5 hanya dicatat di dokumen ini, belum di desain.
 
 Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 479 tes otomatis (2 dilewati), tanpa jaringan
+flutter test                                   # 480 tes otomatis (2 dilewati), tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]

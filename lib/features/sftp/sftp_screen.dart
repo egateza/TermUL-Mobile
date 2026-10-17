@@ -406,6 +406,17 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     }
   }
 
+  /// Muat ulang dari tombol header atau tarik ke bawah: toast hanya bila berhasil (galat tampil di banner).
+  Future<void> _refresh() async {
+    final browser = _browser;
+    if (browser == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l = AppLocalizations.of(context);
+    await browser.refresh();
+    if (!mounted || browser.failure != null) return;
+    showTermulToastOn(messenger, l.sftpRefreshed);
+  }
+
   /// Tombol kembali (header dan sistem): selagi ada pilihan, hanya melepas pilihan; di dalam folder yang dibuka dari folder lain, kembali ke folder sebelumnya;
   /// di folder awal baru menanyakan keluar. Selagi folder dimuat, ketukan kembali tidak keluar.
   void _back() {
@@ -537,7 +548,7 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
                     : l.sftpConnectedTo(link.profile.name),
                 subtitleColor: link.service != null && link.lost ? TermulPalette.bad : TermulPalette.ok,
                 onBack: _back,
-                onRefresh: browser == null || link.lost ? null : () => unawaited(browser.refresh()),
+                onRefresh: browser == null || link.lost ? null : () => unawaited(_refresh()),
                 onUpload: browser == null || link.lost ? null : () => unawaited(_upload()),
               ),
               Expanded(
@@ -545,7 +556,8 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
                     ? _Connecting(link: link, state: state, onLeave: _leave)
                     : ListenableBuilder(
                         listenable: Listenable.merge([browser, link, link.transfers]),
-                        builder: (context, _) => _Listing(browser: browser, link: link, onDownload: _download),
+                        builder: (context, _) =>
+                            _Listing(browser: browser, link: link, onDownload: _download, onRefresh: _refresh),
                       ),
               ),
             ],
@@ -759,7 +771,9 @@ class _Problem extends StatelessWidget {
 }
 
 class _Listing extends StatelessWidget {
-  const _Listing({required this.browser, required this.link, required this.onDownload});
+  const _Listing({required this.browser, required this.link, required this.onDownload, required this.onRefresh});
+
+  final Future<void> Function() onRefresh;
 
   final void Function(List<SftpEntry>) onDownload;
 
@@ -874,7 +888,7 @@ class _Listing extends StatelessWidget {
                   child: Text(l.sftpEmptyFolder, style: TermulText.body.copyWith(color: TermulPalette.inkMuted)),
                 )
               : RefreshIndicator(
-                  onRefresh: browser.refresh,
+                  onRefresh: onRefresh,
                   child: ListView(
                     physics: const AlwaysScrollableScrollPhysics(),
                     padding: const EdgeInsets.fromLTRB(

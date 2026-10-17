@@ -2064,6 +2064,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'{name} tidak berisi berkas'**
   String sftpFolderNoFiles(String name);
+
+  /// Toast setelah daftar folder berhasil dimuat ulang (tombol atau tarik ke bawah).
+  ///
+  /// In id, this message translates to:
+  /// **'Daftar file diperbarui'**
+  String get sftpRefreshed;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

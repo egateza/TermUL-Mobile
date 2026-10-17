@@ -1155,4 +1155,7 @@ class AppLocalizationsId extends AppLocalizations {
   String sftpFolderNoFiles(String name) {
     return '$name tidak berisi berkas';
   }
+
+  @override
+  String get sftpRefreshed => 'Daftar file diperbarui';
 }
