@@ -129,6 +129,13 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
     final messenger = ScaffoldMessenger.of(context);
     try {
       await ref.read(hostServiceProvider).deleteHost(p.id);
+      // Snippet yang terikat ke host ini jatuh ke "semua host". Bila gagal, daftar snippet tetap menampilkannya
+      // sebagai "semua host" karena host-nya sudah tidak ada.
+      try {
+        await ref.read(snippetRepositoryProvider).clearHost(p.id);
+      } on Object {
+        // Tidak menggagalkan penghapusan host yang sudah berhasil.
+      }
       if (!mounted) return;
       setState(() => _error = null);
       messenger.hideCurrentSnackBar();

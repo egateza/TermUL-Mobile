@@ -581,15 +581,6 @@ class AppLocalizationsId extends AppLocalizations {
   String get navSettings => 'Pengaturan';
 
   @override
-  String get comingSoonHeading => 'Belum tersedia';
-
-  @override
-  String get comingSoonSftp => 'Menjelajah dan memindahkan berkas lewat SFTP belum ada di versi ini.';
-
-  @override
-  String get comingSoonSnippets => 'Menyimpan perintah yang sering dipakai belum ada di versi ini.';
-
-  @override
   String get settingsTitle => 'Pengaturan';
 
   @override
@@ -1362,4 +1353,282 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get exportFailed => 'Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.';
+
+  @override
+  String get snippetsAdd => 'Snippet baru';
+
+  @override
+  String get snippetsSearchLabel => 'Cari snippet';
+
+  @override
+  String get snippetsSearchPlaceholder => 'Cari judul atau perintah';
+
+  @override
+  String get snippetsNoMatch => 'Tidak ada snippet yang cocok. Ubah kata kunci atau filter.';
+
+  @override
+  String get snippetsEmptyTitle => 'Belum ada snippet';
+
+  @override
+  String get snippetsEmptyBody =>
+      'Simpan perintah yang sering dipakai di sini, lengkap dengan variabel yang diisi saat dipakai.';
+
+  @override
+  String get snippetsCorruptTitle => 'Daftar snippet rusak';
+
+  @override
+  String snippetsCorruptBody(String name) {
+    return 'Berkas snippet tidak bisa dibaca dan disimpan sebagai $name. Aplikasi mulai dari daftar kosong; berkas lama tidak dihapus.';
+  }
+
+  @override
+  String get snippetScopeAll => 'Semua host';
+
+  @override
+  String snippetVarCount(int count) {
+    return '$count variabel';
+  }
+
+  @override
+  String get snippetFavoriteLabel => 'Favorit';
+
+  @override
+  String get snippetDetailVariable => 'Isi nilai';
+
+  @override
+  String get snippetDetailRisky =>
+      'Perintah berbahaya. Periksa dulu sebelum dipakai: tempel, periksa, lalu tekan Enter sendiri.';
+
+  @override
+  String get snippetDetailNotReady => 'Isi semua variabel untuk menempel atau menyalin.';
+
+  @override
+  String get snippetDetailCopy => 'Salin';
+
+  @override
+  String get snippetDetailEdit => 'Edit';
+
+  @override
+  String snippetCopied(int count) {
+    return 'Disalin · $count karakter';
+  }
+
+  @override
+  String get snippetEditorNewTitle => 'Snippet baru';
+
+  @override
+  String get snippetEditorEditTitle => 'Edit snippet';
+
+  @override
+  String get snippetFieldTitle => 'Judul';
+
+  @override
+  String get snippetFieldTitlePlaceholder => 'Mis. Cek config lalu reload Nginx';
+
+  @override
+  String snippetFieldCommand(String example) {
+    return 'Perintah (boleh beberapa baris; variabel ditulis $example)';
+  }
+
+  @override
+  String get snippetFieldCategory => 'Kategori';
+
+  @override
+  String get snippetFieldScope => 'Berlaku untuk';
+
+  @override
+  String get snippetScopeOneHost => 'Satu host';
+
+  @override
+  String get snippetScopePickTitle => 'Pilih host';
+
+  @override
+  String get snippetFavoriteToggle => 'Tandai favorit';
+
+  @override
+  String get snippetSaved => 'Snippet disimpan';
+
+  @override
+  String get snippetSaveFailed => 'Snippet tidak bisa disimpan. Coba lagi.';
+
+  @override
+  String snippetDeleteTitle(String title) {
+    return 'Hapus $title?';
+  }
+
+  @override
+  String get snippetDeleteBody => 'Snippet ini dihapus permanen dari perangkat.';
+
+  @override
+  String get snippetDeleted => 'Snippet dihapus';
+
+  @override
+  String get snippetDeleteFailed => 'Snippet tidak bisa dihapus. Coba lagi.';
+
+  @override
+  String get snippetCategoryNone => 'Tanpa kategori';
+
+  @override
+  String get snippetsManageCategories => 'Kelola kategori';
+
+  @override
+  String get categoryManagerTitle => 'Kelola kategori';
+
+  @override
+  String get categoryManagerEmpty => 'Belum ada kategori. Tambahkan satu untuk mengelompokkan snippet.';
+
+  @override
+  String categoryCount(int count) {
+    return '$count snippet';
+  }
+
+  @override
+  String get categoryAdd => 'Kategori baru';
+
+  @override
+  String categoryEditLabel(String name) {
+    return 'Ubah $name';
+  }
+
+  @override
+  String categoryDeleteLabel(String name) {
+    return 'Hapus $name';
+  }
+
+  @override
+  String get categoryNameLabel => 'Nama kategori';
+
+  @override
+  String get categoryNewTitle => 'Kategori baru';
+
+  @override
+  String get categoryRenameTitle => 'Ubah kategori';
+
+  @override
+  String get categoryNameTaken => 'Nama kategori sudah dipakai.';
+
+  @override
+  String categoryNameTooLong(int max) {
+    return 'Nama kategori maksimal $max karakter.';
+  }
+
+  @override
+  String categoryDeleteTitle(String name) {
+    return 'Hapus kategori $name?';
+  }
+
+  @override
+  String categoryDeleteBodyUsed(int count) {
+    return '$count snippet di dalamnya dipindah ke Tanpa kategori; snippet tidak ikut terhapus.';
+  }
+
+  @override
+  String get categoryDeleteBodyEmpty => 'Kategori ini dihapus dari perangkat.';
+
+  @override
+  String get categorySaved => 'Kategori disimpan';
+
+  @override
+  String get categoryDeleted => 'Kategori dihapus';
+
+  @override
+  String get categorySaveFailed => 'Kategori tidak bisa disimpan. Coba lagi.';
+
+  @override
+  String get categoryDeleteFailed => 'Kategori tidak bisa dihapus. Coba lagi.';
+
+  @override
+  String get categoryManagerHint =>
+      'Tahan dan geser ikon titik di kiri untuk mengubah urutan. Urutan ini dipakai di filter dan di editor.';
+
+  @override
+  String categoryDragLabel(String name) {
+    return 'Geser untuk mengurutkan $name';
+  }
+
+  @override
+  String get categoryMoveFailed => 'Urutan kategori tidak bisa disimpan. Coba lagi.';
+
+  @override
+  String get snippetDangerousTag => 'berbahaya';
+
+  @override
+  String get snippetDangerousToggle => 'Tandai sebagai perintah berbahaya';
+
+  @override
+  String get snippetDangerousDesc => 'Setiap kali dipakai, aplikasi memperingatkan dulu dan meminta Anda memastikan.';
+
+  @override
+  String get snippetDangerousDescAuto =>
+      'Perintah ini juga terdeteksi berbahaya (mis. rm -rf, dd, mkfs), jadi peringatan tetap muncul walau penanda ini mati.';
+
+  @override
+  String get snippetDangerWarnTitle => 'Perintah berbahaya';
+
+  @override
+  String get snippetDangerWarnBody =>
+      'Perintah ini bisa merusak data atau layanan di server bila salah dipakai. Periksa isinya sebelum menyalin dan menjalankannya.';
+
+  @override
+  String get snippetDangerWarnConfirm => 'Tetap salin';
+
+  @override
+  String get snippetsSort => 'Urutkan snippet';
+
+  @override
+  String get snippetsSortDone => 'Selesai mengurutkan';
+
+  @override
+  String get snippetsSortHint =>
+      'Tahan dan geser ikon titik di kiri untuk mengubah urutan snippet. Semua snippet tampil selama mengurutkan.';
+
+  @override
+  String snippetsSortDragLabel(String title) {
+    return 'Geser untuk mengurutkan $title';
+  }
+
+  @override
+  String get snippetMoveFailed => 'Urutan snippet tidak bisa disimpan. Coba lagi.';
+
+  @override
+  String snippetDeleteLabel(String title) {
+    return 'Hapus $title';
+  }
+
+  @override
+  String get snippetTargetLabel => 'Kirim ke';
+
+  @override
+  String snippetPasteTo(String target) {
+    return 'Tempel ke $target';
+  }
+
+  @override
+  String get snippetPasteRun => 'Tempel & jalankan';
+
+  @override
+  String snippetPasted(String target) {
+    return 'Ditempel ke $target · belum dijalankan';
+  }
+
+  @override
+  String snippetRan(String target) {
+    return 'Dijalankan di $target';
+  }
+
+  @override
+  String get snippetNoTargets =>
+      'Belum ada sesi terminal yang tersambung di latar belakang. Buka sesi lalu pilih \"Tetap terhubung\", atau pakai tombol Snippet di dalam terminal.';
+
+  @override
+  String get snippetDangerWarnPaste => 'Tetap tempel';
+
+  @override
+  String get keySnippetsAria => 'Snippet';
+
+  @override
+  String get snippetPickerEmpty => 'Belum ada snippet untuk host ini. Buat di tab Snippet.';
+
+  @override
+  String get snippetPanelManage => 'Kelola semua';
 }

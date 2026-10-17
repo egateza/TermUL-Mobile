@@ -10,7 +10,7 @@ import '../hosts/host_list_screen.dart';
 import '../sessions/sessions_screen.dart';
 import '../sftp/sftp_session_manager.dart';
 import '../settings/settings_screen.dart';
-import 'coming_soon_screen.dart';
+import '../snippets/snippets_screen.dart';
 
 /// Kerangka layar utama: empat tab di `NavBar` (Host, Sesi, Snippet, Pengaturan). Tab SFTP dihapus (keputusan pemilik
 /// 2026-10-17): SFTP dibuka dari menu tekan lama host ("Sambung SFTP") atau tombol SFTP di terminal, dan sesinya muncul
@@ -45,7 +45,7 @@ class _MainShellState extends ConsumerState<MainShell> {
   Widget _page(int i, AppLocalizations l) => switch (i) {
     0 => HostListScreen(onConnect: widget.onConnect),
     1 => const SessionsScreen(showBack: false),
-    2 => ComingSoonScreen(title: l.navSnippets, heading: l.comingSoonHeading, body: l.comingSoonSnippets),
+    2 => const SnippetsScreen(),
     _ => const SettingsScreen(showBack: false),
   };
 

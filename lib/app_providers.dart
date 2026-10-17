@@ -13,10 +13,12 @@ import 'core/platform/file_sharer.dart';
 import 'core/platform/keepalive_platform.dart';
 import 'core/platform/screen_monitor.dart';
 import 'core/models/profile_snapshot.dart';
+import 'core/models/snippet_library.dart';
 import 'core/ssh/reconnect_backoff.dart';
 import 'core/ssh/ssh_connector.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
+import 'core/storage/snippet_repository.dart';
 import 'core/vault/auth_gate.dart';
 import 'core/vault/credential_vault.dart';
 import 'core/vault/device_auth.dart';
@@ -36,6 +38,9 @@ final knownHostsRepositoryProvider = Provider<KnownHostsRepository>(
 final credentialVaultProvider = Provider<CredentialVault>(
   (ref) => throw UnimplementedError('Suntikkan lewat bootstrap'),
 );
+
+/// Snippet tersimpan. Bawaan di memori (tes); bootstrap menyuntikkan `JsonSnippetRepository`.
+final snippetRepositoryProvider = Provider<SnippetRepository>((ref) => MemorySnippetRepository());
 final hostServiceProvider = Provider<HostService>((ref) => throw UnimplementedError('Suntikkan lewat bootstrap'));
 
 /// Pengaturan yang dimuat dari `settings.json` saat mulai; nilai awal [appSettingsProvider].
@@ -148,6 +153,7 @@ extension AppDependenciesOverrides on AppDependencies {
     knownHostsRepositoryProvider.overrideWithValue(knownHosts),
     credentialVaultProvider.overrideWithValue(vault),
     hostServiceProvider.overrideWithValue(service),
+    if (snippets != null) snippetRepositoryProvider.overrideWithValue(snippets!),
     bootReportProvider.overrideWithValue(report),
     initialSettingsProvider.overrideWithValue(settings),
     if (saveSettings != null) settingsSaverProvider.overrideWithValue(saveSettings!),
@@ -170,6 +176,19 @@ class HostSnapshotNotifier extends Notifier<ProfileSnapshot> {
 }
 
 final hostSnapshotProvider = NotifierProvider<HostSnapshotNotifier, ProfileSnapshot>(HostSnapshotNotifier.new);
+
+/// Kategori dan snippet terbaru; berubah setiap repository mengumumkan perubahan.
+class SnippetLibraryNotifier extends Notifier<SnippetLibrary> {
+  @override
+  SnippetLibrary build() {
+    final repo = ref.watch(snippetRepositoryProvider);
+    final sub = repo.changes.listen((s) => state = s);
+    ref.onDispose(sub.cancel);
+    return repo.library;
+  }
+}
+
+final snippetLibraryProvider = NotifierProvider<SnippetLibraryNotifier, SnippetLibrary>(SnippetLibraryNotifier.new);
 
 class HostListState {
   const HostListState({this.query = '', this.filter = HostFilter.all, this.collapsed = const {}});

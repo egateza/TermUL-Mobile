@@ -798,18 +798,6 @@
   "@navSettings": {
     "description": "Tab Pengaturan di bar navigasi."
   },
-  "comingSoonHeading": "Belum tersedia",
-  "@comingSoonHeading": {
-    "description": "Judul banner di tab yang fiturnya belum dibuat."
-  },
-  "comingSoonSftp": "Menjelajah dan memindahkan berkas lewat SFTP belum ada di versi ini.",
-  "@comingSoonSftp": {
-    "description": "Keterangan tab SFTP yang belum dibuat."
-  },
-  "comingSoonSnippets": "Menyimpan perintah yang sering dipakai belum ada di versi ini.",
-  "@comingSoonSnippets": {
-    "description": "Keterangan tab Snippet yang belum dibuat."
-  },
   "settingsTitle": "Pengaturan",
   "@settingsTitle": {
     "description": "Judul layar pengaturan."
@@ -1974,5 +1962,406 @@
   "exportFailed": "Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.",
   "@exportFailed": {
     "description": "Galat bila berkas ekspor tidak bisa disimpan."
+  },
+  "snippetsAdd": "Snippet baru",
+  "@snippetsAdd": {
+    "description": "Tombol tambah di layar Snippet."
+  },
+  "snippetsSearchLabel": "Cari snippet",
+  "@snippetsSearchLabel": {
+    "description": "Label kolom pencarian snippet (disembunyikan, dibaca pembaca layar)."
+  },
+  "snippetsSearchPlaceholder": "Cari judul atau perintah",
+  "@snippetsSearchPlaceholder": {
+    "description": "Placeholder kolom pencarian snippet."
+  },
+  "snippetsNoMatch": "Tidak ada snippet yang cocok. Ubah kata kunci atau filter.",
+  "@snippetsNoMatch": {
+    "description": "Daftar snippet kosong karena pencarian atau filter."
+  },
+  "snippetsEmptyTitle": "Belum ada snippet",
+  "@snippetsEmptyTitle": {
+    "description": "Judul keadaan kosong layar Snippet."
+  },
+  "snippetsEmptyBody": "Simpan perintah yang sering dipakai di sini, lengkap dengan variabel yang diisi saat dipakai.",
+  "@snippetsEmptyBody": {
+    "description": "Keterangan keadaan kosong layar Snippet."
+  },
+  "snippetsCorruptTitle": "Daftar snippet rusak",
+  "@snippetsCorruptTitle": {
+    "description": "Judul banner berkas snippet rusak."
+  },
+  "snippetsCorruptBody": "Berkas snippet tidak bisa dibaca dan disimpan sebagai {name}. Aplikasi mulai dari daftar kosong; berkas lama tidak dihapus.",
+  "@snippetsCorruptBody": {
+    "description": "Isi banner berkas snippet rusak.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetScopeAll": "Semua host",
+  "@snippetScopeAll": {
+    "description": "Cakupan snippet: berlaku untuk semua host."
+  },
+  "snippetVarCount": "{count} variabel",
+  "@snippetVarCount": {
+    "description": "Tag jumlah variabel di kartu snippet.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "snippetFavoriteLabel": "Favorit",
+  "@snippetFavoriteLabel": {
+    "description": "Label semantik bintang favorit di kartu snippet."
+  },
+  "snippetDetailVariable": "Isi nilai",
+  "@snippetDetailVariable": {
+    "description": "Placeholder isian nilai variabel snippet."
+  },
+  "snippetDetailRisky": "Perintah berbahaya. Periksa dulu sebelum dipakai: tempel, periksa, lalu tekan Enter sendiri.",
+  "@snippetDetailRisky": {
+    "description": "Peringatan di detail snippet berisiko."
+  },
+  "snippetDetailNotReady": "Isi semua variabel untuk menempel atau menyalin.",
+  "@snippetDetailNotReady": {
+    "description": "Keterangan saat variabel belum lengkap."
+  },
+  "snippetDetailCopy": "Salin",
+  "@snippetDetailCopy": {
+    "description": "Tombol salin perintah snippet ke papan klip."
+  },
+  "snippetDetailEdit": "Edit",
+  "@snippetDetailEdit": {
+    "description": "Tombol buka editor di detail snippet."
+  },
+  "snippetCopied": "Disalin · {count} karakter",
+  "@snippetCopied": {
+    "description": "Konfirmasi salin snippet.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "snippetEditorNewTitle": "Snippet baru",
+  "@snippetEditorNewTitle": {
+    "description": "Judul editor snippet baru."
+  },
+  "snippetEditorEditTitle": "Edit snippet",
+  "@snippetEditorEditTitle": {
+    "description": "Judul editor snippet yang sudah ada."
+  },
+  "snippetFieldTitle": "Judul",
+  "@snippetFieldTitle": {
+    "description": "Label isian judul snippet."
+  },
+  "snippetFieldTitlePlaceholder": "Mis. Cek config lalu reload Nginx",
+  "@snippetFieldTitlePlaceholder": {
+    "description": "Placeholder judul snippet."
+  },
+  "snippetFieldCommand": "Perintah (boleh beberapa baris; variabel ditulis {example})",
+  "@snippetFieldCommand": {
+    "description": "Label isian perintah snippet.",
+    "placeholders": {
+      "example": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetFieldCategory": "Kategori",
+  "@snippetFieldCategory": {
+    "description": "Label pilihan kategori snippet."
+  },
+  "snippetFieldScope": "Berlaku untuk",
+  "@snippetFieldScope": {
+    "description": "Label pilihan cakupan snippet."
+  },
+  "snippetScopeOneHost": "Satu host",
+  "@snippetScopeOneHost": {
+    "description": "Pil cakupan: pilih satu host."
+  },
+  "snippetScopePickTitle": "Pilih host",
+  "@snippetScopePickTitle": {
+    "description": "Judul daftar pilihan host untuk cakupan snippet."
+  },
+  "snippetFavoriteToggle": "Tandai favorit",
+  "@snippetFavoriteToggle": {
+    "description": "Label saklar favorit di editor snippet."
+  },
+  "snippetSaved": "Snippet disimpan",
+  "@snippetSaved": {
+    "description": "Konfirmasi simpan snippet."
+  },
+  "snippetSaveFailed": "Snippet tidak bisa disimpan. Coba lagi.",
+  "@snippetSaveFailed": {
+    "description": "Galat saat menyimpan snippet."
+  },
+  "snippetDeleteTitle": "Hapus {title}?",
+  "@snippetDeleteTitle": {
+    "description": "Judul konfirmasi hapus snippet.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetDeleteBody": "Snippet ini dihapus permanen dari perangkat.",
+  "@snippetDeleteBody": {
+    "description": "Isi konfirmasi hapus snippet."
+  },
+  "snippetDeleted": "Snippet dihapus",
+  "@snippetDeleted": {
+    "description": "Konfirmasi hapus snippet."
+  },
+  "snippetDeleteFailed": "Snippet tidak bisa dihapus. Coba lagi.",
+  "@snippetDeleteFailed": {
+    "description": "Galat saat menghapus snippet."
+  },
+  "snippetCategoryNone": "Tanpa kategori",
+  "@snippetCategoryNone": {
+    "description": "Pilihan kategori snippet: tidak ada kategori."
+  },
+  "snippetsManageCategories": "Kelola kategori",
+  "@snippetsManageCategories": {
+    "description": "Tombol di header layar Snippet untuk membuka pengelola kategori."
+  },
+  "categoryManagerTitle": "Kelola kategori",
+  "@categoryManagerTitle": {
+    "description": "Judul sheet pengelola kategori snippet."
+  },
+  "categoryManagerEmpty": "Belum ada kategori. Tambahkan satu untuk mengelompokkan snippet.",
+  "@categoryManagerEmpty": {
+    "description": "Keadaan kosong pengelola kategori."
+  },
+  "categoryCount": "{count} snippet",
+  "@categoryCount": {
+    "description": "Jumlah snippet di bawah nama kategori.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryAdd": "Kategori baru",
+  "@categoryAdd": {
+    "description": "Tombol tambah kategori."
+  },
+  "categoryEditLabel": "Ubah {name}",
+  "@categoryEditLabel": {
+    "description": "Nama aksesibilitas tombol ubah nama kategori.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryDeleteLabel": "Hapus {name}",
+  "@categoryDeleteLabel": {
+    "description": "Nama aksesibilitas tombol hapus kategori.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryNameLabel": "Nama kategori",
+  "@categoryNameLabel": {
+    "description": "Label isian nama kategori."
+  },
+  "categoryNewTitle": "Kategori baru",
+  "@categoryNewTitle": {
+    "description": "Judul sheet tambah kategori."
+  },
+  "categoryRenameTitle": "Ubah kategori",
+  "@categoryRenameTitle": {
+    "description": "Judul sheet ubah nama kategori."
+  },
+  "categoryNameTaken": "Nama kategori sudah dipakai.",
+  "@categoryNameTaken": {
+    "description": "Galat isian nama kategori yang kembar."
+  },
+  "categoryNameTooLong": "Nama kategori maksimal {max} karakter.",
+  "@categoryNameTooLong": {
+    "description": "Galat isian nama kategori terlalu panjang.",
+    "placeholders": {
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryDeleteTitle": "Hapus kategori {name}?",
+  "@categoryDeleteTitle": {
+    "description": "Judul konfirmasi hapus kategori.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryDeleteBodyUsed": "{count} snippet di dalamnya dipindah ke Tanpa kategori; snippet tidak ikut terhapus.",
+  "@categoryDeleteBodyUsed": {
+    "description": "Isi konfirmasi hapus kategori yang berisi snippet.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "categoryDeleteBodyEmpty": "Kategori ini dihapus dari perangkat.",
+  "@categoryDeleteBodyEmpty": {
+    "description": "Isi konfirmasi hapus kategori kosong."
+  },
+  "categorySaved": "Kategori disimpan",
+  "@categorySaved": {
+    "description": "Konfirmasi simpan kategori."
+  },
+  "categoryDeleted": "Kategori dihapus",
+  "@categoryDeleted": {
+    "description": "Konfirmasi hapus kategori."
+  },
+  "categorySaveFailed": "Kategori tidak bisa disimpan. Coba lagi.",
+  "@categorySaveFailed": {
+    "description": "Galat saat menyimpan kategori."
+  },
+  "categoryDeleteFailed": "Kategori tidak bisa dihapus. Coba lagi.",
+  "@categoryDeleteFailed": {
+    "description": "Galat saat menghapus kategori."
+  },
+  "categoryManagerHint": "Tahan dan geser ikon titik di kiri untuk mengubah urutan. Urutan ini dipakai di filter dan di editor.",
+  "@categoryManagerHint": {
+    "description": "Petunjuk di pengelola kategori bila ada lebih dari satu kategori."
+  },
+  "categoryDragLabel": "Geser untuk mengurutkan {name}",
+  "@categoryDragLabel": {
+    "description": "Nama aksesibilitas pegangan geser kategori.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "categoryMoveFailed": "Urutan kategori tidak bisa disimpan. Coba lagi.",
+  "@categoryMoveFailed": {
+    "description": "Galat saat menyimpan urutan kategori."
+  },
+  "snippetDangerousTag": "berbahaya",
+  "@snippetDangerousTag": {
+    "description": "Tag kartu snippet dan penanda baris saklar untuk perintah berbahaya."
+  },
+  "snippetDangerousToggle": "Tandai sebagai perintah berbahaya",
+  "@snippetDangerousToggle": {
+    "description": "Label saklar penanda berbahaya di editor snippet."
+  },
+  "snippetDangerousDesc": "Setiap kali dipakai, aplikasi memperingatkan dulu dan meminta Anda memastikan.",
+  "@snippetDangerousDesc": {
+    "description": "Keterangan saklar penanda berbahaya."
+  },
+  "snippetDangerousDescAuto": "Perintah ini juga terdeteksi berbahaya (mis. rm -rf, dd, mkfs), jadi peringatan tetap muncul walau penanda ini mati.",
+  "@snippetDangerousDescAuto": {
+    "description": "Keterangan saklar bila perintah terdeteksi berbahaya otomatis."
+  },
+  "snippetDangerWarnTitle": "Perintah berbahaya",
+  "@snippetDangerWarnTitle": {
+    "description": "Judul peringatan sebelum memakai snippet berbahaya."
+  },
+  "snippetDangerWarnBody": "Perintah ini bisa merusak data atau layanan di server bila salah dipakai. Periksa isinya sebelum menyalin dan menjalankannya.",
+  "@snippetDangerWarnBody": {
+    "description": "Isi peringatan sebelum memakai snippet berbahaya."
+  },
+  "snippetDangerWarnConfirm": "Tetap salin",
+  "@snippetDangerWarnConfirm": {
+    "description": "Tombol konfirmasi di peringatan snippet berbahaya."
+  },
+  "snippetsSort": "Urutkan snippet",
+  "@snippetsSort": {
+    "description": "Tombol di header Snippet untuk masuk ke mode mengurutkan."
+  },
+  "snippetsSortDone": "Selesai mengurutkan",
+  "@snippetsSortDone": {
+    "description": "Tombol di header Snippet untuk keluar dari mode mengurutkan."
+  },
+  "snippetsSortHint": "Tahan dan geser ikon titik di kiri untuk mengubah urutan snippet. Semua snippet tampil selama mengurutkan.",
+  "@snippetsSortHint": {
+    "description": "Petunjuk di mode mengurutkan snippet."
+  },
+  "snippetsSortDragLabel": "Geser untuk mengurutkan {title}",
+  "@snippetsSortDragLabel": {
+    "description": "Nama aksesibilitas pegangan geser snippet.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetMoveFailed": "Urutan snippet tidak bisa disimpan. Coba lagi.",
+  "@snippetMoveFailed": {
+    "description": "Galat saat menyimpan urutan snippet."
+  },
+  "snippetDeleteLabel": "Hapus {title}",
+  "@snippetDeleteLabel": {
+    "description": "Nama aksesibilitas tombol hapus snippet di baris mode mengurutkan.",
+    "placeholders": {
+      "title": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetTargetLabel": "Kirim ke",
+  "@snippetTargetLabel": {
+    "description": "Label pilihan sesi tujuan di detail snippet."
+  },
+  "snippetPasteTo": "Tempel ke {target}",
+  "@snippetPasteTo": {
+    "description": "Tombol utama detail snippet: tempel ke sesi tujuan tanpa menjalankan.",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetPasteRun": "Tempel & jalankan",
+  "@snippetPasteRun": {
+    "description": "Tombol detail snippet: tempel lalu tekan Enter."
+  },
+  "snippetPasted": "Ditempel ke {target} · belum dijalankan",
+  "@snippetPasted": {
+    "description": "Konfirmasi snippet ditempel ke sesi.",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetRan": "Dijalankan di {target}",
+  "@snippetRan": {
+    "description": "Konfirmasi snippet dijalankan di sesi.",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      }
+    }
+  },
+  "snippetNoTargets": "Belum ada sesi terminal yang tersambung di latar belakang. Buka sesi lalu pilih \"Tetap terhubung\", atau pakai tombol Snippet di dalam terminal.",
+  "@snippetNoTargets": {
+    "description": "Keterangan di detail snippet bila tidak ada sesi tujuan."
+  },
+  "snippetDangerWarnPaste": "Tetap tempel",
+  "@snippetDangerWarnPaste": {
+    "description": "Tombol konfirmasi menempel perintah berbahaya."
+  },
+  "keySnippetsAria": "Snippet",
+  "@keySnippetsAria": {
+    "description": "Nama aksesibilitas tombol ikon Snippet di bilah tombol cepat terminal (membuka dan menutup panel snippet)."
+  },
+  "snippetPickerEmpty": "Belum ada snippet untuk host ini. Buat di tab Snippet.",
+  "@snippetPickerEmpty": {
+    "description": "Keadaan kosong pemilih snippet di terminal."
+  },
+  "snippetPanelManage": "Kelola semua",
+  "@snippetPanelManage": {
+    "description": "Tautan di panel snippet terminal yang membuka tab Snippet."
   }
 }

@@ -69,6 +69,9 @@ class PasteAnalysis {
     caseSensitive: false,
   );
 
+  /// Satu baris [line] memuat perintah yang merusak bila salah jalan (rm -rf, dd, mkfs, dan sejenisnya).
+  static bool isRisky(String line) => _risk.hasMatch(line);
+
   /// Karakter kontrol C0 selain tab dan baris baru, serta DEL dan C1.
   static final _controls = RegExp(r'[\x00-\x08\x0B\x0C\x0E-\x1F\x7F\x80-\x9F]');
 

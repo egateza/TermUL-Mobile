@@ -25,6 +25,8 @@ class TermulTextField extends StatefulWidget {
     this.autofocus = false,
     this.enabled = true,
     this.suffix,
+    this.minLines,
+    this.maxLines = 1,
   });
 
   final String label;
@@ -43,6 +45,10 @@ class TermulTextField extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final Widget? suffix;
+
+  /// Isian beberapa baris (perintah snippet): tinggi tumbuh dari [minLines] sampai [maxLines], lalu digulir.
+  final int? minLines;
+  final int? maxLines;
 
   @override
   State<TermulTextField> createState() => _TermulTextFieldState();
@@ -101,6 +107,8 @@ class _TermulTextFieldState extends State<TermulTextField> {
                         focusNode: _focus,
                         enabled: widget.enabled,
                         obscureText: widget.obscure,
+                        minLines: widget.obscure ? 1 : widget.minLines,
+                        maxLines: widget.obscure ? 1 : widget.maxLines,
                         autofocus: widget.autofocus,
                         keyboardType: widget.keyboardType,
                         textInputAction: widget.textInputAction,

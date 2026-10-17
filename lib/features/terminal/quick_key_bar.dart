@@ -4,19 +4,34 @@ import 'package:xterm/xterm.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/key_button.dart';
+import '../../shared/widgets/termul_icon.dart';
+import '../../shared/widgets/termul_icon_button.dart';
 import 'terminal_session.dart';
 
 /// Baris tombol khusus di atas keyboard: Esc, Tab, Ctrl dan Alt (sekali pakai), ^C, ^D, panah, Home, End, PgUp,
 /// PgDn, simbol, dan Fn yang menukar baris dengan F1 sampai F12. Satu baris yang bisa digeser; [compact]
 /// (36 dp) hanya untuk landscape ringkas. Tombol tidak mengambil fokus sehingga keyboard sistem tetap terbuka.
 class QuickKeyBar extends StatefulWidget {
-  const QuickKeyBar({super.key, required this.session, this.compact = false, this.onPaste});
+  const QuickKeyBar({
+    super.key,
+    required this.session,
+    this.compact = false,
+    this.onPaste,
+    this.onSnippets,
+    this.snippetsOpen = false,
+  });
 
   final TerminalSession session;
   final bool compact;
 
   /// Dipanggil saat tombol Tempel ditekan (membaca papan klip dan meminta konfirmasi bila perlu).
   final VoidCallback? onPaste;
+
+  /// Dipanggil saat ikon Snippet ditekan (membuka atau menutup panel snippet). Kosong = ikon tidak ditampilkan.
+  final VoidCallback? onSnippets;
+
+  /// Panel snippet sedang terbuka: ikonnya menyala (isian `accent`).
+  final bool snippetsOpen;
 
   @override
   State<QuickKeyBar> createState() => _QuickKeyBarState();
@@ -39,13 +54,30 @@ class _QuickKeyBarState extends State<QuickKeyBar> {
           color: TermulPalette.ground,
           border: Border(top: BorderSide(color: TermulPalette.line)),
         ),
-        child: ListenableBuilder(
-          listenable: s,
-          builder: (context, _) => ListView(
-            scrollDirection: Axis.horizontal,
-            padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3, vertical: TermulSpacing.space3),
-            children: _functionRow ? _functionKeys(l) : _mainKeys(l, s),
-          ),
+        child: Row(
+          children: [
+            // Ikon Snippet tetap di kiri (tidak ikut tergulir), seperti tombol Snippet di prototipe terminal.
+            if (widget.onSnippets != null)
+              Padding(
+                padding: const EdgeInsets.only(left: TermulSpacing.space3),
+                child: TermulIconButton(
+                  icon: TermulIconName.snippets,
+                  label: l.keySnippetsAria,
+                  pressed: widget.snippetsOpen,
+                  onPressed: widget.onSnippets,
+                ),
+              ),
+            Expanded(
+              child: ListenableBuilder(
+                listenable: s,
+                builder: (context, _) => ListView(
+                  scrollDirection: Axis.horizontal,
+                  padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3, vertical: TermulSpacing.space3),
+                  children: _functionRow ? _functionKeys(l) : _mainKeys(l, s),
+                ),
+              ),
+            ),
+          ],
         ),
       ),
     );

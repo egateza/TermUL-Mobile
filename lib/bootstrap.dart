@@ -9,6 +9,8 @@ import 'core/storage/host_repository.dart';
 import 'core/storage/json/json_host_repository.dart';
 import 'core/storage/json/json_known_hosts_repository.dart';
 import 'core/storage/json/json_settings_repository.dart';
+import 'core/storage/json/json_snippet_repository.dart';
+import 'core/storage/snippet_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/storage/load_result.dart';
 import 'core/vault/credential_vault.dart';
@@ -26,6 +28,7 @@ class BootReport {
     this.knownHosts = const LoadResult(),
     this.vaultIndex = const LoadResult(),
     this.settings = const LoadResult(),
+    this.snippets = const LoadResult(),
     this.sweptSecrets = 0,
   });
 
@@ -35,6 +38,9 @@ class BootReport {
 
   /// `settings.json` rusak diganti nilai bawaan tanpa banner (pengaturan hilang tidak berbahaya).
   final LoadResult settings;
+
+  /// `snippets.json` rusak disisihkan dan daftar dimulai kosong; layar Snippet memberi tahu lewat banner.
+  final LoadResult snippets;
 
   /// Jumlah rahasia yatim yang dibuang saat mulai.
   final int sweptSecrets;
@@ -53,6 +59,7 @@ class AppDependencies {
     this.keepAlive,
     this.screenMonitor,
     this.vaultLock,
+    this.snippets,
   });
 
   final HostRepository hosts;
@@ -76,6 +83,9 @@ class AppDependencies {
 
   /// Status vault terbuka. `null` di tes (provider memakai kunci yang selalu terkunci).
   final VaultLock? vaultLock;
+
+  /// Penyimpanan snippet. `null` di tes (memakai salinan di memori).
+  final SnippetRepository? snippets;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -93,6 +103,8 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
   final indexLoad = await index.load();
   final settingsRepo = JsonSettingsRepository(file('settings.json'));
   final settingsLoad = await settingsRepo.load();
+  final snippetRepo = JsonSnippetRepository(file('snippets.json'));
+  final snippetsLoad = await snippetRepo.load();
 
   final deviceAuth = auth ?? LocalAuthDeviceAuth();
   final screenMonitor = MethodChannelScreenMonitor();
@@ -124,11 +136,13 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     keepAlive: MethodChannelKeepAlive(),
     screenMonitor: screenMonitor,
     vaultLock: vaultLock,
+    snippets: snippetRepo,
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,
       vaultIndex: indexLoad,
       settings: settingsLoad,
+      snippets: snippetsLoad,
       sweptSecrets: swept,
     ),
   );

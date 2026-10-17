@@ -1129,24 +1129,6 @@ abstract class AppLocalizations {
   /// **'Pengaturan'**
   String get navSettings;
 
-  /// Judul banner di tab yang fiturnya belum dibuat.
-  ///
-  /// In id, this message translates to:
-  /// **'Belum tersedia'**
-  String get comingSoonHeading;
-
-  /// Keterangan tab SFTP yang belum dibuat.
-  ///
-  /// In id, this message translates to:
-  /// **'Menjelajah dan memindahkan berkas lewat SFTP belum ada di versi ini.'**
-  String get comingSoonSftp;
-
-  /// Keterangan tab Snippet yang belum dibuat.
-  ///
-  /// In id, this message translates to:
-  /// **'Menyimpan perintah yang sering dipakai belum ada di versi ini.'**
-  String get comingSoonSnippets;
-
   /// Judul layar pengaturan.
   ///
   /// In id, this message translates to:
@@ -2418,6 +2400,480 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.'**
   String get exportFailed;
+
+  /// Tombol tambah di layar Snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet baru'**
+  String get snippetsAdd;
+
+  /// Label kolom pencarian snippet (disembunyikan, dibaca pembaca layar).
+  ///
+  /// In id, this message translates to:
+  /// **'Cari snippet'**
+  String get snippetsSearchLabel;
+
+  /// Placeholder kolom pencarian snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Cari judul atau perintah'**
+  String get snippetsSearchPlaceholder;
+
+  /// Daftar snippet kosong karena pencarian atau filter.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak ada snippet yang cocok. Ubah kata kunci atau filter.'**
+  String get snippetsNoMatch;
+
+  /// Judul keadaan kosong layar Snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada snippet'**
+  String get snippetsEmptyTitle;
+
+  /// Keterangan keadaan kosong layar Snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan perintah yang sering dipakai di sini, lengkap dengan variabel yang diisi saat dipakai.'**
+  String get snippetsEmptyBody;
+
+  /// Judul banner berkas snippet rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Daftar snippet rusak'**
+  String get snippetsCorruptTitle;
+
+  /// Isi banner berkas snippet rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas snippet tidak bisa dibaca dan disimpan sebagai {name}. Aplikasi mulai dari daftar kosong; berkas lama tidak dihapus.'**
+  String snippetsCorruptBody(String name);
+
+  /// Cakupan snippet: berlaku untuk semua host.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua host'**
+  String get snippetScopeAll;
+
+  /// Tag jumlah variabel di kartu snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} variabel'**
+  String snippetVarCount(int count);
+
+  /// Label semantik bintang favorit di kartu snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Favorit'**
+  String get snippetFavoriteLabel;
+
+  /// Placeholder isian nilai variabel snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Isi nilai'**
+  String get snippetDetailVariable;
+
+  /// Peringatan di detail snippet berisiko.
+  ///
+  /// In id, this message translates to:
+  /// **'Perintah berbahaya. Periksa dulu sebelum dipakai: tempel, periksa, lalu tekan Enter sendiri.'**
+  String get snippetDetailRisky;
+
+  /// Keterangan saat variabel belum lengkap.
+  ///
+  /// In id, this message translates to:
+  /// **'Isi semua variabel untuk menempel atau menyalin.'**
+  String get snippetDetailNotReady;
+
+  /// Tombol salin perintah snippet ke papan klip.
+  ///
+  /// In id, this message translates to:
+  /// **'Salin'**
+  String get snippetDetailCopy;
+
+  /// Tombol buka editor di detail snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Edit'**
+  String get snippetDetailEdit;
+
+  /// Konfirmasi salin snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Disalin · {count} karakter'**
+  String snippetCopied(int count);
+
+  /// Judul editor snippet baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet baru'**
+  String get snippetEditorNewTitle;
+
+  /// Judul editor snippet yang sudah ada.
+  ///
+  /// In id, this message translates to:
+  /// **'Edit snippet'**
+  String get snippetEditorEditTitle;
+
+  /// Label isian judul snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Judul'**
+  String get snippetFieldTitle;
+
+  /// Placeholder judul snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Mis. Cek config lalu reload Nginx'**
+  String get snippetFieldTitlePlaceholder;
+
+  /// Label isian perintah snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Perintah (boleh beberapa baris; variabel ditulis {example})'**
+  String snippetFieldCommand(String example);
+
+  /// Label pilihan kategori snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori'**
+  String get snippetFieldCategory;
+
+  /// Label pilihan cakupan snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Berlaku untuk'**
+  String get snippetFieldScope;
+
+  /// Pil cakupan: pilih satu host.
+  ///
+  /// In id, this message translates to:
+  /// **'Satu host'**
+  String get snippetScopeOneHost;
+
+  /// Judul daftar pilihan host untuk cakupan snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih host'**
+  String get snippetScopePickTitle;
+
+  /// Label saklar favorit di editor snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Tandai favorit'**
+  String get snippetFavoriteToggle;
+
+  /// Konfirmasi simpan snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet disimpan'**
+  String get snippetSaved;
+
+  /// Galat saat menyimpan snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet tidak bisa disimpan. Coba lagi.'**
+  String get snippetSaveFailed;
+
+  /// Judul konfirmasi hapus snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus {title}?'**
+  String snippetDeleteTitle(String title);
+
+  /// Isi konfirmasi hapus snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet ini dihapus permanen dari perangkat.'**
+  String get snippetDeleteBody;
+
+  /// Konfirmasi hapus snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet dihapus'**
+  String get snippetDeleted;
+
+  /// Galat saat menghapus snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet tidak bisa dihapus. Coba lagi.'**
+  String get snippetDeleteFailed;
+
+  /// Pilihan kategori snippet: tidak ada kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Tanpa kategori'**
+  String get snippetCategoryNone;
+
+  /// Tombol di header layar Snippet untuk membuka pengelola kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola kategori'**
+  String get snippetsManageCategories;
+
+  /// Judul sheet pengelola kategori snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola kategori'**
+  String get categoryManagerTitle;
+
+  /// Keadaan kosong pengelola kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada kategori. Tambahkan satu untuk mengelompokkan snippet.'**
+  String get categoryManagerEmpty;
+
+  /// Jumlah snippet di bawah nama kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} snippet'**
+  String categoryCount(int count);
+
+  /// Tombol tambah kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori baru'**
+  String get categoryAdd;
+
+  /// Nama aksesibilitas tombol ubah nama kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah {name}'**
+  String categoryEditLabel(String name);
+
+  /// Nama aksesibilitas tombol hapus kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus {name}'**
+  String categoryDeleteLabel(String name);
+
+  /// Label isian nama kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kategori'**
+  String get categoryNameLabel;
+
+  /// Judul sheet tambah kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori baru'**
+  String get categoryNewTitle;
+
+  /// Judul sheet ubah nama kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Ubah kategori'**
+  String get categoryRenameTitle;
+
+  /// Galat isian nama kategori yang kembar.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kategori sudah dipakai.'**
+  String get categoryNameTaken;
+
+  /// Galat isian nama kategori terlalu panjang.
+  ///
+  /// In id, this message translates to:
+  /// **'Nama kategori maksimal {max} karakter.'**
+  String categoryNameTooLong(int max);
+
+  /// Judul konfirmasi hapus kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus kategori {name}?'**
+  String categoryDeleteTitle(String name);
+
+  /// Isi konfirmasi hapus kategori yang berisi snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} snippet di dalamnya dipindah ke Tanpa kategori; snippet tidak ikut terhapus.'**
+  String categoryDeleteBodyUsed(int count);
+
+  /// Isi konfirmasi hapus kategori kosong.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori ini dihapus dari perangkat.'**
+  String get categoryDeleteBodyEmpty;
+
+  /// Konfirmasi simpan kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori disimpan'**
+  String get categorySaved;
+
+  /// Konfirmasi hapus kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori dihapus'**
+  String get categoryDeleted;
+
+  /// Galat saat menyimpan kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori tidak bisa disimpan. Coba lagi.'**
+  String get categorySaveFailed;
+
+  /// Galat saat menghapus kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Kategori tidak bisa dihapus. Coba lagi.'**
+  String get categoryDeleteFailed;
+
+  /// Petunjuk di pengelola kategori bila ada lebih dari satu kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Tahan dan geser ikon titik di kiri untuk mengubah urutan. Urutan ini dipakai di filter dan di editor.'**
+  String get categoryManagerHint;
+
+  /// Nama aksesibilitas pegangan geser kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Geser untuk mengurutkan {name}'**
+  String categoryDragLabel(String name);
+
+  /// Galat saat menyimpan urutan kategori.
+  ///
+  /// In id, this message translates to:
+  /// **'Urutan kategori tidak bisa disimpan. Coba lagi.'**
+  String get categoryMoveFailed;
+
+  /// Tag kartu snippet dan penanda baris saklar untuk perintah berbahaya.
+  ///
+  /// In id, this message translates to:
+  /// **'berbahaya'**
+  String get snippetDangerousTag;
+
+  /// Label saklar penanda berbahaya di editor snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Tandai sebagai perintah berbahaya'**
+  String get snippetDangerousToggle;
+
+  /// Keterangan saklar penanda berbahaya.
+  ///
+  /// In id, this message translates to:
+  /// **'Setiap kali dipakai, aplikasi memperingatkan dulu dan meminta Anda memastikan.'**
+  String get snippetDangerousDesc;
+
+  /// Keterangan saklar bila perintah terdeteksi berbahaya otomatis.
+  ///
+  /// In id, this message translates to:
+  /// **'Perintah ini juga terdeteksi berbahaya (mis. rm -rf, dd, mkfs), jadi peringatan tetap muncul walau penanda ini mati.'**
+  String get snippetDangerousDescAuto;
+
+  /// Judul peringatan sebelum memakai snippet berbahaya.
+  ///
+  /// In id, this message translates to:
+  /// **'Perintah berbahaya'**
+  String get snippetDangerWarnTitle;
+
+  /// Isi peringatan sebelum memakai snippet berbahaya.
+  ///
+  /// In id, this message translates to:
+  /// **'Perintah ini bisa merusak data atau layanan di server bila salah dipakai. Periksa isinya sebelum menyalin dan menjalankannya.'**
+  String get snippetDangerWarnBody;
+
+  /// Tombol konfirmasi di peringatan snippet berbahaya.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap salin'**
+  String get snippetDangerWarnConfirm;
+
+  /// Tombol di header Snippet untuk masuk ke mode mengurutkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Urutkan snippet'**
+  String get snippetsSort;
+
+  /// Tombol di header Snippet untuk keluar dari mode mengurutkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Selesai mengurutkan'**
+  String get snippetsSortDone;
+
+  /// Petunjuk di mode mengurutkan snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Tahan dan geser ikon titik di kiri untuk mengubah urutan snippet. Semua snippet tampil selama mengurutkan.'**
+  String get snippetsSortHint;
+
+  /// Nama aksesibilitas pegangan geser snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Geser untuk mengurutkan {title}'**
+  String snippetsSortDragLabel(String title);
+
+  /// Galat saat menyimpan urutan snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Urutan snippet tidak bisa disimpan. Coba lagi.'**
+  String get snippetMoveFailed;
+
+  /// Nama aksesibilitas tombol hapus snippet di baris mode mengurutkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus {title}'**
+  String snippetDeleteLabel(String title);
+
+  /// Label pilihan sesi tujuan di detail snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Kirim ke'**
+  String get snippetTargetLabel;
+
+  /// Tombol utama detail snippet: tempel ke sesi tujuan tanpa menjalankan.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel ke {target}'**
+  String snippetPasteTo(String target);
+
+  /// Tombol detail snippet: tempel lalu tekan Enter.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel & jalankan'**
+  String get snippetPasteRun;
+
+  /// Konfirmasi snippet ditempel ke sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Ditempel ke {target} · belum dijalankan'**
+  String snippetPasted(String target);
+
+  /// Konfirmasi snippet dijalankan di sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Dijalankan di {target}'**
+  String snippetRan(String target);
+
+  /// Keterangan di detail snippet bila tidak ada sesi tujuan.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada sesi terminal yang tersambung di latar belakang. Buka sesi lalu pilih \"Tetap terhubung\", atau pakai tombol Snippet di dalam terminal.'**
+  String get snippetNoTargets;
+
+  /// Tombol konfirmasi menempel perintah berbahaya.
+  ///
+  /// In id, this message translates to:
+  /// **'Tetap tempel'**
+  String get snippetDangerWarnPaste;
+
+  /// Nama aksesibilitas tombol ikon Snippet di bilah tombol cepat terminal (membuka dan menutup panel snippet).
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet'**
+  String get keySnippetsAria;
+
+  /// Keadaan kosong pemilih snippet di terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada snippet untuk host ini. Buat di tab Snippet.'**
+  String get snippetPickerEmpty;
+
+  /// Tautan di panel snippet terminal yang membuka tab Snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Kelola semua'**
+  String get snippetPanelManage;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

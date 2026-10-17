@@ -7,6 +7,7 @@ import '../../app_providers.dart';
 import '../../core/keys/private_key_inspector.dart';
 import '../../core/models/auth_method.dart';
 import '../../core/models/host_profile.dart';
+import '../../core/models/snippet.dart';
 import '../../core/ssh/ssh_failure.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
@@ -21,6 +22,9 @@ import '../terminal/terminal_palette.dart';
 import '../terminal/terminal_screen.dart';
 import '../settings/settings_screen.dart';
 import '../sftp/sftp_screen.dart' show openSftpFromSession;
+import '../snippets/snippet_detail_sheet.dart';
+import '../snippets/snippets_screen.dart';
+import '../snippets/snippet_target.dart';
 import 'connect_flow.dart';
 import 'host_key_prompt.dart';
 import 'session_controller.dart';
@@ -126,6 +130,29 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     Navigator.of(context).pop();
   }
 
+  /// Detail snippet dari terminal (snippet berisi variabel, atau tekan lama di panel): isi variabel lalu Tempel, Tempel &
+  /// jalankan, atau Salin ke sesi ini. Edit dan Hapus snippet hanya di tab Snippet.
+  Future<void> _openSnippetDetail(SessionController c, Snippet snippet) async {
+    final session = c.session;
+    if (session == null) return;
+    final l = AppLocalizations.of(context);
+    final library = ref.read(snippetLibraryProvider);
+    final category = library.categoryOf(snippet.categoryId);
+    final scope = snippet.hostId == null ? l.snippetScopeAll : widget.profile.name;
+    await showSnippetDetail(
+      context,
+      snippet: snippet,
+      meta: [?category?.name, scope].join(' · '),
+      canManage: false,
+      targets: [sessionTarget(id: '${c.id}', label: sessionLabel(l, c), session: session)],
+      // Toast di atas bilah tombol cepat, sama seperti toast tempel dari papan klip.
+      toastBottomOffset: TermulSize.tapMin + TermulSpacing.space3 * 3,
+    );
+  }
+
+  /// "Kelola semua" di panel snippet: membuka tab Snippet sebagai layar biasa (tombol kembali sistem menutupnya).
+  void _manageSnippets() => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SnippetsScreen()));
+
   void _openSettings() => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SettingsScreen()));
 
   @override
@@ -143,6 +170,11 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
         final handle = settings.terminal.handleStyle;
         final confirmPaste = settings.terminal.confirmSingleLinePaste;
         final keepAlive = settings.connection.keepAlive;
+        // Snippet yang berlaku untuk host ini (semua host, atau khusus host ini).
+        final usableSnippets = [
+          for (final s in ref.watch(snippetLibraryProvider).snippets)
+            if (s.hostId == null || s.hostId == widget.profile.id) s,
+        ];
         if (session != null) {
           if (state is ConnectDone) {
             return TerminalScreen(
@@ -159,6 +191,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               keepAliveEnabled: keepAlive,
               onOpenSettings: _openSettings,
               onOpenSftp: () => openSftpFromSession(context, c, confirmLeave: false),
+              snippets: usableSnippets,
+              onSnippetDetail: (s) => _openSnippetDetail(c, s),
+              onManageSnippets: _manageSnippets,
             );
           }
           if (state is ConnectPreparing || state is ConnectConnecting) {

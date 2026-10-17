@@ -7,6 +7,7 @@ import 'package:xterm/xterm.dart';
 
 import '../../core/models/app_settings.dart' show SelectionHandleStyle;
 import '../../core/models/host_profile.dart';
+import '../../core/models/snippet.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/pressable.dart';
@@ -18,6 +19,8 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_action_sheet.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_toast.dart';
+import '../snippets/snippet_danger_sheet.dart';
+import '../snippets/snippet_panel.dart';
 import 'paste_analysis.dart';
 import 'paste_popover.dart';
 import 'quick_key_bar.dart';
@@ -58,6 +61,9 @@ class TerminalScreen extends StatefulWidget {
     this.keepAliveEnabled = true,
     this.onOpenSettings,
     this.onOpenSftp,
+    this.snippets,
+    this.onSnippetDetail,
+    this.onManageSnippets,
   });
 
   final HostProfile profile;
@@ -100,6 +106,15 @@ class TerminalScreen extends StatefulWidget {
   /// Membuka SFTP lewat sambungan sesi ini (tombol folder di header). Kosong = tombol tidak ditampilkan.
   final VoidCallback? onOpenSftp;
 
+  /// Snippet yang berlaku untuk host ini (panel snippet dari ikon di bilah tombol cepat). Null = ikon tidak ditampilkan.
+  final List<Snippet>? snippets;
+
+  /// Membuka detail snippet (isi variabel, Tempel & jalankan, Salin): untuk snippet berisi variabel dan tekan lama.
+  final void Function(Snippet snippet)? onSnippetDetail;
+
+  /// Membuka tab Snippet ("Kelola semua" di panel).
+  final VoidCallback? onManageSnippets;
+
   static const compactBelowDp = 480.0;
 
   @override
@@ -111,6 +126,10 @@ class _TerminalScreenState extends State<TerminalScreen> {
   final _controller = TerminalController();
   final _scrollController = ScrollController();
   final _viewKey = GlobalKey<TerminalViewState>();
+  final _focus = FocusNode();
+
+  /// Panel snippet terbuka: keyboard sistem disembunyikan dan panel 240 dp tampil di bawah bilah tombol cepat.
+  bool _snippetsOpen = false;
   final _bodyKey = GlobalKey();
 
   /// Popover Tempel di kursor prompt; null bila tertutup.
@@ -137,6 +156,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
     _longPressTimer?.cancel();
     if (_session.onInput == _clearSelectionOnInput) _session.onInput = null;
     _controller.dispose();
+    _focus.dispose();
     _scrollController.dispose();
     super.dispose();
   }
@@ -265,12 +285,50 @@ class _TerminalScreenState extends State<TerminalScreen> {
       widget.link == TerminalLink.up &&
       (_session.state == TerminalSessionState.opening || _session.state == TerminalSessionState.running);
 
+  /// Membuka atau menutup panel snippet. Terbuka: keyboard sistem disembunyikan (fokus terminal dilepas); tertutup:
+  /// fokus kembali ke terminal supaya keyboard muncul lagi.
+  void _toggleSnippets() {
+    final open = !_snippetsOpen;
+    setState(() => _snippetsOpen = open);
+    if (open) {
+      _focus.unfocus();
+    } else {
+      _focus.requestFocus();
+    }
+  }
+
+  void _closeSnippets({bool refocus = true}) {
+    if (!_snippetsOpen) return;
+    setState(() => _snippetsOpen = false);
+    if (refocus) _focus.requestFocus();
+  }
+
+  /// Ketuk baris snippet: snippet berisi variabel membuka detail untuk diisi; snippet yang ditandai berbahaya meminta
+  /// peringatan dulu; selain itu menempel lewat alur tempel (satu baris aman langsung masuk, banyak baris atau berisiko
+  /// ditampilkan dulu).
+  Future<void> _pickSnippet(Snippet s) async {
+    if (s.variables.isNotEmpty) {
+      _closeSnippets(refocus: false);
+      widget.onSnippetDetail?.call(s);
+      return;
+    }
+    _closeSnippets(refocus: !s.dangerous);
+    if (s.dangerous) {
+      final l = AppLocalizations.of(context);
+      showSnippetDangerSheet(
+        context,
+        command: s.command,
+        confirmLabel: l.snippetDangerWarnPaste,
+        onConfirm: () => _pasteText(s.command, direct: true),
+      );
+      return;
+    }
+    await _pasteText(s.command, direct: true);
+  }
+
   /// Tempel dari papan klip. Satu baris tanpa tanda bahaya langsung masuk ke prompt; selain itu isi dan akibatnya
   /// ditampilkan dulu (layar 2b dan 2c di desain).
   Future<void> _paste({Rect? anchor}) async {
-    final l = AppLocalizations.of(context);
-    final messenger = ScaffoldMessenger.of(context);
-    final offset = TermulSize.tapMin + TermulSpacing.space3 * 2 + TermulSpacing.space3;
     ClipboardData? clip;
     try {
       clip = await Clipboard.getData(Clipboard.kTextPlain);
@@ -278,7 +336,16 @@ class _TerminalScreenState extends State<TerminalScreen> {
       clip = null;
     }
     if (!mounted) return;
-    final raw = clip?.text ?? '';
+    await _pasteText(clip?.text ?? '', anchor: anchor);
+  }
+
+  /// Menempel [raw] lewat alur tempel yang sama untuk papan klip dan snippet: teks dibersihkan, lalu langsung masuk ke
+  /// prompt atau ditampilkan dulu bila banyak baris, panjang, atau berisiko. [direct] melewati popover satu baris
+  /// (snippet yang sengaja dipilih tidak perlu dikonfirmasi lagi).
+  Future<void> _pasteText(String raw, {Rect? anchor, bool direct = false}) async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final offset = TermulSize.tapMin + TermulSpacing.space3 * 2 + TermulSpacing.space3;
     if (raw.isEmpty) {
       showTermulToastOn(messenger, l.pasteEmpty, icon: TermulIconName.warning, bottomOffset: offset);
       return;
@@ -303,7 +370,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
     if (!analysis.needsConfirm) {
       final at = anchor ?? _defaultPasteAnchor();
-      if (!widget.confirmSingleLinePaste || at == null) {
+      if (!widget.confirmSingleLinePaste || at == null || direct) {
         send();
       } else {
         _showPasteMenu(at, analysis.text, send);
@@ -558,6 +625,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                                       textStyle: widget.textStyle ?? termulTerminalStyle,
                                       padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space2),
                                       autofocus: true,
+                                      focusNode: _focus,
                                       backgroundOpacity: 1,
                                     ),
                                   ),
@@ -576,25 +644,47 @@ class _TerminalScreenState extends State<TerminalScreen> {
                       ),
                       SafeArea(
                         top: false,
-                        child: ListenableBuilder(
-                          listenable: _controller,
-                          builder: (context, _) {
-                            final range = _controller.selection?.normalized;
-                            if (range == null || range.isCollapsed) {
-                              return QuickKeyBar(
-                                session: _session,
-                                compact: compact,
-                                onPaste: widget.link == TerminalLink.up ? _paste : null,
-                              );
-                            }
-                            return SelectionBar(
-                              count: _session.terminal.buffer.getText(range).length,
-                              compact: compact,
-                              onCopy: _copySelection,
-                              onSelectAll: _selectAll,
-                              onCancel: _controller.clearSelection,
-                            );
-                          },
+                        child: Column(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            ListenableBuilder(
+                              listenable: _controller,
+                              builder: (context, _) {
+                                final range = _controller.selection?.normalized;
+                                if (range == null || range.isCollapsed) {
+                                  return QuickKeyBar(
+                                    session: _session,
+                                    compact: compact,
+                                    onPaste: widget.link == TerminalLink.up ? _paste : null,
+                                    onSnippets: widget.link == TerminalLink.up && widget.snippets != null
+                                        ? _toggleSnippets
+                                        : null,
+                                    snippetsOpen: _snippetsOpen,
+                                  );
+                                }
+                                return SelectionBar(
+                                  count: _session.terminal.buffer.getText(range).length,
+                                  compact: compact,
+                                  onCopy: _copySelection,
+                                  onSelectAll: _selectAll,
+                                  onCancel: _controller.clearSelection,
+                                );
+                              },
+                            ),
+                            if (_snippetsOpen && widget.link == TerminalLink.up && widget.snippets != null)
+                              SnippetPanel(
+                                snippets: widget.snippets!,
+                                onPick: _pickSnippet,
+                                onDetail: (s) {
+                                  _closeSnippets(refocus: false);
+                                  widget.onSnippetDetail?.call(s);
+                                },
+                                onManage: () {
+                                  _closeSnippets(refocus: false);
+                                  widget.onManageSnippets?.call();
+                                },
+                              ),
+                          ],
                         ),
                       ),
                     ],

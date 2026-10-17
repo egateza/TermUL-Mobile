@@ -3,6 +3,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/features/hosts/host_list_screen.dart';
 import 'package:termul_mobile/features/sessions/sessions_screen.dart';
 import 'package:termul_mobile/features/settings/settings_screen.dart';
+import 'package:termul_mobile/features/snippets/snippets_screen.dart';
 import 'package:termul_mobile/shared/widgets/termul_nav_bar.dart';
 
 import 'hosts_ui_harness.dart';
@@ -20,7 +21,7 @@ void main() {
     expect(bar.active, 'hosts');
   });
 
-  testWidgets('tab Sesi dan Pengaturan tanpa tombol Kembali; Snippet menyatakan belum tersedia; tidak ada tab SFTP', (
+  testWidgets('tab Sesi dan Pengaturan tanpa tombol Kembali; tab Snippet membuka layar Snippet; tidak ada tab SFTP', (
     tester,
   ) async {
     await Harness().pump(tester);
@@ -34,8 +35,8 @@ void main() {
 
     await tester.tap(tab('Snippet'));
     await tester.pumpAndSettle();
-    expect(find.text('Belum tersedia'), findsOneWidget);
-    expect(find.textContaining('perintah yang sering dipakai'), findsOneWidget);
+    expect(find.byType(SnippetsScreen), findsOneWidget);
+    expect(find.text('Belum ada snippet'), findsOneWidget);
 
     await tester.tap(tab('Pengaturan'));
     await tester.pumpAndSettle();

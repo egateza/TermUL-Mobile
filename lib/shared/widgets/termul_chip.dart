@@ -23,15 +23,19 @@ class FilterChipButton extends StatelessWidget {
         return Container(
           constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
           padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space7),
-          alignment: Alignment.center,
           decoration: BoxDecoration(
             color: on ? TermulPalette.accent : TermulPalette.surface,
             borderRadius: BorderRadius.circular(TermulRadius.radiusPill),
             border: Border.all(color: on ? TermulPalette.accent : TermulPalette.lineStrong),
           ),
-          child: Text(
-            label,
-            style: TermulText.label.copyWith(color: on ? TermulPalette.onAccent : TermulPalette.inkSoft),
+          // Lebar mengikuti isi (tidak membentang di Wrap); tinggi tetap minimal 44 dan teks di tengah.
+          child: Center(
+            widthFactor: 1,
+            heightFactor: 1,
+            child: Text(
+              label,
+              style: TermulText.label.copyWith(color: on ? TermulPalette.onAccent : TermulPalette.inkSoft),
+            ),
           ),
         );
       },
