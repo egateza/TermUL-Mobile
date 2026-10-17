@@ -464,6 +464,24 @@
    "title": "4j · SFTP: nama berkas sudah ada (unduh)",
    "is_interactive": true,
    "radius": 28
+  },
+  "SftpSelect.dc.html": {
+   "x": 4230,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4k · SFTP: seleksi ganda (tekan lama), jumlah dan total ukuran",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SftpTransferFolder.dc.html": {
+   "x": 4700,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4l · SFTP: unduh folder berjalan (satu transfer)",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -517,7 +535,9 @@
   "SftpNeedsAuth.dc.html",
   "SftpTransfer.dc.html",
   "SftpOverwrite.dc.html",
-  "SftpConflictDownload.dc.html"
+  "SftpConflictDownload.dc.html",
+  "SftpSelect.dc.html",
+  "SftpTransferFolder.dc.html"
  ],
  "notes": {
   "judul": {

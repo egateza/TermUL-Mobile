@@ -48,10 +48,19 @@ class MainActivity : FlutterFragmentActivity() {
                 result.error("bad_args", "name wajib", null)
                 return@setMethodCallHandler
             }
+            val folder = call.argument<String>("folder")
             when (call.method) {
+                "folderExists" -> Thread {
+                    try {
+                        val found = DownloadsSaver.folderExists(applicationContext, name)
+                        runOnUiThread { result.success(found) }
+                    } catch (e: Exception) {
+                        runOnUiThread { result.error("exists_failed", e.javaClass.simpleName, null) }
+                    }
+                }.start()
                 "exists" -> Thread {
                     try {
-                        val found = DownloadsSaver.exists(applicationContext, name)
+                        val found = DownloadsSaver.exists(applicationContext, name, folder)
                         runOnUiThread { result.success(found) }
                     } catch (e: Exception) {
                         runOnUiThread { result.error("exists_failed", e.javaClass.simpleName, null) }
@@ -67,7 +76,7 @@ class MainActivity : FlutterFragmentActivity() {
                     // Berkas bisa ratusan MB: salin di thread latar belakang, jawab di thread utama.
                     Thread {
                         try {
-                            val saved = DownloadsSaver.save(applicationContext, path, name, overwrite)
+                            val saved = DownloadsSaver.save(applicationContext, path, name, overwrite, folder)
                             runOnUiThread {
                                 result.success(
                                     mapOf("name" to saved.name, "location" to saved.location, "overwritten" to saved.overwritten),

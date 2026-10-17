@@ -1108,4 +1108,51 @@ class AppLocalizationsId extends AppLocalizations {
   String sftpDownloadedOverwritten(String location, String name) {
     return 'Ditimpa di $location · $name';
   }
+
+  @override
+  String get sftpSelectAll => 'Pilih semua';
+
+  @override
+  String get sftpSelectionCancel => 'Batal pilih';
+
+  @override
+  String sftpSelectedCount(int count) {
+    return '$count dipilih';
+  }
+
+  @override
+  String sftpPathsCopied(int count) {
+    return '$count path disalin';
+  }
+
+  @override
+  String sftpConflictManyTitle(int count) {
+    return '$count item sudah ada';
+  }
+
+  @override
+  String get sftpConflictRenameAll => 'Simpan dengan nama bernomor';
+
+  @override
+  String get sftpConflictOverwriteAll => 'Timpa semuanya';
+
+  @override
+  String sftpDownloadedMany(int count, String location) {
+    return '$count berkas diunduh ke $location';
+  }
+
+  @override
+  String sftpDownloadedManyPartial(int done, int failed) {
+    return '$done berkas diunduh, $failed gagal';
+  }
+
+  @override
+  String sftpDownloadedManySkipped(int count, String location, int skipped) {
+    return '$count berkas diunduh ke $location · $skipped dilewati';
+  }
+
+  @override
+  String sftpFolderNoFiles(String name) {
+    return '$name tidak berisi berkas';
+  }
 }

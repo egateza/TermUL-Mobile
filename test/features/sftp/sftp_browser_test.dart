@@ -48,9 +48,21 @@ class FakeFiles extends FakeBrowsing implements SftpFileOps {
   SftpFailure? uploadFailure;
   Completer<void>? hold;
 
+  /// Hasil penelusuran per folder (kunci: jalur folder) dan galat per jalur berkas jarak jauh untuk unduhan.
+  final trees = <String, SftpTree>{};
+  final downloadFailures = <String, SftpFailure>{};
+  final downloaded = <String>[];
+
   /// Jumlah pemanggilan progres beruntun sebelum unduhan mulai (untuk menguji pembatasan laju).
   int burst = 0;
   final uploaded = <String, int>{};
+
+  @override
+  Future<SftpTree> walk(String dir, {SftpCancelToken? cancel}) async {
+    final t = trees[dir];
+    if (t == null) throw const SftpFailure(SftpFailureKind.notFound, 'tidak ada');
+    return t;
+  }
 
   @override
   Future<int> download(
@@ -59,6 +71,8 @@ class FakeFiles extends FakeBrowsing implements SftpFileOps {
     void Function(int bytes)? onProgress,
     SftpCancelToken? cancel,
   }) async {
+    downloaded.add(remotePath);
+    if (downloadFailures[remotePath] != null) throw downloadFailures[remotePath]!;
     if (downloadFailure != null) throw downloadFailure!;
     for (var i = 1; i <= burst; i++) {
       onProgress?.call(i);
@@ -195,22 +209,47 @@ void main() {
   test('clearSelection melepas pilihan dan tidak apa-apa bila tidak ada', () async {
     await c.start();
     c.clearSelection();
-    c.select(c.entries.last);
-    expect(c.selected, isNotNull);
+    c.toggle(c.entries.last);
+    expect(c.hasSelection, isTrue);
     c.clearSelection();
-    expect(c.selected, isNull);
+    expect(c.hasSelection, isFalse);
   });
 
   test('pilihan: ketuk lagi membatalkan, pindah folder menghapusnya', () async {
     await c.start();
     final f = c.entries.last;
-    c.select(f);
-    expect(c.selected, f);
-    c.select(f);
-    expect(c.selected, isNull);
-    c.select(f);
+    c.toggle(f);
+    expect(c.selection, [f]);
+    c.toggle(f);
+    expect(c.hasSelection, isFalse);
+    c.toggle(f);
     await c.open('/home/u/proyek');
-    expect(c.selected, isNull);
+    expect(c.hasSelection, isFalse);
+  });
+
+  test('seleksi ganda: berkas dan folder, urut seperti daftar, jumlah dan total ukuran tanpa folder', () async {
+    await c.start();
+    final entries = c.entries;
+    final folders = entries.where((e) => e.isDirectory).toList();
+    final files = entries.where((e) => !e.isDirectory).toList();
+    expect(folders, isNotEmpty);
+    expect(files, isNotEmpty);
+    // Dipilih dalam urutan terbalik; hasilnya tetap urut daftar.
+    c.toggle(files.last);
+    c.toggle(folders.first);
+    expect(c.selection, [folders.first, files.last]);
+    expect(c.selectionCount, 2);
+    expect(c.selectionBytes, files.last.size, reason: 'folder tidak dihitung ke ukuran');
+    expect(c.isSelected(folders.first), isTrue);
+  });
+
+  test('pilih semua memilih seluruh isi folder; muat ulang melepas pilihan', () async {
+    await c.start();
+    c.selectAll();
+    expect(c.selectionCount, c.entries.length);
+    expect(c.allSelected, isTrue);
+    await c.refresh();
+    expect(c.hasSelection, isFalse);
   });
 
   test('hasil muatan lama dibuang bila pengguna sudah membuka folder lain', () async {

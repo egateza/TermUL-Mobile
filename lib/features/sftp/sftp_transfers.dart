@@ -10,7 +10,9 @@ class SftpTransfer {
   final int id;
   final String name;
   final bool upload;
-  final int? total;
+
+  /// Diisi belakangan untuk unduhan folder (total diketahui setelah penelusuran).
+  int? total;
   final SftpCancelToken cancel;
   int done = 0;
 

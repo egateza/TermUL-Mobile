@@ -14,7 +14,7 @@ class SftpBrowserController extends ChangeNotifier {
   List<SftpEntry> _entries = const [];
   bool _loading = false;
   SftpFailure? _failure;
-  SftpEntry? _selected;
+  final _selected = <String>{};
   bool _disposed = false;
 
   /// Folder yang dikunjungi sebelum folder aktif (yang terakhir di ujung), untuk [back]. Muat ulang tidak menambah.
@@ -27,7 +27,25 @@ class SftpBrowserController extends ChangeNotifier {
   List<SftpEntry> get entries => _entries;
   bool get loading => _loading;
   SftpFailure? get failure => _failure;
-  SftpEntry? get selected => _selected;
+
+  /// Entri yang dipilih, urut seperti di daftar. Ada pilihan berarti mode seleksi aktif: ketukan menambah atau
+  /// mencabut pilihan, bukan membuka folder.
+  List<SftpEntry> get selection => [
+    for (final e in _entries)
+      if (_selected.contains(e.path)) e,
+  ];
+
+  bool get hasSelection => _selected.isNotEmpty;
+
+  bool isSelected(SftpEntry entry) => _selected.contains(entry.path);
+
+  /// Jumlah entri dipilih, folder ikut dihitung.
+  int get selectionCount => _selected.length;
+
+  /// Total ukuran berkas yang dipilih. Folder tidak dihitung (ukurannya tidak diketahui tanpa menelusurinya).
+  int get selectionBytes => selection.where((e) => !e.isDirectory).fold(0, (sum, e) => sum + (e.size ?? 0));
+
+  bool get allSelected => _entries.isNotEmpty && _selected.length == _entries.length;
 
   /// Bagian jalur untuk breadcrumb: `/etc/nginx` menjadi `[('/', '/'), ('etc', '/etc'), ('nginx', '/etc/nginx')]`.
   List<(String, String)> get crumbs {
@@ -64,7 +82,7 @@ class SftpBrowserController extends ChangeNotifier {
           if (epoch != _epoch) return;
           _path = restore;
           _entries = list;
-          _selected = null;
+          _selected.clear();
           _loading = false;
           _notify();
           return;
@@ -101,15 +119,24 @@ class SftpBrowserController extends ChangeNotifier {
 
   Future<void> refresh() => open(_path);
 
-  void select(SftpEntry? entry) {
-    _selected = identical(_selected, entry) ? null : entry;
+  /// Menambah entri ke pilihan, atau mencabutnya bila sudah dipilih.
+  void toggle(SftpEntry entry) {
+    if (!_selected.remove(entry.path)) _selected.add(entry.path);
     _notify();
   }
 
-  /// Melepas pilihan (setelah aksi pada berkas dijalankan).
+  /// Memilih semua entri di folder ini.
+  void selectAll() {
+    _selected
+      ..clear()
+      ..addAll(_entries.map((e) => e.path));
+    _notify();
+  }
+
+  /// Melepas pilihan (setelah aksi dijalankan atau mode seleksi dibatalkan).
   void clearSelection() {
-    if (_selected == null) return;
-    _selected = null;
+    if (_selected.isEmpty) return;
+    _selected.clear();
     _notify();
   }
 
@@ -127,7 +154,7 @@ class SftpBrowserController extends ChangeNotifier {
       if (pushFrom != null) _history.add(pushFrom);
       _path = path;
       _entries = list;
-      _selected = null;
+      _selected.clear();
       _loading = false;
       _notify();
     } on SftpFailure catch (e) {

@@ -266,6 +266,25 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
 
   void _toastOutcome(ScaffoldMessengerState messenger, AppLocalizations l, TransferOutcome o, {required bool upload}) {
     switch (o) {
+      case TransferDone(:final fileCount, :final failedCount, :final skipped, :final isFolder, :final location)
+          when isFolder:
+        if (failedCount > 0) {
+          showTermulToastOn(
+            messenger,
+            l.sftpDownloadedManyPartial(fileCount, failedCount),
+            icon: TermulIconName.warning,
+          );
+        } else if (fileCount == 0) {
+          showTermulToastOn(messenger, l.sftpFolderNoFiles(o.name), icon: TermulIconName.warning);
+        } else {
+          final where = location ?? 'Unduhan/TermUL/${o.name}';
+          showTermulToastOn(
+            messenger,
+            skipped > 0
+                ? l.sftpDownloadedManySkipped(fileCount, where, skipped)
+                : l.sftpDownloadedMany(fileCount, where),
+          );
+        }
       case TransferDone(:final location, :final savedName, :final overwritten):
         showTermulToastOn(
           messenger,
@@ -288,30 +307,76 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     }
   }
 
-  Future<void> _download(SftpEntry entry) async {
+  /// Mengunduh [entries] satu per satu (berurutan). Nama yang sudah ada di Unduhan/TermUL ditanyakan sekali untuk
+  /// seluruh kelompok. Satu transfer dibatalkan berarti sisanya tidak dimulai. Satu entri memakai toast per berkas,
+  /// beberapa entri satu toast ringkasan.
+  Future<void> _download(List<SftpEntry> entries) async {
+    if (entries.isEmpty) return;
     final messenger = ScaffoldMessenger.of(context);
     final l = AppLocalizations.of(context);
     final saver = ref.read(downloadsSaverProvider);
-    String? saveAs;
+    final saveAs = <String, String>{};
     var overwrite = false;
-    if (await saver.exists(entry.name)) {
-      if (!mounted) return;
-      // Nama bebas berikutnya menurut yang terlihat di Unduhan/TermUL.
-      final taken = <String>{entry.name};
-      var candidate = uniqueName(entry.name, taken.contains);
-      while (await saver.exists(candidate)) {
+    final conflicts = <SftpEntry>[];
+    Future<bool> inUse(SftpEntry e, String name) => e.isDirectory ? saver.folderExists(name) : saver.exists(name);
+    for (final e in entries) {
+      if (await inUse(e, e.name)) conflicts.add(e);
+    }
+    if (!mounted) return;
+    if (conflicts.isNotEmpty) {
+      // Nama bebas berikutnya menurut yang terlihat di Unduhan/TermUL; tidak boleh bentrok dengan nama lain di kelompok.
+      final taken = {for (final e in entries) e.name};
+      for (final e in conflicts) {
+        final pick = e.isDirectory ? uniqueFolderName : uniqueName;
+        var candidate = pick(e.name, taken.contains);
+        while (await inUse(e, candidate)) {
+          taken.add(candidate);
+          candidate = pick(e.name, taken.contains);
+        }
         taken.add(candidate);
-        candidate = uniqueName(entry.name, taken.contains);
+        saveAs[e.path] = candidate;
       }
       if (!mounted) return;
-      final choice = await _askConflict(entry.name, suggested: candidate, upload: false, dir: '');
+      final choice = conflicts.length == 1 && entries.length == 1
+          ? await _askConflict(conflicts.first.name, suggested: saveAs[conflicts.first.path]!, upload: false, dir: '')
+          : await _askConflictMany(conflicts.length);
       if (choice == _Conflict.cancel || !mounted) return;
-      if (choice == _Conflict.rename) saveAs = candidate;
       overwrite = choice == _Conflict.overwrite;
+      if (overwrite) saveAs.clear();
     }
-    final outcome = await _actions.download(entry, saveAs: saveAs, overwrite: overwrite);
+    final outcomes = <TransferOutcome>[];
+    for (final e in entries) {
+      if (!mounted) return;
+      final replace = overwrite && conflicts.contains(e);
+      final outcome = e.isDirectory
+          ? await _actions.downloadFolder(e, saveAs: saveAs[e.path], overwrite: replace)
+          : await _actions.download(e, saveAs: saveAs[e.path], overwrite: replace);
+      outcomes.add(outcome);
+      if (outcome is TransferCancelled) break;
+    }
     if (!mounted) return;
-    _toastOutcome(messenger, l, outcome, upload: false);
+    if (outcomes.length == 1) {
+      _toastOutcome(messenger, l, outcomes.single, upload: false);
+      return;
+    }
+    final dones = outcomes.whereType<TransferDone>().toList();
+    final files = dones.fold<int>(0, (sum, d) => sum + d.fileCount);
+    final failed = outcomes.whereType<TransferFailed>().length + dones.fold<int>(0, (sum, d) => sum + d.failedCount);
+    final skipped = dones.fold<int>(0, (sum, d) => sum + d.skipped);
+    final cancelled = outcomes.whereType<TransferCancelled>().firstOrNull;
+    if (cancelled != null) {
+      showTermulToastOn(messenger, l.sftpTransferCancelledToast(cancelled.name), icon: TermulIconName.warning);
+    } else if (failed > 0) {
+      showTermulToastOn(messenger, l.sftpDownloadedManyPartial(files, failed), icon: TermulIconName.warning);
+    } else if (files == 0) {
+      showTermulToastOn(messenger, l.sftpFolderNoFiles(dones.first.name), icon: TermulIconName.warning);
+    } else {
+      final location = dones.first.isFolder ? 'Unduhan/TermUL' : (dones.first.location ?? 'Unduhan/TermUL');
+      showTermulToastOn(
+        messenger,
+        skipped > 0 ? l.sftpDownloadedManySkipped(files, location, skipped) : l.sftpDownloadedMany(files, location),
+      );
+    }
   }
 
   /// Memilih berkas dari perangkat lalu mengunggahnya ke folder yang sedang dibuka. Nama yang sudah ada di folder
@@ -341,10 +406,14 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     }
   }
 
-  /// Tombol kembali (header dan sistem): di dalam folder yang dibuka dari folder lain, kembali ke folder sebelumnya;
+  /// Tombol kembali (header dan sistem): selagi ada pilihan, hanya melepas pilihan; di dalam folder yang dibuka dari folder lain, kembali ke folder sebelumnya;
   /// di folder awal baru menanyakan keluar. Selagi folder dimuat, ketukan kembali tidak keluar.
   void _back() {
     final browser = _browser;
+    if (browser != null && browser.hasSelection) {
+      browser.clearSelection();
+      return;
+    }
     if (browser != null && browser.canGoBack) {
       unawaited(browser.back());
       return;
@@ -410,6 +479,30 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
       actions: [
         SheetAction(label: l.sftpConflictRename(suggested), primary: true, onSelected: () => choice = _Conflict.rename),
         SheetAction(label: l.sftpConflictOverwrite, danger: true, onSelected: () => choice = _Conflict.overwrite),
+        SheetAction(label: l.actionCancel, onSelected: () {}),
+      ],
+    );
+    return choice;
+  }
+
+  /// Beberapa nama sudah ada di Unduhan/TermUL: satu pilihan berlaku untuk semuanya.
+  Future<_Conflict> _askConflictMany(int count) async {
+    final l = AppLocalizations.of(context);
+    var choice = _Conflict.cancel;
+    await showTermulActions(
+      context,
+      title: l.sftpConflictManyTitle(count),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: TermulSpacing.space3,
+        children: [
+          Text(l.sftpConflictBodyDownload, style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
+          Text(l.sftpConflictOverwriteNote, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
+        ],
+      ),
+      actions: [
+        SheetAction(label: l.sftpConflictRenameAll, primary: true, onSelected: () => choice = _Conflict.rename),
+        SheetAction(label: l.sftpConflictOverwriteAll, danger: true, onSelected: () => choice = _Conflict.overwrite),
         SheetAction(label: l.actionCancel, onSelected: () {}),
       ],
     );
@@ -668,7 +761,7 @@ class _Problem extends StatelessWidget {
 class _Listing extends StatelessWidget {
   const _Listing({required this.browser, required this.link, required this.onDownload});
 
-  final void Function(SftpEntry) onDownload;
+  final void Function(List<SftpEntry>) onDownload;
 
   final SftpBrowserController browser;
   final SftpLink link;
@@ -749,8 +842,9 @@ class _Listing extends StatelessWidget {
                 ].join(' · '),
           icon: e.isDirectory ? TermulIconName.folder : TermulIconName.file,
           iconColor: e.isDirectory ? TermulPalette.info : TermulPalette.inkSoft,
-          selected: identical(browser.selected, e),
-          onPressed: () => e.isDirectory ? unawaited(browser.open(e.path)) : browser.select(e),
+          selected: browser.isSelected(e),
+          onLongPress: () => browser.toggle(e),
+          onPressed: () => browser.hasSelection || !e.isDirectory ? browser.toggle(e) : unawaited(browser.open(e.path)),
         ),
     ];
     return Column(
@@ -794,13 +888,18 @@ class _Listing extends StatelessWidget {
                 ),
         ),
         if (link.transfers.isBusy) _TransferPanel(tracker: link.transfers),
-        if (browser.selected case final sel?)
+        if (browser.hasSelection)
           _SelectionBar(
-            entry: sel,
+            browser: browser,
             // Pilihan dilepas begitu aksi ditekan: unduhan berjalan di panel transfer dan tombol tidak bisa ditekan
             // berulang untuk berkas yang sama.
-            onDone: browser.clearSelection,
-            onDownload: link.lost ? null : () => onDownload(sel),
+            onDownload: link.lost
+                ? null
+                : () {
+                    final picked = browser.selection;
+                    browser.clearSelection();
+                    onDownload(picked);
+                  },
           ),
       ],
     );
@@ -879,6 +978,7 @@ class _EntryRow extends StatelessWidget {
     required this.icon,
     required this.iconColor,
     required this.onPressed,
+    this.onLongPress,
     this.selected = false,
   });
 
@@ -888,6 +988,7 @@ class _EntryRow extends StatelessWidget {
   final Color iconColor;
   final bool selected;
   final VoidCallback onPressed;
+  final VoidCallback? onLongPress;
 
   @override
   Widget build(BuildContext context) {
@@ -895,6 +996,7 @@ class _EntryRow extends StatelessWidget {
       padding: const EdgeInsets.only(bottom: TermulSpacing.space3),
       child: Pressable(
         onPressed: onPressed,
+        onLongPress: onLongPress,
         semanticLabel: meta.isEmpty ? name : '$name, $meta',
         toggled: selected ? true : null,
         radius: TermulRadius.radiusXl,
@@ -929,6 +1031,7 @@ class _EntryRow extends StatelessWidget {
                   ],
                 ),
               ),
+              if (selected) const TermulIcon(TermulIconName.check, size: 20, color: TermulPalette.accent),
             ],
           ),
         ),
@@ -938,12 +1041,9 @@ class _EntryRow extends StatelessWidget {
 }
 
 class _SelectionBar extends StatelessWidget {
-  const _SelectionBar({required this.entry, required this.onDone, this.onDownload});
+  const _SelectionBar({required this.browser, this.onDownload});
 
-  final SftpEntry entry;
-
-  /// Dipanggil begitu sebuah aksi ditekan (melepas pilihan).
-  final VoidCallback onDone;
+  final SftpBrowserController browser;
 
   /// null bila sambungan putus (unduh tidak bisa dimulai).
   final VoidCallback? onDownload;
@@ -951,10 +1051,15 @@ class _SelectionBar extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    final selection = browser.selection;
+    final count = browser.selectionCount;
+    final bytes = browser.selectionBytes;
+    final hasFiles = selection.any((e) => !e.isDirectory);
+    final caption = TermulText.caption.copyWith(fontFamily: TermulFonts.mono, color: TermulPalette.inkSoft);
     return Container(
       padding: const EdgeInsets.fromLTRB(
         TermulSpacing.space5,
-        TermulSpacing.space5,
+        TermulSpacing.space3,
         TermulSpacing.space5,
         TermulSpacing.space5,
       ),
@@ -964,14 +1069,34 @@ class _SelectionBar extends StatelessWidget {
       ),
       child: Column(
         mainAxisSize: MainAxisSize.min,
-        crossAxisAlignment: CrossAxisAlignment.start,
-        spacing: TermulSpacing.space4,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: TermulSpacing.space3,
         children: [
-          Text(
-            l.sftpSelected(entry.name),
-            maxLines: 1,
-            overflow: TextOverflow.ellipsis,
-            style: TermulText.caption.copyWith(fontFamily: TermulFonts.mono, color: TermulPalette.inkSoft),
+          Row(
+            spacing: TermulSpacing.space3,
+            children: [
+              TermulIconButton(
+                icon: TermulIconName.close,
+                label: l.sftpSelectionCancel,
+                onPressed: browser.clearSelection,
+              ),
+              Expanded(
+                child: Text(
+                  count == 1 ? l.sftpSelected(selection.first.name) : l.sftpSelectedCount(count),
+                  maxLines: 1,
+                  overflow: TextOverflow.ellipsis,
+                  style: caption,
+                ),
+              ),
+              if (hasFiles) Text(formatSize(bytes), style: caption.copyWith(color: TermulPalette.ink)),
+              if (!browser.allSelected)
+                TermulButton(
+                  label: l.sftpSelectAll,
+                  variant: TermulButtonVariant.ghost,
+                  expand: false,
+                  onPressed: browser.selectAll,
+                ),
+            ],
           ),
           Row(
             spacing: TermulSpacing.space3,
@@ -983,10 +1108,7 @@ class _SelectionBar extends StatelessWidget {
                     label: l.sftpDownloadAction,
                     icon: TermulIconName.download,
                     variant: TermulButtonVariant.primary,
-                    onPressed: () {
-                      onDone();
-                      onDownload!();
-                    },
+                    onPressed: onDownload,
                   ),
                 ),
               Expanded(
@@ -996,9 +1118,9 @@ class _SelectionBar extends StatelessWidget {
                   icon: TermulIconName.copy,
                   onPressed: () async {
                     final messenger = ScaffoldMessenger.of(context);
-                    onDone();
-                    await Clipboard.setData(ClipboardData(text: entry.path));
-                    showTermulToastOn(messenger, l.sftpPathCopied);
+                    browser.clearSelection();
+                    await Clipboard.setData(ClipboardData(text: selection.map((e) => e.path).join('\n')));
+                    showTermulToastOn(messenger, count == 1 ? l.sftpPathCopied : l.sftpPathsCopied(count));
                   },
                 ),
               ),

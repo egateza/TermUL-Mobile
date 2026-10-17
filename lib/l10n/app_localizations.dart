@@ -1998,6 +1998,72 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Ditimpa di {location} · {name}'**
   String sftpDownloadedOverwritten(String location, String name);
+
+  /// Tombol memilih semua entri di folder.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih semua'**
+  String get sftpSelectAll;
+
+  /// Tombol melepas semua pilihan dan keluar dari mode seleksi.
+  ///
+  /// In id, this message translates to:
+  /// **'Batal pilih'**
+  String get sftpSelectionCancel;
+
+  /// Jumlah entri dipilih (berkas dan folder).
+  ///
+  /// In id, this message translates to:
+  /// **'{count} dipilih'**
+  String sftpSelectedCount(int count);
+
+  /// Toast setelah beberapa path disalin.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} path disalin'**
+  String sftpPathsCopied(int count);
+
+  /// Judul pilihan saat beberapa nama berkas atau folder sudah dipakai di Unduhan/TermUL.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} item sudah ada'**
+  String sftpConflictManyTitle(int count);
+
+  /// Tombol utama: semua yang bentrok disimpan dengan nama bernomor.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan dengan nama bernomor'**
+  String get sftpConflictRenameAll;
+
+  /// Tombol berisiko: semua berkas lama yang bentrok diganti isinya.
+  ///
+  /// In id, this message translates to:
+  /// **'Timpa semuanya'**
+  String get sftpConflictOverwriteAll;
+
+  /// Toast setelah beberapa berkas diunduh.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} berkas diunduh ke {location}'**
+  String sftpDownloadedMany(int count, String location);
+
+  /// Toast bila sebagian unduhan gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'{done} berkas diunduh, {failed} gagal'**
+  String sftpDownloadedManyPartial(int done, int failed);
+
+  /// Toast unduhan folder bila ada tautan rusak atau tidak terbaca yang dilewati.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} berkas diunduh ke {location} · {skipped} dilewati'**
+  String sftpDownloadedManySkipped(int count, String location, int skipped);
+
+  /// Toast bila folder yang diunduh tidak punya berkas.
+  ///
+  /// In id, this message translates to:
+  /// **'{name} tidak berisi berkas'**
+  String sftpFolderNoFiles(String name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -1576,5 +1576,96 @@
         "type": "String"
       }
     }
+  },
+  "sftpSelectAll": "Pilih semua",
+  "@sftpSelectAll": {
+    "description": "Tombol memilih semua entri di folder."
+  },
+  "sftpSelectionCancel": "Batal pilih",
+  "@sftpSelectionCancel": {
+    "description": "Tombol melepas semua pilihan dan keluar dari mode seleksi."
+  },
+  "sftpSelectedCount": "{count} dipilih",
+  "@sftpSelectedCount": {
+    "description": "Jumlah entri dipilih (berkas dan folder).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpPathsCopied": "{count} path disalin",
+  "@sftpPathsCopied": {
+    "description": "Toast setelah beberapa path disalin.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpConflictManyTitle": "{count} item sudah ada",
+  "@sftpConflictManyTitle": {
+    "description": "Judul pilihan saat beberapa nama berkas atau folder sudah dipakai di Unduhan/TermUL.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpConflictRenameAll": "Simpan dengan nama bernomor",
+  "@sftpConflictRenameAll": {
+    "description": "Tombol utama: semua yang bentrok disimpan dengan nama bernomor."
+  },
+  "sftpConflictOverwriteAll": "Timpa semuanya",
+  "@sftpConflictOverwriteAll": {
+    "description": "Tombol berisiko: semua berkas lama yang bentrok diganti isinya."
+  },
+  "sftpDownloadedMany": "{count} berkas diunduh ke {location}",
+  "@sftpDownloadedMany": {
+    "description": "Toast setelah beberapa berkas diunduh.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "location": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpDownloadedManyPartial": "{done} berkas diunduh, {failed} gagal",
+  "@sftpDownloadedManyPartial": {
+    "description": "Toast bila sebagian unduhan gagal.",
+    "placeholders": {
+      "done": {
+        "type": "int"
+      },
+      "failed": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpDownloadedManySkipped": "{count} berkas diunduh ke {location} · {skipped} dilewati",
+  "@sftpDownloadedManySkipped": {
+    "description": "Toast unduhan folder bila ada tautan rusak atau tidak terbaca yang dilewati.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "location": {
+        "type": "String"
+      },
+      "skipped": {
+        "type": "int"
+      }
+    }
+  },
+  "sftpFolderNoFiles": "{name} tidak berisi berkas",
+  "@sftpFolderNoFiles": {
+    "description": "Toast bila folder yang diunduh tidak punya berkas.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

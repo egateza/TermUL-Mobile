@@ -22,6 +22,9 @@ import java.io.FileInputStream
  * dan menimpa pun hanya "melihat" berkas milik aplikasi ini. Berkas bernama sama milik aplikasi lain tidak terlihat,
  * jadi MediaStore menamainya " (1)" sendiri.
  *
+ * Unduhan folder: berkas disimpan di subfolder `Download/TermUL/<folder>/...` (parameter `folder`, jalur relatif
+ * dengan `/`; MediaStore membuat folder yang belum ada). Segmen kosong, `.`, dan `..` ditolak.
+ *
  * Di bawah API 29 (minSdk 24): folder Unduhan publik butuh izin penyimpanan, jadi berkas disimpan di folder
  * Unduhan khusus aplikasi (`Android/data/.../files/Download/TermUL`). Jalur ini belum diuji di perangkat.
  */
@@ -29,17 +32,42 @@ object DownloadsSaver {
     const val FOLDER = "TermUL"
     private const val RELATIVE = "Download/$FOLDER/"
 
+    /** Jalur relatif MediaStore untuk [folder] (null = langsung di TermUL), berakhiran `/`. */
+    private fun relativeFor(folder: String?): String = if (folder.isNullOrEmpty()) RELATIVE else "$RELATIVE${cleanFolder(folder)}/"
+
+    private fun cleanFolder(folder: String): String {
+        val parts = folder.split('/')
+        require(parts.none { it.isEmpty() || it == "." || it == ".." }) { "Jalur folder tidak sah" }
+        return parts.joinToString("/")
+    }
+
     data class Saved(val name: String, val location: String, val overwritten: Boolean)
 
-    fun exists(context: Context, displayName: String): Boolean =
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) findExisting(context, displayName) != null
-        else File(appDir(context), displayName).exists()
+    fun exists(context: Context, displayName: String, folder: String? = null): Boolean =
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) findExisting(context, displayName, relativeFor(folder)) != null
+        else File(appDir(context, folder), displayName).exists()
 
-    fun save(context: Context, sourcePath: String, displayName: String, overwrite: Boolean): Saved {
+    /** Ada berkas milik aplikasi ini di dalam folder [name] (termasuk subfolder). */
+    fun folderExists(context: Context, name: String): Boolean {
+        if (Build.VERSION.SDK_INT < Build.VERSION_CODES.Q) return File(appDir(context, null), cleanFolder(name)).exists()
+        val base = relativeFor(name)
+        // LIKE dengan ESCAPE supaya % dan _ pada nama folder tidak dianggap pola.
+        val escaped = base.replace("\\", "\\\\").replace("%", "\\%").replace("_", "\\_")
+        context.contentResolver.query(
+            MediaStore.Downloads.EXTERNAL_CONTENT_URI,
+            arrayOf(MediaStore.MediaColumns._ID),
+            "${MediaStore.MediaColumns.RELATIVE_PATH} LIKE ? ESCAPE '\\'",
+            arrayOf("$escaped%"),
+            null,
+        )?.use { c -> return c.moveToFirst() }
+        return false
+    }
+
+    fun save(context: Context, sourcePath: String, displayName: String, overwrite: Boolean, folder: String? = null): Saved {
         val source = File(sourcePath)
         require(source.isFile) { "Berkas sumber tidak ada" }
-        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) saveToMediaStore(context, source, displayName, overwrite)
-        else saveToAppFolder(context, source, displayName, overwrite)
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) saveToMediaStore(context, source, displayName, overwrite, folder)
+        else saveToAppFolder(context, source, displayName, overwrite, folder)
     }
 
     private fun mimeOf(name: String): String {
@@ -47,13 +75,13 @@ object DownloadsSaver {
         return MimeTypeMap.getSingleton().getMimeTypeFromExtension(ext) ?: "application/octet-stream"
     }
 
-    private fun findExisting(context: Context, displayName: String): Uri? {
+    private fun findExisting(context: Context, displayName: String, relative: String): Uri? {
         val collection = MediaStore.Downloads.EXTERNAL_CONTENT_URI
         context.contentResolver.query(
             collection,
             arrayOf(MediaStore.MediaColumns._ID),
             "${MediaStore.MediaColumns.DISPLAY_NAME}=? AND ${MediaStore.MediaColumns.RELATIVE_PATH}=?",
-            arrayOf(displayName, RELATIVE),
+            arrayOf(displayName, relative),
             null,
         )?.use { c ->
             if (c.moveToFirst()) return ContentUris.withAppendedId(collection, c.getLong(0))
@@ -61,10 +89,11 @@ object DownloadsSaver {
         return null
     }
 
-    private fun saveToMediaStore(context: Context, source: File, displayName: String, overwrite: Boolean): Saved {
+    private fun saveToMediaStore(context: Context, source: File, displayName: String, overwrite: Boolean, folder: String?): Saved {
         val resolver = context.contentResolver
+        val relative = relativeFor(folder)
         if (overwrite) {
-            val existing = findExisting(context, displayName)
+            val existing = findExisting(context, displayName, relative)
             if (existing != null) {
                 try {
                     // "wt": potong lalu tulis ulang. Gagal (bukan milik kita) -> jatuh ke berkas baru bernomor.
@@ -82,7 +111,7 @@ object DownloadsSaver {
         val values = ContentValues().apply {
             put(MediaStore.MediaColumns.DISPLAY_NAME, displayName)
             put(MediaStore.MediaColumns.MIME_TYPE, mimeOf(displayName))
-            put(MediaStore.MediaColumns.RELATIVE_PATH, "${Environment.DIRECTORY_DOWNLOADS}/$FOLDER")
+            put(MediaStore.MediaColumns.RELATIVE_PATH, relative.trimEnd('/'))
             put(MediaStore.MediaColumns.IS_PENDING, 1)
         }
         val uri = resolver.insert(MediaStore.Downloads.EXTERNAL_CONTENT_URI, values)
@@ -104,14 +133,15 @@ object DownloadsSaver {
         return Saved(finalName, "Unduhan/$FOLDER", false)
     }
 
-    private fun appDir(context: Context): File {
+    private fun appDir(context: Context, folder: String? = null): File {
         val base = context.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS)
             ?: throw IllegalStateException("Penyimpanan tidak tersedia")
-        return File(base, FOLDER).apply { mkdirs() }
+        val root = File(base, FOLDER)
+        return (if (folder.isNullOrEmpty()) root else File(root, cleanFolder(folder))).apply { mkdirs() }
     }
 
-    private fun saveToAppFolder(context: Context, source: File, displayName: String, overwrite: Boolean): Saved {
-        val dir = appDir(context)
+    private fun saveToAppFolder(context: Context, source: File, displayName: String, overwrite: Boolean, folder: String?): Saved {
+        val dir = appDir(context, folder)
         var target = File(dir, displayName)
         val overwritten = overwrite && target.exists()
         var n = 1

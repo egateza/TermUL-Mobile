@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app_providers.dart';
 import 'package:termul_mobile/core/platform/downloads_saver.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
+import 'package:termul_mobile/core/sftp/sftp_service.dart';
 import 'package:termul_mobile/core/theme/termul_theme.dart';
 import 'package:termul_mobile/features/sftp/sftp_link.dart';
 import 'package:termul_mobile/features/sftp/sftp_screen.dart';
@@ -26,15 +27,26 @@ late SftpLink lastLink;
 
 class _Saver implements DownloadsSaver {
   final saved = <String>[];
+  final folders = <String?>[];
   final overwrites = <bool>[];
   final existing = <String>{};
+  final existingFolders = <String>{};
 
   @override
-  Future<bool> exists(String name) async => existing.contains(name);
+  Future<bool> exists(String name, {String? folder}) async => existing.contains(name);
 
   @override
-  Future<SavedDownload> save({required String path, required String name, bool overwrite = false}) async {
+  Future<bool> folderExists(String name) async => existingFolders.contains(name);
+
+  @override
+  Future<SavedDownload> save({
+    required String path,
+    required String name,
+    String? folder,
+    bool overwrite = false,
+  }) async {
     saved.add(name);
+    folders.add(folder);
     overwrites.add(overwrite);
     return SavedDownload(name: name, location: 'Unduhan/TermUL', overwritten: overwrite);
   }
@@ -59,7 +71,11 @@ Future<void> settle(WidgetTester tester, {int rounds = 8}) async {
   }
 }
 
-Future<FakeFiles> pumpBrowser(WidgetTester tester, {Size size = const Size(390, 844)}) async {
+Future<FakeFiles> pumpBrowser(
+  WidgetTester tester, {
+  Size size = const Size(390, 844),
+  List<SftpEntry> extra = const [],
+}) async {
   _tmp = Directory.systemTemp.createTempSync('termul_layar_');
   addTearDown(() {
     try {
@@ -69,11 +85,13 @@ Future<FakeFiles> pumpBrowser(WidgetTester tester, {Size size = const Size(390, 
     }
   });
   _saver.saved.clear();
+  _saver.folders.clear();
+  _saver.existingFolders.clear();
   _saver.overwrites.clear();
   _saver.existing.clear();
   _picker.next = [];
   final fake = FakeFiles({
-    '/home/u': [dir('/home/u', 'proyek'), file('/home/u', 'catatan.txt', size: 1229)],
+    '/home/u': [dir('/home/u', 'proyek'), file('/home/u', 'catatan.txt', size: 1229), ...extra],
     '/home/u/proyek': [file('/home/u/proyek', 'a.conf')],
     '/home': [dir('/home', 'u')],
     '/': [dir('/', 'home')],
@@ -152,6 +170,153 @@ void main() {
     expect(find.text('Path disalin'), findsOneWidget);
     expect(find.text('catatan.txt dipilih'), findsNothing, reason: 'pilihan dilepas setelah aksi');
     await tester.pump(const Duration(seconds: 3));
+  });
+
+  group('seleksi ganda', () {
+    String? clip;
+    setUp(() => clip = null);
+
+    Future<FakeFiles> pumpSelectable(WidgetTester tester) {
+      tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, (call) async {
+        if (call.method == 'Clipboard.setData') clip = (call.arguments as Map)['text'] as String;
+        return null;
+      });
+      addTearDown(() => tester.binding.defaultBinaryMessenger.setMockMethodCallHandler(SystemChannels.platform, null));
+      return pumpBrowser(tester, extra: [file('/home/u', 'log.txt', size: 2048)]);
+    }
+
+    testWidgets('tekan lama pada folder memilihnya tanpa membukanya; jumlah dan ukuran tanpa folder', (tester) async {
+      final fake = await pumpSelectable(tester);
+      await tester.longPress(find.text('proyek'));
+      await tester.pump();
+      expect(find.text('proyek dipilih'), findsOneWidget);
+      expect(fake.listed, ['/home/u'], reason: 'folder tidak dibuka');
+      expect(find.text('0 B'), findsNothing, reason: 'folder saja: tidak ada total ukuran');
+      expect(find.text('Unduh'), findsOneWidget, reason: 'folder juga bisa diunduh');
+
+      // Dalam mode seleksi, ketukan menambah pilihan (juga folder), bukan membuka.
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
+      expect(find.text('2 dipilih'), findsOneWidget);
+      expect(find.text('1,2 KB'), findsNWidgets(2), reason: 'baris dan total');
+      await tester.tap(find.text('log.txt'));
+      await tester.pump();
+      expect(find.text('3 dipilih'), findsOneWidget);
+      expect(find.text('3,2 KB'), findsOneWidget, reason: '1229 + 2048 byte, folder tidak dihitung');
+      expect(find.text('Pilih semua'), findsNothing, reason: 'semua sudah dipilih');
+    });
+
+    testWidgets('Salin path banyak: satu path per baris; kembali dan Batal pilih melepas pilihan', (tester) async {
+      await pumpSelectable(tester);
+      await tester.longPress(find.text('catatan.txt'));
+      await tester.pump();
+      await tester.tap(find.text('log.txt'));
+      await tester.pump();
+      await tester.tap(find.text('Salin path'));
+      await tester.pump();
+      expect(clip, '/home/u/catatan.txt\n/home/u/log.txt');
+      expect(find.text('2 path disalin'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+
+      await tester.longPress(find.text('log.txt'));
+      await tester.pump();
+      expect(find.text('log.txt dipilih'), findsOneWidget);
+      await tester.tap(find.bySemanticsLabel('Batal pilih'));
+      await tester.pump();
+      expect(find.text('log.txt dipilih'), findsNothing);
+
+      await tester.longPress(find.text('log.txt'));
+      await tester.pump();
+      await tester.tap(find.bySemanticsLabel('Kembali'));
+      await tester.pump();
+      expect(find.text('log.txt dipilih'), findsNothing, reason: 'kembali hanya melepas pilihan');
+      expect(find.text('log.txt'), findsOneWidget, reason: 'tetap di layar SFTP');
+    });
+
+    testWidgets('Unduh beberapa berkas: satu toast ringkasan', (tester) async {
+      await pumpSelectable(tester);
+      await tester.longPress(find.text('catatan.txt'));
+      await tester.pump();
+      await tester.tap(find.text('log.txt'));
+      await tester.pump();
+      await tester.tap(find.text('Unduh'));
+      await settle(tester, rounds: 14);
+      expect(_saver.saved, ['catatan.txt', 'log.txt']);
+      expect(find.text('2 berkas diunduh ke Unduhan/TermUL'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('beberapa nama sudah ada: satu pertanyaan untuk semuanya', (tester) async {
+      await pumpSelectable(tester);
+      _saver.existing.addAll({'catatan.txt', 'log.txt'});
+      await tester.longPress(find.text('catatan.txt'));
+      await tester.pump();
+      await tester.tap(find.text('log.txt'));
+      await tester.pump();
+      await tester.tap(find.text('Unduh'));
+      await tester.pumpAndSettle();
+      expect(find.text('2 item sudah ada'), findsOneWidget);
+      await tester.tap(find.text('Simpan dengan nama bernomor'));
+      await settle(tester, rounds: 14);
+      expect(_saver.saved, ['catatan (1).txt', 'log (1).txt']);
+      await tester.pump(const Duration(seconds: 3));
+    });
+  });
+
+  group('unduh folder', () {
+    Future<FakeFiles> pumpFolders(WidgetTester tester) async {
+      final fake = await pumpBrowser(tester, extra: [file('/home/u', 'log.txt', size: 2048)]);
+      fake.trees['/home/u/proyek'] = SftpTree(
+        files: [
+          const SftpTreeFile(remotePath: '/home/u/proyek/a.conf', relativePath: 'a.conf', size: 1000),
+          const SftpTreeFile(remotePath: '/home/u/proyek/sub/b.conf', relativePath: 'sub/b.conf', size: 1000),
+        ],
+        skipped: 1,
+      );
+      return fake;
+    }
+
+    testWidgets(
+      'folder dipilih dengan tekan lama lalu Unduh: disimpan bersubfolder, toast menyebut jumlah dan dilewati',
+      (tester) async {
+        await pumpFolders(tester);
+        await tester.longPress(find.text('proyek'));
+        await tester.pump();
+        await tester.tap(find.text('Unduh'));
+        await settle(tester, rounds: 14);
+        expect(_saver.saved, ['a.conf', 'b.conf']);
+        expect(_saver.folders, ['proyek', 'proyek/sub']);
+        expect(find.text('2 berkas diunduh ke Unduhan/TermUL/proyek · 1 dilewati'), findsOneWidget);
+        await tester.pump(const Duration(seconds: 3));
+      },
+    );
+
+    testWidgets('nama folder sudah ada di Unduhan: folder bernomor, tanpa mengubah ekstensi', (tester) async {
+      await pumpFolders(tester);
+      _saver.existingFolders.add('proyek');
+      await tester.longPress(find.text('proyek'));
+      await tester.pump();
+      await tester.tap(find.text('Unduh'));
+      await tester.pumpAndSettle();
+      expect(find.text('proyek sudah ada'), findsOneWidget);
+      await tester.tap(find.text('Simpan sebagai proyek (1)'));
+      await settle(tester, rounds: 14);
+      expect(_saver.folders, ['proyek (1)', 'proyek (1)/sub']);
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('folder dan berkas sekaligus: satu toast ringkasan menjumlah semua berkas', (tester) async {
+      await pumpFolders(tester);
+      await tester.longPress(find.text('proyek'));
+      await tester.pump();
+      await tester.tap(find.text('log.txt'));
+      await tester.pump();
+      await tester.tap(find.text('Unduh'));
+      await settle(tester, rounds: 20);
+      expect(_saver.saved, ['a.conf', 'b.conf', 'log.txt']);
+      expect(find.text('3 berkas diunduh ke Unduhan/TermUL · 1 dilewati'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+    });
   });
 
   testWidgets('landscape pendek: daftar tidak meluap', (tester) async {

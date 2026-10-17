@@ -131,6 +131,59 @@ void main() {
       );
     });
 
+    test(
+      'walk: tautan simbolik ke berkas dan folder diikuti ke sumbernya; putaran dan tautan rusak dilewati',
+      () async {
+        final raw = await conn.client.sftp();
+        final root = joinRemote(base, 'root');
+        await sftp.mkdir(root);
+        await sftp.mkdir(joinRemote(root, 'sub'));
+        await sftp.upload(joinRemote(root, 'a.txt'), bytes(10));
+        await sftp.upload(joinRemote(root, 'sub/b.txt'), bytes(20));
+        // dartssh2 `link(linkPath, targetPath)` meneruskan argumen ke SSH_FXP_SYMLINK, yang di OpenSSH bertukar urutan
+        // (target dulu); hasilnya diperiksa dengan readlink.
+        Future<void> link(String linkPath, String target) async {
+          await raw.link(target, linkPath);
+          expect(await raw.readlink(linkPath), target, reason: 'tautan $linkPath dibuat');
+        }
+
+        await link(joinRemote(root, 'lnk.txt'), joinRemote(root, 'a.txt'));
+        await link(joinRemote(root, 'up'), joinRemote(root, 'sub'));
+        await link(joinRemote(root, 'loop'), root);
+        await link(joinRemote(root, 'rusak'), joinRemote(root, 'tidak-ada'));
+        // Tautan ke folder induk root: mengikutinya akan mengunduh semua isi di luar folder yang dipilih.
+        await link(joinRemote(root, 'naik'), base);
+        await link(joinRemote(base, 'tautan-root'), root);
+
+        for (final start in [root, joinRemote(base, 'tautan-root')]) {
+          final tree = await sftp.walk(start);
+          final files = [for (final f in tree.files) '${f.relativePath}:${f.size}']..sort();
+          expect(files, ['a.txt:10', 'lnk.txt:10', 'sub/b.txt:20', 'up/b.txt:20'], reason: start);
+          expect(tree.skipped, 3, reason: 'loop dan naik (putaran) serta rusak');
+          expect(tree.totalBytes, 60);
+          for (final f in tree.files) {
+            expect(f.remotePath, startsWith(start));
+          }
+        }
+
+        // Berkas dari tautan bisa diunduh dari sumbernya.
+        final out = File('${tmp.path}${Platform.pathSeparator}lnk.bin');
+        final sink = out.openWrite();
+        expect(await sftp.download(joinRemote(root, 'lnk.txt'), sink), 10);
+        await sink.close();
+
+        await expectLater(
+          sftp.walk(joinRemote(base, 'tidak-ada')),
+          throwsA(isA<SftpFailure>().having((f) => f.kind, 'kind', SftpFailureKind.notFound)),
+        );
+        final token = SftpCancelToken()..cancel();
+        await expectLater(
+          sftp.walk(root, cancel: token),
+          throwsA(isA<SftpFailure>().having((f) => f.kind, 'kind', SftpFailureKind.cancelled)),
+        );
+      },
+    );
+
     test('batal unggah: melempar cancelled dan berkas parsial dihapus', () async {
       final path = joinRemote(base, 'besar.bin');
       final token = SftpCancelToken();

@@ -24,12 +24,17 @@ class DownloadSaveException implements Exception {
 
 /// Menyalin berkas yang sudah selesai diunduh ke folder Unduhan/TermUL (`DownloadsSaver.kt`). Android saja.
 abstract interface class DownloadsSaver {
-  /// Ada berkas bernama [name] di Unduhan/TermUL yang bisa dilihat aplikasi (milik aplikasi ini).
-  Future<bool> exists(String name);
+  /// Ada berkas bernama [name] di Unduhan/TermUL (atau di [folder] di dalamnya) yang bisa dilihat aplikasi (milik
+  /// aplikasi ini).
+  Future<bool> exists(String name, {String? folder});
 
-  /// Menyalin [path] ke Unduhan/TermUL sebagai [name]. Dengan [overwrite], berkas lama milik aplikasi diganti isinya;
+  /// Ada folder bernama [name] di Unduhan/TermUL yang berisi berkas milik aplikasi ini.
+  Future<bool> folderExists(String name);
+
+  /// Menyalin [path] ke Unduhan/TermUL sebagai [name], di dalam [folder] (jalur relatif dengan `/`, dibuat bila
+  /// belum ada; bawaan langsung di Unduhan/TermUL). Dengan [overwrite], berkas lama milik aplikasi diganti isinya;
   /// bila tidak bisa diganti, hasilnya disimpan bernomor dan [SavedDownload.overwritten] false.
-  Future<SavedDownload> save({required String path, required String name, bool overwrite = false});
+  Future<SavedDownload> save({required String path, required String name, String? folder, bool overwrite = false});
 }
 
 class MethodChannelDownloadsSaver implements DownloadsSaver {
@@ -39,9 +44,9 @@ class MethodChannelDownloadsSaver implements DownloadsSaver {
   final MethodChannel _channel;
 
   @override
-  Future<bool> exists(String name) async {
+  Future<bool> exists(String name, {String? folder}) async {
     try {
-      return await _channel.invokeMethod<bool>('exists', {'name': name}) ?? false;
+      return await _channel.invokeMethod<bool>('exists', {'name': name, 'folder': folder}) ?? false;
     } on PlatformException {
       return false;
     } on MissingPluginException {
@@ -50,11 +55,28 @@ class MethodChannelDownloadsSaver implements DownloadsSaver {
   }
 
   @override
-  Future<SavedDownload> save({required String path, required String name, bool overwrite = false}) async {
+  Future<bool> folderExists(String name) async {
+    try {
+      return await _channel.invokeMethod<bool>('folderExists', {'name': name}) ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+
+  @override
+  Future<SavedDownload> save({
+    required String path,
+    required String name,
+    String? folder,
+    bool overwrite = false,
+  }) async {
     try {
       final r = await _channel.invokeMapMethod<String, Object?>('save', {
         'path': path,
         'name': name,
+        'folder': folder,
         'overwrite': overwrite,
       });
       if (r == null) throw const DownloadSaveException();

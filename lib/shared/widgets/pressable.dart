@@ -59,6 +59,7 @@ class Pressable extends StatefulWidget {
     super.key,
     required this.builder,
     required this.onPressed,
+    this.onLongPress,
     this.semanticLabel,
     this.radius = TermulRadius.radiusLg,
     this.minWidth = 0,
@@ -70,6 +71,9 @@ class Pressable extends StatefulWidget {
   /// Dipanggil dengan keadaan menekan; kembalikan isi kontrol (warna menyesuaikan [pressed]).
   final Widget Function(BuildContext context, bool pressed) builder;
   final VoidCallback? onPressed;
+
+  /// Tekan lama (mis. memulai seleksi). Tidak mengubah tampilan menekan.
+  final VoidCallback? onLongPress;
   final String? semanticLabel;
   final double radius;
   final double minWidth;
@@ -95,6 +99,7 @@ class _PressableState extends State<Pressable> {
         type: MaterialType.transparency,
         child: InkWell(
           onTap: widget.onPressed,
+          onLongPress: enabled ? widget.onLongPress : null,
           canRequestFocus: widget.canRequestFocus && enabled,
           borderRadius: BorderRadius.circular(widget.radius),
           splashFactory: NoSplash.splashFactory,
@@ -110,6 +115,7 @@ class _PressableState extends State<Pressable> {
       button: true,
       enabled: enabled,
       toggled: widget.toggled,
+      onLongPress: enabled ? widget.onLongPress : null,
       label: widget.semanticLabel,
       excludeSemantics: widget.semanticLabel != null,
       child: Opacity(

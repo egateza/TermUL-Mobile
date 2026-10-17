@@ -88,6 +88,28 @@ int compareEntries(SftpEntry a, SftpEntry b) {
   return a.name.toLowerCase().compareTo(b.name.toLowerCase());
 }
 
+/// Satu berkas hasil penelusuran folder: jalur di server, jalur relatif terhadap folder yang diunduh (pemisah `/`,
+/// termasuk nama berkas), dan ukurannya.
+class SftpTreeFile {
+  const SftpTreeFile({required this.remotePath, required this.relativePath, required this.size});
+
+  final String remotePath;
+  final String relativePath;
+  final int size;
+}
+
+/// Hasil menelusuri folder: berkas yang bisa diunduh dan jumlah entri yang dilewati (tautan simbolik rusak,
+/// tautan yang menunjuk ke folder induknya sendiri, folder yang tidak boleh dibaca, soket dan sejenisnya).
+/// Folder kosong tidak dicatat: Unduhan Android tidak bisa membuat folder tanpa berkas.
+class SftpTree {
+  const SftpTree({required this.files, this.skipped = 0});
+
+  final List<SftpTreeFile> files;
+  final int skipped;
+
+  int get totalBytes => files.fold(0, (sum, f) => sum + f.size);
+}
+
 /// Bagian SFTP yang dipakai penjelajah folder; dipisah supaya penjelajah bisa dites tanpa server.
 abstract interface class SftpBrowsing {
   Future<String> home();
@@ -97,6 +119,9 @@ abstract interface class SftpBrowsing {
 
 /// Transfer berkas; dipisah dari [SftpBrowsing] supaya orkestrasi transfer bisa dites tanpa server.
 abstract interface class SftpFileOps {
+  /// Menelusuri [dir] beserta seluruh isinya untuk unduhan folder. Tautan simbolik diikuti ke sumbernya.
+  Future<SftpTree> walk(String dir, {SftpCancelToken? cancel});
+
   Future<int> download(
     String remotePath,
     StreamSink<List<int>> sink, {
@@ -157,6 +182,62 @@ class SftpService implements SftpBrowsing, SftpFileOps {
     }
     entries.sort(compareEntries);
     return entries;
+  });
+
+  /// Menelusuri [dir] rekursif. Tautan simbolik ke berkas atau folder diikuti dan diunduh dari sumbernya; yang rusak
+  /// atau menunjuk ke folder yang sedang ditelusuri (putaran) dilewati dan dihitung. Folder anak yang tidak bisa
+  /// dibaca dilewati; hanya galat di [dir] sendiri yang menggagalkan penelusuran.
+  @override
+  Future<SftpTree> walk(String dir, {SftpCancelToken? cancel}) => _guard(() async {
+    final files = <SftpTreeFile>[];
+    var skipped = 0;
+    String? rootReal;
+
+    Future<void> visit(String path, String relative, Set<String> ancestors, {required bool root}) async {
+      if (cancel?.isCancelled ?? false) throw const SftpFailure(SftpFailureKind.cancelled, 'Dibatalkan');
+      final real = await _client.absolute(path);
+      final top = rootReal ??= real;
+      // Putaran: folder yang sedang ditelusuri, atau folder yang memuat folder awal (mis. tautan ke `..`; kalau diikuti,
+      // seluruh isi di luar folder yang dipilih ikut terunduh).
+      if (!root && (ancestors.contains(real) || _isSameOrAncestor(real, top))) {
+        skipped++;
+        return;
+      }
+      final List<SftpName> names;
+      try {
+        names = await _client.listdir(path);
+      } on Object {
+        if (root) rethrow;
+        skipped++;
+        return;
+      }
+      final chain = {...ancestors, real};
+      for (final n in names) {
+        if (n.filename == '.' || n.filename == '..') continue;
+        final child = joinRemote(path, n.filename);
+        final rel = relative.isEmpty ? n.filename : '$relative/${n.filename}';
+        var attr = n.attr;
+        if (_kindOf(attr) == SftpEntryKind.symlink) {
+          try {
+            attr = await _client.stat(child);
+          } on Object {
+            skipped++;
+            continue;
+          }
+        }
+        switch (_kindOf(attr)) {
+          case SftpEntryKind.directory:
+            await visit(child, rel, chain, root: false);
+          case SftpEntryKind.file:
+            files.add(SftpTreeFile(remotePath: child, relativePath: rel, size: attr.size ?? 0));
+          case SftpEntryKind.symlink || SftpEntryKind.other:
+            skipped++;
+        }
+      }
+    }
+
+    await visit(dir, '', const {}, root: true);
+    return SftpTree(files: files, skipped: skipped);
   });
 
   Future<void> mkdir(String path) => _guard(() => _client.mkdir(path));
@@ -272,6 +353,9 @@ class SftpService implements SftpBrowsing, SftpFileOps {
       await _client.rename(partial, remotePath);
     }
   });
+
+  /// [dir] sama dengan [of] atau memuatnya (jalur mutlak hasil realpath).
+  static bool _isSameOrAncestor(String dir, String of) => of == dir || of.startsWith(dir.endsWith('/') ? dir : '$dir/');
 
   void close() => _client.close();
 
