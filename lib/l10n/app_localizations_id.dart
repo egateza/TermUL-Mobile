@@ -957,7 +957,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get sftpLostTitle => 'Sambungan SFTP terputus';
 
   @override
-  String get sftpLostBorrowedBody => 'Sesi terminalnya terputus. Kembali, lalu buka lagi setelah sesinya tersambung.';
+  String get sftpLostBorrowedBody => 'Sesi terminalnya terputus. SFTP tersambung lagi begitu sesinya tersambung ulang.';
 
   @override
   String get sftpLostOwnBody => 'Android bisa menutup sambungan di latar belakang. Sambung ulang untuk melanjutkan.';
@@ -1039,4 +1039,7 @@ class AppLocalizationsId extends AppLocalizations {
   String sftpDisconnectedFrom(String name) {
     return '$name · terputus';
   }
+
+  @override
+  String get sftpReconnectingBody => 'Folder yang dibuka tetap terlihat.';
 }

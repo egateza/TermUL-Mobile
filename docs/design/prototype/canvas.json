@@ -419,6 +419,24 @@
    "title": "4e · SFTP: sambungan terputus (Sambung ulang)",
    "is_interactive": true,
    "radius": 28
+  },
+  "SftpWaiting.dc.html": {
+   "x": 1880,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4f · SFTP: menunggu server terjangkau (hitungan mundur)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SftpNeedsAuth.dc.html": {
+   "x": 2350,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4g · SFTP: sambung ulang menunggu verifikasi",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -467,7 +485,9 @@
   "SftpSources.dc.html",
   "SftpLeave.dc.html",
   "SftpLeaveBusy.dc.html",
-  "SftpLost.dc.html"
+  "SftpLost.dc.html",
+  "SftpWaiting.dc.html",
+  "SftpNeedsAuth.dc.html"
  ],
  "notes": {
   "judul": {

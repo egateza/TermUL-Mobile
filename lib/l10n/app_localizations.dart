@@ -1768,7 +1768,7 @@ abstract class AppLocalizations {
   /// Keterangan bila sesi yang dipinjam putus.
   ///
   /// In id, this message translates to:
-  /// **'Sesi terminalnya terputus. Kembali, lalu buka lagi setelah sesinya tersambung.'**
+  /// **'Sesi terminalnya terputus. SFTP tersambung lagi begitu sesinya tersambung ulang.'**
   String get sftpLostBorrowedBody;
 
   /// Keterangan bila koneksi SFTP sendiri putus.
@@ -1896,6 +1896,12 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'{name} · terputus'**
   String sftpDisconnectedFrom(String name);
+
+  /// Isi banner saat SFTP menyambung ulang.
+  ///
+  /// In id, this message translates to:
+  /// **'Folder yang dibuka tetap terlihat.'**
+  String get sftpReconnectingBody;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

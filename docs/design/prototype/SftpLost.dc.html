@@ -27,8 +27,8 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 <div style="display: flex; align-items: center; gap: 6px; padding: 8px 20px 12px 20px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; color: #9AA8AF; white-space: nowrap"><span>/</span><span>var</span><span>/</span><span style="color: #E8EEF0">log</span></div>
 <div style="margin: 0 20px 12px 20px; display: flex; flex-direction: column; gap: 14px; padding: 16px; box-sizing: border-box; border-radius: 16px; border: 1px solid #5A4720; background: #231C0E">
 <div style="display: flex; gap: 12px"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F0B34A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 4l10 17H2zM12 10v5M12 18h.01"/></svg>
-<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 500; color: #F0B34A">Sambungan SFTP terputus</span><span style="font-size: 13.5px; line-height: 1.5; color: #F3D9A4">Android bisa menutup sambungan di latar belakang. Sambung ulang untuk melanjutkan.</span></div></div>
-<button type="button" style="align-self: flex-start; min-height: 44px; padding: 0 18px; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer">Sambung ulang</button>
+<div style="display: flex; flex-direction: column; gap: 4px"><span style="font-size: 16px; font-weight: 500; color: #F0B34A">{{bannerTitle}}</span><span style="font-size: 13.5px; line-height: 1.5; color: #F3D9A4">{{bannerBody}}</span></div></div>
+<button type="button" style="align-self: flex-start; min-height: 44px; padding: 0 18px; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; font-weight: 600; cursor: pointer">{{bannerButton}}</button>
 </div>
 <div style="flex: 1; min-height: 0; overflow: hidden; padding: 0 20px; display: flex; flex-direction: column; gap: 10px">
 <div style="min-height: 60px; flex: none; display: flex; align-items: center; gap: 14px; padding: 8px 14px; box-sizing: border-box; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
@@ -46,10 +46,17 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </div>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+<script type="text/x-dc" data-dc-script data-props='{"state":{"editor":"enum","default":"lost","options":["lost","waiting","auth"],"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
   renderVals() {
-    return {};
+    const st = this.props.state || 'lost';
+    const map = {
+      lost: ['Sambungan SFTP terputus', 'Android bisa menutup sambungan di latar belakang. Sambung ulang untuk melanjutkan.', 'Sambung ulang'],
+      waiting: ['Menunggu server terjangkau\u2026', 'Mencoba lagi dalam 5 detik.', 'Sambung sekarang'],
+      auth: ['Perlu verifikasi', 'Menyambung ulang membutuhkan sidik jari, PIN, atau pola perangkat.', 'Tampilkan prompt']
+    };
+    const m = map[st] || map.lost;
+    return { bannerTitle: m[0], bannerBody: m[1], bannerButton: m[2] };
   }
 }
 </script>

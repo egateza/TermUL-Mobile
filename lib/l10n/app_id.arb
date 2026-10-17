@@ -1325,7 +1325,7 @@
   "@sftpLostTitle": {
     "description": "Judul banner sambungan SFTP putus."
   },
-  "sftpLostBorrowedBody": "Sesi terminalnya terputus. Kembali, lalu buka lagi setelah sesinya tersambung.",
+  "sftpLostBorrowedBody": "Sesi terminalnya terputus. SFTP tersambung lagi begitu sesinya tersambung ulang.",
   "@sftpLostBorrowedBody": {
     "description": "Keterangan bila sesi yang dipinjam putus."
   },
@@ -1457,5 +1457,9 @@
         "type": "String"
       }
     }
+  },
+  "sftpReconnectingBody": "Folder yang dibuka tetap terlihat.",
+  "@sftpReconnectingBody": {
+    "description": "Isi banner saat SFTP menyambung ulang."
   }
 }

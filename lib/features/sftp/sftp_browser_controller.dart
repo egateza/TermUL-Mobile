@@ -40,11 +40,26 @@ class SftpBrowserController extends ChangeNotifier {
 
   bool get atRoot => _path == '/';
 
-  /// Membuka folder rumah (awal).
-  Future<void> start() async {
+  /// Membuka folder rumah (awal). Dengan [restore] (setelah sambung ulang) mencoba folder itu dulu; bila tidak bisa
+  /// dibuka (hilang, izin berubah), jatuh ke folder rumah.
+  Future<void> start({String? restore}) async {
     final epoch = ++_epoch;
     _begin();
     try {
+      if (restore != null) {
+        try {
+          final list = await _sftp.list(restore);
+          if (epoch != _epoch) return;
+          _path = restore;
+          _entries = list;
+          _selected = null;
+          _loading = false;
+          _notify();
+          return;
+        } on Object {
+          if (epoch != _epoch) return;
+        }
+      }
       final home = await _sftp.home();
       if (epoch != _epoch) return;
       await _load(home, epoch);

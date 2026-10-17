@@ -43,6 +43,9 @@ class SftpScreen extends ConsumerWidget {
         unlockReason: l.unlockReason(profile.name),
         gate: ref.read(authGateProvider),
       ),
+      probe: ref.read(hostProbeProvider),
+      screenMonitor: ref.read(screenMonitorProvider),
+      autoReconnect: () => ref.read(appSettingsProvider).connection.autoReconnect,
     );
     _push(context, link);
   }
@@ -53,7 +56,7 @@ class SftpScreen extends ConsumerWidget {
       showTermulToast(context, AppLocalizations.of(context).sftpErrLost, icon: TermulIconName.warning);
       return;
     }
-    _push(context, SftpLink.borrowed(profile: session.profile, connection: connection));
+    _push(context, SftpLink.borrowed(session: session));
   }
 
   void _push(BuildContext context, SftpLink link) {
@@ -223,9 +226,11 @@ class _SftpBrowserScreenState extends State<SftpBrowserScreen> {
     final service = widget.link.service;
     if (service == null || identical(service, _boundTo)) return;
     _boundTo = service;
+    // Setelah sambung ulang, kembali ke folder yang sedang dibuka.
+    final restore = _browser?.path;
     _browser?.dispose();
     _browser = SftpBrowserController(service);
-    unawaited(_browser!.start());
+    unawaited(_browser!.start(restore: restore));
   }
 
   void _onLink() {
@@ -280,7 +285,7 @@ class _SftpBrowserScreenState extends State<SftpBrowserScreen> {
     final link = widget.link;
     final flow = link.flow;
     final state = flow?.state;
-    if (link.service == null && state is ConnectNeedsHostKey) {
+    if (state is ConnectNeedsHostKey) {
       return HostKeyPrompt(profile: link.profile, challenge: state.challenge, onChoice: flow!.answerHostKey);
     }
     final browser = _browser;
@@ -308,7 +313,7 @@ class _SftpBrowserScreenState extends State<SftpBrowserScreen> {
                 child: link.service == null || browser == null
                     ? _Connecting(link: link, state: state, onLeave: _leave)
                     : ListenableBuilder(
-                        listenable: browser,
+                        listenable: Listenable.merge([browser, link]),
                         builder: (context, _) => _Listing(browser: browser, link: link),
                       ),
               ),
@@ -450,7 +455,7 @@ class _Connecting extends StatelessWidget {
             TermulButton(
               label: l.actionRetry,
               variant: TermulButtonVariant.primary,
-              onPressed: () => unawaited(link.reconnect()),
+              onPressed: () => unawaited(link.retry()),
             ),
             TermulButton(label: l.actionBack, variant: TermulButtonVariant.ghost, onPressed: onLeave),
           ],
@@ -466,7 +471,7 @@ class _Connecting extends StatelessWidget {
             TermulButton(
               label: l.actionRetry,
               variant: TermulButtonVariant.primary,
-              onPressed: () => unawaited(link.reconnect()),
+              onPressed: () => unawaited(link.retry()),
             ),
             TermulButton(label: l.actionBack, variant: TermulButtonVariant.ghost, onPressed: onLeave),
           ],
@@ -532,6 +537,46 @@ class _Listing extends StatelessWidget {
     _ => l.sftpErrOther,
   };
 
+  /// Banner sambungan putus: sama dengan terminal (menunggu server terjangkau dengan hitungan mundur, menyambung
+  /// ulang, perlu verifikasi), ditambah keadaan putus biasa.
+  Widget _linkBanner(AppLocalizations l) {
+    TermulButton button(String label, {bool primary = true}) => TermulButton(
+      label: label,
+      variant: primary ? TermulButtonVariant.primary : TermulButtonVariant.secondary,
+      expand: false,
+      onPressed: () => unawaited(link.retry()),
+    );
+    if (!link.isOwn) {
+      return TermulBanner(tone: BannerTone.warn, title: l.sftpLostTitle, child: Text(l.sftpLostBorrowedBody));
+    }
+    if (link.needsAuth) {
+      return TermulBanner(
+        tone: BannerTone.warn,
+        title: l.reconnectAuthTitle,
+        action: button(l.reconnectShowPrompt),
+        child: Text(l.reconnectAuthBody),
+      );
+    }
+    final retry = link.secondsUntilRetry;
+    if (retry != null) {
+      return TermulBanner(
+        tone: BannerTone.warn,
+        title: l.reconnectWaitingTitle,
+        action: button(l.reconnectNow),
+        child: Text(l.reconnectWaitingBody(retry)),
+      );
+    }
+    if (link.reconnecting) {
+      return TermulBanner(tone: BannerTone.warn, title: l.reconnectingTitle, child: Text(l.sftpReconnectingBody));
+    }
+    return TermulBanner(
+      tone: BannerTone.warn,
+      title: l.sftpLostTitle,
+      action: button(l.sftpReconnect),
+      child: Text(l.sftpLostOwnBody),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
@@ -571,19 +616,7 @@ class _Listing extends StatelessWidget {
         if (lost)
           Padding(
             padding: const EdgeInsets.fromLTRB(TermulSpacing.space5, 0, TermulSpacing.space5, TermulSpacing.space3),
-            child: TermulBanner(
-              tone: BannerTone.warn,
-              title: l.sftpLostTitle,
-              action: link.isOwn
-                  ? TermulButton(
-                      label: l.sftpReconnect,
-                      variant: TermulButtonVariant.primary,
-                      expand: false,
-                      onPressed: () => unawaited(link.reconnect()),
-                    )
-                  : null,
-              child: Text(link.isOwn ? l.sftpLostOwnBody : l.sftpLostBorrowedBody),
-            ),
+            child: _linkBanner(l),
           )
         else if (failure != null)
           Padding(
