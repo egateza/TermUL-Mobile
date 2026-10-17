@@ -823,13 +823,13 @@ Permintaan pemilik: unduh dan unggah punya pilihan timpa atau simpan dengan nama
 
 ## 11s. SFTP: pilihan berkas dilepas setelah aksi (2026-10-17)
 
-**Selesai (456 tes; teruji di HP). Design system versi 45 (catatan di README); prototipe tidak berubah.**
+**Selesai (457 tes; teruji di HP). Design system versi 45 (catatan di README); prototipe tidak berubah.**
 
 Permintaan pemilik: setelah Unduh atau Salin path ditekan, seleksi pada berkas dihilangkan, karena sebelumnya Unduh bisa ditekan berulang. `SftpBrowserController.clearSelection()`; bar pilihan memanggilnya begitu salah satu tombol ditekan (sebelum aksi berjalan, jadi tidak ada celah untuk ketukan kedua). Konsekuensi: bila pengguna membatalkan sheet "nama sudah ada", pilihan tetap sudah lepas dan berkas dipilih ulang. Tes: unduh melepas pilihan dan hanya satu unduhan berjalan, Salin path melepas pilihan, `clearSelection`. **Teruji di HP [T]:** Salin path (toast, bar hilang) dan tiga ketukan cepat pada Unduh menghasilkan satu berkas saja di Unduhan/TermUL.
 
 ## 12. Status terkini dan cara melanjutkan
 
-Terakhir diperbarui: 2026-10-17. **SFTP selesai untuk menjelajah, sambung ulang otomatis, unduh, dan unggah (11n sampai 11s); edit berkas, buat folder, ganti nama, dan hapus belum.** Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), sesi di latar belakang (11e), sambung ulang menunggu jaringan (11f), layar pemuatan dan gulir seleksi (11g), `NavBar` lima tab (11h), saklar sambung ulang otomatis (11i), popover Tempel dan saklarnya (11j), dan landscape layar utama (11k). 456 tes lulus (2 dilewati), `flutter analyze` bersih. **Dua perbaikan landscape (banner status sambungan dan label profil, 11l; form host dengan keyboard, 11m) teruji di HP dan artifact desainnya sudah diperbarui.** Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
+Terakhir diperbarui: 2026-10-17. **SFTP selesai untuk menjelajah, sambung ulang otomatis, unduh, dan unggah (11n sampai 11s); edit berkas, buat folder, ganti nama, dan hapus belum.** Langkah 0 sampai 8 selesai, ditambah `settings.json` dan menu setting (11a), foreground service (11b), tempel (11c), seleksi dan salin teks (11d), sesi di latar belakang (11e), sambung ulang menunggu jaringan (11f), layar pemuatan dan gulir seleksi (11g), `NavBar` lima tab (11h), saklar sambung ulang otomatis (11i), popover Tempel dan saklarnya (11j), dan landscape layar utama (11k). 457 tes lulus (2 dilewati), `flutter analyze` bersih. **Dua perbaikan landscape (banner status sambungan dan label profil, 11l; form host dengan keyboard, 11m) teruji di HP dan artifact desainnya sudah diperbarui.** Irisan pertama (daftar host, sambung dengan verifikasi host key, terminal, sambung ulang) berjalan di emulator terhadap server SSH sungguhan dan di HP fisik. Menu setting dan seleksi sudah dicoba di HP dan sesuai.
 
 **Sudah diuji di HP (2026-10-16):** foreground service (`Destroyed live tcp sockets` tidak muncul lagi dengan saklar menyala, sambungan bertahan sekitar 9 menit), sesi di latar belakang, multi sesi, Putuskan semua, dan putus serta pulih saat mode pesawat; rincian dan batasnya di "Hasil uji HP" (11e). **Tempel (11c, 11j) dan landscape (11k) sudah dicoba di HP lewat adb (2026-10-16).** **Landscape: banner, label profil, form host, pencarian, dan dropdown teruji di HP (2026-10-17).** **Teruji di HP 2026-10-17:** tempel isi papan klip panjang (91 baris), "Putuskan semua" dari notifikasi, dan layar mati sekitar 25 menit (sesi tetap hidup; HP masih tercolok kabel). **Belum diuji di HP:** layar mati 30 menit atau lebih tanpa kabel, efek HyperOS. Sisa uji HP lama: Home 13 detik dan 5 menit, Wi-Fi mati dan Wi-Fi ke seluler, impor kunci lewat pemilih berkas, sidik jari, PIN dan sandi, `vim` dan `tmux`, hasil sambung ulang di HP, HP tanpa kunci layar (`none`), `keyboard-interactive`, animasi keyboard (belum diukur).
 
@@ -845,7 +845,7 @@ Cara menjalankan tes:
 
 ```
 flutter analyze
-flutter test                                   # 456 tes otomatis (2 dilewati), tanpa jaringan
+flutter test                                   # 457 tes otomatis (2 dilewati), tanpa jaringan
 flutter test integration_test/storage_test.dart -d <perangkat>
 flutter test integration_test/host_flow_test.dart -d <perangkat>
 flutter test integration_test/vault_test.dart -d <perangkat> [--dart-define=PROMPT=true]
