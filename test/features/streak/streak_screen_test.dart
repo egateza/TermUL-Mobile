@@ -78,7 +78,10 @@ void main() {
   });
 
   testWidgets('streak aktif: chip 11x membuka tab Streak dengan angka, level, dan lencana', (tester) async {
-    final s = await open(tester, record: StreakRecord(streak: Streak(10, daysAgo(1)), days: [daysAgo(2), daysAgo(1)]));
+    final s = await open(
+      tester,
+      record: StreakRecord(streak: Streak(10, daysAgo(1)), days: [daysAgo(2), daysAgo(1)]),
+    );
     expect(s.repo.record.streak.count, 11);
     expect(find.descendant(of: chip(), matching: find.text('11x')), findsOneWidget);
     await tester.tap(chip());
@@ -206,7 +209,10 @@ void main() {
     AppSettings? saved;
     tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
     addTearDown(tester.platformDispatcher.clearAccessibilityFeaturesTestValue);
-    final harness = Harness(saveSettings: (s) async => saved = s, streak: MemoryStreakRepository(StreakRecord(streak: Streak(5, DateTime.now()))));
+    final harness = Harness(
+      saveSettings: (s) async => saved = s,
+      streak: MemoryStreakRepository(StreakRecord(streak: Streak(5, DateTime.now()))),
+    );
     await harness.pump(tester);
     expect(chip(), findsOneWidget);
     await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Pengaturan')));

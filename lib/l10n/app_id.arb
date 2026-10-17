@@ -1456,6 +1456,26 @@
   "@streakSplashLater": {
     "description": "Tombol menutup splash padam atau beku tanpa menyalakan api."
   },
+  "streakReminderTitle": "Api streak menunggu",
+  "@streakReminderTitle": {
+    "description": "Judul notifikasi pengingat streak harian."
+  },
+  "streakReminderText": "Buka TermUL hari ini supaya streak tetap menyala.",
+  "@streakReminderText": {
+    "description": "Isi notifikasi pengingat streak harian."
+  },
+  "streakReminderChannel": "Pengingat streak",
+  "@streakReminderChannel": {
+    "description": "Nama saluran notifikasi pengingat streak di pengaturan Android."
+  },
+  "settingsStreakReminderNeedsPermission": "Izin notifikasi diperlukan untuk pengingat harian",
+  "@settingsStreakReminderNeedsPermission": {
+    "description": "Pesan saat izin notifikasi ditolak ketika menyalakan pengingat."
+  },
+  "settingsStreakReminderBlocked": "Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.",
+  "@settingsStreakReminderBlocked": {
+    "description": "Peringatan saat pengingat menyala tetapi notifikasi diblokir."
+  },
   "settingsStreakSection": "Streak",
   "@settingsStreakSection": {
     "description": "Judul bagian Streak di Pengaturan."

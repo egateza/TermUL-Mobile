@@ -1002,6 +1002,21 @@ class AppLocalizationsId extends AppLocalizations {
   String get streakSplashLater => 'Nanti saja';
 
   @override
+  String get streakReminderTitle => 'Api streak menunggu';
+
+  @override
+  String get streakReminderText => 'Buka TermUL hari ini supaya streak tetap menyala.';
+
+  @override
+  String get streakReminderChannel => 'Pengingat streak';
+
+  @override
+  String get settingsStreakReminderNeedsPermission => 'Izin notifikasi diperlukan untuk pengingat harian';
+
+  @override
+  String get settingsStreakReminderBlocked => 'Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.';
+
+  @override
   String get settingsStreakSection => 'Streak';
 
   @override

@@ -18,6 +18,7 @@ import '../settings/settings_screen.dart';
 import '../snippets/snippets_screen.dart';
 import '../streak/streak_controller.dart';
 import '../streak/streak_screen.dart';
+import '../streak/streak_reminder.dart';
 import '../streak/streak_splash.dart';
 import 'main_tab.dart';
 
@@ -48,6 +49,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
 
   final _visited = <int>{0};
   Timer? _dayCheck;
+  late final _reminder = StreakReminderSync(ref);
 
   @override
   void initState() {
@@ -56,6 +58,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (!mounted) return;
       _onStreakEvent(ref.read(streakControllerProvider.notifier).openToday());
+      _syncReminder();
       _dayCheck = Timer.periodic(dayCheckInterval, (_) => _checkDay());
     });
   }
@@ -87,6 +90,10 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
     showStreakSplash(context, event);
   }
 
+  void _syncReminder() {
+    if (mounted) _reminder.sync(AppLocalizations.of(context));
+  }
+
   void _select(String id) => ref.read(mainTabProvider.notifier).select(id);
 
   Widget _page(int i, AppLocalizations l) => switch (i) {
@@ -100,6 +107,9 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
+    // Pengingat mengikuti keadaan streak (hari baru, api dinyalakan) dan saklar Pengaturan.
+    ref.listen(streakControllerProvider, (_, _) => _syncReminder());
+    ref.listen(appSettingsProvider.select((s) => s.streak.reminder), (_, _) => _syncReminder());
     final active = ref.watch(mainTabProvider);
     final index = _ids.indexOf(active).clamp(0, _ids.length - 1);
     _visited.add(index);

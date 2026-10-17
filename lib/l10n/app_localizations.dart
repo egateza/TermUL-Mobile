@@ -1861,6 +1861,36 @@ abstract class AppLocalizations {
   /// **'Nanti saja'**
   String get streakSplashLater;
 
+  /// Judul notifikasi pengingat streak harian.
+  ///
+  /// In id, this message translates to:
+  /// **'Api streak menunggu'**
+  String get streakReminderTitle;
+
+  /// Isi notifikasi pengingat streak harian.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka TermUL hari ini supaya streak tetap menyala.'**
+  String get streakReminderText;
+
+  /// Nama saluran notifikasi pengingat streak di pengaturan Android.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat streak'**
+  String get streakReminderChannel;
+
+  /// Pesan saat izin notifikasi ditolak ketika menyalakan pengingat.
+  ///
+  /// In id, this message translates to:
+  /// **'Izin notifikasi diperlukan untuk pengingat harian'**
+  String get settingsStreakReminderNeedsPermission;
+
+  /// Peringatan saat pengingat menyala tetapi notifikasi diblokir.
+  ///
+  /// In id, this message translates to:
+  /// **'Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.'**
+  String get settingsStreakReminderBlocked;
+
   /// Judul bagian Streak di Pengaturan.
   ///
   /// In id, this message translates to:

@@ -17,6 +17,7 @@ class MainActivity : FlutterFragmentActivity() {
     private var channel: MethodChannel? = null
     private var screenChannel: MethodChannel? = null
     private var downloadsChannel: MethodChannel? = null
+    private var reminderChannel: MethodChannel? = null
     private var pendingNotificationResult: MethodChannel.Result? = null
 
     // Harus didaftarkan sebelum Activity mencapai STARTED, jadi sebagai properti.
@@ -87,6 +88,30 @@ class MainActivity : FlutterFragmentActivity() {
                         }
                     }.start()
                 }
+                else -> result.notImplemented()
+            }
+        }
+        val reminder = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/reminder")
+        reminderChannel = reminder
+        reminder.setMethodCallHandler { call, result ->
+            when (call.method) {
+                "schedule" -> {
+                    val at = call.argument<Number>("at")?.toLong()
+                    val title = call.argument<String>("title")
+                    val text = call.argument<String>("text")
+                    val channelName = call.argument<String>("channelName")
+                    if (at == null || title == null || text == null || channelName == null) {
+                        result.error("bad_args", "at, title, text, dan channelName wajib", null)
+                    } else {
+                        StreakReminder.schedule(applicationContext, at, title, text, channelName)
+                        result.success(null)
+                    }
+                }
+                "cancel" -> {
+                    StreakReminder.cancel(applicationContext)
+                    result.success(null)
+                }
+                "scheduledAt" -> result.success(StreakReminder.scheduledAt(applicationContext))
                 else -> result.notImplemented()
             }
         }
@@ -162,6 +187,8 @@ class MainActivity : FlutterFragmentActivity() {
         screenChannel = null
         downloadsChannel?.setMethodCallHandler(null)
         downloadsChannel = null
+        reminderChannel?.setMethodCallHandler(null)
+        reminderChannel = null
         channel?.setMethodCallHandler(null)
         channel = null
         super.cleanUpFlutterEngine(flutterEngine)

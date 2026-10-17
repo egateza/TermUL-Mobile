@@ -9,6 +9,10 @@
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE"/>
     <uses-permission android:name="android.permission.FOREGROUND_SERVICE_SPECIAL_USE"/>
     <uses-permission android:name="android.permission.POST_NOTIFICATIONS"/>
+    <!-- Pengingat streak harian (StreakReminder.kt): alarm hilang saat HP dimatikan, jadi dipasang lagi setelah
+         BOOT_COMPLETED. Nama izin dicek di developer.android.com "Schedule alarms". Alarm inexact
+         (setAndAllowWhileIdle) tidak butuh SCHEDULE_EXACT_ALARM. -->
+    <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
 
     <application
         android:label="TermUL"
@@ -46,6 +50,15 @@
                 android:name="android.app.PROPERTY_SPECIAL_USE_FGS_SUBTYPE"
                 android:value="menjaga sesi SSH interaktif tetap tersambung selama aplikasi di latar belakang" />
         </service>
+        <!-- Pengingat streak: alarm dan BOOT_COMPLETED. Nonaktif sampai pengingat dijadwalkan (StreakReminder). -->
+        <receiver
+            android:name=".StreakReminderReceiver"
+            android:enabled="false"
+            android:exported="false">
+            <intent-filter>
+                <action android:name="android.intent.action.BOOT_COMPLETED"/>
+            </intent-filter>
+        </receiver>
         <!-- Membagikan berkas ekspor lewat menu bagikan Android (FileSharer.kt): hanya cache/share/. -->
         <provider
             android:name="androidx.core.content.FileProvider"

@@ -25,11 +25,7 @@ class JsonStreakRepository implements StreakRepository {
 
   @override
   Future<LoadResult> load() => _lock.run(() async {
-    final loaded = await loadJsonOrQuarantine<StreakRecord>(
-      _file,
-      parse: StreakRecord.fromJson,
-      empty: StreakRecord(),
-    );
+    final loaded = await loadJsonOrQuarantine<StreakRecord>(_file, parse: StreakRecord.fromJson, empty: StreakRecord());
     _record = loaded.value;
     return LoadResult(quarantinedPath: loaded.quarantinedPath);
   });

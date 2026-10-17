@@ -41,11 +41,8 @@ class StreakRecord {
   /// Streak padam atau beku dinyalakan lagi di [today] (lihat [Streak.revive]).
   StreakRecord revive(DateTime today) => _with(streak.revive(today), today);
 
-  StreakRecord _with(Streak next, DateTime today) => StreakRecord(
-    streak: next,
-    days: [...days, dayOf(today)],
-    longest: next.count > longest ? next.count : longest,
-  );
+  StreakRecord _with(Streak next, DateTime today) =>
+      StreakRecord(streak: next, days: [...days, dayOf(today)], longest: next.count > longest ? next.count : longest);
 
   bool isActiveDay(DateTime day) => days.contains(dayOf(day));
 

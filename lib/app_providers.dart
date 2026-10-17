@@ -27,6 +27,7 @@ import 'core/vault/device_auth.dart';
 import 'core/vault/vault_lock.dart';
 import 'features/connect/keepalive_sync.dart';
 import 'features/streak/streak_controller.dart' show streakRepositoryProvider;
+import 'features/streak/streak_reminder.dart' show reminderPlatformProvider;
 import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
 import 'features/terminal/shell_channel.dart';
@@ -44,6 +45,7 @@ final credentialVaultProvider = Provider<CredentialVault>(
 
 /// Snippet tersimpan. Bawaan di memori (tes); bootstrap menyuntikkan `JsonSnippetRepository`.
 final snippetRepositoryProvider = Provider<SnippetRepository>((ref) => MemorySnippetRepository());
+
 /// Keadaan tampilan yang diingat (`ui_state.json`). Bawaan di memori (tes); bootstrap menyuntikkan
 /// `JsonUiStateRepository`.
 final uiStateRepositoryProvider = Provider<UiStateRepository>((ref) => MemoryUiStateRepository());
@@ -161,6 +163,7 @@ extension AppDependenciesOverrides on AppDependencies {
     hostServiceProvider.overrideWithValue(service),
     if (snippets != null) snippetRepositoryProvider.overrideWithValue(snippets!),
     if (streak != null) streakRepositoryProvider.overrideWithValue(streak!),
+    if (reminder != null) reminderPlatformProvider.overrideWithValue(reminder!),
     if (uiState != null) uiStateRepositoryProvider.overrideWithValue(uiState!),
     bootReportProvider.overrideWithValue(report),
     initialSettingsProvider.overrideWithValue(settings),

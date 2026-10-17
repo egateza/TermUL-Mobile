@@ -74,7 +74,14 @@ void main() {
     test('JSON: angka negatif menjadi kosong seperti desktop; tanggal rusak ditolak', () {
       expect(StreakRecord.fromJson({'count': -4, 'lastDay': '2026-10-13'}).streak, Streak.none);
       expect(() => StreakRecord.fromJson({'count': 5, 'lastDay': 'kemarin'}), throwsFormatException);
-      expect(() => StreakRecord.fromJson({'count': 5, 'lastDay': '2026-10-13', 'days': [1]}), throwsFormatException);
+      expect(
+        () => StreakRecord.fromJson({
+          'count': 5,
+          'lastDay': '2026-10-13',
+          'days': [1],
+        }),
+        throwsFormatException,
+      );
       expect(() => StreakRecord.fromJson({'count': '5'}), throwsFormatException);
     });
   });

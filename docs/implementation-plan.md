@@ -1104,3 +1104,11 @@ Permintaan pemilik: lengkapi fitur streak sesuai design system, irisan 1 sampai 
 - **Belum teruji di HP:** splash, gerak (goyangan, percikan, guncangan) dan kelancarannya di build profile, dan reduce motion sistem.
 - **Artifact:** design system versi 65 (`docs/design/SUMBER.md`); prototipe tidak berubah.
 
+### Irisan 3: pengingat harian pukul 20.00
+
+- **Native, tanpa paket baru** (`android/.../StreakReminder.kt`, kanal `io.github.egateza.termul/reminder`): `AlarmManager.setAndAllowWhileIdle` (inexact, tetap jalan saat Doze, tidak butuh `SCHEDULE_EXACT_ALARM`) memanggil `StreakReminderReceiver`, yang menampilkan notifikasi (saluran "Pengingat streak", `IMPORTANCE_DEFAULT`, ikon `ic_stat_streak`, ketuk membuka aplikasi) lalu memasang alarm lagi 24 jam kemudian. Alarm hilang saat HP dimatikan; receiver yang sama menerima `BOOT_COMPLETED` dan memasangnya lagi. Receiver nonaktif di manifest dan baru diaktifkan saat pengingat dijadwalkan (pola di dokumentasi resmi). Izin baru: `android.permission.RECEIVE_BOOT_COMPLETED` (nama dicek di developer.android.com "Schedule alarms", 2026-10-18). Tanpa paket baru, jadi `docs/licenses.md` tidak berubah.
+- **Dart:** `ReminderPlatform` (`MethodChannelReminder`, `NoopReminder` untuk tes), `nextReminder` (pukul 20.00 hari ini bila hari ini belum terhitung dan belum lewat pukul 20.00, selain itu besok), `StreakReminderSync` di `MainShell` (menjadwalkan ulang saat hari dihitung, api dinyalakan, dan saklar berubah; hanya memanggil platform bila waktunya berubah). Pengaturan: saklar "Pengingat harian" meminta izin notifikasi saat dinyalakan; banner bila ditolak atau bila notifikasi diblokir (dengan tombol "Izinkan").
+- **Tes:** `streak_reminder_test.dart` (waktu berikutnya, jadwal saat dibuka, padam lalu dinyalakan, saklar mati membatalkan, izin ditolak, notifikasi diblokir lalu diizinkan).
+- **Belum teruji di HP:** notifikasi benar-benar muncul sekitar pukul 20.00, berulang keesokan harinya, bertahan setelah HP dinyalakan ulang, tidak muncul setelah aplikasi dibuka di hari itu, dan perilaku setelah aplikasi dihentikan paksa (Android membatalkan alarm aplikasi yang dihentikan paksa sampai dibuka lagi; belum dicek). HP tidak terdeteksi adb saat irisan ini selesai.
+- **Artifact:** design system versi 66 (`docs/design/SUMBER.md`); prototipe tidak berubah (saklar sudah ada di prototipe `Settings`).
+

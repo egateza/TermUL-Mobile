@@ -4,6 +4,7 @@ import 'package:path_provider/path_provider.dart';
 
 import 'core/models/app_settings.dart';
 import 'core/platform/keepalive_platform.dart';
+import 'core/platform/reminder_platform.dart';
 import 'core/platform/screen_monitor.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/json/json_host_repository.dart';
@@ -70,6 +71,7 @@ class AppDependencies {
     this.snippets,
     this.uiState,
     this.streak,
+    this.reminder,
   });
 
   final HostRepository hosts;
@@ -102,6 +104,9 @@ class AppDependencies {
 
   /// Penyimpanan streak. `null` di tes (memakai salinan di memori).
   final StreakRepository? streak;
+
+  /// Pengingat streak harian Android. `null` di tes (memakai `NoopReminder`).
+  final ReminderPlatform? reminder;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -160,6 +165,7 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     snippets: snippetRepo,
     uiState: uiState,
     streak: streakRepo,
+    reminder: MethodChannelReminder(),
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,
