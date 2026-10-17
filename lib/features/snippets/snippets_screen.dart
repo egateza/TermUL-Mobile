@@ -15,9 +15,7 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../../shared/widgets/termul_toast.dart';
-import '../connect/session_manager.dart';
 import 'snippet_detail_sheet.dart';
-import 'snippet_target.dart';
 import 'snippet_editor_sheet.dart';
 import 'snippet_card.dart';
 import 'snippet_category_sheet.dart';
@@ -152,9 +150,7 @@ class _SnippetsScreenState extends ConsumerState<SnippetsScreen> {
     final l = AppLocalizations.of(context);
     final category = ref.read(snippetLibraryProvider).categoryOf(snippet.categoryId);
     final meta = [?category?.name, _scopeLabel(l, snippet)].join(' · ');
-    // Sesi di latar belakang yang siap menerima perintah; snippet khusus satu host hanya ke sesi host itu.
-    final targets = keptSessionTargets(l, ref.read(sessionManagerProvider), onlyHostId: snippet.hostId);
-    final result = await showSnippetDetail(context, snippet: snippet, meta: meta, targets: targets);
+    final result = await showSnippetDetail(context, snippet: snippet, meta: meta);
     if (!mounted || result == null) return;
     switch (result) {
       case SnippetDetailResult.edit:

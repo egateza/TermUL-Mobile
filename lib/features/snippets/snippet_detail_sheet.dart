@@ -6,7 +6,6 @@ import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
-import '../../shared/widgets/termul_chip.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_text_field.dart';
@@ -22,7 +21,7 @@ enum SnippetDetailResult { edit, delete }
 /// Membuka detail [snippet]: isian variabel, pratinjau perintah, lalu tempel ke sesi, salin, atau edit. [meta] adalah
 /// baris "Kategori · Cakupan" di bawah judul.
 ///
-/// - [targets]: sesi terminal yang bisa dituju ("Kirim ke"). Kosong = hanya Salin.
+/// - [targets]: sesi terminal yang dituju (hanya dari terminal: sesi yang sedang tampil). Kosong = hanya Salin.
 /// - [canManage]: tampilkan Edit dan Hapus (tab Snippet); false di terminal, yang hanya memakai snippet.
 /// - [toastBottomOffset]: jarak toast dari bawah supaya tidak menutup bilah tombol cepat di terminal.
 Future<SnippetDetailResult?> showSnippetDetail(
@@ -77,7 +76,6 @@ class _DetailSheetState extends State<_DetailSheet> {
   late final Map<String, TextEditingController> _controllers = {
     for (final n in _names) n: TextEditingController(text: widget.snippet.defaults[n] ?? ''),
   };
-  int _target = 0;
 
   @override
   void dispose() {
@@ -95,7 +93,7 @@ class _DetailSheetState extends State<_DetailSheet> {
 
   bool get _dangerous => widget.snippet.dangerous || commandLooksDangerous(_preview);
 
-  SnippetTarget? get _selected => widget.targets.isEmpty ? null : widget.targets[_target];
+  SnippetTarget? get _selected => widget.targets.isEmpty ? null : widget.targets.first;
 
   void _copyTapped() {
     if (!_dangerous) {
@@ -250,28 +248,6 @@ class _DetailSheetState extends State<_DetailSheet> {
                     if (risky) TermulBanner(tone: BannerTone.risk, child: Text(l.snippetDetailRisky)),
                     if (!ready)
                       Text(l.snippetDetailNotReady, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
-                    if (widget.targets.isEmpty && widget.canManage)
-                      Text(l.snippetNoTargets, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
-                    if (widget.targets.isNotEmpty)
-                      Column(
-                        crossAxisAlignment: CrossAxisAlignment.start,
-                        spacing: TermulSpacing.space3,
-                        children: [
-                          Text(l.snippetTargetLabel, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
-                          Wrap(
-                            spacing: TermulSpacing.space3,
-                            runSpacing: TermulSpacing.space3,
-                            children: [
-                              for (var i = 0; i < widget.targets.length; i++)
-                                FilterChipButton(
-                                  label: widget.targets[i].label,
-                                  selected: _target == i,
-                                  onPressed: () => setState(() => _target = i),
-                                ),
-                            ],
-                          ),
-                        ],
-                      ),
                   ],
                 ),
               ),

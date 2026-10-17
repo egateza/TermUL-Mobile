@@ -190,22 +190,9 @@ Pengaturan
 <span style="font-size: 13px; color: #9AA8AF">Isi semua variabel untuk menempel atau menyalin.</span>
 </sc-if>
 
-<div style="display: flex; flex-direction: column; gap: 8px">
-<span style="font-size: 13px; color: #9AA8AF">Kirim ke</span>
-<div style="display: flex; flex-wrap: wrap; gap: 8px">
-<sc-for list="{{targets}}" as="t" hint-placeholder-count="2">
-<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="min-height: 44px; padding: 0 16px; border-radius: 22px; border: 1px solid {{t.bd}}; background: {{t.bg}}; color: {{t.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; cursor: pointer">{{t.label}}</button>
-</sc-for>
-</div>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 8px">
-<button type="button" onClick="{{pasteIt}}" disabled="{{dNotReady}}" style="min-height: 52px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; opacity: {{pasteOpacity}}">Tempel ke {{targetLabel}}</button>
 <div style="display: flex; gap: 8px">
-<button type="button" onClick="{{runIt}}" disabled="{{cantRun}}" style="flex: 2; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer; opacity: {{runOpacity}}">Tempel &amp; jalankan</button>
-<button type="button" onClick="{{copyIt}}" disabled="{{dNotReady}}" style="flex: 1; min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer; opacity: {{pasteOpacity}}">Salin</button>
-</div>
-<button type="button" onClick="{{editIt}}" style="min-height: 48px; border-radius: 12px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Edit</button>
+<button type="button" onClick="{{editIt}}" style="flex: 2; min-height: 52px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Edit</button>
+<button type="button" onClick="{{copyIt}}" disabled="{{dNotReady}}" style="flex: 3; min-height: 52px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 600; cursor: pointer; opacity: {{pasteOpacity}}">Salin</button>
 </div>
 
 </div>
@@ -520,7 +507,7 @@ class Component extends DCLogic {
         pick: () => this.setState({ target: t.id })
       };
     });
-    const warnKind = s.warn === undefined ? (startAt === 'warn' ? 'paste' : null) : s.warn;
+    const warnKind = s.warn === undefined ? (startAt === 'warn' ? 'copy' : null) : s.warn;
     const doPaste = () => {
       this.setState({ openId: null, warn: null });
       flash('Ditempel ke ' + targetLabel + ' · belum dijalankan');

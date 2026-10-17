@@ -182,11 +182,11 @@ Lainnya
 
 <sc-if value="{{showBar}}" hint-placeholder-val="{{ true }}">
 <div style="display: flex; gap: 6px; padding: 8px 12px">
-<button type="button" onClick="{{togglePanel}}" aria-expanded="{{panel}}" aria-label="Semua tombol" style="flex: none; width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid {{panelBd}}; background: {{panelBg}}; color: {{panelFg}}; cursor: pointer">
-<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h.01M11 9h.01M15 9h.01M7 13h.01M11 13h.01M15 13h.01M8 16.5h8"/></svg>
-</button>
 <button type="button" onClick="{{toggleSnip}}" aria-expanded="{{snip}}" aria-label="Snippet" style="flex: none; width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid {{snipBd}}; background: {{snipBg}}; color: {{snipFg}}; cursor: pointer">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3"/></svg>
+</button>
+<button type="button" onClick="{{togglePanel}}" aria-expanded="{{panel}}" aria-label="Semua tombol" style="flex: none; width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid {{panelBd}}; background: {{panelBg}}; color: {{panelFg}}; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="3" y="4" width="18" height="16" rx="2"/><path d="M7 9h.01M11 9h.01M15 9h.01M7 13h.01M11 13h.01M15 13h.01M8 16.5h8"/></svg>
 </button>
 <div style="flex: 1; min-width: 0; display: flex; gap: 6px; overflow-x: auto">
 <sc-for list="{{keys}}" as="k" hint-placeholder-count="8">
@@ -624,7 +624,7 @@ class Component extends DCLogic {
       snipRows: snipRows,
       toggleSnip: () => this.setState({ snip: !snip, panel: false }),
       snipBg: snip ? '#F0B34A' : '#1E262B',
-      snipFg: snip ? '#1B1406' : '#E8EEF0',
+      snipFg: snip ? '#1B1406' : '#F0B34A',
       snipBd: snip ? '#F0B34A' : '#2A343A',
       confirm: confirm,
       pasteMenu: pasteMenu,

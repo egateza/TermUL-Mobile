@@ -4,7 +4,8 @@ import '../../core/theme/termul_theme.dart';
 import 'pressable.dart';
 import 'termul_icon.dart';
 
-enum IconButtonTone { plain, filled, accent }
+/// [accentIcon]: ikon kuning di atas permukaan terangkat dengan tepi 1 px; menyala penuh saat ditekan atau [pressed].
+enum IconButtonTone { plain, filled, accent, accentIcon }
 
 /// Tombol persegi 44 px berisi ikon saja. [label] wajib (kata kerja: "Tutup", "Tambah host"); menjadi nama
 /// aksesibilitas dan tooltip.
@@ -39,12 +40,22 @@ class TermulIconButton extends StatelessWidget {
           final on = down || pressed || tone == IconButtonTone.accent;
           final bg = on
               ? TermulPalette.accent
-              : (tone == IconButtonTone.filled ? TermulPalette.surfaceRaised : Colors.transparent);
-          final fg = on ? TermulPalette.onAccent : TermulPalette.ink;
+              : (tone == IconButtonTone.filled || tone == IconButtonTone.accentIcon
+                    ? TermulPalette.surfaceRaised
+                    : Colors.transparent);
+          final fg = on
+              ? TermulPalette.onAccent
+              : (tone == IconButtonTone.accentIcon ? TermulPalette.accent : TermulPalette.ink);
           return Container(
             width: TermulSize.tapMin,
             height: TermulSize.tapMin,
-            decoration: BoxDecoration(color: bg, borderRadius: BorderRadius.circular(TermulRadius.radiusLg)),
+            decoration: BoxDecoration(
+              color: bg,
+              borderRadius: BorderRadius.circular(TermulRadius.radiusLg),
+              border: tone == IconButtonTone.accentIcon
+                  ? Border.all(color: on ? TermulPalette.accent : TermulPalette.line)
+                  : null,
+            ),
             alignment: Alignment.center,
             child: TermulIcon(icon, size: 22, color: fg),
           );

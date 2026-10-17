@@ -2309,10 +2309,6 @@
       }
     }
   },
-  "snippetTargetLabel": "Kirim ke",
-  "@snippetTargetLabel": {
-    "description": "Label pilihan sesi tujuan di detail snippet."
-  },
   "snippetPasteTo": "Tempel ke {target}",
   "@snippetPasteTo": {
     "description": "Tombol utama detail snippet: tempel ke sesi tujuan tanpa menjalankan.",
@@ -2343,10 +2339,6 @@
         "type": "String"
       }
     }
-  },
-  "snippetNoTargets": "Belum ada sesi terminal yang tersambung di latar belakang. Buka sesi lalu pilih \"Tetap terhubung\", atau pakai tombol Snippet di dalam terminal.",
-  "@snippetNoTargets": {
-    "description": "Keterangan di detail snippet bila tidak ada sesi tujuan."
   },
   "snippetDangerWarnPaste": "Tetap tempel",
   "@snippetDangerWarnPaste": {

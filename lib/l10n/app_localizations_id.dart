@@ -1596,9 +1596,6 @@ class AppLocalizationsId extends AppLocalizations {
   }
 
   @override
-  String get snippetTargetLabel => 'Kirim ke';
-
-  @override
   String snippetPasteTo(String target) {
     return 'Tempel ke $target';
   }
@@ -1615,10 +1612,6 @@ class AppLocalizationsId extends AppLocalizations {
   String snippetRan(String target) {
     return 'Dijalankan di $target';
   }
-
-  @override
-  String get snippetNoTargets =>
-      'Belum ada sesi terminal yang tersambung di latar belakang. Buka sesi lalu pilih \"Tetap terhubung\", atau pakai tombol Snippet di dalam terminal.';
 
   @override
   String get snippetDangerWarnPaste => 'Tetap tempel';

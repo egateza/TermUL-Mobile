@@ -3,7 +3,7 @@ import '../connect/session_controller.dart';
 import '../terminal/paste_analysis.dart';
 import '../terminal/terminal_session.dart';
 
-/// Sesi terminal yang bisa menerima perintah dari snippet ("Kirim ke").
+/// Sesi terminal yang menerima perintah dari snippet (dipakai dari dalam terminal).
 class SnippetTarget {
   const SnippetTarget({required this.id, required this.label, required this.send});
 
@@ -38,16 +38,3 @@ SnippetTarget sessionTarget({required String id, required String label, required
 /// Nama sesi seperti di tab Sesi: nama host, ditambah nomor bila ada beberapa sesi ke host yang sama.
 String sessionLabel(AppLocalizations l, SessionController c) =>
     c.ordinal > 1 ? '${c.profile.name} · ${l.sessionsNumber(c.ordinal)}' : c.profile.name;
-
-/// Sesi di latar belakang yang siap menerima perintah: tersambung dan shell-nya berjalan. [onlyHostId] membatasi ke
-/// satu host (snippet yang berlaku untuk satu host saja); null = semua host.
-List<SnippetTarget> keptSessionTargets(AppLocalizations l, List<SessionController> sessions, {String? onlyHostId}) {
-  return [
-    for (final c in sessions)
-      if (c.session != null &&
-          c.phase == SessionPhase.connected &&
-          c.session!.state == TerminalSessionState.running &&
-          (onlyHostId == null || c.profile.id == onlyHostId))
-        sessionTarget(id: '${c.id}', label: sessionLabel(l, c), session: c.session!),
-  ];
-}

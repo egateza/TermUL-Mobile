@@ -30,7 +30,7 @@ class QuickKeyBar extends StatefulWidget {
   /// Dipanggil saat ikon Snippet ditekan (membuka atau menutup panel snippet). Kosong = ikon tidak ditampilkan.
   final VoidCallback? onSnippets;
 
-  /// Panel snippet sedang terbuka: ikonnya menyala (isian `accent`).
+  /// Panel snippet sedang terbuka: tombolnya menyala penuh (isian `accent`); tertutup, ikonnya kuning.
   final bool snippetsOpen;
 
   @override
@@ -62,6 +62,7 @@ class _QuickKeyBarState extends State<QuickKeyBar> {
                 padding: const EdgeInsets.only(left: TermulSpacing.space3),
                 child: TermulIconButton(
                   icon: TermulIconName.snippets,
+                  tone: IconButtonTone.accentIcon,
                   label: l.keySnippetsAria,
                   pressed: widget.snippetsOpen,
                   onPressed: widget.onSnippets,

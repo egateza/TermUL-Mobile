@@ -2815,12 +2815,6 @@ abstract class AppLocalizations {
   /// **'Hapus {title}'**
   String snippetDeleteLabel(String title);
 
-  /// Label pilihan sesi tujuan di detail snippet.
-  ///
-  /// In id, this message translates to:
-  /// **'Kirim ke'**
-  String get snippetTargetLabel;
-
   /// Tombol utama detail snippet: tempel ke sesi tujuan tanpa menjalankan.
   ///
   /// In id, this message translates to:
@@ -2844,12 +2838,6 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Dijalankan di {target}'**
   String snippetRan(String target);
-
-  /// Keterangan di detail snippet bila tidak ada sesi tujuan.
-  ///
-  /// In id, this message translates to:
-  /// **'Belum ada sesi terminal yang tersambung di latar belakang. Buka sesi lalu pilih \"Tetap terhubung\", atau pakai tombol Snippet di dalam terminal.'**
-  String get snippetNoTargets;
 
   /// Tombol konfirmasi menempel perintah berbahaya.
   ///

@@ -6,7 +6,6 @@ import 'package:termul_mobile/core/storage/snippet_repository.dart';
 import 'package:termul_mobile/features/snippets/snippet_panel.dart';
 import 'package:termul_mobile/features/snippets/snippets_screen.dart';
 import 'package:termul_mobile/shared/widgets/termul_button.dart';
-import 'package:termul_mobile/shared/widgets/termul_chip.dart';
 import 'package:termul_mobile/shared/widgets/termul_icon_button.dart';
 import 'package:termul_mobile/shared/widgets/termul_nav_bar.dart';
 
@@ -153,8 +152,7 @@ void main() {
       await tester.tap(inPanel(find.text('Status layanan')));
       await tester.pumpAndSettle();
       expect(find.byType(SnippetPanel), findsNothing);
-      expect(find.text('Kirim ke'), findsOneWidget);
-      expect(inSheet(find.widgetWithText(FilterChipButton, 'app-01')), findsOneWidget);
+      expect(find.text('Kirim ke'), findsNothing);
       expect(find.text('Edit'), findsNothing);
       expect(find.byTooltip('Hapus'), findsNothing);
       expect(tester.widget<TermulButton>(find.widgetWithText(TermulButton, 'Tempel ke app-01')).onPressed, isNull);
@@ -229,88 +227,24 @@ void main() {
     });
   });
 
-  group('dari tab Snippet ke sesi di latar belakang', () {
+  group('dari tab Snippet (tanpa tempel ke sesi)', () {
     Future<void> toSnippetTab(WidgetTester tester) async {
       await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Snippet')));
       await tester.pumpAndSettle();
     }
 
-    testWidgets('tanpa sesi: keterangan dan hanya Salin (seperti sebelumnya)', (tester) async {
-      final h = Harness();
-      await h.pump(
-        tester,
-        overrides: [
-          snippetRepositoryProvider.overrideWithValue(MemorySnippetRepository([_plain])),
-        ],
-      );
-      await toSnippetTab(tester);
-      await tester.tap(find.text('Cek disk'));
-      await tester.pumpAndSettle();
-      expect(find.textContaining('Belum ada sesi terminal yang tersambung'), findsOneWidget);
-      expect(find.widgetWithText(TermulButton, 'Salin'), findsOneWidget);
-      expect(find.text('Kirim ke'), findsNothing);
-      expect(find.text('Edit'), findsOneWidget);
-    });
-
-    testWidgets('sesi di latar belakang menjadi tujuan; Tempel dan Edit sama-sama tersedia', (tester) async {
+    testWidgets('sesi di latar belakang tidak menjadi tujuan: hanya Salin dan Edit, tanpa "Kirim ke"', (tester) async {
       final (_, net) = await startWith(tester, [_plain]);
       await chooseKeep(tester);
       await toSnippetTab(tester);
       await tester.tap(find.text('Cek disk'));
       await tester.pumpAndSettle();
-      expect(find.text('Kirim ke'), findsOneWidget);
-      expect(inSheet(find.widgetWithText(FilterChipButton, 'app-01')), findsOneWidget);
+      expect(find.text('Kirim ke'), findsNothing);
+      expect(find.textContaining('Tempel'), findsNothing);
+      expect(find.widgetWithText(TermulButton, 'Salin'), findsOneWidget);
       expect(find.text('Edit'), findsOneWidget);
       expect(find.byTooltip('Hapus'), findsOneWidget);
-
-      await tester.tap(find.widgetWithText(TermulButton, 'Tempel ke app-01'));
-      await tester.pumpAndSettle();
-      expect(net.shells[0].sent, 'df -h /');
-      expect(find.text('Ditempel ke app-01 · belum dijalankan'), findsOneWidget);
-    });
-
-    testWidgets('Tempel & jalankan dari tab', (tester) async {
-      final (_, net) = await startWith(tester, [_plain]);
-      await chooseKeep(tester);
-      await toSnippetTab(tester);
-      await tester.tap(find.text('Cek disk'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Tempel & jalankan'));
-      await tester.pumpAndSettle();
-      expect(net.shells[0].sent, 'df -h /\r');
-      expect(find.text('Dijalankan di app-01'), findsOneWidget);
-    });
-
-    testWidgets('snippet khusus host lain: tidak ada tujuan; khusus host sesi ini: ada', (tester) async {
-      await startWith(tester, [_otherHost, _thisHost]);
-      await chooseKeep(tester);
-      await toSnippetTab(tester);
-      await tester.tap(find.text('Khusus host lain'));
-      await tester.pumpAndSettle();
-      expect(find.text('Kirim ke'), findsNothing);
-      expect(find.textContaining('Belum ada sesi terminal yang tersambung'), findsOneWidget);
-      await tester.tap(find.byTooltip('Tutup'));
-      await tester.pumpAndSettle();
-
-      await tester.tap(find.text('Khusus app-01'));
-      await tester.pumpAndSettle();
-      expect(find.text('Kirim ke'), findsOneWidget);
-    });
-
-    testWidgets('perintah berbahaya dari tab: jalankan nonaktif, tempel meminta peringatan', (tester) async {
-      final (_, net) = await startWith(tester, [_marked]);
-      await chooseKeep(tester);
-      await toSnippetTab(tester);
-      await tester.tap(find.text('Restart'));
-      await tester.pumpAndSettle();
-      expect(tester.widget<TermulButton>(find.widgetWithText(TermulButton, 'Tempel & jalankan')).onPressed, isNull);
-      await tester.tap(find.widgetWithText(TermulButton, 'Tempel ke app-01'));
-      await tester.pumpAndSettle();
-      expect(find.text('Perintah berbahaya'), findsOneWidget);
       expect(net.shells[0].sent, isEmpty);
-      await tester.tap(find.text('Tetap tempel'));
-      await tester.pumpAndSettle();
-      expect(net.shells[0].sent, 'sudo systemctl restart nginx');
     });
   });
 }
