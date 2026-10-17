@@ -1012,7 +1012,7 @@ Pemilik memilih kedua jalur. Terminal mengikuti prototipe 2 (tombol Snippet di b
 - **Kirim ke dihapus dari tab Snippet** (lihat di atas). Tempel ke sesi hanya lewat panel snippet di terminal.
 - **Tombol Snippet di bilah tombol cepat:** tetap paling kiri dan ikon saja, kini ikonnya **kuning** (nada baru `IconButtonTone.accentIcon`: ikon aksen di atas permukaan terangkat dengan tepi 1 px; menyala penuh saat panel terbuka), sesuai permintaan pemilik.
 - Tes: `snippet_paste_test.dart` diganti (grup tab menjadi satu tes: tanpa "Kirim ke" dan tanpa tombol Tempel walau ada sesi di latar belakang); 672 tes lulus (2 dilewati); `flutter analyze` bersih.
-- **Belum teruji di HP [?]:** warna kuning ikon Snippet di terminal (perlu sesi SSH) dan detail dari tab tanpa "Kirim ke" (perlu pasang ulang build).
+- **Teruji di HP [T] (build profile, profil "WSL Uji" lewat `adb reverse`, 2026-10-17):** detail dari tab tanpa "Kirim ke" (hanya Edit dan Salin); di terminal ikon Snippet kuning paling kiri, panel terbuka dan menyala penuh, ketuk snippet berisi variabel membuka detail tanpa chip "Kirim ke", mengisi variabel lalu Tempel ke WSL Uji memasukkan `cp /etc/hostname /tmp/h.txt` ke prompt tanpa Enter dengan toast "Ditempel ke WSL Uji · belum dijalankan". **Belum teruji [?]:** Tempel & jalankan di sesi nyata, isi papan klip sesudah Salin.
 - **Desain:** prototipe `Snippets` (detail hanya Edit dan Salin; peringatan contoh 7h memakai "Tetap salin") dan `Terminal` (ikon Snippet kuning) serta README diperbarui; prototipe 60 (`1792251862-a9a1`) dan design system 60 (`1792251864-76ae`), hash terverifikasi; rincian di `docs/design/SUMBER.md`.
 
 ## 12. Status terkini dan cara melanjutkan
