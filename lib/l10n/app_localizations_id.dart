@@ -662,6 +662,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get streakSettingsLabel => 'Pengaturan streak';
 
   @override
+  String get streakSettingsTitle => 'Pengaturan streak';
+
+  @override
   String get streakStageGray => 'Ketuk api untuk menyalakan';
 
   @override
@@ -1015,9 +1018,6 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get settingsStreakReminderBlocked => 'Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.';
-
-  @override
-  String get settingsStreakSection => 'Streak';
 
   @override
   String get settingsStreakShowLabel => 'Tampilkan streak api';

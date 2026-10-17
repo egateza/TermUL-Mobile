@@ -923,6 +923,10 @@
   "@streakSettingsLabel": {
     "description": "Tombol ke Pengaturan di header Streak."
   },
+  "streakSettingsTitle": "Pengaturan streak",
+  "@streakSettingsTitle": {
+    "description": "Judul layar pengaturan khusus streak (dibuka dari tab Streak)."
+  },
   "streakStageGray": "Ketuk api untuk menyalakan",
   "@streakStageGray": {
     "description": "Nama tombol api padam."
@@ -1475,10 +1479,6 @@
   "settingsStreakReminderBlocked": "Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.",
   "@settingsStreakReminderBlocked": {
     "description": "Peringatan saat pengingat menyala tetapi notifikasi diblokir."
-  },
-  "settingsStreakSection": "Streak",
-  "@settingsStreakSection": {
-    "description": "Judul bagian Streak di Pengaturan."
   },
   "settingsStreakShowLabel": "Tampilkan streak api",
   "@settingsStreakShowLabel": {

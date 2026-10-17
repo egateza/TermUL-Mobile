@@ -235,23 +235,6 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </div>
 
 <div style="display: flex; flex-direction: column; gap: 6px">
-<div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Streak</div>
-<div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
-<sc-for list="{{streakSwitches}}" as="sw" hint-placeholder-count="3">
-<button type="button" onClick="{{sw.toggle}}" aria-pressed="{{sw.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer">
-<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
-<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">{{sw.label}}</span>
-<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">{{sw.sub}}</span>
-</span>
-<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{sw.bg}}; display: flex; justify-content: {{sw.align}}">
-<span style="width: 22px; height: 22px; border-radius: 50%; background: {{sw.knob}}"></span>
-</span>
-</button>
-</sc-for>
-</div>
-</div>
-
-<div style="display: flex; flex-direction: column; gap: 6px">
 <div style="padding: 0 8px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; letter-spacing: 0.08em; text-transform: uppercase; color: #9AA8AF">Widget</div>
 <div style="border-radius: 14px; border: 1px solid #2A343A; background: #161C20; overflow: hidden">
 <a href="Widgets.dc.html" style="width: 100%; min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; box-sizing: border-box; color: #E8EEF0; font-size: 15px">

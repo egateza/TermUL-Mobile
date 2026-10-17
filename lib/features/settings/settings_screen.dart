@@ -36,9 +36,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
   /// Izin notifikasi (untuk foreground service); null selagi belum diketahui.
   bool? _notifAllowed;
 
-  /// Pengingat streak dinyalakan tetapi izin notifikasi ditolak.
-  bool _reminderNeedsPermission = false;
-
   /// Saklar "Pertahankan koneksi" baru saja ditolak karena izin notifikasi tidak diberikan.
   bool _needsPermission = false;
 
@@ -110,48 +107,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     } on Object {
       if (mounted) setState(() => _saveFailed = true);
     }
-  }
-
-  Future<void> _setStreakShow(bool on) async {
-    try {
-      final current = ref.read(appSettingsProvider);
-      await ref.read(appSettingsProvider.notifier).update(current.copyWith(streak: current.streak.copyWith(show: on)));
-      if (mounted && _saveFailed) setState(() => _saveFailed = false);
-    } on Object {
-      if (mounted) setState(() => _saveFailed = true);
-    }
-  }
-
-  /// Menyalakan meminta izin notifikasi lebih dulu; bila ditolak, saklar tetap mati dan pesan tampil.
-  Future<void> _setStreakReminder(bool on) async {
-    if (on) {
-      final allowed = await _requestNotifications();
-      if (!mounted) return;
-      setState(() => _reminderNeedsPermission = !allowed);
-      if (!allowed) return;
-    } else if (_reminderNeedsPermission) {
-      setState(() => _reminderNeedsPermission = false);
-    }
-    try {
-      final current = ref.read(appSettingsProvider);
-      await ref
-          .read(appSettingsProvider.notifier)
-          .update(current.copyWith(streak: current.streak.copyWith(reminder: on)));
-      if (mounted && _saveFailed) setState(() => _saveFailed = false);
-    } on Object {
-      if (mounted) setState(() => _saveFailed = true);
-    }
-  }
-
-  Future<bool> _requestNotifications() async {
-    bool allowed;
-    try {
-      allowed = await ref.read(keepAlivePlatformProvider).requestNotifications();
-    } on Object {
-      allowed = false;
-    }
-    if (mounted) setState(() => _notifAllowed = allowed);
-    return allowed;
   }
 
   /// Menyalakan meminta konfirmasi (peringatan) lalu satu kali autentikasi perangkat; mematikan langsung berlaku.
@@ -227,7 +182,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     final keepAlive = ref.watch(appSettingsProvider).connection.keepAlive;
     final autoReconnect = ref.watch(appSettingsProvider).connection.autoReconnect;
     final vaultAlwaysOpen = ref.watch(appSettingsProvider).security.vaultAlwaysOpen;
-    final streak = ref.watch(appSettingsProvider).streak;
 
     TerminalSettings Function(TerminalSettings) fontBy(double d) =>
         (c) => c.copyWith(fontSize: (c.fontSize + d).clamp(TerminalSettings.minFontSize, TerminalSettings.maxFontSize));
@@ -537,53 +491,6 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                     dangerTag: l.settingsDangerTag,
                     onChanged: _setVaultAlwaysOpen,
                   ),
-                  const SizedBox(height: TermulSpacing.space8),
-                  Padding(
-                    padding: const EdgeInsets.fromLTRB(
-                      TermulSpacing.space3,
-                      0,
-                      TermulSpacing.space3,
-                      TermulSpacing.space3,
-                    ),
-                    child: Semantics(
-                      header: true,
-                      child: Text(
-                        l.settingsStreakSection.toUpperCase(),
-                        style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
-                      ),
-                    ),
-                  ),
-                  SwitchRow(
-                    key: const ValueKey('settings-streak-show'),
-                    label: l.settingsStreakShowLabel,
-                    description: l.settingsStreakShowDesc,
-                    value: streak.show,
-                    onChanged: _setStreakShow,
-                  ),
-                  const SizedBox(height: TermulSpacing.space3),
-                  SwitchRow(
-                    key: const ValueKey('settings-streak-reminder'),
-                    label: l.settingsStreakReminderLabel,
-                    description: l.settingsStreakReminderDesc,
-                    value: streak.reminder,
-                    onChanged: _setStreakReminder,
-                  ),
-                  if (_reminderNeedsPermission) ...[
-                    const SizedBox(height: TermulSpacing.space3),
-                    TermulBanner(tone: BannerTone.warn, child: Text(l.settingsStreakReminderNeedsPermission)),
-                  ] else if (streak.reminder && _notifAllowed == false) ...[
-                    const SizedBox(height: TermulSpacing.space3),
-                    TermulBanner(
-                      tone: BannerTone.warn,
-                      action: TermulButton(
-                        label: l.settingsNotifAllow,
-                        size: TermulButtonSize.sm,
-                        variant: TermulButtonVariant.secondary,
-                        onPressed: _requestNotifications,
-                      ),
-                      child: Text(l.settingsStreakReminderBlocked),
-                    ),
-                  ],
                 ],
               ),
             ),

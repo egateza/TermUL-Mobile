@@ -34,7 +34,7 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 <button type="button" onClick="{{openHelp}}" aria-label="Bantuan: cara kerja streak" aria-haspopup="dialog" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; background: transparent; color: #9AA8AF; padding: 0; cursor: pointer">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1.1.8-1.1 1.6"/><path d="M12 17h.01"/></svg>
 </button>
-<a href="Settings.dc.html" aria-label="Pengaturan streak" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF">
+<a href="StreakSettings.dc.html" aria-label="Pengaturan streak" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7h10M18 7h2M4 17h2M10 17h10"/><circle cx="16" cy="7" r="2"/><circle cx="8" cy="17" r="2"/></svg>
 </a>
 </div>
@@ -199,7 +199,7 @@ Pengaturan
 <p style="margin: 0; font-size: 13.5px; line-height: 1.5; color: #C5D0D5">Satu hari dihitung saat Tuan membuka aplikasi. Bila tanggal berganti selagi aplikasi terbuka, hari baru dihitung seperti membuka lagi.</p>
 <p style="margin: 0; font-size: 13.5px; line-height: 1.5; color: #C5D0D5">Hari 1-2 tampil sebagai bara dengan angka N/3 dan belum dihitung sebagai streak. Mulai hari ke-3 api menyala.</p>
 <p style="margin: 0; font-size: 13.5px; line-height: 1.5; color: #C5D0D5">Absen 1-2 hari: api padam, ketuk 3 kali cepat untuk menyalakan. Absen 3-10 hari: api membeku, ketukan = 5 + (hari absen - 3), maksimal 10. Absen lebih dari 10 hari: streak hangus dan mulai lagi dari 1/3.</p>
-<a href="Settings.dc.html" style="min-height: 44px; display: flex; align-items: center; color: #F0B34A; font-size: 14px; font-weight: 500">Atur tampilan streak dan pengingat</a>
+<a href="StreakSettings.dc.html" style="min-height: 44px; display: flex; align-items: center; color: #F0B34A; font-size: 14px; font-weight: 500">Atur tampilan streak dan pengingat</a>
 <div style="display: flex; flex-direction: column; gap: 12px; padding-top: 12px; border-top: 1px solid #2A343A">
 <span style="font-size: 13.5px; font-weight: 600">Contoh jika tidak membuka TermUL</span>
 <sc-for list="{{absenRows}}" as="r" hint-placeholder-count="3">

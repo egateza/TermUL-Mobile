@@ -617,6 +617,15 @@
    "title": "15 · (tidak dipakai lagi sejak streak dibangun) Tab Streak: segera hadir",
    "is_interactive": true,
    "radius": 28
+  },
+  "StreakSettings.dc.html": {
+   "x": 5170,
+   "y": 964,
+   "w": 390,
+   "h": 844,
+   "title": "8d · Pengaturan streak (ikon pengaturan di tab Streak; tidak lagi di tab Pengaturan)",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -687,7 +696,8 @@
   "SnippetDanger.dc.html",
   "SnippetDelete.dc.html",
   "TerminalSnippets.dc.html",
-  "StreakSoon.dc.html"
+  "StreakSoon.dc.html",
+  "StreakSettings.dc.html"
  ],
  "notes": {
   "judul": {

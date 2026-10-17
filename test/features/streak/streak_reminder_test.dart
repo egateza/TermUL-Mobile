@@ -6,7 +6,7 @@ import 'package:termul_mobile/core/platform/reminder_platform.dart';
 import 'package:termul_mobile/core/storage/streak_repository.dart';
 import 'package:termul_mobile/core/streak/streak.dart';
 import 'package:termul_mobile/core/streak/streak_record.dart';
-import 'package:termul_mobile/features/settings/settings_screen.dart';
+import 'package:termul_mobile/features/streak/streak_settings_screen.dart';
 import 'package:termul_mobile/features/streak/streak_controller.dart';
 import 'package:termul_mobile/features/streak/streak_reminder.dart';
 import 'package:termul_mobile/shared/widgets/termul_nav_bar.dart';
@@ -84,17 +84,12 @@ void main() {
   testWidgets('saklar Pengingat harian mati: jadwal dibatalkan dan tersimpan', (tester) async {
     final s = await open(tester, record: StreakRecord(streak: Streak(5, daysAgo(1))));
     expect(s.reminder.scheduledAt, isNotNull);
-    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Pengaturan')));
+    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Streak')));
     await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Pengaturan streak'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StreakSettingsScreen), findsOneWidget);
     final row = find.byKey(const ValueKey('settings-streak-reminder'));
-    await tester.scrollUntilVisible(
-      row,
-      300,
-      scrollable: find.descendant(of: find.byType(SettingsScreen), matching: find.byType(Scrollable)).first,
-    );
-    // Bawa baris ke tengah supaya tidak tertutup bar navigasi.
-    await tester.drag(row, const Offset(0, -250));
-    await tester.pumpAndSettle();
     await tester.tap(row);
     await tester.pumpAndSettle();
     expect(s.saved.last.streak.reminder, isFalse);
@@ -111,17 +106,12 @@ void main() {
     s.keepAlive
       ..enabled = false
       ..grantOnRequest = false;
-    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Pengaturan')));
+    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Streak')));
     await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Pengaturan streak'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StreakSettingsScreen), findsOneWidget);
     final row = find.byKey(const ValueKey('settings-streak-reminder'));
-    await tester.scrollUntilVisible(
-      row,
-      300,
-      scrollable: find.descendant(of: find.byType(SettingsScreen), matching: find.byType(Scrollable)).first,
-    );
-    // Bawa baris ke tengah supaya tidak tertutup bar navigasi.
-    await tester.drag(row, const Offset(0, -250));
-    await tester.pumpAndSettle();
     await tester.tap(row);
     await tester.pumpAndSettle();
     expect(find.text('Izin notifikasi diperlukan untuk pengingat harian'), findsOneWidget);
@@ -133,14 +123,12 @@ void main() {
     tester.platformDispatcher.accessibilityFeaturesTestValue = const FakeAccessibilityFeatures(disableAnimations: true);
     final s = await open(tester, record: StreakRecord(streak: Streak(5, daysAgo(1))));
     s.keepAlive.enabled = false;
-    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Pengaturan')));
+    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Streak')));
     await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Pengaturan streak'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StreakSettingsScreen), findsOneWidget);
     final blocked = find.text('Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.');
-    await tester.scrollUntilVisible(
-      blocked,
-      300,
-      scrollable: find.descendant(of: find.byType(SettingsScreen), matching: find.byType(Scrollable)).first,
-    );
     expect(blocked, findsOneWidget);
     s.keepAlive.grantOnRequest = true;
     await tester.tap(find.descendant(of: find.byType(Row), matching: find.text('Izinkan')).last);

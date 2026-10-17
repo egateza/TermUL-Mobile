@@ -1136,3 +1136,12 @@ Permintaan pemilik: ikuti versi terbaru artifact desktop "Streak Api TermUL" (`1
 - **Uji HP (dd3bf2af, profile):** di tab Streak bara terlihat condong ke kanan dengan garis hembusan, lalu kembali tegak. Belum diamati: splash dengan angin, tier tinggi di HP, dan reduce motion sistem.
 - **Artifact:** prototipe versi 66 (`FlameArt` prop `wind`) dan design system versi 67 (`docs/design/SUMBER.md`).
 
+### Pengaturan streak pindah ke tab Streak (2026-10-18)
+
+Keputusan pemilik: pengaturan streak hanya ada di tab Streak, tidak dicampur ke tab Pengaturan.
+
+- **Kode:** `lib/features/streak/streak_settings_screen.dart` (`StreakSettingsScreen`, dibuka dengan `openStreakSettings` dari ikon pengaturan di header tab Streak dan tautan "Atur tampilan streak dan pengingat" di bantuan): saklar "Tampilkan streak api" dan "Pengingat harian" dengan alur izin notifikasi yang sama (banner bila ditolak, banner dengan "Izinkan" bila diblokir) dan banner gagal menyimpan. Bagian Streak dan logikanya dicabut dari `SettingsScreen`; teks `settingsStreakSection` dihapus, `streakSettingsTitle` ditambah.
+- **Tes:** tes streak dan pengingat membuka saklar lewat tab Streak; tes baru memastikan tab Pengaturan tidak lagi memuat pengaturan streak; tautan bantuan membuka Pengaturan streak dan tombol kembali kembali ke tab Streak (747 tes).
+- **Uji HP (dd3bf2af, profile):** ikon pengaturan di tab Streak membuka "Pengaturan streak" dengan dua saklar; tab Pengaturan berakhir di bagian Keamanan.
+- **Artifact:** prototipe versi 67 (contoh 8d `StreakSettings`, bagian Streak dihapus dari `Settings`) dan design system versi 68.
+

@@ -7,6 +7,7 @@ import 'package:termul_mobile/core/storage/streak_repository.dart';
 import 'package:termul_mobile/core/streak/streak.dart';
 import 'package:termul_mobile/core/streak/streak_record.dart';
 import 'package:termul_mobile/features/settings/settings_screen.dart';
+import 'package:termul_mobile/features/streak/streak_settings_screen.dart';
 import 'package:termul_mobile/features/streak/streak_controller.dart';
 import 'package:termul_mobile/features/streak/streak_screen.dart';
 import 'package:termul_mobile/features/streak/streak_splash.dart';
@@ -196,7 +197,7 @@ void main() {
     expect(find.text('Data streak rusak'), findsNothing);
   });
 
-  testWidgets('bantuan terbuka dari header; tautan Pengaturan pindah ke tab Pengaturan', (tester) async {
+  testWidgets('bantuan terbuka dari header; tautan membuka Pengaturan streak', (tester) async {
     await open(tester);
     await openStreakTab(tester);
     await tester.tap(find.bySemanticsLabel('Bantuan: cara kerja streak'));
@@ -205,7 +206,12 @@ void main() {
     expect(find.text('Contoh jika tidak membuka TermUL'), findsOneWidget);
     await tester.tap(find.text('Atur tampilan streak dan pengingat'));
     await tester.pumpAndSettle();
-    expect(find.byType(SettingsScreen), findsOneWidget);
+    expect(find.byType(StreakSettingsScreen), findsOneWidget);
+    expect(find.text('Pengaturan streak'), findsOneWidget);
+    // Kembali ke tab Streak.
+    await tester.tap(find.bySemanticsLabel('Kembali'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StreakScreen), findsOneWidget);
   });
 
   testWidgets('saklar Pengaturan "Tampilkan streak api" menyembunyikan chip; tersimpan', (tester) async {
@@ -218,20 +224,31 @@ void main() {
     );
     await harness.pump(tester);
     expect(chip(), findsOneWidget);
-    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Pengaturan')));
+    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Streak')));
     await tester.pumpAndSettle();
+    await tester.tap(find.bySemanticsLabel('Pengaturan streak'));
+    await tester.pumpAndSettle();
+    expect(find.byType(StreakSettingsScreen), findsOneWidget);
     final row = find.byKey(const ValueKey('settings-streak-show'));
-    await tester.scrollUntilVisible(
-      row,
-      300,
-      scrollable: find.descendant(of: find.byType(SettingsScreen), matching: find.byType(Scrollable)).first,
-    );
     await tester.tap(row);
     await tester.pumpAndSettle();
     expect(saved?.streak.show, isFalse);
+    await tester.tap(find.bySemanticsLabel('Kembali'));
+    await tester.pumpAndSettle();
     await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Host')));
     await tester.pumpAndSettle();
     expect(chip(), findsNothing);
+  });
+
+  testWidgets('tab Pengaturan tidak lagi memuat pengaturan streak', (tester) async {
+    await open(tester);
+    await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Pengaturan')));
+    await tester.pumpAndSettle();
+    await tester.drag(find.byType(SettingsScreen), const Offset(0, -5000));
+    await tester.pumpAndSettle();
+    expect(find.text('Tampilkan streak api'), findsNothing);
+    expect(find.text('Pengingat harian'), findsNothing);
+    expect(find.text('STREAK'), findsNothing);
   });
 
   group('splash saat aplikasi dibuka', () {

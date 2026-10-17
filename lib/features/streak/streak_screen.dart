@@ -14,16 +14,17 @@ import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
-import '../shell/main_tab.dart';
 import 'streak_cards.dart';
 import 'streak_controller.dart';
 import 'streak_help_sheet.dart';
+import 'streak_settings_screen.dart';
 import 'streak_text.dart';
 
 /// Tab "Streak" (prototipe 8 `Streak`, 8b, 8c): api besar yang bisa diketuk untuk menyalakan api padam atau
 /// memecahkan es, angka hari, pekan ini, statistik, progres level, kalender bulan ini, dan bantuan.
 ///
-/// Sebagai tab, layar ini tanpa tombol kembali; tombol Pengaturan di header membuka tab Pengaturan. Animasi masuk
+/// Sebagai tab, layar ini tanpa tombol kembali; tombol pengaturan di header membuka "Pengaturan streak" (bukan tab
+/// Pengaturan; keputusan pemilik 2026-10-18). Animasi masuk
 /// (cincin, angka bergulir, lencana, bilah level, sel hari ini) diputar saat tab pertama kali dibuka dan lewat
 /// "Putar ulang animasi"; reduce motion melewatinya.
 class StreakScreen extends ConsumerStatefulWidget {
@@ -89,7 +90,7 @@ class _StreakScreenState extends ConsumerState<StreakScreen> with TickerProvider
     }
   }
 
-  void _openSettings() => ref.read(mainTabProvider.notifier).select('settings');
+  void _openSettings() => openStreakSettings(context);
 
   @override
   Widget build(BuildContext context) {

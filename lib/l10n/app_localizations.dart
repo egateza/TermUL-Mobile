@@ -1267,6 +1267,12 @@ abstract class AppLocalizations {
   /// **'Pengaturan streak'**
   String get streakSettingsLabel;
 
+  /// Judul layar pengaturan khusus streak (dibuka dari tab Streak).
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan streak'**
+  String get streakSettingsTitle;
+
   /// Nama tombol api padam.
   ///
   /// In id, this message translates to:
@@ -1890,12 +1896,6 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.'**
   String get settingsStreakReminderBlocked;
-
-  /// Judul bagian Streak di Pengaturan.
-  ///
-  /// In id, this message translates to:
-  /// **'Streak'**
-  String get settingsStreakSection;
 
   /// Saklar menampilkan chip dan splash streak.
   ///

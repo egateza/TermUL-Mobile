@@ -1,0 +1,79 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Pengaturan streak</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="display: flex; align-items: center; gap: 8px; padding: 20px 20px 8px 8px">
+<a href="Streak.dc.html" aria-label="Kembali" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+</a>
+<h1 style="flex: 1; margin: 0; font-size: 22px; font-weight: 600">Pengaturan streak</h1>
+</div>
+
+<div style="flex: 1; min-height: 0; overflow-y: auto; padding: 8px 12px 20px 12px; display: flex; flex-direction: column; gap: 8px">
+<sc-for list="{{switches}}" as="sw" hint-placeholder-count="2">
+<button type="button" onClick="{{sw.toggle}}" aria-pressed="{{sw.on}}" style="width: 100%; min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 10px 14px; box-sizing: border-box; border-radius: 12px; border: 1px solid #2A343A; background: #161C20; color: #E8EEF0; text-align: left; cursor: pointer">
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px">{{sw.label}}</span>
+<span style="font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">{{sw.sub}}</span>
+</span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; background: {{sw.bg}}; display: flex; justify-content: {{sw.align}}">
+<span style="width: 22px; height: 22px; border-radius: 50%; background: {{sw.knob}}"></span>
+</span>
+</button>
+</sc-for>
+<sc-if value="{{blocked}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="display: flex; gap: 12px; padding: 14px 16px; border-radius: 14px; border: 1px solid #5C4A23; background: #231C0E">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F0B34A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none; margin-top: 1px"><path d="M12 4l10 17H2zM12 10v5M12 18h.01"/></svg>
+<div style="flex: 1; display: flex; flex-direction: column; gap: 10px">
+<span style="font-size: 13.5px; line-height: 1.45; color: #C5D0D5">Notifikasi belum diizinkan, jadi pengingat tidak akan tampil.</span>
+<button type="button" onClick="{{allow}}" style="align-self: start; min-height: 44px; padding: 0 16px; border-radius: 12px; border: 1px solid #5C6A71; background: #1E262B; color: #E8EEF0; font: 500 14px 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer">Izinkan</button>
+</div>
+</div>
+</sc-if>
+</div>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"notifAllowed":{"editor":"boolean","default":true,"section":"Keadaan"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const sw = Object.assign({ streak: true, remind: true }, s.sw || {});
+    const allowed = s.allowed === true || (s.allowed !== false && this.props.notifAllowed !== false && this.props.notifAllowed !== 'false');
+    const mk = (id, label, sub) => ({
+      label: label,
+      sub: sub,
+      on: sw[id],
+      bg: sw[id] ? '#F0B34A' : '#2A343A',
+      knob: sw[id] ? '#1B1406' : '#9AA8AF',
+      align: sw[id] ? 'flex-end' : 'flex-start',
+      toggle: () => this.setState({ sw: Object.assign({}, sw, { [id]: !sw[id] }) })
+    });
+    return {
+      switches: [
+        mk('streak', 'Tampilkan streak api', 'Hari tetap dihitung walau ikonnya disembunyikan'),
+        mk('remind', 'Pengingat harian', 'Notifikasi pukul 20.00 bila belum membuka aplikasi hari ini')
+      ],
+      blocked: sw.remind && !allowed,
+      allow: () => this.setState({ allowed: true })
+    };
+  }
+}
+</script>
+</body>
+</html>
