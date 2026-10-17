@@ -889,7 +889,7 @@ Keputusan pemilik: tab SFTP dihapus, semua sesi aktif di Sesi, SFTP dibuka dari 
 
 ## 11aa. Vault terbuka: chip di daftar host dan saklar "Jangan kunci vault" (2026-10-17)
 
-**Selesai di PC (510 tes, `flutter analyze` bersih); belum diuji di HP. Prototipe versi 54 (`1792240210-8f47`; `Main` dengan prop `vault`, `Settings` dengan saklar, contoh baru 1e `MainVaultOpen`), design system versi 54 (`1792240223-1474`; README "Vault terbuka" dan ikon `lock-open`).**
+**Selesai di PC (510 tes, `flutter analyze` bersih); jalur utama teruji di HP [T] (lihat hasil uji di bawah). Prototipe versi 54 (`1792240210-8f47`; `Main` dengan prop `vault`, `Settings` dengan saklar, contoh baru 1e `MainVaultOpen`), design system versi 54 (`1792240223-1474`; README "Vault terbuka" dan ikon `lock-open`).**
 
 Permintaan pemilik: chip "Vault terkunci" di prototipe bisa dibuka supaya terminal tersambung tanpa biometrik atau PIN, dan opsinya ada di Pengaturan. Rencana disetujui pemilik, cakupan "Keduanya" (buka sementara lewat chip, dan permanen lewat Pengaturan).
 
@@ -901,7 +901,8 @@ Permintaan pemilik: chip "Vault terkunci" di prototipe bisa dibuka supaya termin
 - **Chip** (`features/hosts/vault_chip.dart`, di header Host potret): "Vault terkunci" (gembok, `ink-muted`) atau "Vault terbuka" (gembok terbuka, `accent`). Ketuk saat terkunci: prompt satu kali (lewat `AuthGate`, jadi tidak bertabrakan dengan sesi), toast "Vault terbuka sampai layar mati" atau "Vault tetap terkunci". Ketuk saat terbuka sementara: mengunci lagi. Mode permanen: ketuk hanya memberi toast keterangan. Ikon baru `lockOpen`.
 - **Tidak dikerjakan:** chip di layout landscape (landscape tidak aktif, 11x). Streak chip di header Host juga belum ada di aplikasi (di prototipe sudah). Pada HP tanpa penguncian layar (`AuthLevel.none`) gerbang memang sudah tanpa prompt, chip tetap bisa diketuk.
 - **Tes baru:** `vault_lock_test.dart` (gerbang terkunci, buka sementara satu prompt, batal atau galat, layar mati lewat peristiwa dan lewat penghitung, penghitung gagal, `lock`, selalu terbuka, `SecuritySettings`), `vault_chip_test.dart` (chip membuka dan mengunci, batal, mode permanen, saklar: peringatan lalu prompt lalu tersimpan, batal di prompt, batal di peringatan, mematikan).
-- **Belum teruji di HP:** prompt dari chip, sambung tanpa prompt setelah dibuka, layar mati mengunci lagi (terutama saat proses dibekukan lama di HyperOS), saklar permanen dan sambung tanpa prompt, sheet peringatan, tampilan chip di lebar sempit. Tugas CLAUDE.md butir "Rahasia" sudah diberi catatan keputusan ini.
+- **Hasil uji HP (2026-10-17, Xiaomi 25053PC47G, lewat adb dengan izin pemilik; prompt disentuh pemilik) [T]:** chip "Vault terkunci" tampil di header; ketuk memunculkan satu prompt sistem, lalu chip menjadi "Vault terbuka" (ikon terbuka, aksen); sambung ke WSL Uji **tanpa prompt** (fokus tetap di aplikasi); layar dimatikan lalu dinyalakan (jeda 4 detik): chip kembali "Vault terkunci"; saklar Pengaturan > Keamanan tampil, ketuk memunculkan sheet "Jangan kunci vault?" (Batal utama), "Jangan kunci" memunculkan satu prompt, lalu `settings.json` berisi `security.vaultAlwaysOpen: true`; chip menjadi "Vault terbuka" (permanen), layar mati-nyala tidak mengunci, sambung tanpa prompt; saklar dimatikan tanpa prompt dan `settings.json` kembali `false` (HP dikembalikan ke keadaan semula, sesi diputus).
+- **Belum teruji di HP:** layar mati lama saat proses dibekukan di HyperOS (hanya jeda 4 detik yang dicoba), ketuk chip untuk mengunci kembali, prompt dibatalkan, tampilan chip di lebar sempit, dan tanpa penguncian layar. Tugas CLAUDE.md butir "Rahasia" sudah diberi catatan keputusan ini.
 
 ## 12. Status terkini dan cara melanjutkan
 
