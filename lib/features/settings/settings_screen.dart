@@ -109,6 +109,18 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     }
   }
 
+  Future<void> _setStreakShow(bool on) async {
+    try {
+      final current = ref.read(appSettingsProvider);
+      await ref
+          .read(appSettingsProvider.notifier)
+          .update(current.copyWith(streak: current.streak.copyWith(show: on)));
+      if (mounted && _saveFailed) setState(() => _saveFailed = false);
+    } on Object {
+      if (mounted) setState(() => _saveFailed = true);
+    }
+  }
+
   /// Menyalakan meminta konfirmasi (peringatan) lalu satu kali autentikasi perangkat; mematikan langsung berlaku.
   Future<void> _setVaultAlwaysOpen(bool on) async {
     if (!on) {
@@ -182,6 +194,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
     final keepAlive = ref.watch(appSettingsProvider).connection.keepAlive;
     final autoReconnect = ref.watch(appSettingsProvider).connection.autoReconnect;
     final vaultAlwaysOpen = ref.watch(appSettingsProvider).security.vaultAlwaysOpen;
+    final streak = ref.watch(appSettingsProvider).streak;
 
     TerminalSettings Function(TerminalSettings) fontBy(double d) =>
         (c) => c.copyWith(fontSize: (c.fontSize + d).clamp(TerminalSettings.minFontSize, TerminalSettings.maxFontSize));
@@ -490,6 +503,29 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                     value: vaultAlwaysOpen,
                     dangerTag: l.settingsDangerTag,
                     onChanged: _setVaultAlwaysOpen,
+                  ),
+                  const SizedBox(height: TermulSpacing.space8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      TermulSpacing.space3,
+                      0,
+                      TermulSpacing.space3,
+                      TermulSpacing.space3,
+                    ),
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        l.settingsStreakSection.toUpperCase(),
+                        style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
+                      ),
+                    ),
+                  ),
+                  SwitchRow(
+                    key: const ValueKey('settings-streak-show'),
+                    label: l.settingsStreakShowLabel,
+                    description: l.settingsStreakShowDesc,
+                    value: streak.show,
+                    onChanged: _setStreakShow,
                   ),
                 ],
               ),

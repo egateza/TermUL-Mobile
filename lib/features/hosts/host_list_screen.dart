@@ -23,6 +23,7 @@ import 'host_list_model.dart';
 import 'profile_export_flow.dart';
 import 'profile_import_flow.dart';
 import 'vault_chip.dart';
+import '../streak/streak_chip.dart';
 
 /// Layar utama: daftar host berkelompok dengan pencarian dan filter. [onConnect] dipanggil untuk host yang
 /// siap disambung; host bermetode agen SSH (dari desktop) lebih dulu diarahkan ke form untuk dilengkapi.
@@ -280,6 +281,9 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                         ),
                       ),
                     ),
+                    // Prototipe `Main`: chip streak lalu chip vault, berjarak 8.
+                    const StreakChip(),
+                    const SizedBox(width: TermulSpacing.space3),
                     const VaultChip(),
                   ],
                 ),

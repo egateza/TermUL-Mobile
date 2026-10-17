@@ -15,6 +15,7 @@ import 'package:termul_mobile/core/models/app_settings.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
 import 'package:termul_mobile/core/storage/json/json_host_repository.dart';
 import 'package:termul_mobile/core/storage/json/json_known_hosts_repository.dart';
+import 'package:termul_mobile/core/storage/streak_repository.dart';
 import 'package:termul_mobile/core/storage/ui_state_repository.dart';
 import 'package:termul_mobile/core/vault/device_auth.dart';
 import 'package:termul_mobile/core/vault/keystore_credential_vault.dart';
@@ -63,7 +64,9 @@ class Harness {
     AppSettings settings = const AppSettings(),
     Future<void> Function(AppSettings)? saveSettings,
     MemoryUiStateRepository? uiState,
-  }) : uiState = uiState ?? MemoryUiStateRepository() {
+    MemoryStreakRepository? streak,
+  }) : uiState = uiState ?? MemoryUiStateRepository(),
+       streak = streak ?? MemoryStreakRepository() {
     auth = FakeDeviceAuth(currentLevel: level);
     hosts = JsonHostRepository(File('tidak-dipakai-profiles.json'), writer: noWrite);
     known = JsonKnownHostsRepository(File('tidak-dipakai-known.json'), writer: noWrite);
@@ -82,10 +85,12 @@ class Harness {
       saveSettings: saveSettings,
       vaultLock: lock,
       uiState: this.uiState,
+      streak: this.streak,
     );
   }
 
   final MemoryUiStateRepository uiState;
+  final MemoryStreakRepository streak;
 
   late final FakeDeviceAuth auth;
   late final VaultLock lock;

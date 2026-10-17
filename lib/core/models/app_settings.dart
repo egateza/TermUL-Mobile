@@ -139,6 +139,29 @@ class SecuritySettings {
   int get hashCode => vaultAlwaysOpen.hashCode;
 }
 
+/// Pengaturan streak api. [show]: chip dan splash tampil (hari tetap dihitung walau mati). [reminder]: notifikasi
+/// pukul 20.00 bila hari itu aplikasi belum dibuka. Keduanya bawaan menyala (prototipe `Settings`).
+class StreakSettings {
+  const StreakSettings({this.show = true, this.reminder = true});
+
+  final bool show;
+  final bool reminder;
+
+  StreakSettings copyWith({bool? show, bool? reminder}) =>
+      StreakSettings(show: show ?? this.show, reminder: reminder ?? this.reminder);
+
+  factory StreakSettings.fromJson(Map<String, Object?> json) =>
+      StreakSettings(show: optBool(json, 'show') ?? true, reminder: optBool(json, 'reminder') ?? true);
+
+  Map<String, Object?> toJson() => {'show': show, 'reminder': reminder};
+
+  @override
+  bool operator ==(Object other) => other is StreakSettings && other.show == show && other.reminder == reminder;
+
+  @override
+  int get hashCode => Object.hash(show, reminder);
+}
+
 /// Isi `settings.json`:
 /// `{"version": 1, "terminal": {"fontSize": 13, "lineHeight": 1.3, "handleStyle": "drop"}, "connection": {"keepAlive": false, "autoReconnect": true}}`.
 /// Properti yang tidak dikenal diabaikan; bagian yang hilang memakai bawaan.
@@ -147,6 +170,7 @@ class AppSettings {
     this.terminal = const TerminalSettings(),
     this.connection = const ConnectionSettings(),
     this.security = const SecuritySettings(),
+    this.streak = const StreakSettings(),
   });
 
   static const currentVersion = 1;
@@ -154,22 +178,30 @@ class AppSettings {
   final TerminalSettings terminal;
   final ConnectionSettings connection;
   final SecuritySettings security;
+  final StreakSettings streak;
 
-  AppSettings copyWith({TerminalSettings? terminal, ConnectionSettings? connection, SecuritySettings? security}) =>
-      AppSettings(
-        terminal: terminal ?? this.terminal,
-        connection: connection ?? this.connection,
-        security: security ?? this.security,
-      );
+  AppSettings copyWith({
+    TerminalSettings? terminal,
+    ConnectionSettings? connection,
+    SecuritySettings? security,
+    StreakSettings? streak,
+  }) => AppSettings(
+    terminal: terminal ?? this.terminal,
+    connection: connection ?? this.connection,
+    security: security ?? this.security,
+    streak: streak ?? this.streak,
+  );
 
   factory AppSettings.fromJson(Map<String, Object?> json) {
     final t = optObject(json, 'terminal');
     final c = optObject(json, 'connection');
     final s = optObject(json, 'security');
+    final k = optObject(json, 'streak');
     return AppSettings(
       terminal: t == null ? const TerminalSettings() : TerminalSettings.fromJson(t),
       connection: c == null ? const ConnectionSettings() : ConnectionSettings.fromJson(c),
       security: s == null ? const SecuritySettings() : SecuritySettings.fromJson(s),
+      streak: k == null ? const StreakSettings() : StreakSettings.fromJson(k),
     );
   }
 
@@ -178,5 +210,6 @@ class AppSettings {
     'terminal': terminal.toJson(),
     'connection': connection.toJson(),
     'security': security.toJson(),
+    'streak': streak.toJson(),
   };
 }

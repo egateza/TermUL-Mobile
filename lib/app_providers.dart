@@ -26,6 +26,7 @@ import 'core/vault/credential_vault.dart';
 import 'core/vault/device_auth.dart';
 import 'core/vault/vault_lock.dart';
 import 'features/connect/keepalive_sync.dart';
+import 'features/streak/streak_controller.dart' show streakRepositoryProvider;
 import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
 import 'features/terminal/shell_channel.dart';
@@ -159,6 +160,7 @@ extension AppDependenciesOverrides on AppDependencies {
     credentialVaultProvider.overrideWithValue(vault),
     hostServiceProvider.overrideWithValue(service),
     if (snippets != null) snippetRepositoryProvider.overrideWithValue(snippets!),
+    if (streak != null) streakRepositoryProvider.overrideWithValue(streak!),
     if (uiState != null) uiStateRepositoryProvider.overrideWithValue(uiState!),
     bootReportProvider.overrideWithValue(report),
     initialSettingsProvider.overrideWithValue(settings),

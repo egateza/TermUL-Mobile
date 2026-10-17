@@ -186,7 +186,10 @@ void main() {
       final setup = _Setup();
       await setup.open(tester);
       await scrollToKoneksi(tester);
+      // Bagian Streak di bawah membuat daftar lebih panjang: judul bagian bisa sudah tergulir ke atas.
+      await tester.scrollUntilVisible(find.text('KONEKSI'), -100);
       expect(find.text('KONEKSI'), findsOneWidget);
+      await scrollToKoneksi(tester);
       expect(find.text('Pembatasan baterai HP'), findsNothing);
 
       await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
@@ -223,6 +226,7 @@ void main() {
       await scrollToKoneksi(tester);
       await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
       await tester.pumpAndSettle();
+      await tester.scrollUntilVisible(find.text('Izin notifikasi diperlukan untuk menjaga koneksi'), -100);
       expect(find.text('Izin notifikasi diperlukan untuk menjaga koneksi'), findsOneWidget);
       expect(_current(tester).connection.keepAlive, isFalse);
       expect(setup.saved, isEmpty);

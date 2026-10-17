@@ -810,13 +810,593 @@
   "@streakTitle": {
     "description": "Judul layar tab Streak."
   },
-  "streakSoonTitle": "Segera hadir",
-  "@streakSoonTitle": {
-    "description": "Judul banner di tab Streak: fitur belum tersedia."
+  "streakTier1": "Bara",
+  "@streakTier1": {
+    "description": "Nama level api 1."
   },
-  "streakSoonBody": "Streak api, hitungan hari kamu membuka TermUL, akan hadir di versi berikutnya.",
-  "@streakSoonBody": {
-    "description": "Isi banner di tab Streak: fitur yang akan datang."
+  "streakTier2": "Api Jingga",
+  "@streakTier2": {
+    "description": "Nama level api 2."
+  },
+  "streakTier3": "Api Merah",
+  "@streakTier3": {
+    "description": "Nama level api 3."
+  },
+  "streakTier4": "Api Magenta",
+  "@streakTier4": {
+    "description": "Nama level api 4."
+  },
+  "streakTier5": "Api Ungu",
+  "@streakTier5": {
+    "description": "Nama level api 5."
+  },
+  "streakTier6": "Api Biru",
+  "@streakTier6": {
+    "description": "Nama level api 6."
+  },
+  "streakTier7": "Api Zamrud",
+  "@streakTier7": {
+    "description": "Nama level api 7."
+  },
+  "streakTier8": "Api Emas",
+  "@streakTier8": {
+    "description": "Nama level api 8."
+  },
+  "streakTier9": "Api Pelangi",
+  "@streakTier9": {
+    "description": "Nama level api 9."
+  },
+  "streakFlameGray": "Api padam",
+  "@streakFlameGray": {
+    "description": "Nama api padam untuk pembaca layar."
+  },
+  "streakFlameFrozen": "Api membeku",
+  "@streakFlameFrozen": {
+    "description": "Nama api beku untuk pembaca layar."
+  },
+  "streakFlameExpired": "Api hangus",
+  "@streakFlameExpired": {
+    "description": "Nama api hangus untuk pembaca layar."
+  },
+  "streakCountActive": "{count}x",
+  "@streakCountActive": {
+    "description": "Angka streak aktif (mono).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakCountKindling": "{count}/3",
+  "@streakCountKindling": {
+    "description": "Angka bara: hari ke-N dari 3.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakChipActive": "Streak {count} hari, {tier}. Ketuk untuk membuka layar Streak.",
+  "@streakChipActive": {
+    "description": "Nama aksesibilitas chip streak aktif.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "tier": {
+        "type": "String"
+      }
+    }
+  },
+  "streakChipKindling": "Hari ke-{count} dari 3 menuju streak. Ketuk untuk membuka layar Streak.",
+  "@streakChipKindling": {
+    "description": "Nama aksesibilitas chip bara.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakChipGray": "Streak {count} hari padam. Ketuk untuk membuka dan menyalakan.",
+  "@streakChipGray": {
+    "description": "Nama aksesibilitas chip padam.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakChipFrozen": "Streak {count} hari beku. Ketuk untuk membuka dan memecahkan es.",
+  "@streakChipFrozen": {
+    "description": "Nama aksesibilitas chip beku.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakHelpLabel": "Bantuan: cara kerja streak",
+  "@streakHelpLabel": {
+    "description": "Tombol bantuan di header Streak."
+  },
+  "streakSettingsLabel": "Pengaturan streak",
+  "@streakSettingsLabel": {
+    "description": "Tombol ke Pengaturan di header Streak."
+  },
+  "streakStageGray": "Ketuk api untuk menyalakan",
+  "@streakStageGray": {
+    "description": "Nama tombol api padam."
+  },
+  "streakStageFrozen": "Ketuk untuk memecahkan es",
+  "@streakStageFrozen": {
+    "description": "Nama tombol api beku."
+  },
+  "streakStageActive": "Api streak",
+  "@streakStageActive": {
+    "description": "Nama api yang tidak menunggu ketukan."
+  },
+  "streakUnitDays": "hari berturut-turut",
+  "@streakUnitDays": {
+    "description": "Satuan di bawah angka streak."
+  },
+  "streakStatusActive": "Hari ini terhitung sejak aplikasi dibuka. Sampai jumpa besok.",
+  "@streakStatusActive": {
+    "description": "Status hari ini sudah dihitung."
+  },
+  "streakStatusKindling": "Buka TermUL lagi besok. Streak menyala di hari ke-3.",
+  "@streakStatusKindling": {
+    "description": "Status bara."
+  },
+  "streakStatusGray": "Kemarin kamu tidak membuka TermUL, jadi api padam. Ketuk api 3x cepat untuk menyalakannya lagi.",
+  "@streakStatusGray": {
+    "description": "Status padam sebelum diketuk."
+  },
+  "streakStatusGrayLeft": "Sisa {count} ketukan lagi untuk menyalakan api.",
+  "@streakStatusGrayLeft": {
+    "description": "Status padam saat diketuk.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakStatusGrayRelit": "Api menyala lagi. Hari ini terhitung.",
+  "@streakStatusGrayRelit": {
+    "description": "Status setelah api padam dinyalakan."
+  },
+  "streakStatusFrozen": "Kamu absen {missed} hari, api membeku. Ketuk api {need} kali untuk memecahkan es.",
+  "@streakStatusFrozen": {
+    "description": "Status beku sebelum diketuk.",
+    "placeholders": {
+      "missed": {
+        "type": "int"
+      },
+      "need": {
+        "type": "int"
+      }
+    }
+  },
+  "streakStatusFrozenLeft": "Sisa {count} ketukan lagi untuk memecahkan es.",
+  "@streakStatusFrozenLeft": {
+    "description": "Status beku saat diketuk.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakStatusFrozenRelit": "Es pecah! Streak dilanjutkan. Hari ini terhitung.",
+  "@streakStatusFrozenRelit": {
+    "description": "Status setelah es pecah."
+  },
+  "streakTodayDone": "Hari ini selesai",
+  "@streakTodayDone": {
+    "description": "Lencana hari ini sudah dihitung."
+  },
+  "streakReplay": "Putar ulang animasi",
+  "@streakReplay": {
+    "description": "Tombol memutar ulang animasi layar Streak."
+  },
+  "streakWeek": "Pekan ini",
+  "@streakWeek": {
+    "description": "Judul kartu pekan ini."
+  },
+  "streakDayMon": "Sen",
+  "@streakDayMon": {
+    "description": "Nama hari singkat."
+  },
+  "streakDayTue": "Sel",
+  "@streakDayTue": {
+    "description": "Nama hari singkat."
+  },
+  "streakDayWed": "Rab",
+  "@streakDayWed": {
+    "description": "Nama hari singkat."
+  },
+  "streakDayThu": "Kam",
+  "@streakDayThu": {
+    "description": "Nama hari singkat."
+  },
+  "streakDayFri": "Jum",
+  "@streakDayFri": {
+    "description": "Nama hari singkat."
+  },
+  "streakDaySat": "Sab",
+  "@streakDaySat": {
+    "description": "Nama hari singkat."
+  },
+  "streakDaySun": "Min",
+  "@streakDaySun": {
+    "description": "Nama hari singkat."
+  },
+  "streakLongest": "Terpanjang",
+  "@streakLongest": {
+    "description": "Statistik streak terpanjang."
+  },
+  "streakActiveMonth": "Aktif bulan ini",
+  "@streakActiveMonth": {
+    "description": "Statistik hari aktif bulan ini."
+  },
+  "streakLevel": "Level api",
+  "@streakLevel": {
+    "description": "Statistik level api."
+  },
+  "streakDays": "{count} hari",
+  "@streakDays": {
+    "description": "Nilai statistik dalam hari.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakLevelValue": "{level} · {name}",
+  "@streakLevelValue": {
+    "description": "Nilai level api.",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "streakNextLevel": "Menuju Level {level} · hari ke-{target}",
+  "@streakNextLevel": {
+    "description": "Judul kartu progres level.",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "streakNextProgress": "{count} / {target}",
+  "@streakNextProgress": {
+    "description": "Angka progres level (mono).",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "target": {
+        "type": "int"
+      }
+    }
+  },
+  "streakDaysLeft": "Tinggal {count} hari lagi.",
+  "@streakDaysLeft": {
+    "description": "Sisa hari menuju level berikutnya.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "streakMaxLevel": "Level 9 · {name}",
+  "@streakMaxLevel": {
+    "description": "Judul kartu level saat level tertinggi.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "streakMaxLevelText": "Level tertinggi sudah tercapai.",
+  "@streakMaxLevelText": {
+    "description": "Keterangan saat level tertinggi."
+  },
+  "streakLevelBadge": "Level {level}, {name}, {state}",
+  "@streakLevelBadge": {
+    "description": "Nama aksesibilitas lencana level.",
+    "placeholders": {
+      "level": {
+        "type": "int"
+      },
+      "name": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "streakBadgeCurrent": "level sekarang",
+  "@streakBadgeCurrent": {
+    "description": "Keadaan lencana level."
+  },
+  "streakBadgeReached": "sudah tercapai",
+  "@streakBadgeReached": {
+    "description": "Keadaan lencana level."
+  },
+  "streakBadgeLocked": "belum tercapai",
+  "@streakBadgeLocked": {
+    "description": "Keadaan lencana level."
+  },
+  "streakMonth1": "Januari",
+  "@streakMonth1": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort1": "Jan",
+  "@streakMonthShort1": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth2": "Februari",
+  "@streakMonth2": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort2": "Feb",
+  "@streakMonthShort2": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth3": "Maret",
+  "@streakMonth3": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort3": "Mar",
+  "@streakMonthShort3": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth4": "April",
+  "@streakMonth4": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort4": "Apr",
+  "@streakMonthShort4": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth5": "Mei",
+  "@streakMonth5": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort5": "Mei",
+  "@streakMonthShort5": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth6": "Juni",
+  "@streakMonth6": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort6": "Jun",
+  "@streakMonthShort6": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth7": "Juli",
+  "@streakMonth7": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort7": "Jul",
+  "@streakMonthShort7": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth8": "Agustus",
+  "@streakMonth8": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort8": "Agu",
+  "@streakMonthShort8": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth9": "September",
+  "@streakMonth9": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort9": "Sep",
+  "@streakMonthShort9": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth10": "Oktober",
+  "@streakMonth10": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort10": "Okt",
+  "@streakMonthShort10": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth11": "November",
+  "@streakMonth11": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort11": "Nov",
+  "@streakMonthShort11": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonth12": "Desember",
+  "@streakMonth12": {
+    "description": "Nama bulan."
+  },
+  "streakMonthShort12": "Des",
+  "@streakMonthShort12": {
+    "description": "Nama bulan singkat."
+  },
+  "streakMonthTitle": "{month} {year}",
+  "@streakMonthTitle": {
+    "description": "Judul kalender.",
+    "placeholders": {
+      "month": {
+        "type": "String"
+      },
+      "year": {
+        "type": "String"
+      }
+    }
+  },
+  "streakLegend": "Kotak terisi = hari aktif. Bingkai amber = hari ini. Bingkai putus-putus berwarna = hari absen.",
+  "@streakLegend": {
+    "description": "Keterangan kalender."
+  },
+  "streakAbsentFrozen": "Absen {count} hari ({range}): api membeku. Ketuk {need} kali untuk memecahkan es.",
+  "@streakAbsentFrozen": {
+    "description": "Keterangan absen beku di kalender.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      },
+      "need": {
+        "type": "int"
+      }
+    }
+  },
+  "streakAbsentGray": "Absen {count} hari ({range}): api padam. Ketuk 3 kali cepat untuk menyalakan.",
+  "@streakAbsentGray": {
+    "description": "Keterangan absen padam di kalender.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "range": {
+        "type": "String"
+      }
+    }
+  },
+  "streakDayState": "{day} {month}, {state}",
+  "@streakDayState": {
+    "description": "Nama aksesibilitas sel kalender.",
+    "placeholders": {
+      "day": {
+        "type": "int"
+      },
+      "month": {
+        "type": "String"
+      },
+      "state": {
+        "type": "String"
+      }
+    }
+  },
+  "streakDayActive": "aktif",
+  "@streakDayActive": {
+    "description": "Keadaan hari."
+  },
+  "streakDayToday": "hari ini, belum terhitung",
+  "@streakDayToday": {
+    "description": "Keadaan hari."
+  },
+  "streakDayTodayActive": "hari ini, aktif",
+  "@streakDayTodayActive": {
+    "description": "Keadaan hari."
+  },
+  "streakDayAbsent": "absen",
+  "@streakDayAbsent": {
+    "description": "Keadaan hari."
+  },
+  "streakDayMissed": "tidak aktif",
+  "@streakDayMissed": {
+    "description": "Keadaan hari."
+  },
+  "streakDayFuture": "belum tiba",
+  "@streakDayFuture": {
+    "description": "Keadaan hari."
+  },
+  "streakHelpRow": "Cara kerja streak dan contoh jika absen",
+  "@streakHelpRow": {
+    "description": "Baris pembuka bantuan."
+  },
+  "streakHelpTitle": "Cara kerja streak",
+  "@streakHelpTitle": {
+    "description": "Judul sheet bantuan."
+  },
+  "streakHelp1": "Satu hari dihitung saat Tuan membuka aplikasi. Bila tanggal berganti selagi aplikasi terbuka, hari baru dihitung seperti membuka lagi.",
+  "@streakHelp1": {
+    "description": "Bantuan paragraf 1 (teks prototipe)."
+  },
+  "streakHelp2": "Hari 1-2 tampil sebagai bara dengan angka N/3 dan belum dihitung sebagai streak. Mulai hari ke-3 api menyala.",
+  "@streakHelp2": {
+    "description": "Bantuan paragraf 2."
+  },
+  "streakHelp3": "Absen 1-2 hari: api padam, ketuk 3 kali cepat untuk menyalakan. Absen 3-10 hari: api membeku, ketukan = 5 + (hari absen - 3), maksimal 10. Absen lebih dari 10 hari: streak hangus dan mulai lagi dari 1/3.",
+  "@streakHelp3": {
+    "description": "Bantuan paragraf 3."
+  },
+  "streakHelpSettings": "Atur tampilan streak dan pengingat",
+  "@streakHelpSettings": {
+    "description": "Tautan bantuan ke Pengaturan."
+  },
+  "streakHelpExamples": "Contoh jika tidak membuka TermUL",
+  "@streakHelpExamples": {
+    "description": "Judul contoh absen."
+  },
+  "streakExampleGrayTitle": "Absen 1-2 hari",
+  "@streakExampleGrayTitle": {
+    "description": "Contoh absen."
+  },
+  "streakExampleGrayText": "Api padam. Ketuk 3 kali cepat untuk menyalakan.",
+  "@streakExampleGrayText": {
+    "description": "Contoh absen."
+  },
+  "streakExampleFrozenTitle": "Absen 3-10 hari",
+  "@streakExampleFrozenTitle": {
+    "description": "Contoh absen."
+  },
+  "streakExampleFrozenText": "Api membeku. Ketukan = 5 + (hari absen - 3), jadi absen 5 hari = 7 ketukan.",
+  "@streakExampleFrozenText": {
+    "description": "Contoh absen."
+  },
+  "streakExampleExpiredTitle": "Absen lebih dari 10 hari",
+  "@streakExampleExpiredTitle": {
+    "description": "Contoh absen."
+  },
+  "streakExampleExpiredText": "Streak hangus dan mulai lagi dari 1/3.",
+  "@streakExampleExpiredText": {
+    "description": "Contoh absen."
+  },
+  "streakCorruptTitle": "Data streak rusak",
+  "@streakCorruptTitle": {
+    "description": "Banner berkas streak rusak."
+  },
+  "streakCorruptBody": "Berkas streak tidak bisa dibaca dan disimpan sebagai {name}. Streak dimulai lagi dari awal; berkas lama tidak dihapus.",
+  "@streakCorruptBody": {
+    "description": "Banner berkas streak rusak.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsStreakSection": "Streak",
+  "@settingsStreakSection": {
+    "description": "Judul bagian Streak di Pengaturan."
+  },
+  "settingsStreakShowLabel": "Tampilkan streak api",
+  "@settingsStreakShowLabel": {
+    "description": "Saklar menampilkan chip dan splash streak."
+  },
+  "settingsStreakShowDesc": "Hari tetap dihitung walau ikonnya disembunyikan",
+  "@settingsStreakShowDesc": {
+    "description": "Keterangan saklar tampilkan streak."
+  },
+  "settingsStreakReminderLabel": "Pengingat harian",
+  "@settingsStreakReminderLabel": {
+    "description": "Saklar pengingat streak."
+  },
+  "settingsStreakReminderDesc": "Notifikasi pukul 20.00 bila belum membuka aplikasi hari ini",
+  "@settingsStreakReminderDesc": {
+    "description": "Keterangan saklar pengingat."
   },
   "settingsTitle": "Pengaturan",
   "@settingsTitle": {

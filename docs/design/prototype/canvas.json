@@ -105,7 +105,7 @@
    "y": 964,
    "w": 390,
    "h": 844,
-   "title": "8 · Streak (layar)",
+   "title": "8 · Streak (tab kelima: api bisa diketuk, pekan ini, level, kalender)",
    "is_interactive": true,
    "radius": 28
   },
@@ -614,7 +614,7 @@
    "y": 964,
    "w": 390,
    "h": 844,
-   "title": "15 · Tab Streak: segera hadir (tab kelima, ikon api merah; fitur streak belum ada)",
+   "title": "15 · (tidak dipakai lagi sejak streak dibangun) Tab Streak: segera hadir",
    "is_interactive": true,
    "radius": 28
   }

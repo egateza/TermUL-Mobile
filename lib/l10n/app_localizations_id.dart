@@ -590,10 +590,384 @@ class AppLocalizationsId extends AppLocalizations {
   String get streakTitle => 'Streak';
 
   @override
-  String get streakSoonTitle => 'Segera hadir';
+  String get streakTier1 => 'Bara';
 
   @override
-  String get streakSoonBody => 'Streak api, hitungan hari kamu membuka TermUL, akan hadir di versi berikutnya.';
+  String get streakTier2 => 'Api Jingga';
+
+  @override
+  String get streakTier3 => 'Api Merah';
+
+  @override
+  String get streakTier4 => 'Api Magenta';
+
+  @override
+  String get streakTier5 => 'Api Ungu';
+
+  @override
+  String get streakTier6 => 'Api Biru';
+
+  @override
+  String get streakTier7 => 'Api Zamrud';
+
+  @override
+  String get streakTier8 => 'Api Emas';
+
+  @override
+  String get streakTier9 => 'Api Pelangi';
+
+  @override
+  String get streakFlameGray => 'Api padam';
+
+  @override
+  String get streakFlameFrozen => 'Api membeku';
+
+  @override
+  String get streakFlameExpired => 'Api hangus';
+
+  @override
+  String streakCountActive(int count) {
+    return '${count}x';
+  }
+
+  @override
+  String streakCountKindling(int count) {
+    return '$count/3';
+  }
+
+  @override
+  String streakChipActive(int count, String tier) {
+    return 'Streak $count hari, $tier. Ketuk untuk membuka layar Streak.';
+  }
+
+  @override
+  String streakChipKindling(int count) {
+    return 'Hari ke-$count dari 3 menuju streak. Ketuk untuk membuka layar Streak.';
+  }
+
+  @override
+  String streakChipGray(int count) {
+    return 'Streak $count hari padam. Ketuk untuk membuka dan menyalakan.';
+  }
+
+  @override
+  String streakChipFrozen(int count) {
+    return 'Streak $count hari beku. Ketuk untuk membuka dan memecahkan es.';
+  }
+
+  @override
+  String get streakHelpLabel => 'Bantuan: cara kerja streak';
+
+  @override
+  String get streakSettingsLabel => 'Pengaturan streak';
+
+  @override
+  String get streakStageGray => 'Ketuk api untuk menyalakan';
+
+  @override
+  String get streakStageFrozen => 'Ketuk untuk memecahkan es';
+
+  @override
+  String get streakStageActive => 'Api streak';
+
+  @override
+  String get streakUnitDays => 'hari berturut-turut';
+
+  @override
+  String get streakStatusActive => 'Hari ini terhitung sejak aplikasi dibuka. Sampai jumpa besok.';
+
+  @override
+  String get streakStatusKindling => 'Buka TermUL lagi besok. Streak menyala di hari ke-3.';
+
+  @override
+  String get streakStatusGray =>
+      'Kemarin kamu tidak membuka TermUL, jadi api padam. Ketuk api 3x cepat untuk menyalakannya lagi.';
+
+  @override
+  String streakStatusGrayLeft(int count) {
+    return 'Sisa $count ketukan lagi untuk menyalakan api.';
+  }
+
+  @override
+  String get streakStatusGrayRelit => 'Api menyala lagi. Hari ini terhitung.';
+
+  @override
+  String streakStatusFrozen(int missed, int need) {
+    return 'Kamu absen $missed hari, api membeku. Ketuk api $need kali untuk memecahkan es.';
+  }
+
+  @override
+  String streakStatusFrozenLeft(int count) {
+    return 'Sisa $count ketukan lagi untuk memecahkan es.';
+  }
+
+  @override
+  String get streakStatusFrozenRelit => 'Es pecah! Streak dilanjutkan. Hari ini terhitung.';
+
+  @override
+  String get streakTodayDone => 'Hari ini selesai';
+
+  @override
+  String get streakReplay => 'Putar ulang animasi';
+
+  @override
+  String get streakWeek => 'Pekan ini';
+
+  @override
+  String get streakDayMon => 'Sen';
+
+  @override
+  String get streakDayTue => 'Sel';
+
+  @override
+  String get streakDayWed => 'Rab';
+
+  @override
+  String get streakDayThu => 'Kam';
+
+  @override
+  String get streakDayFri => 'Jum';
+
+  @override
+  String get streakDaySat => 'Sab';
+
+  @override
+  String get streakDaySun => 'Min';
+
+  @override
+  String get streakLongest => 'Terpanjang';
+
+  @override
+  String get streakActiveMonth => 'Aktif bulan ini';
+
+  @override
+  String get streakLevel => 'Level api';
+
+  @override
+  String streakDays(int count) {
+    return '$count hari';
+  }
+
+  @override
+  String streakLevelValue(int level, String name) {
+    return '$level · $name';
+  }
+
+  @override
+  String streakNextLevel(int level, int target) {
+    return 'Menuju Level $level · hari ke-$target';
+  }
+
+  @override
+  String streakNextProgress(int count, int target) {
+    return '$count / $target';
+  }
+
+  @override
+  String streakDaysLeft(int count) {
+    return 'Tinggal $count hari lagi.';
+  }
+
+  @override
+  String streakMaxLevel(String name) {
+    return 'Level 9 · $name';
+  }
+
+  @override
+  String get streakMaxLevelText => 'Level tertinggi sudah tercapai.';
+
+  @override
+  String streakLevelBadge(int level, String name, String state) {
+    return 'Level $level, $name, $state';
+  }
+
+  @override
+  String get streakBadgeCurrent => 'level sekarang';
+
+  @override
+  String get streakBadgeReached => 'sudah tercapai';
+
+  @override
+  String get streakBadgeLocked => 'belum tercapai';
+
+  @override
+  String get streakMonth1 => 'Januari';
+
+  @override
+  String get streakMonthShort1 => 'Jan';
+
+  @override
+  String get streakMonth2 => 'Februari';
+
+  @override
+  String get streakMonthShort2 => 'Feb';
+
+  @override
+  String get streakMonth3 => 'Maret';
+
+  @override
+  String get streakMonthShort3 => 'Mar';
+
+  @override
+  String get streakMonth4 => 'April';
+
+  @override
+  String get streakMonthShort4 => 'Apr';
+
+  @override
+  String get streakMonth5 => 'Mei';
+
+  @override
+  String get streakMonthShort5 => 'Mei';
+
+  @override
+  String get streakMonth6 => 'Juni';
+
+  @override
+  String get streakMonthShort6 => 'Jun';
+
+  @override
+  String get streakMonth7 => 'Juli';
+
+  @override
+  String get streakMonthShort7 => 'Jul';
+
+  @override
+  String get streakMonth8 => 'Agustus';
+
+  @override
+  String get streakMonthShort8 => 'Agu';
+
+  @override
+  String get streakMonth9 => 'September';
+
+  @override
+  String get streakMonthShort9 => 'Sep';
+
+  @override
+  String get streakMonth10 => 'Oktober';
+
+  @override
+  String get streakMonthShort10 => 'Okt';
+
+  @override
+  String get streakMonth11 => 'November';
+
+  @override
+  String get streakMonthShort11 => 'Nov';
+
+  @override
+  String get streakMonth12 => 'Desember';
+
+  @override
+  String get streakMonthShort12 => 'Des';
+
+  @override
+  String streakMonthTitle(String month, String year) {
+    return '$month $year';
+  }
+
+  @override
+  String get streakLegend =>
+      'Kotak terisi = hari aktif. Bingkai amber = hari ini. Bingkai putus-putus berwarna = hari absen.';
+
+  @override
+  String streakAbsentFrozen(int count, String range, int need) {
+    return 'Absen $count hari ($range): api membeku. Ketuk $need kali untuk memecahkan es.';
+  }
+
+  @override
+  String streakAbsentGray(int count, String range) {
+    return 'Absen $count hari ($range): api padam. Ketuk 3 kali cepat untuk menyalakan.';
+  }
+
+  @override
+  String streakDayState(int day, String month, String state) {
+    return '$day $month, $state';
+  }
+
+  @override
+  String get streakDayActive => 'aktif';
+
+  @override
+  String get streakDayToday => 'hari ini, belum terhitung';
+
+  @override
+  String get streakDayTodayActive => 'hari ini, aktif';
+
+  @override
+  String get streakDayAbsent => 'absen';
+
+  @override
+  String get streakDayMissed => 'tidak aktif';
+
+  @override
+  String get streakDayFuture => 'belum tiba';
+
+  @override
+  String get streakHelpRow => 'Cara kerja streak dan contoh jika absen';
+
+  @override
+  String get streakHelpTitle => 'Cara kerja streak';
+
+  @override
+  String get streakHelp1 =>
+      'Satu hari dihitung saat Tuan membuka aplikasi. Bila tanggal berganti selagi aplikasi terbuka, hari baru dihitung seperti membuka lagi.';
+
+  @override
+  String get streakHelp2 =>
+      'Hari 1-2 tampil sebagai bara dengan angka N/3 dan belum dihitung sebagai streak. Mulai hari ke-3 api menyala.';
+
+  @override
+  String get streakHelp3 =>
+      'Absen 1-2 hari: api padam, ketuk 3 kali cepat untuk menyalakan. Absen 3-10 hari: api membeku, ketukan = 5 + (hari absen - 3), maksimal 10. Absen lebih dari 10 hari: streak hangus dan mulai lagi dari 1/3.';
+
+  @override
+  String get streakHelpSettings => 'Atur tampilan streak dan pengingat';
+
+  @override
+  String get streakHelpExamples => 'Contoh jika tidak membuka TermUL';
+
+  @override
+  String get streakExampleGrayTitle => 'Absen 1-2 hari';
+
+  @override
+  String get streakExampleGrayText => 'Api padam. Ketuk 3 kali cepat untuk menyalakan.';
+
+  @override
+  String get streakExampleFrozenTitle => 'Absen 3-10 hari';
+
+  @override
+  String get streakExampleFrozenText => 'Api membeku. Ketukan = 5 + (hari absen - 3), jadi absen 5 hari = 7 ketukan.';
+
+  @override
+  String get streakExampleExpiredTitle => 'Absen lebih dari 10 hari';
+
+  @override
+  String get streakExampleExpiredText => 'Streak hangus dan mulai lagi dari 1/3.';
+
+  @override
+  String get streakCorruptTitle => 'Data streak rusak';
+
+  @override
+  String streakCorruptBody(String name) {
+    return 'Berkas streak tidak bisa dibaca dan disimpan sebagai $name. Streak dimulai lagi dari awal; berkas lama tidak dihapus.';
+  }
+
+  @override
+  String get settingsStreakSection => 'Streak';
+
+  @override
+  String get settingsStreakShowLabel => 'Tampilkan streak api';
+
+  @override
+  String get settingsStreakShowDesc => 'Hari tetap dihitung walau ikonnya disembunyikan';
+
+  @override
+  String get settingsStreakReminderLabel => 'Pengingat harian';
+
+  @override
+  String get settingsStreakReminderDesc => 'Notifikasi pukul 20.00 bila belum membuka aplikasi hari ini';
 
   @override
   String get settingsTitle => 'Pengaturan';

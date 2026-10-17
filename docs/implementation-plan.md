@@ -1061,7 +1061,7 @@ Permintaan pemilik (2026-10-17): tab baru **Streak** di kiri Pengaturan, isinya 
 - **Belum teruji di HP:** tampilan lima tab di layar sempit (label "Pengaturan" paling panjang) dan di rel landscape.
 - **Artifact (sudah, 2026-10-17):** prototipe versi 61 (`1792253150-1905`) dan design system versi 61 (`1792253153-ee3d`); rincian di `docs/design/SUMBER.md`. Tab Streak masuk ke `Main`, `MainLandscape`, `Settings`, `Snippets`, contoh baru 15 (`StreakSoon`), README (butir `NavBar`), `NavBar/README.md` (`highlight`), dan `Icon/README.md` (`flame`). `Settings` sekaligus kehilangan tab SFTP lamanya (sisa keputusan 2026-10-17). Prototipe lain yang memuat bar navigasi (`ComingSoon`, `Sftp`, `SftpSources`) sudah tidak dipakai aplikasi dan tidak diubah.
 - **Uji HP (2026-10-17, dd3bf2af, build debug):** lima tab muat satu baris, perpindahan Host, Pengaturan, Streak berfungsi, ikon merah api dan label merah saat aktif; layar Streak sejajar dengan judul tab lain. Belum diuji: layar lebih sempit dan rel landscape.
-- **Belum dikerjakan:** streak sungguhan (api, chip, `streak.json`), tetap irisan tersendiri.
+- **Lanjutan:** streak sungguhan dibangun di bagian "Streak api" di bawah; layar "Segera hadir" sudah diganti.
 
 ## Tombol x hapus pencarian
 
@@ -1080,3 +1080,19 @@ Permintaan pemilik (2026-10-17): grup host yang diciutkan tetap terciut saat apl
 - **Tes:** `json_ui_state_repository_test.dart` (berkas belum ada, simpan dan muat ulang, urutan simpan beruntun, berkas rusak dan tipe salah disisihkan, gagal menulis), `host_list_screen_test.dart` (ketukan judul grup tersimpan termasuk "Tanpa grup"; dibuka dengan grup tersimpan terciut dan path usang dibuang); total 684 tes.
 - **Belum teruji di HP [?]:** lipatan bertahan setelah aplikasi ditutup paksa atau dimatikan Android; berkas `ui_state.json` benar-benar tertulis di folder pribadi aplikasi.
 - **Artifact:** design system versi 63 dan prototipe versi 63 (`docs/design/SUMBER.md`): butir README "Lipatan grup host diingat" dan `Main` mengingat lipatan lewat `localStorage`. Tanpa contoh baru di kanvas (tidak ada keadaan visual baru).
+
+## Streak api (2026-10-18)
+
+Permintaan pemilik: lengkapi fitur streak sesuai design system, irisan 1 sampai 3 sekaligus (inti dan layar, splash, pengingat). Keputusan pemilik: riwayat hari disimpan sebagai field tambahan di `streak.json`. Widget layar utama (prototipe 10) belum, irisan berikutnya.
+
+### Irisan 1: inti, api, chip, layar Streak, saklar tampil
+
+- **Aturan** (`lib/core/streak/streak.dart`): port `Streak`, `StreakStatus`, `StreakEvent`, dan `TapCounter` desktop (`b3d7854150`). Tanggal disimpan sebagai tengah malam UTC dari tanggal lokal supaya selisih hari tidak terganggu jam musim panas. Jam yang mundur dianggap hari yang sama.
+- **Rekaman** (`streak_record.dart`): `StreakRecord` = streak + `days` (hari yang dihitung, paling banyak 400) + `longest`. Format berkas: `{"format": 1, "count", "lastDay", "days": [...], "longest"}`; berkas desktop (tanpa dua field tambahan) terbaca, `lastDay` selalu dicatat ke `days`.
+- **Penyimpanan** (`JsonStreakRepository`, `streak.json`): tulis atomik; berkas rusak dikarantina dan `BootReport.streak` membuat layar Streak menampilkan banner "Data streak rusak". Gagal menyimpan hanya dicatat (`debugPrint`, tanpa isi), sama dengan desktop.
+- **Penghitungan** (`StreakController`, `MainShell`): hari dihitung saat kerangka utama tampil, saat aplikasi kembali ke depan, dan tiap 1 menit selama terbuka. Ketukan: tiga ketukan cepat (jeda di bawah 500 ms) menyalakan api padam; beku butuh `clicksToThaw` ketukan; menyalakan menambah 1 dan mencatat hari ini.
+- **Tampilan:** `Flame` (`lib/shared/widgets/flame.dart`, `CustomPainter` port `FlameArt`, goyangan motion.md, mati saat reduce motion atau tab tidak terlihat lewat `TickerMode`), `StreakChip` di header Host (membuka tab Streak lewat `mainTabProvider`), tab Streak (`streak_screen.dart`, `streak_cards.dart`, `streak_help_sheet.dart`), dan bagian Streak di Pengaturan (saklar "Tampilkan streak api"; `AppSettings.streak`). Ikon `help` baru.
+- **Tes:** `test/core/streak/` (port tes desktop: aturan, `TapCounter`, tier; rekaman, JSON, repository) dan `test/features/streak/streak_screen_test.dart` (hari pertama, chip dan layar aktif, padam tiga ketukan cepat dan lambat, beku tujuh ketukan, hangus, pergantian tanggal saat kembali ke depan, saklar tampil, banner rusak, bantuan). Tes Pengaturan dan main shell disesuaikan (daftar lebih panjang; api bergoyang sehingga tidak menunggu diam).
+- **Belum teruji di HP:** seluruh irisan. HP tidak terdeteksi adb saat build profile selesai (2026-10-18). Padam, beku, dan hangus di HP butuh tanggal sungguhan berganti (atau `streak.json` yang diatur lewat build debug); sejauh ini hanya teruji dengan jam palsu di tes.
+- **Artifact:** prototipe versi 64 dan design system versi 64 (`docs/design/SUMBER.md`).
+

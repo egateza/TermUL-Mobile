@@ -1147,17 +1147,671 @@ abstract class AppLocalizations {
   /// **'Streak'**
   String get streakTitle;
 
-  /// Judul banner di tab Streak: fitur belum tersedia.
+  /// Nama level api 1.
   ///
   /// In id, this message translates to:
-  /// **'Segera hadir'**
-  String get streakSoonTitle;
+  /// **'Bara'**
+  String get streakTier1;
 
-  /// Isi banner di tab Streak: fitur yang akan datang.
+  /// Nama level api 2.
   ///
   /// In id, this message translates to:
-  /// **'Streak api, hitungan hari kamu membuka TermUL, akan hadir di versi berikutnya.'**
-  String get streakSoonBody;
+  /// **'Api Jingga'**
+  String get streakTier2;
+
+  /// Nama level api 3.
+  ///
+  /// In id, this message translates to:
+  /// **'Api Merah'**
+  String get streakTier3;
+
+  /// Nama level api 4.
+  ///
+  /// In id, this message translates to:
+  /// **'Api Magenta'**
+  String get streakTier4;
+
+  /// Nama level api 5.
+  ///
+  /// In id, this message translates to:
+  /// **'Api Ungu'**
+  String get streakTier5;
+
+  /// Nama level api 6.
+  ///
+  /// In id, this message translates to:
+  /// **'Api Biru'**
+  String get streakTier6;
+
+  /// Nama level api 7.
+  ///
+  /// In id, this message translates to:
+  /// **'Api Zamrud'**
+  String get streakTier7;
+
+  /// Nama level api 8.
+  ///
+  /// In id, this message translates to:
+  /// **'Api Emas'**
+  String get streakTier8;
+
+  /// Nama level api 9.
+  ///
+  /// In id, this message translates to:
+  /// **'Api Pelangi'**
+  String get streakTier9;
+
+  /// Nama api padam untuk pembaca layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Api padam'**
+  String get streakFlameGray;
+
+  /// Nama api beku untuk pembaca layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Api membeku'**
+  String get streakFlameFrozen;
+
+  /// Nama api hangus untuk pembaca layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Api hangus'**
+  String get streakFlameExpired;
+
+  /// Angka streak aktif (mono).
+  ///
+  /// In id, this message translates to:
+  /// **'{count}x'**
+  String streakCountActive(int count);
+
+  /// Angka bara: hari ke-N dari 3.
+  ///
+  /// In id, this message translates to:
+  /// **'{count}/3'**
+  String streakCountKindling(int count);
+
+  /// Nama aksesibilitas chip streak aktif.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak {count} hari, {tier}. Ketuk untuk membuka layar Streak.'**
+  String streakChipActive(int count, String tier);
+
+  /// Nama aksesibilitas chip bara.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari ke-{count} dari 3 menuju streak. Ketuk untuk membuka layar Streak.'**
+  String streakChipKindling(int count);
+
+  /// Nama aksesibilitas chip padam.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak {count} hari padam. Ketuk untuk membuka dan menyalakan.'**
+  String streakChipGray(int count);
+
+  /// Nama aksesibilitas chip beku.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak {count} hari beku. Ketuk untuk membuka dan memecahkan es.'**
+  String streakChipFrozen(int count);
+
+  /// Tombol bantuan di header Streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Bantuan: cara kerja streak'**
+  String get streakHelpLabel;
+
+  /// Tombol ke Pengaturan di header Streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan streak'**
+  String get streakSettingsLabel;
+
+  /// Nama tombol api padam.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk api untuk menyalakan'**
+  String get streakStageGray;
+
+  /// Nama tombol api beku.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk untuk memecahkan es'**
+  String get streakStageFrozen;
+
+  /// Nama api yang tidak menunggu ketukan.
+  ///
+  /// In id, this message translates to:
+  /// **'Api streak'**
+  String get streakStageActive;
+
+  /// Satuan di bawah angka streak.
+  ///
+  /// In id, this message translates to:
+  /// **'hari berturut-turut'**
+  String get streakUnitDays;
+
+  /// Status hari ini sudah dihitung.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari ini terhitung sejak aplikasi dibuka. Sampai jumpa besok.'**
+  String get streakStatusActive;
+
+  /// Status bara.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka TermUL lagi besok. Streak menyala di hari ke-3.'**
+  String get streakStatusKindling;
+
+  /// Status padam sebelum diketuk.
+  ///
+  /// In id, this message translates to:
+  /// **'Kemarin kamu tidak membuka TermUL, jadi api padam. Ketuk api 3x cepat untuk menyalakannya lagi.'**
+  String get streakStatusGray;
+
+  /// Status padam saat diketuk.
+  ///
+  /// In id, this message translates to:
+  /// **'Sisa {count} ketukan lagi untuk menyalakan api.'**
+  String streakStatusGrayLeft(int count);
+
+  /// Status setelah api padam dinyalakan.
+  ///
+  /// In id, this message translates to:
+  /// **'Api menyala lagi. Hari ini terhitung.'**
+  String get streakStatusGrayRelit;
+
+  /// Status beku sebelum diketuk.
+  ///
+  /// In id, this message translates to:
+  /// **'Kamu absen {missed} hari, api membeku. Ketuk api {need} kali untuk memecahkan es.'**
+  String streakStatusFrozen(int missed, int need);
+
+  /// Status beku saat diketuk.
+  ///
+  /// In id, this message translates to:
+  /// **'Sisa {count} ketukan lagi untuk memecahkan es.'**
+  String streakStatusFrozenLeft(int count);
+
+  /// Status setelah es pecah.
+  ///
+  /// In id, this message translates to:
+  /// **'Es pecah! Streak dilanjutkan. Hari ini terhitung.'**
+  String get streakStatusFrozenRelit;
+
+  /// Lencana hari ini sudah dihitung.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari ini selesai'**
+  String get streakTodayDone;
+
+  /// Tombol memutar ulang animasi layar Streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Putar ulang animasi'**
+  String get streakReplay;
+
+  /// Judul kartu pekan ini.
+  ///
+  /// In id, this message translates to:
+  /// **'Pekan ini'**
+  String get streakWeek;
+
+  /// Nama hari singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Sen'**
+  String get streakDayMon;
+
+  /// Nama hari singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Sel'**
+  String get streakDayTue;
+
+  /// Nama hari singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Rab'**
+  String get streakDayWed;
+
+  /// Nama hari singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Kam'**
+  String get streakDayThu;
+
+  /// Nama hari singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Jum'**
+  String get streakDayFri;
+
+  /// Nama hari singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Sab'**
+  String get streakDaySat;
+
+  /// Nama hari singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Min'**
+  String get streakDaySun;
+
+  /// Statistik streak terpanjang.
+  ///
+  /// In id, this message translates to:
+  /// **'Terpanjang'**
+  String get streakLongest;
+
+  /// Statistik hari aktif bulan ini.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktif bulan ini'**
+  String get streakActiveMonth;
+
+  /// Statistik level api.
+  ///
+  /// In id, this message translates to:
+  /// **'Level api'**
+  String get streakLevel;
+
+  /// Nilai statistik dalam hari.
+  ///
+  /// In id, this message translates to:
+  /// **'{count} hari'**
+  String streakDays(int count);
+
+  /// Nilai level api.
+  ///
+  /// In id, this message translates to:
+  /// **'{level} · {name}'**
+  String streakLevelValue(int level, String name);
+
+  /// Judul kartu progres level.
+  ///
+  /// In id, this message translates to:
+  /// **'Menuju Level {level} · hari ke-{target}'**
+  String streakNextLevel(int level, int target);
+
+  /// Angka progres level (mono).
+  ///
+  /// In id, this message translates to:
+  /// **'{count} / {target}'**
+  String streakNextProgress(int count, int target);
+
+  /// Sisa hari menuju level berikutnya.
+  ///
+  /// In id, this message translates to:
+  /// **'Tinggal {count} hari lagi.'**
+  String streakDaysLeft(int count);
+
+  /// Judul kartu level saat level tertinggi.
+  ///
+  /// In id, this message translates to:
+  /// **'Level 9 · {name}'**
+  String streakMaxLevel(String name);
+
+  /// Keterangan saat level tertinggi.
+  ///
+  /// In id, this message translates to:
+  /// **'Level tertinggi sudah tercapai.'**
+  String get streakMaxLevelText;
+
+  /// Nama aksesibilitas lencana level.
+  ///
+  /// In id, this message translates to:
+  /// **'Level {level}, {name}, {state}'**
+  String streakLevelBadge(int level, String name, String state);
+
+  /// Keadaan lencana level.
+  ///
+  /// In id, this message translates to:
+  /// **'level sekarang'**
+  String get streakBadgeCurrent;
+
+  /// Keadaan lencana level.
+  ///
+  /// In id, this message translates to:
+  /// **'sudah tercapai'**
+  String get streakBadgeReached;
+
+  /// Keadaan lencana level.
+  ///
+  /// In id, this message translates to:
+  /// **'belum tercapai'**
+  String get streakBadgeLocked;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Januari'**
+  String get streakMonth1;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Jan'**
+  String get streakMonthShort1;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Februari'**
+  String get streakMonth2;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Feb'**
+  String get streakMonthShort2;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Maret'**
+  String get streakMonth3;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Mar'**
+  String get streakMonthShort3;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'April'**
+  String get streakMonth4;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Apr'**
+  String get streakMonthShort4;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Mei'**
+  String get streakMonth5;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Mei'**
+  String get streakMonthShort5;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Juni'**
+  String get streakMonth6;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Jun'**
+  String get streakMonthShort6;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Juli'**
+  String get streakMonth7;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Jul'**
+  String get streakMonthShort7;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Agustus'**
+  String get streakMonth8;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Agu'**
+  String get streakMonthShort8;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'September'**
+  String get streakMonth9;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Sep'**
+  String get streakMonthShort9;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Oktober'**
+  String get streakMonth10;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Okt'**
+  String get streakMonthShort10;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'November'**
+  String get streakMonth11;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Nov'**
+  String get streakMonthShort11;
+
+  /// Nama bulan.
+  ///
+  /// In id, this message translates to:
+  /// **'Desember'**
+  String get streakMonth12;
+
+  /// Nama bulan singkat.
+  ///
+  /// In id, this message translates to:
+  /// **'Des'**
+  String get streakMonthShort12;
+
+  /// Judul kalender.
+  ///
+  /// In id, this message translates to:
+  /// **'{month} {year}'**
+  String streakMonthTitle(String month, String year);
+
+  /// Keterangan kalender.
+  ///
+  /// In id, this message translates to:
+  /// **'Kotak terisi = hari aktif. Bingkai amber = hari ini. Bingkai putus-putus berwarna = hari absen.'**
+  String get streakLegend;
+
+  /// Keterangan absen beku di kalender.
+  ///
+  /// In id, this message translates to:
+  /// **'Absen {count} hari ({range}): api membeku. Ketuk {need} kali untuk memecahkan es.'**
+  String streakAbsentFrozen(int count, String range, int need);
+
+  /// Keterangan absen padam di kalender.
+  ///
+  /// In id, this message translates to:
+  /// **'Absen {count} hari ({range}): api padam. Ketuk 3 kali cepat untuk menyalakan.'**
+  String streakAbsentGray(int count, String range);
+
+  /// Nama aksesibilitas sel kalender.
+  ///
+  /// In id, this message translates to:
+  /// **'{day} {month}, {state}'**
+  String streakDayState(int day, String month, String state);
+
+  /// Keadaan hari.
+  ///
+  /// In id, this message translates to:
+  /// **'aktif'**
+  String get streakDayActive;
+
+  /// Keadaan hari.
+  ///
+  /// In id, this message translates to:
+  /// **'hari ini, belum terhitung'**
+  String get streakDayToday;
+
+  /// Keadaan hari.
+  ///
+  /// In id, this message translates to:
+  /// **'hari ini, aktif'**
+  String get streakDayTodayActive;
+
+  /// Keadaan hari.
+  ///
+  /// In id, this message translates to:
+  /// **'absen'**
+  String get streakDayAbsent;
+
+  /// Keadaan hari.
+  ///
+  /// In id, this message translates to:
+  /// **'tidak aktif'**
+  String get streakDayMissed;
+
+  /// Keadaan hari.
+  ///
+  /// In id, this message translates to:
+  /// **'belum tiba'**
+  String get streakDayFuture;
+
+  /// Baris pembuka bantuan.
+  ///
+  /// In id, this message translates to:
+  /// **'Cara kerja streak dan contoh jika absen'**
+  String get streakHelpRow;
+
+  /// Judul sheet bantuan.
+  ///
+  /// In id, this message translates to:
+  /// **'Cara kerja streak'**
+  String get streakHelpTitle;
+
+  /// Bantuan paragraf 1 (teks prototipe).
+  ///
+  /// In id, this message translates to:
+  /// **'Satu hari dihitung saat Tuan membuka aplikasi. Bila tanggal berganti selagi aplikasi terbuka, hari baru dihitung seperti membuka lagi.'**
+  String get streakHelp1;
+
+  /// Bantuan paragraf 2.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari 1-2 tampil sebagai bara dengan angka N/3 dan belum dihitung sebagai streak. Mulai hari ke-3 api menyala.'**
+  String get streakHelp2;
+
+  /// Bantuan paragraf 3.
+  ///
+  /// In id, this message translates to:
+  /// **'Absen 1-2 hari: api padam, ketuk 3 kali cepat untuk menyalakan. Absen 3-10 hari: api membeku, ketukan = 5 + (hari absen - 3), maksimal 10. Absen lebih dari 10 hari: streak hangus dan mulai lagi dari 1/3.'**
+  String get streakHelp3;
+
+  /// Tautan bantuan ke Pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'Atur tampilan streak dan pengingat'**
+  String get streakHelpSettings;
+
+  /// Judul contoh absen.
+  ///
+  /// In id, this message translates to:
+  /// **'Contoh jika tidak membuka TermUL'**
+  String get streakHelpExamples;
+
+  /// Contoh absen.
+  ///
+  /// In id, this message translates to:
+  /// **'Absen 1-2 hari'**
+  String get streakExampleGrayTitle;
+
+  /// Contoh absen.
+  ///
+  /// In id, this message translates to:
+  /// **'Api padam. Ketuk 3 kali cepat untuk menyalakan.'**
+  String get streakExampleGrayText;
+
+  /// Contoh absen.
+  ///
+  /// In id, this message translates to:
+  /// **'Absen 3-10 hari'**
+  String get streakExampleFrozenTitle;
+
+  /// Contoh absen.
+  ///
+  /// In id, this message translates to:
+  /// **'Api membeku. Ketukan = 5 + (hari absen - 3), jadi absen 5 hari = 7 ketukan.'**
+  String get streakExampleFrozenText;
+
+  /// Contoh absen.
+  ///
+  /// In id, this message translates to:
+  /// **'Absen lebih dari 10 hari'**
+  String get streakExampleExpiredTitle;
+
+  /// Contoh absen.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak hangus dan mulai lagi dari 1/3.'**
+  String get streakExampleExpiredText;
+
+  /// Banner berkas streak rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Data streak rusak'**
+  String get streakCorruptTitle;
+
+  /// Banner berkas streak rusak.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas streak tidak bisa dibaca dan disimpan sebagai {name}. Streak dimulai lagi dari awal; berkas lama tidak dihapus.'**
+  String streakCorruptBody(String name);
+
+  /// Judul bagian Streak di Pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'Streak'**
+  String get settingsStreakSection;
+
+  /// Saklar menampilkan chip dan splash streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Tampilkan streak api'**
+  String get settingsStreakShowLabel;
+
+  /// Keterangan saklar tampilkan streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Hari tetap dihitung walau ikonnya disembunyikan'**
+  String get settingsStreakShowDesc;
+
+  /// Saklar pengingat streak.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengingat harian'**
+  String get settingsStreakReminderLabel;
+
+  /// Keterangan saklar pengingat.
+  ///
+  /// In id, this message translates to:
+  /// **'Notifikasi pukul 20.00 bila belum membuka aplikasi hari ini'**
+  String get settingsStreakReminderDesc;
 
   /// Judul layar pengaturan.
   ///

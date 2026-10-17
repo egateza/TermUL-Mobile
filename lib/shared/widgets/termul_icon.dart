@@ -38,6 +38,8 @@ enum TermulIconName {
   key('M11 12l9-9M16 7l3 3M14 9l2 2'),
   // Api satu lidah bergaya garis untuk tab Streak; bukan `Flame` desain (api berwarna tier).
   flame('M12 3c.5 3.2 5.5 5.3 5.5 10.2a5.5 5.5 0 0 1-11 0c0-2.2 1-3.6 2.3-4.7.1 1.8.9 2.8 2 3.2C10 8.8 10.5 5.7 12 3z'),
+  // Tanda tanya dalam lingkaran: bantuan (header Streak di prototipe).
+  help('M9.6 9.4a2.5 2.5 0 1 1 3.5 2.3c-.7.3-1.1.8-1.1 1.6M12 17h.01'),
   star('M12 3l2.7 5.6 6.1.9-4.4 4.3 1 6.1L12 17l-5.4 2.9 1-6.1L3.2 9.5l6.1-.9z'),
   refresh('M20 12a8 8 0 1 1-2.3-5.7M20 4v4h-4'),
   more('M12 6h.01M12 12h.01M12 18h.01'),
@@ -67,6 +69,7 @@ enum TermulIconName {
   /// Bentuk dasar yang dihasilkan dari persegi dan lingkaran, digabung dengan [_extra].
   String get pathData => switch (this) {
     search => '${_circle(11, 11, 7)} $_extra',
+    help => '${_circle(12, 12, 9)} $_extra',
     lock || lockOpen => '${_rect(5, 11, 14, 9, 2)} $_extra',
     hosts => '${_rect(3, 4, 18, 7, 2)} ${_rect(3, 13, 18, 7, 2)} $_extra',
     terminal => '${_rect(3, 4, 18, 16, 2)} $_extra',

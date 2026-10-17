@@ -10,8 +10,10 @@ import 'core/storage/json/json_host_repository.dart';
 import 'core/storage/json/json_known_hosts_repository.dart';
 import 'core/storage/json/json_settings_repository.dart';
 import 'core/storage/json/json_snippet_repository.dart';
+import 'core/storage/json/json_streak_repository.dart';
 import 'core/storage/json/json_ui_state_repository.dart';
 import 'core/storage/snippet_repository.dart';
+import 'core/storage/streak_repository.dart';
 import 'core/storage/ui_state_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/storage/load_result.dart';
@@ -31,6 +33,7 @@ class BootReport {
     this.vaultIndex = const LoadResult(),
     this.settings = const LoadResult(),
     this.snippets = const LoadResult(),
+    this.streak = const LoadResult(),
     this.sweptSecrets = 0,
   });
 
@@ -43,6 +46,9 @@ class BootReport {
 
   /// `snippets.json` rusak disisihkan dan daftar dimulai kosong; layar Snippet memberi tahu lewat banner.
   final LoadResult snippets;
+
+  /// `streak.json` rusak disisihkan dan streak mulai dari awal; layar Streak memberi tahu lewat banner.
+  final LoadResult streak;
 
   /// Jumlah rahasia yatim yang dibuang saat mulai.
   final int sweptSecrets;
@@ -63,6 +69,7 @@ class AppDependencies {
     this.vaultLock,
     this.snippets,
     this.uiState,
+    this.streak,
   });
 
   final HostRepository hosts;
@@ -92,6 +99,9 @@ class AppDependencies {
 
   /// Keadaan tampilan yang diingat. `null` di tes (memakai salinan di memori).
   final UiStateRepository? uiState;
+
+  /// Penyimpanan streak. `null` di tes (memakai salinan di memori).
+  final StreakRepository? streak;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -111,6 +121,8 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
   final settingsLoad = await settingsRepo.load();
   final snippetRepo = JsonSnippetRepository(file('snippets.json'));
   final snippetsLoad = await snippetRepo.load();
+  final streakRepo = JsonStreakRepository(file('streak.json'));
+  final streakLoad = await streakRepo.load();
   // Rusak: disisihkan dan semua grup terbuka, tanpa banner (keadaan tampilan hilang tidak berbahaya).
   final uiState = JsonUiStateRepository(file('ui_state.json'));
   await uiState.load();
@@ -147,12 +159,14 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     vaultLock: vaultLock,
     snippets: snippetRepo,
     uiState: uiState,
+    streak: streakRepo,
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,
       vaultIndex: indexLoad,
       settings: settingsLoad,
       snippets: snippetsLoad,
+      streak: streakLoad,
       sweptSecrets: swept,
     ),
   );

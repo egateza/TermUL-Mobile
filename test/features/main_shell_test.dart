@@ -43,9 +43,11 @@ void main() {
     expect(find.text('Belum ada snippet'), findsOneWidget);
 
     await tester.tap(tab('Streak'));
-    await tester.pumpAndSettle();
+    // Api di layar Streak bergoyang terus, jadi tidak menunggu sampai diam.
+    await tester.pump();
+    await tester.pump(const Duration(seconds: 2));
     expect(find.byType(StreakScreen), findsOneWidget);
-    expect(find.text('Segera hadir'), findsOneWidget);
+    expect(find.text('hari berturut-turut'), findsOneWidget);
 
     await tester.tap(tab('Pengaturan'));
     await tester.pumpAndSettle();
