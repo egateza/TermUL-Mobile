@@ -1126,3 +1126,13 @@ Keadaan padam, beku, dan hangus diatur dengan menulis `streak.json` lewat `adb r
 - **Belum terjelaskan:** pada percobaan pertama, tiga ketukan cepat di splash padam tembus ke daftar host (membuka sambungan "development", lalu dibatalkan). Tidak terulang di empat percobaan berikutnya. Pada saat yang sama terlihat `am force-stop` tidak selalu langsung mematikan proses, jadi dugaan sementara ada dua instans aplikasi; belum terbukti.
 - **Belum teruji di HP:** notifikasi pengingat benar-benar tampil, pemulihan setelah HP dinyalakan ulang, pergantian tanggal saat aplikasi terbuka, dan reduce motion sistem.
 
+### Hembusan angin pada api (2026-10-18)
+
+Permintaan pemilik: ikuti versi terbaru artifact desktop "Streak Api TermUL" (`1792078599-27c9`) yang menambah hembusan angin. Keputusan pemilik: kekuatan tetap sepoi (0,6), tanpa pengaturan.
+
+- **Kode:** `lib/shared/widgets/flame_wind.dart` (`WindField`, port `gust`/`windTick`/`windAt`: hembusan acak 80% dari kiri, pertama 2,2 detik setelah mulai, lalu tiap 4,5-8,5 detik, 1,3-2,2 detik per hembusan, selubung sinus lalu kosinus kuadrat dengan getaran, dibatasi -1,2..1,2; satu sumber bersama `flameWind`). `Flame`: kemiringan per lapis seperti `flamePath` desktop (ujung dan titik kontrol bergeser, pangkal tetap; jeda 0,07 detik per lapis; lidah 1,15 kali; goyangan dikuatkan 1 + 1,2 x |angin|), percikan dan asap terdorong, garis hembusan pada api setinggi 40 ke atas; beku tanpa angin, padam dan hangus 0,8, bara 0,7. Hanya api yang `animate` (splash, hero tab Streak); reduce motion dan tab tersembunyi menghentikannya bersama goyangan.
+- **Beda dengan desktop (dicatat di README):** rambatan hembusan dari kiri ke kanan halaman tidak dibuat (satu api besar per layar); percikan dan asap tetap memakai keyframe `FlameArt`, angin menggesernya dengan dorongan kuadrat, bukan simulasi partikel desktop.
+- **Tes:** `test/shared/flame_wind_test.dart` (tenang sebelum 2,2 detik, naik lalu meluruh, jadwal berikutnya, arah kiri negatif dan batas, kekuatan 0, jeda lapis). Pratinjau render sementara memastikan api miring ke kanan dan beku tetap tegak.
+- **Uji HP (dd3bf2af, profile):** di tab Streak bara terlihat condong ke kanan dengan garis hembusan, lalu kembali tegak. Belum diamati: splash dengan angin, tier tinggi di HP, dan reduce motion sistem.
+- **Artifact:** prototipe versi 66 (`FlameArt` prop `wind`) dan design system versi 67 (`docs/design/SUMBER.md`).
+

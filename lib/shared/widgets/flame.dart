@@ -7,6 +7,7 @@ import 'package:flutter/widgets.dart';
 
 import '../../core/streak/streak_tier.dart';
 import '../../core/theme/termul_theme.dart';
+import 'flame_wind.dart';
 
 /// Bentuk api: menyala menurut tier, padam (abu-abu dengan asap), beku (di dalam balok es), atau hangus.
 enum FlameMode { active, gray, frozen, reset }
@@ -18,6 +19,10 @@ enum FlameMode { active, gray, frozen, reset }
 /// bukan di daftar atau chip. Reduce motion sistem mematikannya, dan `TickerMode` menghentikannya saat tab tidak
 /// terlihat. Selalu sertakan kata atau angka di dekat api; dengan [semanticLabel] null api disembunyikan dari pembaca
 /// layar (dekoratif).
+///
+/// Api yang bergoyang juga tertiup angin ([flameWind]; artifact desktop "Streak Api TermUL" versi `1792078599-27c9`):
+/// ujung dan lengkung api miring searah hembusan, lapisan dalam tertinggal sedikit, percikan dan asap terdorong, dan
+/// api setinggi 40 ke atas memperlihatkan garis hembusan. Api beku tidak tertiup.
 class Flame extends StatefulWidget {
   const Flame({
     super.key,
@@ -29,6 +34,7 @@ class Flame extends StatefulWidget {
     this.animate = false,
     this.glow = true,
     this.semanticLabel,
+    this.wind,
   });
 
   /// Hari streak; menentukan tier untuk [FlameMode.active].
@@ -45,13 +51,53 @@ class Flame extends StatefulWidget {
   final bool glow;
   final String? semanticLabel;
 
+  /// Sumber angin; bawaan [flameWind] (tes menyuntikkan yang terkendali).
+  final WindField? wind;
+
   @override
   State<Flame> createState() => _FlameState();
 }
 
 class _FlameState extends State<Flame> with SingleTickerProviderStateMixin {
-  late final Ticker _ticker = createTicker((elapsed) => _time.value = elapsed.inMicroseconds / 1e6);
+  late final Ticker _ticker = createTicker(_onTick);
   final _time = ValueNotifier<double>(0);
+  final _gusts = <GustLine>[];
+  final _random = math.Random();
+  double _gustAcc = 0;
+
+  WindField get _wind => widget.wind ?? flameWind;
+
+  void _onTick(Duration elapsed) {
+    final t = elapsed.inMicroseconds / 1e6;
+    _updateGusts((t - _time.value).clamp(0.0, 0.05));
+    _time.value = t;
+  }
+
+  /// Garis hembusan (hanya api besar), dalam satuan viewBox: muncul di sisi datangnya angin lalu melesat melewati api.
+  void _updateGusts(double dt) {
+    for (final g in _gusts) {
+      g.life -= dt;
+      g.x += g.vx * dt;
+    }
+    _gusts.removeWhere((g) => g.life <= 0);
+    final w = _wind.at();
+    if (widget.size < 40 || w.abs() <= 0.2) return;
+    final dir = w > 0 ? 1 : -1;
+    _gustAcc += dt * w.abs() * 7;
+    while (_gustAcc > 1) {
+      _gustAcc--;
+      _gusts.add(
+        GustLine(
+          x: -dir * 100 * (0.7 + _random.nextDouble() * 0.5),
+          y: 100 - 100 * (0.1 + _random.nextDouble()),
+          vx: dir * 100 * (3.2 + _random.nextDouble() * 1.6),
+          dir: dir,
+          length: 100 * (0.3 + _random.nextDouble() * 0.35),
+          life: 0.4 + _random.nextDouble() * 0.25,
+        ),
+      );
+    }
+  }
 
   @override
   void didChangeDependencies() {
@@ -72,6 +118,7 @@ class _FlameState extends State<Flame> with SingleTickerProviderStateMixin {
     } else if (!run && _ticker.isActive) {
       _ticker.stop();
       _time.value = 0;
+      _gusts.clear();
     }
   }
 
@@ -96,6 +143,8 @@ class _FlameState extends State<Flame> with SingleTickerProviderStateMixin {
           need: widget.need,
           glow: widget.glow,
           time: animated ? _time : null,
+          wind: animated ? _wind : null,
+          gusts: _gusts,
         ),
       ),
     );
@@ -104,9 +153,37 @@ class _FlameState extends State<Flame> with SingleTickerProviderStateMixin {
   }
 }
 
+/// Garis hembusan angin yang sedang melintas (satuan viewBox api).
+class GustLine {
+  GustLine({
+    required this.x,
+    required this.y,
+    required this.vx,
+    required this.dir,
+    required this.length,
+    required this.life,
+  }) : maxLife = life;
+
+  double x;
+  final double y;
+  final double vx;
+  final int dir;
+  final double length;
+  double life;
+  final double maxLife;
+}
+
 /// Satu bentuk yang digambar, dengan gerak opsionalnya.
 class _Item {
-  _Item(this.path, this.color, {this.motion, this.opacity = 1, this.centerOrigin = false});
+  _Item(
+    this.path,
+    this.color, {
+    this.motion,
+    this.opacity = 1,
+    this.centerOrigin = false,
+    this.swayGain = 1,
+    this.push = 0,
+  });
 
   final Path path;
   final Color color;
@@ -115,9 +192,15 @@ class _Item {
 
   /// Titik tumpu gerak di tengah bentuk (percikan, bintang, asap); selain itu di tengah bawah (lapis api).
   final bool centerOrigin;
+
+  /// Pengali goyangan (api bergoyang lebih kuat saat tertiup angin).
+  final double swayGain;
+
+  /// Seberapa jauh angin penuh mendorong partikel ini sepanjang hidupnya (percikan, asap), dalam satuan viewBox.
+  final double push;
 }
 
-typedef _Frame = ({double skew, double scaleX, double scaleY, double dy, double opacity});
+typedef _Frame = ({double skew, double scaleX, double scaleY, double dy, double opacity, double p});
 
 /// Gerak berulang dengan keyframe CSS dari `FlameArt` (durasi dan jeda dalam detik; jeda negatif = mulai di tengah).
 class _Motion {
@@ -147,6 +230,7 @@ class _Motion {
           scaleY: lerp(fa.scaleY, fb.scaleY),
           dy: lerp(fa.dy, fb.dy),
           opacity: lerp(fa.opacity, fb.opacity),
+          p: p,
         );
       }
     }
@@ -155,7 +239,7 @@ class _Motion {
 }
 
 _Frame _f({double skew = 0, double sx = 1, double sy = 1, double dy = 0, double op = 1}) =>
-    (skew: skew, scaleX: sx, scaleY: sy, dy: dy, opacity: op);
+    (skew: skew, scaleX: sx, scaleY: sy, dy: dy, opacity: op, p: 0);
 
 _Frame _sway(double skew, double sy) => _f(skew: skew, sy: sy);
 
@@ -177,8 +261,16 @@ const _smokeColor = Color(0xFF9A9EA4);
 
 /// Menggambar api di kotak viewBox `-65 -15 130 125` (sama dengan `FlameArt`), diskalakan ke ukuran kanvas.
 class FlamePainter extends CustomPainter {
-  FlamePainter({required this.count, required this.mode, this.cracks = 0, this.need = 5, this.glow = true, this.time})
-    : super(repaint: time);
+  FlamePainter({
+    required this.count,
+    required this.mode,
+    this.cracks = 0,
+    this.need = 5,
+    this.glow = true,
+    this.time,
+    this.wind,
+    this.gusts = const [],
+  }) : super(repaint: time);
 
   final int count;
   final FlameMode mode;
@@ -189,13 +281,23 @@ class FlamePainter extends CustomPainter {
   /// Detik sejak gerak dimulai; null = diam.
   final ValueListenable<double>? time;
 
-  static Path _flame(double cx, double by, double h, double sway) {
-    final w = h * 0.62, r = w / 2, top = by - h * 0.97, cy = top + h * 0.66, tx = cx + sway;
+  /// Sumber angin; null = tanpa angin.
+  final WindField? wind;
+
+  /// Garis hembusan yang sedang melintas.
+  final List<GustLine> gusts;
+
+  /// Lapis api. [lean] (kira-kira -1..1, dari angin) menggeser ujung dan titik kontrol searah hembusan; pangkalnya
+  /// tetap (desktop `flamePath`).
+  static Path _flame(double cx, double by, double h, double sway, {double lean = 0}) {
+    final w = h * 0.62, r = w / 2, top0 = by - h * 0.97, cy = top0 + h * 0.66;
+    final top = top0 + lean.abs() * h * 0.12, tx = cx + sway + lean * h * 0.6;
+    final sh = lean * h * 0.22, sm = lean * h * 0.06;
     return Path()
       ..moveTo(tx, top)
-      ..cubicTo(tx + r * 0.35, top + h * 0.22, cx + r * 1.08, cy - h * 0.22, cx + r, cy)
+      ..cubicTo(tx + r * 0.35 + sm, top + h * 0.22, cx + r * 1.08 + sh, cy - h * 0.22, cx + r, cy)
       ..arcToPoint(Offset(cx - r, cy), radius: Radius.circular(r))
-      ..cubicTo(cx - r * 1.08, cy - h * 0.22, tx - r * 0.35, top + h * 0.22, tx, top)
+      ..cubicTo(cx - r * 1.08 + sh, cy - h * 0.22, tx - r * 0.35 + sm, top + h * 0.22, tx, top)
       ..close();
   }
 
@@ -242,18 +344,51 @@ class FlamePainter extends CustomPainter {
     ];
   }();
 
-  List<_Item> _layers(double cx, double by, double s, ({Color outer, Color mid, Color core}) pal, int tongues) => [
+  static double _noLean(double k) => 0;
+
+  /// Tiga lapis api dan lidahnya. [lean] memberi kemiringan angin untuk lapis ke-k (lapisan dalam memakai angin sedikit
+  /// lebih lama, 0,07 detik per lapis, supaya terasa lentur); [gain] menguatkan goyangan saat tertiup.
+  List<_Item> _layers(
+    double cx,
+    double by,
+    double s,
+    ({Color outer, Color mid, Color core}) pal,
+    int tongues, {
+    double Function(double k) lean = _noLean,
+    double gain = 1,
+  }) => [
     if (tongues >= 1)
-      _Item(_flame(cx - s * 0.2, by - s * 0.06, s * 0.5, -s * 0.5 * 0.14), pal.outer, motion: _Motion(_tl, 0.9, -0.3)),
+      _Item(
+        _flame(cx - s * 0.2, by - s * 0.06, s * 0.5, -s * 0.5 * 0.14, lean: lean(0.6) * 1.15),
+        pal.outer,
+        motion: _Motion(_tl, 0.9, -0.3),
+        swayGain: gain,
+      ),
     if (tongues >= 2)
       _Item(
-        _flame(cx + s * 0.2, by - s * 0.07, s * 0.42, s * 0.42 * 0.14),
+        _flame(cx + s * 0.2, by - s * 0.07, s * 0.42, s * 0.42 * 0.14, lean: lean(0.4) * 1.15),
         pal.outer,
         motion: _Motion(_tr, 0.75, -0.5),
+        swayGain: gain,
       ),
-    _Item(_flame(cx, by, s, 0), pal.outer, motion: _Motion(_l1, 1.1, 0)),
-    _Item(_flame(cx, by - s * 0.02, s * 0.7, 0), pal.mid, motion: _Motion(_l2, 0.85, -0.2)),
-    _Item(_flame(cx, by - s * 0.05, s * 0.4, 0), pal.core, motion: _Motion(_l3, 0.65, -0.4)),
+    _Item(
+      _flame(cx, by, s, 0, lean: lean(0)),
+      pal.outer,
+      motion: _Motion(_l1, 1.1, 0),
+      swayGain: gain,
+    ),
+    _Item(
+      _flame(cx, by - s * 0.02, s * 0.7, 0, lean: lean(1)),
+      pal.mid,
+      motion: _Motion(_l2, 0.85, -0.2),
+      swayGain: gain,
+    ),
+    _Item(
+      _flame(cx, by - s * 0.05, s * 0.4, 0, lean: lean(2) * 0.9),
+      pal.core,
+      motion: _Motion(_l3, 0.65, -0.4),
+      swayGain: gain,
+    ),
   ];
 
   @override
@@ -271,6 +406,19 @@ class FlamePainter extends CustomPainter {
     final fx = <_Item>[];
     Color? glowColor;
 
+    // Angin: beku tidak tertiup, padam 0,8, bara 0,7 (desktop `windAmt`).
+    final windAmt = switch (mode) {
+      FlameMode.frozen => 0.0,
+      FlameMode.gray || FlameMode.reset => 0.8,
+      FlameMode.active when tier == StreakTier.bara => 0.7,
+      FlameMode.active => 1.0,
+    };
+    final source = animate ? wind : null;
+    double lean(double k) => source == null || windAmt == 0 ? 0 : source.at(delay: k * 0.07) * windAmt * 0.72;
+    final gain = 1 + lean(0).abs() * 1.2;
+    // Dorongan percikan dan asap memakai angin saat ini.
+    final push = source == null ? 0.0 : source.at();
+
     switch (mode) {
       case FlameMode.frozen:
         items.addAll(_layers(0, 92, 78, _ice, 0));
@@ -287,7 +435,7 @@ class FlamePainter extends CustomPainter {
           );
         }
       case FlameMode.gray || FlameMode.reset:
-        items.addAll(_layers(0, 100, 100, _gray, 0));
+        items.addAll(_layers(0, 100, 100, _gray, 0, lean: lean, gain: gain));
         for (var i = 0; i < 3; i++) {
           fx.add(
             _Item(
@@ -296,6 +444,7 @@ class FlamePainter extends CustomPainter {
               motion: _Motion(_smoke, 2, i * 0.7, easeOut: true),
               opacity: animate ? 0.4 : 0.3,
               centerOrigin: true,
+              push: 50,
             ),
           );
         }
@@ -303,10 +452,20 @@ class FlamePainter extends CustomPainter {
         glowColor = tier.glow;
         items
           ..add(_Item(_ellipse(0, 95, 30, 8), TermulPalette.coal))
-          ..addAll(_layers(0, 92, 70, (outer: tier.outer, mid: tier.mid, core: tier.core), 0));
+          ..addAll(_layers(0, 92, 70, (outer: tier.outer, mid: tier.mid, core: tier.core), 0, lean: lean, gain: gain));
       case FlameMode.active:
         glowColor = tier.glow;
-        items.addAll(_layers(0, 100, 100, (outer: tier.outer, mid: tier.mid, core: tier.core), tier.tongues));
+        items.addAll(
+          _layers(
+            0,
+            100,
+            100,
+            (outer: tier.outer, mid: tier.mid, core: tier.core),
+            tier.tongues,
+            lean: lean,
+            gain: gain,
+          ),
+        );
         const sx = <double>[-12, 10, -4, 14, 0];
         const sy = <double>[48, 40, 34, 52, 30];
         for (var i = 0; i < tier.sparks; i++) {
@@ -317,6 +476,7 @@ class FlamePainter extends CustomPainter {
               motion: _Motion(_spark, 0.9 + i * 0.12, i * 0.3, easeOut: true),
               opacity: animate ? 1 : 0.85,
               centerOrigin: true,
+              push: 80,
             ),
           );
         }
@@ -407,12 +567,32 @@ class FlamePainter extends CustomPainter {
     }
 
     for (final item in fx) {
-      _draw(canvas, item, t, Paint()..color = tint(item.color).withValues(alpha: item.opacity));
+      _draw(canvas, item, t, Paint()..color = tint(item.color).withValues(alpha: item.opacity), wind: push);
+    }
+
+    // Garis hembusan: lengkung tipis putih yang muncul lalu memudar (desktop `gust`).
+    if (animate && gusts.isNotEmpty) {
+      final line = Paint()
+        ..style = PaintingStyle.stroke
+        ..strokeCap = StrokeCap.round
+        ..strokeWidth = 1.4;
+      for (final g in gusts) {
+        final a = g.life / g.maxLife;
+        final f = math.min(1.0, math.min(a * 3, (1 - a) * 5));
+        if (f <= 0) continue;
+        line.color = const Color(0xFFFFFFFF).withValues(alpha: f * 0.45);
+        canvas.drawPath(
+          Path()
+            ..moveTo(g.x - g.dir * g.length, g.y + g.length * 0.07)
+            ..quadraticBezierTo(g.x - g.dir * g.length * 0.45, g.y - g.length * 0.1, g.x, g.y),
+          line,
+        );
+      }
     }
     canvas.restore();
   }
 
-  void _draw(Canvas canvas, _Item item, double? t, Paint paint) {
+  void _draw(Canvas canvas, _Item item, double? t, Paint paint, {double wind = 0}) {
     final motion = item.motion;
     if (t == null || motion == null) {
       canvas.drawPath(item.path, paint);
@@ -421,12 +601,16 @@ class FlamePainter extends CustomPainter {
     final f = motion.at(t);
     final b = item.path.getBounds();
     final origin = item.centerOrigin ? b.center : b.bottomCenter;
+    // Partikel terdorong angin makin jauh sepanjang hidupnya (percepatan tetap, jadi kuadrat).
+    final dx = item.push * wind * f.p * f.p;
     // Opasitas gerak menggantikan opasitas dasar (seperti properti CSS yang dianimasikan).
     paint.color = paint.color.withValues(alpha: f.opacity.clamp(0.0, 1.0));
     canvas
       ..save()
-      ..translate(origin.dx, origin.dy + f.dy)
-      ..transform((Matrix4.skewX(f.skew * math.pi / 180)..scaleByDouble(f.scaleX, f.scaleY, 1, 1)).storage)
+      ..translate(origin.dx + dx, origin.dy + f.dy)
+      ..transform(
+        (Matrix4.skewX(f.skew * item.swayGain * math.pi / 180)..scaleByDouble(f.scaleX, f.scaleY, 1, 1)).storage,
+      )
       ..translate(-origin.dx, -origin.dy)
       ..drawPath(item.path, paint)
       ..restore();
@@ -439,5 +623,6 @@ class FlamePainter extends CustomPainter {
       old.cracks != cracks ||
       old.need != need ||
       old.glow != glow ||
-      old.time != time;
+      old.time != time ||
+      old.wind != wind;
 }

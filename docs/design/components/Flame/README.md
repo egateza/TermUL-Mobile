@@ -6,4 +6,5 @@ Api streak tiga lapis (luar, tengah, inti) yang bentuk dan warnanya berganti men
 - Tier tinggi menambah lidah api, percikan dan, untuk Emas dan Pelangi, bintang. Pelangi memutar warnanya saat `animate`.
 - `padam` dan `hangus` abu-abu (`flame-gray-*`) dengan asap; `beku` menaruh api di dalam balok es dengan retakan yang bertambah menurut `cracks / need`.
 - `animate` menggoyang tiga lapis api tanpa henti. Pakai hanya selama layar terlihat (splash, layar Streak) dan bukan di daftar atau widget; reduce motion mematikannya.
+- Tambahan (2026-10-18, dari artifact desktop "Streak Api TermUL" versi `1792078599-27c9`): api yang `animate` juga **tertiup angin sepoi**. Ujung dan lengkung api miring searah hembusan (pangkal tetap), lapisan dalam tertinggal sedikit, percikan dan asap terdorong, dan api besar (40 ke atas) memperlihatkan garis hembusan putih tipis. `beku` tidak tertiup; `padam` dan `hangus` 0,8; bara 0,7. Rincian di motion.md "Hembusan angin". Prototipe `FlameArt` punya prop `wind` (`sepoi`, `mati`).
 - Selalu sertakan kata atau angka (tier, "padam", "beku") di dekat api; bentuk dan warna tidak berdiri sendiri.
