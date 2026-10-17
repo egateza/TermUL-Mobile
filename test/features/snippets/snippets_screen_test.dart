@@ -124,6 +124,18 @@ void main() {
       expect(find.text('Cek config lalu reload Nginx'), findsNothing);
     });
 
+    testWidgets('tombol x di kolom cari mengosongkan pencarian dan semua snippet tampil lagi', (tester) async {
+      await openTab(tester, initial: [_nginx, _status, _risky]);
+      await tester.enterText(find.byType(TextField), 'tidak-ada-ini');
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Tidak ada snippet yang cocok'), findsOneWidget);
+      await tester.tap(find.byKey(const ValueKey('field-clear')));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Tidak ada snippet yang cocok'), findsNothing);
+      expect(find.text('Status layanan'), findsOneWidget);
+      expect(find.byKey(const ValueKey('field-clear')), findsNothing);
+    });
+
     testWidgets('berkas snippet rusak: banner menyebut nama berkas dan bisa ditutup', (tester) async {
       final repo = MemorySnippetRepository();
       await Harness(

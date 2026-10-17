@@ -41,6 +41,10 @@
   "@actionCancel": {
     "description": "Tombol batal di sheet dan form."
   },
+  "actionClearSearch": "Hapus pencarian",
+  "@actionClearSearch": {
+    "description": "Tombol x di pojok kanan kolom pencarian: mengosongkan kata kunci."
+  },
   "actionClose": "Tutup",
   "@actionClose": {
     "description": "Tombol tutup banner atau sheet."

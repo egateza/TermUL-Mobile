@@ -6,7 +6,14 @@ import 'termul_icon.dart';
 
 /// Satu tab di [TermulNavBar].
 class NavItem {
-  const NavItem({required this.id, required this.label, required this.icon, this.badge = 0, this.semanticLabel, this.highlight});
+  const NavItem({
+    required this.id,
+    required this.label,
+    required this.icon,
+    this.badge = 0,
+    this.semanticLabel,
+    this.highlight,
+  });
 
   final String id;
 

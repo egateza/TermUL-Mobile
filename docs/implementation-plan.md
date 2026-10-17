@@ -1062,3 +1062,12 @@ Permintaan pemilik (2026-10-17): tab baru **Streak** di kiri Pengaturan, isinya 
 - **Artifact (sudah, 2026-10-17):** prototipe versi 61 (`1792253150-1905`) dan design system versi 61 (`1792253153-ee3d`); rincian di `docs/design/SUMBER.md`. Tab Streak masuk ke `Main`, `MainLandscape`, `Settings`, `Snippets`, contoh baru 15 (`StreakSoon`), README (butir `NavBar`), `NavBar/README.md` (`highlight`), dan `Icon/README.md` (`flame`). `Settings` sekaligus kehilangan tab SFTP lamanya (sisa keputusan 2026-10-17). Prototipe lain yang memuat bar navigasi (`ComingSoon`, `Sftp`, `SftpSources`) sudah tidak dipakai aplikasi dan tidak diubah.
 - **Uji HP (2026-10-17, dd3bf2af, build debug):** lima tab muat satu baris, perpindahan Host, Pengaturan, Streak berfungsi, ikon merah api dan label merah saat aktif; layar Streak sejajar dengan judul tab lain. Belum diuji: layar lebih sempit dan rel landscape.
 - **Belum dikerjakan:** streak sungguhan (api, chip, `streak.json`), tetap irisan tersendiri.
+
+## Tombol x hapus pencarian
+
+Permintaan pemilik (2026-10-18): semua kolom pencarian mendapat tombol x di pojok kanan untuk mengosongkan kata kunci.
+
+- **Kode:** `TermulTextField.clearLabel` (bila diisi dan ada `controller`): tombol `TermulIconButton` 44 dp muncul selama kolom berisi teks (kunci `field-clear`), mengosongkan kolom, memanggil `onChanged('')`, dan menjaga fokus supaya keyboard tetap terbuka. Dipakai di tiga kolom: Host potret, Host landscape, dan Snippet. Teks: `actionClearSearch` ("Hapus pencarian"). Kolom isian lain (form host, editor snippet) tidak memakainya.
+- **Tes:** `widgets_test.dart` (muncul hanya saat ada teks, 44 px, mengosongkan, memberi tahu, fokus bertahan; tanpa `clearLabel` tidak ada tombol), `main_shell_test.dart` (Host), `snippets_screen_test.dart` (Snippet); total 677 tes.
+- **Uji HP (2026-10-18, dd3bf2af, build **profile**):** di tab Host, mengetik "gapura" memunculkan x di pojok kanan, mengetuknya mengosongkan kolom, daftar kembali penuh, keyboard tetap terbuka. Kolom Snippet dan Host landscape belum dicoba di HP (landscape tidak aktif; Snippet diuji otomatis saja).
+- **Artifact:** prototipe versi 62 dan design system versi 62 (`SUMBER.md`); `MainLandscape` statis sehingga tidak memperlihatkan x.

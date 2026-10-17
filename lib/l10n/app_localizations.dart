@@ -145,6 +145,12 @@ abstract class AppLocalizations {
   /// **'Batal'**
   String get actionCancel;
 
+  /// Tombol x di pojok kanan kolom pencarian: mengosongkan kata kunci.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus pencarian'**
+  String get actionClearSearch;
+
   /// Tombol tutup banner atau sheet.
   ///
   /// In id, this message translates to:

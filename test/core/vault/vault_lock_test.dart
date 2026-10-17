@@ -147,10 +147,7 @@ void main() {
 
   test('gerbang yang gagal tetap melempar VaultAuthException saat terkunci', () async {
     auth.result = false;
-    await expectLater(
-      vault.get(_id, SecretType.loginPassword, reason: 'sambung'),
-      throwsA(isA<VaultAuthException>()),
-    );
+    await expectLater(vault.get(_id, SecretType.loginPassword, reason: 'sambung'), throwsA(isA<VaultAuthException>()));
   });
 
   test('SecuritySettings: bawaan mati, baca dan tulis JSON, bagian hilang memakai bawaan', () {

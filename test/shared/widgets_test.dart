@@ -215,6 +215,53 @@ void main() {
       expect(tester.getSize(find.byType(TermulTextField)).height, greaterThanOrEqualTo(TermulSize.inputH));
     });
 
+    testWidgets('tombol hapus: muncul hanya saat ada teks, 44 px, mengosongkan, memberi tahu, fokus bertahan', (
+      tester,
+    ) async {
+      final c = TextEditingController();
+      addTearDown(c.dispose);
+      final changes = <String>[];
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: 360,
+          child: TermulTextField(
+            label: 'Cari host',
+            hideLabel: true,
+            controller: c,
+            clearLabel: 'Hapus pencarian',
+            onChanged: changes.add,
+          ),
+        ),
+      );
+      final clear = find.byKey(const ValueKey('field-clear'));
+      expect(clear, findsNothing);
+      await tester.enterText(find.byType(TextField), 'abc');
+      await tester.pump();
+      expect(clear, findsOneWidget);
+      expect(find.bySemanticsLabel('Hapus pencarian'), findsOneWidget);
+      expect(tester.getSize(clear).width, greaterThanOrEqualTo(TermulSize.tapMin));
+      await tester.tap(clear);
+      await tester.pump();
+      expect(c.text, '');
+      expect(changes.last, '');
+      expect(clear, findsNothing);
+      expect(tester.widget<EditableText>(find.byType(EditableText)).focusNode.hasFocus, isTrue);
+    });
+
+    testWidgets('tanpa clearLabel tidak ada tombol hapus', (tester) async {
+      final c = TextEditingController(text: 'abc');
+      addTearDown(c.dispose);
+      await pumpApp(
+        tester,
+        SizedBox(
+          width: 360,
+          child: TermulTextField(label: 'Host', controller: c),
+        ),
+      );
+      expect(find.byKey(const ValueKey('field-clear')), findsNothing);
+    });
+
     testWidgets('galat ditampilkan dengan kata', (tester) async {
       await pumpApp(
         tester,

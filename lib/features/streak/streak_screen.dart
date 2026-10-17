@@ -34,11 +34,7 @@ class StreakScreen extends StatelessWidget {
             ),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space5),
-              child: TermulBanner(
-                tone: BannerTone.info,
-                title: l.streakSoonTitle,
-                child: Text(l.streakSoonBody),
-              ),
+              child: TermulBanner(tone: BannerTone.info, title: l.streakSoonTitle, child: Text(l.streakSoonBody)),
             ),
           ],
         ),

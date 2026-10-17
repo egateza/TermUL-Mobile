@@ -13,7 +13,9 @@ import 'hosts_ui_harness.dart';
 Finder tab(String label) => find.descendant(of: find.byType(TermulNavBar), matching: find.text(label));
 
 void main() {
-  testWidgets('lima tab (Streak di kiri Pengaturan); Host aktif dan tab lain dibangun saat pertama dibuka', (tester) async {
+  testWidgets('lima tab (Streak di kiri Pengaturan); Host aktif dan tab lain dibangun saat pertama dibuka', (
+    tester,
+  ) async {
     await Harness().pump(tester);
     expect(find.byType(HostListScreen), findsOneWidget);
     expect(find.byType(SessionsScreen), findsNothing);
@@ -67,6 +69,21 @@ void main() {
     await tester.tap(tab('Host'));
     await tester.pumpAndSettle();
     expect(find.text('abc'), findsOneWidget);
+  });
+
+  testWidgets('kolom pencarian Host punya tombol x yang mengosongkan pencarian dan daftar kembali penuh', (
+    tester,
+  ) async {
+    await Harness().pump(tester);
+    final clear = find.byKey(const ValueKey('field-clear'));
+    expect(clear, findsNothing);
+    await tester.enterText(find.byType(TextField).first, 'abc');
+    await tester.pump();
+    expect(clear, findsOneWidget);
+    await tester.tap(clear);
+    await tester.pump();
+    expect(find.text('abc'), findsNothing);
+    expect(clear, findsNothing);
   });
 
   testWidgets('tombol kembali dari tab lain menuju Host dulu', (tester) async {

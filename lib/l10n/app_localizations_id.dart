@@ -39,6 +39,9 @@ class AppLocalizationsId extends AppLocalizations {
   String get actionCancel => 'Batal';
 
   @override
+  String get actionClearSearch => 'Hapus pencarian';
+
+  @override
   String get actionClose => 'Tutup';
 
   @override

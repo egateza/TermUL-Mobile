@@ -248,6 +248,7 @@ class _SnippetsScreenState extends ConsumerState<SnippetsScreen> {
                   hideLabel: true,
                   icon: TermulIconName.search,
                   placeholder: l.snippetsSearchPlaceholder,
+                  clearLabel: l.actionClearSearch,
                   controller: _search,
                   onChanged: (v) => setState(() => _query = v),
                 ),

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 
 import '../../core/theme/termul_theme.dart';
 import 'termul_icon.dart';
+import 'termul_icon_button.dart';
 
 /// Kolom input satu baris, 48 px, tepi `line-strong`, cincin `accent` saat fokus. [label] wajib; dengan
 /// [hideLabel] label disembunyikan secara visual tetapi tetap dibaca pembaca layar. Placeholder bukan
@@ -25,6 +26,7 @@ class TermulTextField extends StatefulWidget {
     this.autofocus = false,
     this.enabled = true,
     this.suffix,
+    this.clearLabel,
     this.minLines,
     this.maxLines = 1,
   });
@@ -45,6 +47,11 @@ class TermulTextField extends StatefulWidget {
   final bool autofocus;
   final bool enabled;
   final Widget? suffix;
+
+  /// Nama tombol hapus ("Hapus pencarian"). Bila diisi (dan ada [controller]), tombol x 44 px muncul di pojok kanan
+  /// selama kolom berisi teks; mengetuknya mengosongkan kolom, memanggil [onChanged] dengan teks kosong, dan
+  /// mempertahankan fokus (keyboard tetap terbuka).
+  final String? clearLabel;
 
   /// Isian beberapa baris (perintah snippet): tinggi tumbuh dari [minLines] sampai [maxLines], lalu digulir.
   final int? minLines;
@@ -70,6 +77,12 @@ class _TermulTextFieldState extends State<TermulTextField> {
     super.dispose();
   }
 
+  void _clear() {
+    widget.controller?.clear();
+    widget.onChanged?.call('');
+    _focus.requestFocus();
+  }
+
   @override
   Widget build(BuildContext context) {
     final style = (widget.mono ? TermulText.terminal : TermulText.body).copyWith(color: TermulPalette.ink);
@@ -86,7 +99,11 @@ class _TermulTextFieldState extends State<TermulTextField> {
           children: [
             Container(
               constraints: const BoxConstraints(minHeight: TermulSize.inputH),
-              padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space6),
+              // Dengan tombol hapus di kanan, jarak kanan dikecilkan supaya tombol 44 px menempel ke pojok.
+              padding: EdgeInsetsDirectional.only(
+                start: TermulSpacing.space6,
+                end: widget.clearLabel != null && widget.controller != null ? 2 : TermulSpacing.space6,
+              ),
               decoration: BoxDecoration(
                 color: TermulPalette.surface,
                 borderRadius: BorderRadius.circular(TermulRadius.radiusLg),
@@ -129,6 +146,18 @@ class _TermulTextFieldState extends State<TermulTextField> {
                     ),
                   ),
                   ?widget.suffix,
+                  if (widget.clearLabel != null && widget.controller != null)
+                    ValueListenableBuilder<TextEditingValue>(
+                      valueListenable: widget.controller!,
+                      builder: (context, value, _) => value.text.isEmpty || !widget.enabled
+                          ? const SizedBox(width: TermulSpacing.space4)
+                          : TermulIconButton(
+                              key: const ValueKey('field-clear'),
+                              icon: TermulIconName.close,
+                              label: widget.clearLabel!,
+                              onPressed: _clear,
+                            ),
+                    ),
                 ],
               ),
             ),
