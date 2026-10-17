@@ -1951,29 +1951,53 @@ abstract class AppLocalizations {
   /// **'Berkas diterima, tetapi tidak bisa disimpan ke Unduhan'**
   String get sftpSaveFailed;
 
-  /// Judul konfirmasi menimpa berkas di server.
-  ///
-  /// In id, this message translates to:
-  /// **'Timpa {name}?'**
-  String sftpOverwriteTitle(String name);
-
-  /// Isi konfirmasi menimpa berkas.
-  ///
-  /// In id, this message translates to:
-  /// **'Berkas dengan nama ini sudah ada di {dir}. Isinya akan diganti.'**
-  String sftpOverwriteBody(String dir);
-
-  /// Tombol konfirmasi menimpa.
-  ///
-  /// In id, this message translates to:
-  /// **'Timpa'**
-  String get sftpOverwriteConfirm;
-
   /// Nama tombol membatalkan satu transfer.
   ///
   /// In id, this message translates to:
   /// **'Batalkan transfer'**
   String get sftpTransferCancel;
+
+  /// Judul pilihan saat nama berkas sudah dipakai.
+  ///
+  /// In id, this message translates to:
+  /// **'{name} sudah ada'**
+  String sftpConflictTitle(String name);
+
+  /// Isi pilihan konflik nama (unggah).
+  ///
+  /// In id, this message translates to:
+  /// **'Di {dir} di server. Pilih cara menyimpannya.'**
+  String sftpConflictBodyUpload(String dir);
+
+  /// Isi pilihan konflik nama (unduh).
+  ///
+  /// In id, this message translates to:
+  /// **'Di Unduhan/TermUL. Pilih cara menyimpannya.'**
+  String get sftpConflictBodyDownload;
+
+  /// Tombol utama: simpan dengan nama bernomor.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan sebagai {name}'**
+  String sftpConflictRename(String name);
+
+  /// Tombol berisiko: ganti isi berkas lama.
+  ///
+  /// In id, this message translates to:
+  /// **'Timpa berkas lama'**
+  String get sftpConflictOverwrite;
+
+  /// Catatan akibat menimpa.
+  ///
+  /// In id, this message translates to:
+  /// **'Menimpa mengganti isi berkas lama dan tidak bisa dibatalkan.'**
+  String get sftpConflictOverwriteNote;
+
+  /// Toast setelah unduhan menimpa berkas lama.
+  ///
+  /// In id, this message translates to:
+  /// **'Ditimpa di {location} · {name}'**
+  String sftpDownloadedOverwritten(String location, String name);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -13,14 +13,22 @@ import 'package:termul_mobile/features/sftp/sftp_transfer_actions.dart';
 import 'sftp_browser_test.dart' show FakeFiles, file;
 
 class FakeSaver implements DownloadsSaver {
-  final saved = <({String name, Uint8List bytes})>[];
+  final saved = <({String name, Uint8List bytes, bool overwrite})>[];
+  final existing = <String>{};
   Object? error;
 
   @override
-  Future<SavedDownload> save({required String path, required String name}) async {
+  Future<bool> exists(String name) async => existing.contains(name);
+
+  @override
+  Future<SavedDownload> save({required String path, required String name, bool overwrite = false}) async {
     if (error != null) throw error!;
-    saved.add((name: name, bytes: File(path).readAsBytesSync()));
-    return SavedDownload(name: name == 'a.txt' ? 'a (1).txt' : name, location: 'Unduhan/TermUL');
+    saved.add((name: name, bytes: File(path).readAsBytesSync(), overwrite: overwrite));
+    return SavedDownload(
+      name: name == 'a.txt' && !overwrite ? 'a (1).txt' : name,
+      location: 'Unduhan/TermUL',
+      overwritten: overwrite,
+    );
   }
 }
 
@@ -116,6 +124,25 @@ void main() {
     server.uploadFailure = const SftpFailure(SftpFailureKind.connectionLost, 'putus');
     final out = await actions.upload(f, '/');
     expect(out, isA<TransferFailed>().having((o) => o.kind, 'kind', SftpFailureKind.connectionLost));
+  });
+
+  test('unduh dengan nama lain dan menimpa: nama dan tanda timpa diteruskan ke penyimpan', () async {
+    final renamed = await actions.download(file('/', 'b.bin', size: 1000), saveAs: 'b (2).bin');
+    expect(saver.saved.last.name, 'b (2).bin');
+    expect(saver.saved.last.overwrite, isFalse);
+    expect((renamed as TransferDone).savedName, 'b (2).bin');
+
+    final over = await actions.download(file('/', 'b.bin', size: 1000), overwrite: true);
+    expect(saver.saved.last.name, 'b.bin');
+    expect(saver.saved.last.overwrite, isTrue);
+    expect((over as TransferDone).overwritten, isTrue);
+  });
+
+  test('unggah dengan nama lain: jalur memakai nama baru', () async {
+    final f = XFile((File('${tmp.path}${Platform.pathSeparator}c.txt')..writeAsBytesSync(List.filled(10, 1))).path);
+    final out = await actions.upload(f, '/data', remoteName: 'c (1).txt');
+    expect(out.name, 'c (1).txt');
+    expect(server.uploaded, {'/data/c (1).txt': 10});
   });
 
   test('progres dibatasi lajunya; yang pertama dan nilai akhir selalu sampai', () async {

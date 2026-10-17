@@ -1522,30 +1522,59 @@
   "@sftpSaveFailed": {
     "description": "Toast bila penyimpanan ke Unduhan gagal."
   },
-  "sftpOverwriteTitle": "Timpa {name}?",
-  "@sftpOverwriteTitle": {
-    "description": "Judul konfirmasi menimpa berkas di server.",
+  "sftpTransferCancel": "Batalkan transfer",
+  "@sftpTransferCancel": {
+    "description": "Nama tombol membatalkan satu transfer."
+  },
+  "sftpConflictTitle": "{name} sudah ada",
+  "@sftpConflictTitle": {
+    "description": "Judul pilihan saat nama berkas sudah dipakai.",
     "placeholders": {
       "name": {
         "type": "String"
       }
     }
   },
-  "sftpOverwriteBody": "Berkas dengan nama ini sudah ada di {dir}. Isinya akan diganti.",
-  "@sftpOverwriteBody": {
-    "description": "Isi konfirmasi menimpa berkas.",
+  "sftpConflictBodyUpload": "Di {dir} di server. Pilih cara menyimpannya.",
+  "@sftpConflictBodyUpload": {
+    "description": "Isi pilihan konflik nama (unggah).",
     "placeholders": {
       "dir": {
         "type": "String"
       }
     }
   },
-  "sftpOverwriteConfirm": "Timpa",
-  "@sftpOverwriteConfirm": {
-    "description": "Tombol konfirmasi menimpa."
+  "sftpConflictBodyDownload": "Di Unduhan/TermUL. Pilih cara menyimpannya.",
+  "@sftpConflictBodyDownload": {
+    "description": "Isi pilihan konflik nama (unduh)."
   },
-  "sftpTransferCancel": "Batalkan transfer",
-  "@sftpTransferCancel": {
-    "description": "Nama tombol membatalkan satu transfer."
+  "sftpConflictRename": "Simpan sebagai {name}",
+  "@sftpConflictRename": {
+    "description": "Tombol utama: simpan dengan nama bernomor.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpConflictOverwrite": "Timpa berkas lama",
+  "@sftpConflictOverwrite": {
+    "description": "Tombol berisiko: ganti isi berkas lama."
+  },
+  "sftpConflictOverwriteNote": "Menimpa mengganti isi berkas lama dan tidak bisa dibatalkan.",
+  "@sftpConflictOverwriteNote": {
+    "description": "Catatan akibat menimpa."
+  },
+  "sftpDownloadedOverwritten": "Ditimpa di {location} · {name}",
+  "@sftpDownloadedOverwritten": {
+    "description": "Toast setelah unduhan menimpa berkas lama.",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
   }
 }

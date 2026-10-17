@@ -26,11 +26,17 @@ late SftpLink lastLink;
 
 class _Saver implements DownloadsSaver {
   final saved = <String>[];
+  final overwrites = <bool>[];
+  final existing = <String>{};
 
   @override
-  Future<SavedDownload> save({required String path, required String name}) async {
+  Future<bool> exists(String name) async => existing.contains(name);
+
+  @override
+  Future<SavedDownload> save({required String path, required String name, bool overwrite = false}) async {
     saved.add(name);
-    return SavedDownload(name: name, location: 'Unduhan/TermUL');
+    overwrites.add(overwrite);
+    return SavedDownload(name: name, location: 'Unduhan/TermUL', overwritten: overwrite);
   }
 }
 
@@ -63,6 +69,8 @@ Future<FakeFiles> pumpBrowser(WidgetTester tester, {Size size = const Size(390, 
     }
   });
   _saver.saved.clear();
+  _saver.overwrites.clear();
+  _saver.existing.clear();
   _picker.next = [];
   final fake = FakeFiles({
     '/home/u': [dir('/home/u', 'proyek'), file('/home/u', 'catatan.txt', size: 1229)],
@@ -194,26 +202,87 @@ void main() {
       await tester.pump(const Duration(seconds: 3));
     });
 
-    testWidgets('Unggah: nama yang sudah ada ditanyakan; Batal melewati, Timpa mengunggah', (tester) async {
+    testWidgets('Unggah, nama sudah ada: Batal melewati, nama lain bernomor, Timpa mengganti', (tester) async {
       final fake = await pumpBrowser(tester);
       final f = File('${_tmp.path}${Platform.pathSeparator}catatan.txt')..writeAsBytesSync(List.filled(500, 3));
       _picker.next = [XFile(f.path)];
 
       await tester.tap(find.bySemanticsLabel('Unggah berkas'));
-      await tester.pumpAndSettle();
-      expect(find.text('Timpa catatan.txt?'), findsOneWidget);
-      expect(find.textContaining('sudah ada di /home/u'), findsOneWidget);
+      await settle(tester);
+      expect(find.text('catatan.txt sudah ada'), findsOneWidget);
+      expect(find.text('Simpan sebagai catatan (1).txt'), findsOneWidget);
+      expect(find.text('Timpa berkas lama'), findsOneWidget);
+      expect(find.textContaining('Di /home/u di server'), findsOneWidget);
       await tester.tap(find.text('Batal'));
-      await tester.pumpAndSettle();
+      await settle(tester);
       expect(fake.uploaded, isEmpty);
 
       await tester.tap(find.bySemanticsLabel('Unggah berkas'));
-      await tester.pumpAndSettle();
-      await tester.tap(find.text('Timpa'));
+      await settle(tester);
+      await tester.tap(find.text('Simpan sebagai catatan (1).txt'));
+      await settle(tester);
+      expect(fake.uploaded, {'/home/u/catatan (1).txt': 500});
+      expect(find.text('Diunggah · catatan (1).txt'), findsOneWidget);
+      await tester.pump(const Duration(seconds: 3));
+
+      fake.uploaded.clear();
+      await tester.tap(find.bySemanticsLabel('Unggah berkas'));
+      await settle(tester);
+      await tester.tap(find.text('Timpa berkas lama'));
       await settle(tester);
       expect(fake.uploaded, {'/home/u/catatan.txt': 500});
-      expect(find.text('Diunggah · catatan.txt'), findsOneWidget);
-      expect(fake.listed.where((d) => d == '/home/u').length, greaterThanOrEqualTo(2), reason: 'daftar dimuat ulang');
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('Unggah, nama bernomor juga ada: nomor berikutnya yang bebas', (tester) async {
+      final fake = await pumpBrowser(tester);
+      fake.tree['/home/u']!.add(file('/home/u', 'catatan (1).txt'));
+      await tester.tap(find.bySemanticsLabel('Muat ulang'));
+      await settle(tester);
+      final f = File('${_tmp.path}${Platform.pathSeparator}catatan.txt')..writeAsBytesSync(List.filled(20, 3));
+      _picker.next = [XFile(f.path)];
+      await tester.tap(find.bySemanticsLabel('Unggah berkas'));
+      await settle(tester);
+      expect(find.text('Simpan sebagai catatan (2).txt'), findsOneWidget);
+      await tester.tap(find.text('Simpan sebagai catatan (2).txt'));
+      await settle(tester);
+      expect(fake.uploaded, {'/home/u/catatan (2).txt': 20});
+      await tester.pump(const Duration(seconds: 3));
+    });
+
+    testWidgets('Unduh, nama sudah ada di Unduhan/TermUL: nama lain, timpa, atau batal', (tester) async {
+      await pumpBrowser(tester);
+      _saver.existing.addAll({'catatan.txt', 'catatan (1).txt'});
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
+
+      await tester.tap(find.text('Unduh'));
+      await settle(tester);
+      expect(find.text('catatan.txt sudah ada'), findsOneWidget);
+      expect(find.text('Simpan sebagai catatan (2).txt'), findsOneWidget, reason: 'melewati (1) yang sudah ada');
+      expect(find.textContaining('Unduhan/TermUL'), findsOneWidget);
+      await tester.tap(find.text('Batal'));
+      await settle(tester);
+      expect(_saver.saved, isEmpty);
+
+      await tester.tap(find.text('Unduh'));
+      await settle(tester);
+      await tester.tap(find.text('Simpan sebagai catatan (2).txt'));
+      await settle(tester);
+      expect(_saver.saved, ['catatan (2).txt']);
+      expect(_saver.overwrites, [false]);
+      expect(find.text('Diunduh ke Unduhan/TermUL · catatan (2).txt'), findsOneWidget);
+      // Toast menutupi tombol Unduh; tutup dulu.
+      tester.state<ScaffoldMessengerState>(find.byType(ScaffoldMessenger).first).hideCurrentSnackBar();
+      await tester.pumpAndSettle();
+
+      await tester.tap(find.text('Unduh'));
+      await settle(tester);
+      await tester.tap(find.text('Timpa berkas lama'));
+      await settle(tester);
+      expect(_saver.saved.last, 'catatan.txt');
+      expect(_saver.overwrites.last, isTrue);
+      expect(find.text('Ditimpa di Unduhan/TermUL · catatan.txt'), findsOneWidget);
       await tester.pump(const Duration(seconds: 3));
     });
 

@@ -1078,18 +1078,34 @@ class AppLocalizationsId extends AppLocalizations {
   String get sftpSaveFailed => 'Berkas diterima, tetapi tidak bisa disimpan ke Unduhan';
 
   @override
-  String sftpOverwriteTitle(String name) {
-    return 'Timpa $name?';
-  }
-
-  @override
-  String sftpOverwriteBody(String dir) {
-    return 'Berkas dengan nama ini sudah ada di $dir. Isinya akan diganti.';
-  }
-
-  @override
-  String get sftpOverwriteConfirm => 'Timpa';
-
-  @override
   String get sftpTransferCancel => 'Batalkan transfer';
+
+  @override
+  String sftpConflictTitle(String name) {
+    return '$name sudah ada';
+  }
+
+  @override
+  String sftpConflictBodyUpload(String dir) {
+    return 'Di $dir di server. Pilih cara menyimpannya.';
+  }
+
+  @override
+  String get sftpConflictBodyDownload => 'Di Unduhan/TermUL. Pilih cara menyimpannya.';
+
+  @override
+  String sftpConflictRename(String name) {
+    return 'Simpan sebagai $name';
+  }
+
+  @override
+  String get sftpConflictOverwrite => 'Timpa berkas lama';
+
+  @override
+  String get sftpConflictOverwriteNote => 'Menimpa mengganti isi berkas lama dan tidak bisa dibatalkan.';
+
+  @override
+  String sftpDownloadedOverwritten(String location, String name) {
+    return 'Ditimpa di $location · $name';
+  }
 }

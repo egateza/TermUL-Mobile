@@ -3,10 +3,13 @@ import 'package:flutter/services.dart';
 /// Hasil menyimpan berkas ke Unduhan: [name] bisa berbeda dari yang diminta (nama kembar diberi akhiran
 /// " (1)"), [location] jalur yang ditampilkan ke pengguna.
 class SavedDownload {
-  const SavedDownload({required this.name, required this.location});
+  const SavedDownload({required this.name, required this.location, this.overwritten = false});
 
   final String name;
   final String location;
+
+  /// true bila berkas lama dengan nama itu diganti isinya (bukan berkas baru).
+  final bool overwritten;
 }
 
 /// Gagal menyimpan ke Unduhan (penyimpanan penuh, MediaStore menolak, berkas sumber hilang).
@@ -21,7 +24,12 @@ class DownloadSaveException implements Exception {
 
 /// Menyalin berkas yang sudah selesai diunduh ke folder Unduhan/TermUL (`DownloadsSaver.kt`). Android saja.
 abstract interface class DownloadsSaver {
-  Future<SavedDownload> save({required String path, required String name});
+  /// Ada berkas bernama [name] di Unduhan/TermUL yang bisa dilihat aplikasi (milik aplikasi ini).
+  Future<bool> exists(String name);
+
+  /// Menyalin [path] ke Unduhan/TermUL sebagai [name]. Dengan [overwrite], berkas lama milik aplikasi diganti isinya;
+  /// bila tidak bisa diganti, hasilnya disimpan bernomor dan [SavedDownload.overwritten] false.
+  Future<SavedDownload> save({required String path, required String name, bool overwrite = false});
 }
 
 class MethodChannelDownloadsSaver implements DownloadsSaver {
@@ -31,11 +39,30 @@ class MethodChannelDownloadsSaver implements DownloadsSaver {
   final MethodChannel _channel;
 
   @override
-  Future<SavedDownload> save({required String path, required String name}) async {
+  Future<bool> exists(String name) async {
     try {
-      final r = await _channel.invokeMapMethod<String, String>('save', {'path': path, 'name': name});
+      return await _channel.invokeMethod<bool>('exists', {'name': name}) ?? false;
+    } on PlatformException {
+      return false;
+    } on MissingPluginException {
+      return false;
+    }
+  }
+
+  @override
+  Future<SavedDownload> save({required String path, required String name, bool overwrite = false}) async {
+    try {
+      final r = await _channel.invokeMapMethod<String, Object?>('save', {
+        'path': path,
+        'name': name,
+        'overwrite': overwrite,
+      });
       if (r == null) throw const DownloadSaveException();
-      return SavedDownload(name: r['name'] ?? name, location: r['location'] ?? 'Unduhan/TermUL');
+      return SavedDownload(
+        name: (r['name'] as String?) ?? name,
+        location: (r['location'] as String?) ?? 'Unduhan/TermUL',
+        overwritten: (r['overwritten'] as bool?) ?? false,
+      );
     } on PlatformException catch (e) {
       throw DownloadSaveException(e.code);
     } on MissingPluginException catch (e) {

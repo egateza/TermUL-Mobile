@@ -43,25 +43,43 @@ class MainActivity : FlutterFragmentActivity() {
         val downloads = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/downloads")
         downloadsChannel = downloads
         downloads.setMethodCallHandler { call, result ->
-            if (call.method != "save") {
-                result.notImplemented()
-                return@setMethodCallHandler
-            }
-            val path = call.argument<String>("path")
             val name = call.argument<String>("name")
-            if (path == null || name == null) {
-                result.error("bad_args", "path dan name wajib", null)
+            if (name == null) {
+                result.error("bad_args", "name wajib", null)
                 return@setMethodCallHandler
             }
-            // Berkas bisa ratusan MB: salin di thread latar belakang, jawab di thread utama.
-            Thread {
-                try {
-                    val saved = DownloadsSaver.save(applicationContext, path, name)
-                    runOnUiThread { result.success(mapOf("name" to saved.name, "location" to saved.location)) }
-                } catch (e: Exception) {
-                    runOnUiThread { result.error("save_failed", e.javaClass.simpleName, null) }
+            when (call.method) {
+                "exists" -> Thread {
+                    try {
+                        val found = DownloadsSaver.exists(applicationContext, name)
+                        runOnUiThread { result.success(found) }
+                    } catch (e: Exception) {
+                        runOnUiThread { result.error("exists_failed", e.javaClass.simpleName, null) }
+                    }
+                }.start()
+                "save" -> {
+                    val path = call.argument<String>("path")
+                    if (path == null) {
+                        result.error("bad_args", "path wajib", null)
+                        return@setMethodCallHandler
+                    }
+                    val overwrite = call.argument<Boolean>("overwrite") ?: false
+                    // Berkas bisa ratusan MB: salin di thread latar belakang, jawab di thread utama.
+                    Thread {
+                        try {
+                            val saved = DownloadsSaver.save(applicationContext, path, name, overwrite)
+                            runOnUiThread {
+                                result.success(
+                                    mapOf("name" to saved.name, "location" to saved.location, "overwritten" to saved.overwritten),
+                                )
+                            }
+                        } catch (e: Exception) {
+                            runOnUiThread { result.error("save_failed", e.javaClass.simpleName, null) }
+                        }
+                    }.start()
                 }
-            }.start()
+                else -> result.notImplemented()
+            }
         }
         ch.setMethodCallHandler { call, result ->
             when (call.method) {

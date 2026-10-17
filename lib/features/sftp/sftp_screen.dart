@@ -14,6 +14,7 @@ import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
+import '../../shared/widgets/termul_action_sheet.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_toast.dart';
 import '../connect/connect_flow.dart';
@@ -25,6 +26,7 @@ import 'sftp_browser_controller.dart';
 import 'sftp_format.dart';
 import 'sftp_link.dart';
 import 'sftp_transfer_actions.dart';
+import 'unique_name.dart';
 import 'sftp_transfers.dart';
 
 /// Tab SFTP: memilih sumber sambungan. Sesi terminal yang sedang hidup di latar belakang bisa dipinjam
@@ -263,10 +265,14 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
 
   void _toastOutcome(ScaffoldMessengerState messenger, AppLocalizations l, TransferOutcome o, {required bool upload}) {
     switch (o) {
-      case TransferDone(:final location, :final savedName):
+      case TransferDone(:final location, :final savedName, :final overwritten):
         showTermulToastOn(
           messenger,
-          upload ? l.sftpUploaded(o.name) : l.sftpDownloaded(location ?? 'Unduhan', savedName ?? o.name),
+          upload
+              ? l.sftpUploaded(o.name)
+              : (overwritten
+                    ? l.sftpDownloadedOverwritten(location ?? 'Unduhan', savedName ?? o.name)
+                    : l.sftpDownloaded(location ?? 'Unduhan', savedName ?? o.name)),
         );
       case TransferCancelled():
         showTermulToastOn(messenger, l.sftpTransferCancelledToast(o.name), icon: TermulIconName.warning);
@@ -284,7 +290,25 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
   Future<void> _download(SftpEntry entry) async {
     final messenger = ScaffoldMessenger.of(context);
     final l = AppLocalizations.of(context);
-    final outcome = await _actions.download(entry);
+    final saver = ref.read(downloadsSaverProvider);
+    String? saveAs;
+    var overwrite = false;
+    if (await saver.exists(entry.name)) {
+      if (!mounted) return;
+      // Nama bebas berikutnya menurut yang terlihat di Unduhan/TermUL.
+      final taken = <String>{entry.name};
+      var candidate = uniqueName(entry.name, taken.contains);
+      while (await saver.exists(candidate)) {
+        taken.add(candidate);
+        candidate = uniqueName(entry.name, taken.contains);
+      }
+      if (!mounted) return;
+      final choice = await _askConflict(entry.name, suggested: candidate, upload: false, dir: '');
+      if (choice == _Conflict.cancel || !mounted) return;
+      if (choice == _Conflict.rename) saveAs = candidate;
+      overwrite = choice == _Conflict.overwrite;
+    }
+    final outcome = await _actions.download(entry, saveAs: saveAs, overwrite: overwrite);
     if (!mounted) return;
     _toastOutcome(messenger, l, outcome, upload: false);
   }
@@ -301,31 +325,19 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     final dir = browser.path;
     for (final f in files) {
       if (!mounted) return;
+      String? remoteName;
       if (browser.entries.any((e) => e.name == f.name)) {
-        final ok = await _confirmOverwrite(f.name, dir);
-        if (!ok || !mounted) continue;
+        final names = {for (final e in browser.entries) e.name};
+        final suggested = uniqueName(f.name, names.contains);
+        final choice = await _askConflict(f.name, suggested: suggested, upload: true, dir: dir);
+        if (choice == _Conflict.cancel || !mounted) continue;
+        if (choice == _Conflict.rename) remoteName = suggested;
       }
-      final outcome = await _actions.upload(f, dir);
+      final outcome = await _actions.upload(f, dir, remoteName: remoteName);
       if (!mounted) return;
       _toastOutcome(messenger, l, outcome, upload: true);
       if (outcome is TransferDone) unawaited(browser.refresh());
     }
-  }
-
-  Future<bool> _confirmOverwrite(String name, String dir) async {
-    final l = AppLocalizations.of(context);
-    var ok = false;
-    await showTermulSheet<void>(
-      context,
-      title: l.sftpOverwriteTitle(name),
-      child: Text(l.sftpOverwriteBody(dir), style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
-      cancelLabel: l.actionCancel,
-      confirmLabel: l.sftpOverwriteConfirm,
-      confirmIsDanger: true,
-      cancelIsPrimary: true,
-      onConfirm: () => ok = true,
-    );
-    return ok;
   }
 
   /// Keluar selalu meminta konfirmasi selagi sambungan sudah terbuka. Bila ada transfer berjalan, isinya
@@ -357,6 +369,39 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
         navigator.pop();
       },
     );
+  }
+
+  /// Nama sudah dipakai (di server untuk unggah, di Unduhan/TermUL untuk unduh): simpan dengan nama bernomor
+  /// (pilihan aman, tombol utama), timpa (berisiko), atau batal.
+  Future<_Conflict> _askConflict(
+    String name, {
+    required String suggested,
+    required bool upload,
+    required String dir,
+  }) async {
+    final l = AppLocalizations.of(context);
+    var choice = _Conflict.cancel;
+    await showTermulActions(
+      context,
+      title: l.sftpConflictTitle(name),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        spacing: TermulSpacing.space3,
+        children: [
+          Text(
+            upload ? l.sftpConflictBodyUpload(dir) : l.sftpConflictBodyDownload,
+            style: TermulText.body.copyWith(color: TermulPalette.inkSoft),
+          ),
+          Text(l.sftpConflictOverwriteNote, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
+        ],
+      ),
+      actions: [
+        SheetAction(label: l.sftpConflictRename(suggested), primary: true, onSelected: () => choice = _Conflict.rename),
+        SheetAction(label: l.sftpConflictOverwrite, danger: true, onSelected: () => choice = _Conflict.overwrite),
+        SheetAction(label: l.actionCancel, onSelected: () {}),
+      ],
+    );
+    return choice;
   }
 
   @override
@@ -1018,3 +1063,5 @@ class _TransferPanel extends StatelessWidget {
     );
   }
 }
+
+enum _Conflict { rename, overwrite, cancel }

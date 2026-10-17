@@ -17,10 +17,13 @@ sealed class TransferOutcome {
 
 final class TransferDone extends TransferOutcome {
   /// [location] hanya untuk unduhan (mis. `Unduhan/TermUL`); [savedName] bisa berbeda dari [name].
-  const TransferDone(super.name, {this.location, this.savedName});
+  const TransferDone(super.name, {this.location, this.savedName, this.overwritten = false});
 
   final String? location;
   final String? savedName;
+
+  /// Unduhan: isi berkas lama diganti.
+  final bool overwritten;
 }
 
 final class TransferCancelled extends TransferOutcome {
@@ -75,9 +78,10 @@ class SftpTransferActions {
     };
   }
 
-  /// Mengunduh [entry] lalu menyalinnya ke Unduhan/TermUL. Berkas sementara selalu dihapus; bila dibatalkan atau
-  /// gagal, tidak ada yang muncul di Unduhan.
-  Future<TransferOutcome> download(SftpEntry entry) async {
+  /// Mengunduh [entry] lalu menyalinnya ke Unduhan/TermUL sebagai [saveAs] (bawaan: nama aslinya). Dengan [overwrite],
+  /// berkas lama bernama sama diganti. Berkas sementara selalu dihapus; bila dibatalkan atau gagal, tidak ada yang
+  /// muncul di Unduhan.
+  Future<TransferOutcome> download(SftpEntry entry, {String? saveAs, bool overwrite = false}) async {
     final ops = _ops;
     if (ops == null) return TransferFailed(entry.name, SftpFailureKind.other);
     final t = link.transfers.start(name: entry.name, upload: false, total: entry.size);
@@ -98,8 +102,13 @@ class SftpTransferActions {
       }
       if (t.cancel.isCancelled) return TransferCancelled(entry.name);
       try {
-        final saved = await saver.save(path: temp.path, name: entry.name);
-        return TransferDone(entry.name, location: saved.location, savedName: saved.name);
+        final saved = await saver.save(path: temp.path, name: saveAs ?? entry.name, overwrite: overwrite);
+        return TransferDone(
+          entry.name,
+          location: saved.location,
+          savedName: saved.name,
+          overwritten: saved.overwritten,
+        );
       } on DownloadSaveException {
         return TransferFailed(entry.name, SftpFailureKind.other, saveFailed: true);
       }
@@ -119,11 +128,12 @@ class SftpTransferActions {
     }
   }
 
-  /// Mengunggah [file] ke folder [dir] di server (menimpa berkas bernama sama; pemanggil yang menanyakan). Berkas
-  /// parsial di server dihapus bila dibatalkan atau gagal ([SftpService.upload]).
-  Future<TransferOutcome> upload(XFile file, String dir) async {
+  /// Mengunggah [file] ke folder [dir] di server sebagai [remoteName] (bawaan: nama berkasnya; menimpa berkas bernama
+  /// sama, pemanggil yang menanyakan). Berkas parsial di server dihapus bila dibatalkan atau gagal
+  /// ([SftpService.upload]).
+  Future<TransferOutcome> upload(XFile file, String dir, {String? remoteName}) async {
     final ops = _ops;
-    final name = file.name;
+    final name = remoteName ?? file.name;
     if (ops == null) return TransferFailed(name, SftpFailureKind.other);
     int? total;
     try {

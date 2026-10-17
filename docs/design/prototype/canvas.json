@@ -452,7 +452,16 @@
    "y": 6672,
    "w": 390,
    "h": 844,
-   "title": "4i · SFTP: konfirmasi menimpa berkas",
+   "title": "4i · SFTP: nama berkas sudah ada (unggah): nama lain, timpa, batal",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SftpConflictDownload.dc.html": {
+   "x": 3760,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4j · SFTP: nama berkas sudah ada (unduh)",
    "is_interactive": true,
    "radius": 28
   }
@@ -507,7 +516,8 @@
   "SftpWaiting.dc.html",
   "SftpNeedsAuth.dc.html",
   "SftpTransfer.dc.html",
-  "SftpOverwrite.dc.html"
+  "SftpOverwrite.dc.html",
+  "SftpConflictDownload.dc.html"
  ],
  "notes": {
   "judul": {
