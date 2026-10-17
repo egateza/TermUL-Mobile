@@ -20,9 +20,10 @@ enum FlameMode { active, gray, frozen, reset }
 /// terlihat. Selalu sertakan kata atau angka di dekat api; dengan [semanticLabel] null api disembunyikan dari pembaca
 /// layar (dekoratif).
 ///
-/// Api yang bergoyang juga tertiup angin ([flameWind]; artifact desktop "Streak Api TermUL" versi `1792078599-27c9`):
+/// Api yang bergoyang juga tertiup angin ([flameWind]; artifact desktop "Streak Api TermUL" versi `1792273284-2261`):
 /// ujung dan lengkung api miring searah hembusan, lapisan dalam tertinggal sedikit, percikan dan asap terdorong, dan
-/// api setinggi 40 ke atas memperlihatkan garis hembusan. Api beku tidak tertiup.
+/// api setinggi 40 ke atas memperlihatkan garis hembusan. Saat hujan badai api mengecil sedikit (8%) dan bergoyang
+/// lebih kuat; hujan dan kilatnya digambar `FlameWeather`. Api beku tidak tertiup.
 class Flame extends StatefulWidget {
   const Flame({
     super.key,
@@ -414,10 +415,20 @@ class FlamePainter extends CustomPainter {
       FlameMode.active => 1.0,
     };
     final source = animate ? wind : null;
-    double lean(double k) => source == null || windAmt == 0 ? 0 : source.at(delay: k * 0.07) * windAmt * 0.72;
-    final gain = 1 + lean(0).abs() * 1.2;
+    double lean(double k) =>
+        source == null || windAmt == 0 ? 0 : (source.at(delay: k * 0.07) * windAmt * 0.72).clamp(-1.0, 1.0);
+    final rain = source == null ? 0.0 : source.rain;
+    final gain = 1 + lean(0).abs() * 1.2 + rain * 0.5 * windAmt;
     // Dorongan percikan dan asap memakai angin saat ini.
     final push = source == null ? 0.0 : source.at();
+    // Hujan badai mengecilkan api (bukan es) dengan pangkal tetap.
+    if (rain > 0 && mode != FlameMode.frozen) {
+      final shrink = 1 - rain * 0.08;
+      canvas
+        ..translate(0, 100)
+        ..scale(shrink)
+        ..translate(0, -100);
+    }
 
     switch (mode) {
       case FlameMode.frozen:

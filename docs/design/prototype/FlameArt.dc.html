@@ -20,6 +20,11 @@ body{margin:0}
 @keyframes fa-smoke{0%{transform:translateY(0) scale(0.8);opacity:0.4}100%{transform:translateY(-28px) scale(1.7);opacity:0}}
 @keyframes fa-wind{0%,55%,100%{transform:skewX(0deg)}59%{transform:skewX(calc(var(--wa) * -12deg))}64%{transform:skewX(calc(var(--wa) * -10deg))}72%{transform:skewX(calc(var(--wa) * -5deg))}85%{transform:skewX(calc(var(--wa) * -1deg))}}
 @keyframes fa-gl{0%,56%{transform:translateX(0);opacity:0}60%{opacity:0.45}70%{transform:translateX(150px);opacity:0}100%{transform:translateX(150px);opacity:0}}
+@keyframes fa-wind2{0.00%{transform:skewX(calc(var(--wa) * 0deg))}5.85%{transform:skewX(calc(var(--wa) * 0deg))}7.32%{transform:skewX(calc(var(--wa) * -4deg))}12.20%{transform:skewX(calc(var(--wa) * 0deg))}22.93%{transform:skewX(calc(var(--wa) * 0deg))}24.39%{transform:skewX(calc(var(--wa) * -7deg))}30.49%{transform:skewX(calc(var(--wa) * -1deg))}34.15%{transform:skewX(calc(var(--wa) * -6deg))}37.80%{transform:skewX(calc(var(--wa) * 0deg))}40.98%{transform:skewX(calc(var(--wa) * -2deg))}42.68%{transform:skewX(calc(var(--wa) * -10deg))}46.34%{transform:skewX(calc(var(--wa) * -4deg))}50.00%{transform:skewX(calc(var(--wa) * -11deg))}54.88%{transform:skewX(calc(var(--wa) * -3deg))}58.54%{transform:skewX(calc(var(--wa) * -6deg))}60.98%{transform:skewX(calc(var(--wa) * -12deg))}65.85%{transform:skewX(calc(var(--wa) * -7deg))}70.73%{transform:skewX(calc(var(--wa) * -14deg))}75.61%{transform:skewX(calc(var(--wa) * -8deg))}80.49%{transform:skewX(calc(var(--wa) * -13deg))}85.37%{transform:skewX(calc(var(--wa) * -7deg))}90.24%{transform:skewX(calc(var(--wa) * -2deg))}93.90%{transform:skewX(calc(var(--wa) * 0deg))}100.00%{transform:skewX(calc(var(--wa) * 0deg))}}
+@keyframes fa-gl2{0%{transform:translateX(0);opacity:0}6.59%{transform:translateX(0);opacity:0}6.95%{opacity:0.45}7.93%{transform:translateX(150px);opacity:0}7.95%{transform:translateX(0);opacity:0}23.66%{transform:translateX(0);opacity:0}24.02%{opacity:0.45}25.00%{transform:translateX(150px);opacity:0}25.02%{transform:translateX(0);opacity:0}33.41%{transform:translateX(0);opacity:0}33.78%{opacity:0.45}34.76%{transform:translateX(150px);opacity:0}34.78%{transform:translateX(0);opacity:0}41.95%{transform:translateX(0);opacity:0}42.32%{opacity:0.45}43.29%{transform:translateX(150px);opacity:0}43.32%{transform:translateX(0);opacity:0}49.27%{transform:translateX(0);opacity:0}49.63%{opacity:0.45}50.61%{transform:translateX(150px);opacity:0}50.63%{transform:translateX(0);opacity:0}60.24%{transform:translateX(0);opacity:0}60.61%{opacity:0.45}61.59%{transform:translateX(150px);opacity:0}61.61%{transform:translateX(0);opacity:0}70.00%{transform:translateX(0);opacity:0}70.37%{opacity:0.45}71.34%{transform:translateX(150px);opacity:0}71.37%{transform:translateX(0);opacity:0}79.76%{transform:translateX(0);opacity:0}80.12%{opacity:0.45}81.10%{transform:translateX(150px);opacity:0}81.12%{transform:translateX(0);opacity:0}100%{transform:translateX(0);opacity:0}}
+@keyframes fa-storm{0%,58.54%{opacity:0}65.85%,87.80%{opacity:1}93.90%,100%{opacity:0}}
+@keyframes fa-flash{0%,68.29%{opacity:0}68.41%{opacity:0.3}69.27%{opacity:0}69.63%{opacity:0.25}70.49%,80.49%{opacity:0}80.61%{opacity:0.3}81.46%,100%{opacity:0}}
+@keyframes fa-rain{from{transform:translate(-40px,-125px)}to{transform:translate(0,0)}}
 @keyframes fa-hue{from{filter:drop-shadow(0 0 var(--gs) var(--gc)) hue-rotate(0deg)}to{filter:drop-shadow(0 0 var(--gs) var(--gc)) hue-rotate(360deg)}}
 @media (prefers-reduced-motion: reduce){*{animation:none !important}}
 </style>
@@ -29,6 +34,7 @@ body{margin:0}
 <defs>
 <linearGradient id="{{gid}}" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#dcf3ff" stop-opacity="0.62"/><stop offset="1" stop-color="#6eb6ec" stop-opacity="0.46"/></linearGradient>
 <clipPath id="{{cid}}"><path d="{{iceD}}"/></clipPath>
+<clipPath id="{{rid}}"><rect x="-65" y="-15" width="130" height="125"/></clipPath>
 </defs>
 <g style="--wa: {{windAmt}}; transform-box: fill-box; transform-origin: 50% 100%; animation: {{windAnim}}">
 <sc-for list="{{items}}" as="it" hint-placeholder-count="5">
@@ -43,13 +49,21 @@ body{margin:0}
 <sc-for list="{{fx}}" as="it" hint-placeholder-count="0">
 <path d="{{it.d}}" fill="{{it.fill}}" stroke="none" opacity="{{it.op}}" style="transform-box: fill-box; transform-origin: {{it.origin}}; animation: {{it.anim}}"/>
 </sc-for>
+<g clip-path="{{rainClip}}" style="opacity: 0; animation: {{stormAnim}}">
+<rect x="-65" y="-15" width="130" height="125" fill="#d6e2ff" opacity="0" style="animation: {{flashAnim}}"/>
+<g style="animation: {{rainAnim}}">
+<sc-for list="{{drops}}" as="r" hint-placeholder-count="0">
+<path d="{{r.d}}" fill="none" stroke="#b9d4ff" stroke-opacity="0.5" stroke-width="1" stroke-linecap="round"/>
+</sc-for>
+</g>
+</g>
 <sc-for list="{{gusts}}" as="g" hint-placeholder-count="0">
 <path d="{{g.d}}" fill="none" stroke="#ffffff" stroke-width="1.4" stroke-linecap="round" opacity="0" style="animation: {{g.anim}}"/>
 </sc-for>
 </svg>
 </div>
 </x-dc>
-<script type="text/x-dc" data-dc-script data-props='{"count":{"editor":"int","default":23,"min":1,"max":999,"section":"Api"},"mode":{"editor":"enum","default":"active","options":["active","gray","frozen","reset"],"section":"Api"},"size":{"editor":"int","default":120,"min":16,"max":240,"section":"Api"},"cracks":{"editor":"int","default":0,"min":0,"max":10,"section":"Es"},"need":{"editor":"int","default":5,"min":1,"max":10,"section":"Es"},"animate":{"editor":"boolean","default":false,"section":"Api"},"wind":{"editor":"enum","default":"sepoi","options":["sepoi","mati"],"section":"Angin"},"$preview":{"width":156,"height":150}}'>
+<script type="text/x-dc" data-dc-script data-props='{"count":{"editor":"int","default":23,"min":1,"max":999,"section":"Api"},"mode":{"editor":"enum","default":"active","options":["active","gray","frozen","reset"],"section":"Api"},"size":{"editor":"int","default":120,"min":16,"max":240,"section":"Api"},"cracks":{"editor":"int","default":0,"min":0,"max":10,"section":"Es"},"need":{"editor":"int","default":5,"min":1,"max":10,"section":"Es"},"animate":{"editor":"boolean","default":false,"section":"Api"},"wind":{"editor":"enum","default":"bertahap","options":["bertahap","sepoi","mati"],"section":"Angin"},"$preview":{"width":156,"height":150}}'>
 class Component extends DCLogic {
   renderVals() {
     const P = this.props;
@@ -162,14 +176,28 @@ class Component extends DCLogic {
       cracks.push({ d: d });
     }
 
-    // Hembusan angin (artifact desktop "Streak Api TermUL" versi 1792078599-27c9): tiap 7 detik ujung api miring ke kanan
+    // Hembusan angin (artifact desktop "Streak Api TermUL"). wind "sepoi" (versi 1792078599-27c9): tiap 7 detik ujung api miring ke kanan
     // lalu kembali; beku tidak tertiup, padam 0,8, bara 0,7. Api besar (40 ke atas) memperlihatkan garis hembusan.
     const windOn = animate && P.wind !== 'mati' && mode !== 'frozen';
     const windAmt = mode === 'gray' || mode === 'reset' ? 0.8 : (tier.id === 'bara' ? 0.7 : 1);
+    // Bertahap (bawaan; artifact desktop versi 1792273284-2261, mode "naik bertahap otomatis"): siklus tetap 41 detik,
+    // sepoi-sepoi 0-8, agak kencang 8-16, kencang 16-24, hujan badai 24-37 (hujan miring dan kilat; hanya api 40 ke
+    // atas), tenang 37-41. Di aplikasi hembusannya acak; di sini urutannya tetap dan uap dari tetes yang kena api tidak
+    // digambar.
+    const staged = P.wind !== 'sepoi';
+    const gl = staged ? 'fa-gl2 41s linear ' : 'fa-gl 7s linear ';
     const gusts = windOn && size >= 40 ? [
-      { d: 'M-95 22 Q-79 18 -60 20', anim: 'fa-gl 7s linear 0s infinite' },
-      { d: 'M-90 58 Q-77 54 -62 56', anim: 'fa-gl 7s linear 0.15s infinite' }
+      { d: 'M-95 22 Q-79 18 -60 20', anim: gl + '0s infinite' },
+      { d: 'M-90 58 Q-77 54 -62 56', anim: gl + '0.15s infinite' }
     ] : [];
+    const stormOn = windOn && staged && size >= 40;
+    const drops = [];
+    if (stormOn) {
+      for (let i = 0; i < 60; i++) {
+        const x = -65 + ((i * 53) % 175), y = -15 + ((i * 71) % 250);
+        drops.push({ d: 'M' + x + ' ' + y + ' l-3.2 -8' });
+      }
+    }
 
     const glowOn = glowColor && P.glow !== false;
     const rainbow = mode === 'active' && tier.rainbow && animate;
@@ -183,7 +211,11 @@ class Component extends DCLogic {
       gid: uid + 'g', cid: uid + 'c', iceD: iceD,
       clipRef: mode === 'frozen' ? ('url(#' + uid + 'c)') : 'none',
       items: items, fx: fx, cracks: cracks, label: label,
-      windAmt: windAmt, windAnim: windOn ? 'fa-wind 7s ease-in-out infinite' : 'none', gusts: gusts
+      windAmt: windAmt, windAnim: windOn ? (staged ? 'fa-wind2 41s ease-in-out infinite' : 'fa-wind 7s ease-in-out infinite') : 'none', gusts: gusts,
+      rid: uid + 'r', rainClip: 'url(#' + uid + 'r)', drops: drops,
+      stormAnim: stormOn ? 'fa-storm 41s linear infinite' : 'none',
+      rainAnim: stormOn ? 'fa-rain 0.45s linear infinite' : 'none',
+      flashAnim: stormOn ? 'fa-flash 41s linear infinite' : 'none'
     };
   }
 }

@@ -9,6 +9,7 @@ import '../../core/streak/streak_tier.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/flame.dart';
+import '../../shared/widgets/flame_weather.dart';
 import '../../shared/widgets/pressable.dart';
 import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
@@ -46,6 +47,9 @@ class _StreakScreenState extends ConsumerState<StreakScreen> with TickerProvider
 
   bool _shakeLeft = true;
   bool _hideCorruptBanner = false;
+
+  /// Api besar di kartu atas, untuk hujan badai (`FlameWeather`).
+  final _flameKey = GlobalKey();
 
   /// Api baru saja dinyalakan dari padam ([StreakGray]) atau beku ([StreakFrozen]); menentukan teks status.
   Type? _relitFrom;
@@ -172,6 +176,7 @@ class _StreakScreenState extends ConsumerState<StreakScreen> with TickerProvider
                         shards: _shards,
                         onTap: _tap,
                         onReplay: _playIntro,
+                        flameKey: _flameKey,
                       ),
                       const SizedBox(height: TermulSpacing.space5),
                       StreakWeekCard(days: days, pop: phase(450, 450)),
@@ -208,6 +213,7 @@ class _Hero extends StatelessWidget {
     required this.shards,
     required this.onTap,
     required this.onReplay,
+    required this.flameKey,
   });
 
   final StreakView view;
@@ -220,6 +226,9 @@ class _Hero extends StatelessWidget {
   final Animation<double> shards;
   final VoidCallback onTap;
   final VoidCallback onReplay;
+
+  /// Kunci api besar untuk hujan badai (`FlameWeather`).
+  final GlobalKey flameKey;
 
   String _status(AppLocalizations l) {
     final status = view.status;
@@ -251,260 +260,266 @@ class _Hero extends StatelessWidget {
     };
     final numberStyle = TermulText.countLg.copyWith(color: waiting ? TermulPalette.inkFaint : TermulPalette.ink);
 
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space7, vertical: TermulSpacing.space8),
-      decoration: BoxDecoration(
-        color: TermulPalette.surface,
-        borderRadius: BorderRadius.circular(TermulRadius.radius2xl),
-        border: Border.all(color: TermulPalette.line),
-      ),
-      child: Column(
-        spacing: TermulSpacing.space5,
-        children: [
-          SizedBox(
-            width: 150,
-            height: 140,
-            child: Stack(
-              clipBehavior: Clip.none,
-              children: [
-                if (counted && ring > 0 && ring < 1)
-                  Positioned(
-                    left: 25,
-                    top: 25,
-                    width: 100,
-                    height: 100,
-                    child: IgnorePointer(
-                      child: Transform.scale(
-                        scale: 1 + 0.9 * Curves.easeOut.transform(ring),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            shape: BoxShape.circle,
-                            border: Border.all(
-                              color: tier.mid.withValues(alpha: 0.55 * (1 - Curves.easeOut.transform(ring))),
-                              width: 2,
+    return FlameWeather(
+      flameKey: flameKey,
+      borderRadius: BorderRadius.circular(TermulRadius.radius2xl),
+      flashBehind: false,
+      child: Container(
+        padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space7, vertical: TermulSpacing.space8),
+        decoration: BoxDecoration(
+          color: TermulPalette.surface,
+          borderRadius: BorderRadius.circular(TermulRadius.radius2xl),
+          border: Border.all(color: TermulPalette.line),
+        ),
+        child: Column(
+          spacing: TermulSpacing.space5,
+          children: [
+            SizedBox(
+              width: 150,
+              height: 140,
+              child: Stack(
+                clipBehavior: Clip.none,
+                children: [
+                  if (counted && ring > 0 && ring < 1)
+                    Positioned(
+                      left: 25,
+                      top: 25,
+                      width: 100,
+                      height: 100,
+                      child: IgnorePointer(
+                        child: Transform.scale(
+                          scale: 1 + 0.9 * Curves.easeOut.transform(ring),
+                          child: Container(
+                            decoration: BoxDecoration(
+                              shape: BoxShape.circle,
+                              border: Border.all(
+                                color: tier.mid.withValues(alpha: 0.55 * (1 - Curves.easeOut.transform(ring))),
+                                width: 2,
+                              ),
                             ),
                           ),
                         ),
                       ),
                     ),
-                  ),
-                AnimatedBuilder(
-                  animation: shake,
-                  builder: (context, child) {
-                    final s = shake.value;
-                    // shakeA/shakeB: geser kiri 5, kanan 4, kembali; miring sedikit.
-                    final dx = s == 0 || s == 1
-                        ? 0.0
-                        : s < 0.25
-                        ? -5 * (s / 0.25)
-                        : s < 0.6
-                        ? -5 + 9 * ((s - 0.25) / 0.35)
-                        : 4 * (1 - (s - 0.6) / 0.4);
-                    final rot = dx / 5 * 1.5 * math.pi / 180;
-                    return Transform.translate(
-                      offset: Offset(shakeLeft ? dx : -dx, 0),
-                      child: Transform.rotate(angle: shakeLeft ? rot : -rot, child: child),
-                    );
-                  },
-                  // Hanya api yang menunggu ketukan yang menjadi tombol; Pressable nonaktif akan meredupkan api.
-                  child: () {
-                    final stage = SizedBox(
-                      width: 150,
-                      height: 140,
-                      child: Stack(
-                        children: [
-                          Positioned(
-                            left: 10,
-                            bottom: 6,
-                            child: Flame(
-                              count: count,
-                              mode: mode,
-                              size: 100,
-                              cracks: view.cracks,
-                              need: view.need == 0 ? 5 : view.need,
-                              animate: true,
+                  AnimatedBuilder(
+                    animation: shake,
+                    builder: (context, child) {
+                      final s = shake.value;
+                      // shakeA/shakeB: geser kiri 5, kanan 4, kembali; miring sedikit.
+                      final dx = s == 0 || s == 1
+                          ? 0.0
+                          : s < 0.25
+                          ? -5 * (s / 0.25)
+                          : s < 0.6
+                          ? -5 + 9 * ((s - 0.25) / 0.35)
+                          : 4 * (1 - (s - 0.6) / 0.4);
+                      final rot = dx / 5 * 1.5 * math.pi / 180;
+                      return Transform.translate(
+                        offset: Offset(shakeLeft ? dx : -dx, 0),
+                        child: Transform.rotate(angle: shakeLeft ? rot : -rot, child: child),
+                      );
+                    },
+                    // Hanya api yang menunggu ketukan yang menjadi tombol; Pressable nonaktif akan meredupkan api.
+                    child: () {
+                      final stage = SizedBox(
+                        width: 150,
+                        height: 140,
+                        child: Stack(
+                          children: [
+                            Positioned(
+                              left: 10,
+                              bottom: 6,
+                              child: Flame(
+                                key: flameKey,
+                                count: count,
+                                mode: mode,
+                                size: 100,
+                                cracks: view.cracks,
+                                need: view.need == 0 ? 5 : view.need,
+                                animate: true,
+                              ),
                             ),
-                          ),
-                        ],
-                      ),
-                    );
-                    return waiting
-                        ? Pressable(
-                            key: const ValueKey('streak-hero-flame'),
-                            onPressed: onTap,
-                            semanticLabel: stageLabel,
-                            builder: (context, pressed) => stage,
-                          )
-                        : Semantics(
-                            key: const ValueKey('streak-hero-flame'),
-                            label: stageLabel,
-                            image: true,
-                            child: stage,
-                          );
-                  }(),
-                ),
-                AnimatedBuilder(
-                  animation: shards,
-                  builder: (context, _) {
-                    final s = shards.value;
-                    if (s == 0 || s == 1) return const SizedBox.shrink();
-                    final e = Curves.easeOut.transform(s);
-                    const pieces = [
-                      (-60.0, -46.0, -140.0),
-                      (54.0, -56.0, 120.0),
-                      (-66.0, 14.0, -90.0),
-                      (62.0, 20.0, 160.0),
-                      (-26.0, 62.0, -60.0),
-                      (34.0, 66.0, 80.0),
-                      (0.0, -66.0, 30.0),
-                    ];
-                    return Stack(
-                      clipBehavior: Clip.none,
-                      children: [
-                        for (final (dx, dy, rot) in pieces)
-                          Positioned(
-                            left: 70 + dx * e,
-                            top: 70 + dy * e,
-                            child: IgnorePointer(
-                              child: Opacity(
-                                opacity: 1 - e,
-                                child: Transform.rotate(
-                                  angle: rot * e * math.pi / 180,
-                                  child: Container(
-                                    width: 10,
-                                    height: 14,
-                                    decoration: BoxDecoration(
-                                      color: TermulPalette.flameIceCore,
-                                      borderRadius: BorderRadius.circular(2),
+                          ],
+                        ),
+                      );
+                      return waiting
+                          ? Pressable(
+                              key: const ValueKey('streak-hero-flame'),
+                              onPressed: onTap,
+                              semanticLabel: stageLabel,
+                              builder: (context, pressed) => stage,
+                            )
+                          : Semantics(
+                              key: const ValueKey('streak-hero-flame'),
+                              label: stageLabel,
+                              image: true,
+                              child: stage,
+                            );
+                    }(),
+                  ),
+                  AnimatedBuilder(
+                    animation: shards,
+                    builder: (context, _) {
+                      final s = shards.value;
+                      if (s == 0 || s == 1) return const SizedBox.shrink();
+                      final e = Curves.easeOut.transform(s);
+                      const pieces = [
+                        (-60.0, -46.0, -140.0),
+                        (54.0, -56.0, 120.0),
+                        (-66.0, 14.0, -90.0),
+                        (62.0, 20.0, 160.0),
+                        (-26.0, 62.0, -60.0),
+                        (34.0, 66.0, 80.0),
+                        (0.0, -66.0, 30.0),
+                      ];
+                      return Stack(
+                        clipBehavior: Clip.none,
+                        children: [
+                          for (final (dx, dy, rot) in pieces)
+                            Positioned(
+                              left: 70 + dx * e,
+                              top: 70 + dy * e,
+                              child: IgnorePointer(
+                                child: Opacity(
+                                  opacity: 1 - e,
+                                  child: Transform.rotate(
+                                    angle: rot * e * math.pi / 180,
+                                    child: Container(
+                                      width: 10,
+                                      height: 14,
+                                      decoration: BoxDecoration(
+                                        color: TermulPalette.flameIceCore,
+                                        borderRadius: BorderRadius.circular(2),
+                                      ),
                                     ),
                                   ),
                                 ),
                               ),
                             ),
-                          ),
-                      ],
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.end,
-            spacing: TermulSpacing.space3,
-            children: [
-              Flexible(
-                child: SizedBox(
-                  height: 56,
-                  child: FittedBox(
-                    fit: BoxFit.scaleDown,
-                    child: ClipRect(
-                      child: counted && roll < 1
-                          ? _Roll(
-                              from: streakNumberText(l, math.max(0, count - 1)),
-                              to: streakNumberText(l, count),
-                              t: Curves.fastOutSlowIn.transform(roll),
-                              style: numberStyle,
-                            )
-                          : Text(streakNumberText(l, count), style: numberStyle),
-                    ),
+                        ],
+                      );
+                    },
                   ),
-                ),
-              ),
-              Flexible(
-                child: Padding(
-                  padding: const EdgeInsets.only(bottom: TermulSpacing.space3),
-                  child: Text(
-                    l.streakUnitDays,
-                    style: TermulText.body.copyWith(color: TermulPalette.inkMuted, fontSize: 16),
-                  ),
-                ),
-              ),
-            ],
-          ),
-          Semantics(
-            liveRegion: true,
-            child: Text(
-              _status(l),
-              textAlign: TextAlign.center,
-              style: TermulText.bodySm.copyWith(color: TermulPalette.inkSoft, fontSize: 14, height: 1.5),
-            ),
-          ),
-          if (waiting)
-            ExcludeSemantics(
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
-                spacing: TermulSpacing.space3,
-                children: [
-                  for (var i = 0; i < view.need; i++)
-                    Container(
-                      width: 14,
-                      height: 14,
-                      decoration: BoxDecoration(
-                        shape: BoxShape.circle,
-                        color: i < view.progress ? TermulPalette.accent : Colors.transparent,
-                        border: Border.all(color: TermulPalette.accent, width: 2),
-                      ),
-                    ),
                 ],
               ),
             ),
-          if (counted)
-            Column(
-              spacing: 2,
+            Row(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.end,
+              spacing: TermulSpacing.space3,
               children: [
-                Opacity(
-                  opacity: Curves.easeOut.transform(badge),
-                  child: Transform.translate(
-                    offset: Offset(0, 8 * (1 - Curves.easeOut.transform(badge))),
-                    child: Container(
-                      constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
-                      padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space7),
-                      decoration: BoxDecoration(
-                        color: TermulPalette.okBg,
-                        borderRadius: BorderRadius.circular(TermulRadius.radiusPill),
-                        border: Border.all(color: TermulPalette.okLine),
-                      ),
-                      child: Row(
-                        mainAxisSize: MainAxisSize.min,
-                        spacing: TermulSpacing.space3,
-                        children: [
-                          const TermulIcon(TermulIconName.check, size: 18, color: TermulPalette.ok),
-                          Text(
-                            l.streakTodayDone,
-                            style: TermulText.bodySm.copyWith(
-                              color: TermulPalette.ok,
-                              fontSize: 14,
-                              fontWeight: FontWeight.w500,
-                            ),
-                          ),
-                        ],
+                Flexible(
+                  child: SizedBox(
+                    height: 56,
+                    child: FittedBox(
+                      fit: BoxFit.scaleDown,
+                      child: ClipRect(
+                        child: counted && roll < 1
+                            ? _Roll(
+                                from: streakNumberText(l, math.max(0, count - 1)),
+                                to: streakNumberText(l, count),
+                                t: Curves.fastOutSlowIn.transform(roll),
+                                style: numberStyle,
+                              )
+                            : Text(streakNumberText(l, count), style: numberStyle),
                       ),
                     ),
                   ),
                 ),
-                Pressable(
-                  onPressed: onReplay,
-                  semanticLabel: l.streakReplay,
-                  builder: (context, pressed) => Container(
-                    constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
-                    padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space5),
-                    alignment: Alignment.center,
+                Flexible(
+                  child: Padding(
+                    padding: const EdgeInsets.only(bottom: TermulSpacing.space3),
                     child: Text(
-                      l.streakReplay,
-                      style: TermulText.caption.copyWith(
-                        color: TermulPalette.inkMuted,
-                        fontSize: 13,
-                        decoration: TextDecoration.underline,
-                        decorationColor: TermulPalette.inkMuted,
-                      ),
+                      l.streakUnitDays,
+                      style: TermulText.body.copyWith(color: TermulPalette.inkMuted, fontSize: 16),
                     ),
                   ),
                 ),
               ],
             ),
-        ],
+            Semantics(
+              liveRegion: true,
+              child: Text(
+                _status(l),
+                textAlign: TextAlign.center,
+                style: TermulText.bodySm.copyWith(color: TermulPalette.inkSoft, fontSize: 14, height: 1.5),
+              ),
+            ),
+            if (waiting)
+              ExcludeSemantics(
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  spacing: TermulSpacing.space3,
+                  children: [
+                    for (var i = 0; i < view.need; i++)
+                      Container(
+                        width: 14,
+                        height: 14,
+                        decoration: BoxDecoration(
+                          shape: BoxShape.circle,
+                          color: i < view.progress ? TermulPalette.accent : Colors.transparent,
+                          border: Border.all(color: TermulPalette.accent, width: 2),
+                        ),
+                      ),
+                  ],
+                ),
+              ),
+            if (counted)
+              Column(
+                spacing: 2,
+                children: [
+                  Opacity(
+                    opacity: Curves.easeOut.transform(badge),
+                    child: Transform.translate(
+                      offset: Offset(0, 8 * (1 - Curves.easeOut.transform(badge))),
+                      child: Container(
+                        constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
+                        padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space7),
+                        decoration: BoxDecoration(
+                          color: TermulPalette.okBg,
+                          borderRadius: BorderRadius.circular(TermulRadius.radiusPill),
+                          border: Border.all(color: TermulPalette.okLine),
+                        ),
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          spacing: TermulSpacing.space3,
+                          children: [
+                            const TermulIcon(TermulIconName.check, size: 18, color: TermulPalette.ok),
+                            Text(
+                              l.streakTodayDone,
+                              style: TermulText.bodySm.copyWith(
+                                color: TermulPalette.ok,
+                                fontSize: 14,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+                  ),
+                  Pressable(
+                    onPressed: onReplay,
+                    semanticLabel: l.streakReplay,
+                    builder: (context, pressed) => Container(
+                      constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
+                      padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space5),
+                      alignment: Alignment.center,
+                      child: Text(
+                        l.streakReplay,
+                        style: TermulText.caption.copyWith(
+                          color: TermulPalette.inkMuted,
+                          fontSize: 13,
+                          decoration: TextDecoration.underline,
+                          decorationColor: TermulPalette.inkMuted,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+          ],
+        ),
       ),
     );
   }

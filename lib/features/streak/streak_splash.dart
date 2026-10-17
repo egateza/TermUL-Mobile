@@ -8,6 +8,7 @@ import '../../core/streak/streak_tier.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/flame.dart';
+import '../../shared/widgets/flame_weather.dart';
 import '../../shared/widgets/pressable.dart';
 import '../../shared/widgets/termul_button.dart';
 import 'streak_controller.dart';
@@ -68,6 +69,9 @@ class _StreakSplashState extends ConsumerState<StreakSplash> with TickerProvider
   late final _relit = AnimationController(vsync: this, duration: const Duration(milliseconds: 750));
 
   _Fx? _fxKind;
+
+  /// Api yang terkena hujan badai (`FlameWeather`).
+  final _flameKey = GlobalKey();
   bool _shakeLeft = true;
 
   late final _Kind _kind = switch (widget.event) {
@@ -150,103 +154,106 @@ class _StreakSplashState extends ConsumerState<StreakSplash> with TickerProvider
             stops: [0, 0.85],
           ),
         ),
-        child: SafeArea(
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              Padding(
-                padding: const EdgeInsets.fromLTRB(TermulSpacing.space8, 0, TermulSpacing.space5, 0),
-                child: Row(
-                  children: [
-                    Expanded(
-                      child: Text(
-                        l.streakSplashHeader.toUpperCase(),
-                        style: streakMono(12, medium: false).copyWith(color: _white65, letterSpacing: 0.96),
-                      ),
-                    ),
-                    Pressable(
-                      onPressed: _play,
-                      semanticLabel: l.streakSplashReplay,
-                      builder: (context, pressed) => Container(
-                        constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
-                        padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space5),
-                        alignment: Alignment.center,
+        child: FlameWeather(
+          flameKey: _flameKey,
+          child: SafeArea(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                Padding(
+                  padding: const EdgeInsets.fromLTRB(TermulSpacing.space8, 0, TermulSpacing.space5, 0),
+                  child: Row(
+                    children: [
+                      Expanded(
                         child: Text(
-                          l.streakSplashReplay,
-                          style: TermulText.caption.copyWith(
-                            color: _white65,
-                            fontSize: 13,
-                            decoration: TextDecoration.underline,
-                            decorationColor: _white65,
+                          l.streakSplashHeader.toUpperCase(),
+                          style: streakMono(12, medium: false).copyWith(color: _white65, letterSpacing: 0.96),
+                        ),
+                      ),
+                      Pressable(
+                        onPressed: _play,
+                        semanticLabel: l.streakSplashReplay,
+                        builder: (context, pressed) => Container(
+                          constraints: const BoxConstraints(minHeight: TermulSize.tapMin),
+                          padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space5),
+                          alignment: Alignment.center,
+                          child: Text(
+                            l.streakSplashReplay,
+                            style: TermulText.caption.copyWith(
+                              color: _white65,
+                              fontSize: 13,
+                              decoration: TextDecoration.underline,
+                              decorationColor: _white65,
+                            ),
                           ),
                         ),
                       ),
-                    ),
-                  ],
-                ),
-              ),
-              Expanded(
-                child: Padding(
-                  padding: const EdgeInsets.fromLTRB(
-                    TermulSpacing.space9,
-                    0,
-                    TermulSpacing.space9,
-                    TermulSpacing.space9 + 4,
+                    ],
                   ),
-                  child: AnimatedBuilder(
-                    animation: Listenable.merge([_timeline, _fx, _shake, _relit]),
-                    builder: (context, _) => Column(
-                      children: [
-                        Expanded(
-                          child: Center(
-                            child: SingleChildScrollView(
-                              child: Column(
-                                mainAxisSize: MainAxisSize.min,
-                                spacing: TermulSpacing.space3,
-                                children: [
-                                  _stage(l, view, waiting: waiting, revived: revived),
-                                  ConstrainedBox(
-                                    constraints: const BoxConstraints(minHeight: 210),
-                                    child: _blocks(l, view, waiting: waiting, revived: revived),
-                                  ),
-                                ],
+                ),
+                Expanded(
+                  child: Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      TermulSpacing.space9,
+                      0,
+                      TermulSpacing.space9,
+                      TermulSpacing.space9 + 4,
+                    ),
+                    child: AnimatedBuilder(
+                      animation: Listenable.merge([_timeline, _fx, _shake, _relit]),
+                      builder: (context, _) => Column(
+                        children: [
+                          Expanded(
+                            child: Center(
+                              child: SingleChildScrollView(
+                                child: Column(
+                                  mainAxisSize: MainAxisSize.min,
+                                  spacing: TermulSpacing.space3,
+                                  children: [
+                                    _stage(l, view, waiting: waiting, revived: revived),
+                                    ConstrainedBox(
+                                      constraints: const BoxConstraints(minHeight: 210),
+                                      child: _blocks(l, view, waiting: waiting, revived: revived),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ),
                           ),
-                        ),
-                        if (waiting)
-                          Pressable(
-                            key: const ValueKey('streak-splash-later'),
-                            onPressed: _close,
-                            semanticLabel: l.streakSplashLater,
-                            builder: (context, pressed) => Container(
-                              constraints: const BoxConstraints(minHeight: TermulSize.buttonLg),
-                              alignment: Alignment.center,
-                              decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
-                                border: Border.all(color: _white35),
-                                color: pressed ? const Color(0x14FFFFFF) : Colors.transparent,
+                          if (waiting)
+                            Pressable(
+                              key: const ValueKey('streak-splash-later'),
+                              onPressed: _close,
+                              semanticLabel: l.streakSplashLater,
+                              builder: (context, pressed) => Container(
+                                constraints: const BoxConstraints(minHeight: TermulSize.buttonLg),
+                                alignment: Alignment.center,
+                                decoration: BoxDecoration(
+                                  borderRadius: BorderRadius.circular(TermulRadius.radiusXl),
+                                  border: Border.all(color: _white35),
+                                  color: pressed ? const Color(0x14FFFFFF) : Colors.transparent,
+                                ),
+                                child: Text(
+                                  l.streakSplashLater,
+                                  style: TermulText.body.copyWith(color: Colors.white, fontSize: 16),
+                                ),
                               ),
-                              child: Text(
-                                l.streakSplashLater,
-                                style: TermulText.body.copyWith(color: Colors.white, fontSize: 16),
-                              ),
+                            )
+                          else
+                            TermulButton(
+                              key: const ValueKey('streak-splash-continue'),
+                              label: l.streakSplashContinue,
+                              variant: TermulButtonVariant.primary,
+                              size: TermulButtonSize.lg,
+                              onPressed: _close,
                             ),
-                          )
-                        else
-                          TermulButton(
-                            key: const ValueKey('streak-splash-continue'),
-                            label: l.streakSplashContinue,
-                            variant: TermulButtonVariant.primary,
-                            size: TermulButtonSize.lg,
-                            onPressed: _close,
-                          ),
-                      ],
+                        ],
+                      ),
                     ),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
@@ -324,16 +331,32 @@ class _StreakSplashState extends ConsumerState<StreakSplash> with TickerProvider
                 opacity: 1 - swap,
               ),
             )
-            ..add(place(Flame(count: _to, size: 130, animate: true), opacity: swap));
+            ..add(
+              place(
+                Flame(key: _flameKey, count: _to, size: 130, animate: true),
+                opacity: swap,
+              ),
+            );
         } else {
-          flames.add(place(Flame(count: _to, size: 130, animate: true), scale: entry));
+          flames.add(
+            place(
+              Flame(key: _flameKey, count: _to, size: 130, animate: true),
+              scale: entry,
+            ),
+          );
         }
       case _Kind.ember:
-        flames.add(place(Flame(count: _to, size: 130, animate: true), scale: entry));
+        flames.add(
+          place(
+            Flame(key: _flameKey, count: _to, size: 130, animate: true),
+            scale: entry,
+          ),
+        );
       case _Kind.gray || _Kind.frozen:
         flames.add(
           place(
             Flame(
+              key: _flameKey,
               count: view.count,
               mode: waiting ? (_kind == _Kind.frozen ? FlameMode.frozen : FlameMode.gray) : FlameMode.active,
               size: 130,
@@ -349,7 +372,7 @@ class _StreakSplashState extends ConsumerState<StreakSplash> with TickerProvider
         final dying = Curves.easeIn.transform(_phase(1, 1.6));
         flames.add(
           place(
-            Flame(count: lost, size: 130, animate: true),
+            Flame(key: _t < 3.2 ? _flameKey : null, count: lost, size: 130, animate: true),
             scale: entry * (1 - 0.92 * dying),
             dy: 18 * dying,
             opacity: 1 - dying,
@@ -357,7 +380,7 @@ class _StreakSplashState extends ConsumerState<StreakSplash> with TickerProvider
           ),
         );
         final again = _overshoot.transform(_phase(3.2, 0.5));
-        if (_t >= 3.2) flames.add(place(const Flame(count: 1, size: 130, animate: true), scale: again));
+        if (_t >= 3.2) flames.add(place(Flame(key: _flameKey, count: 1, size: 130, animate: true), scale: again));
     }
 
     final s = _shake.value;
