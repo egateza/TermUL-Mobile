@@ -11,6 +11,7 @@ class NavItem {
     required this.label,
     required this.icon,
     this.badge = 0,
+    this.dot = false,
     this.semanticLabel,
     this.highlight,
   });
@@ -23,6 +24,10 @@ class NavItem {
 
   /// Lencana jumlah di atas ikon; 0 = tanpa lencana.
   final int badge;
+
+  /// Lencana titik tanpa angka (mis. ada pembaruan). Selalu sertakan [semanticLabel] yang menyebutnya dengan kata.
+  /// Diabaikan bila [badge] lebih dari 0.
+  final bool dot;
 
   /// Nama untuk pembaca layar bila perlu lebih panjang dari [label] (mis. memuat jumlah lencana).
   final String? semanticLabel;
@@ -184,6 +189,22 @@ class _NavTab extends StatelessWidget {
                           fontVariations: [FontVariation('wght', 500)],
                           color: TermulPalette.onAccent,
                         ),
+                      ),
+                    ),
+                  )
+                else if (item.dot)
+                  Positioned(
+                    top: -3,
+                    right: -5,
+                    child: Container(
+                      key: ValueKey('nav-dot-${item.id}'),
+                      width: 10,
+                      height: 10,
+                      // Tepi warna latar bar supaya titik terpisah dari garis ikon.
+                      decoration: BoxDecoration(
+                        color: TermulPalette.accent,
+                        shape: BoxShape.circle,
+                        border: Border.all(color: TermulPalette.ground, width: 2),
                       ),
                     ),
                   ),

@@ -13,6 +13,9 @@
          BOOT_COMPLETED. Nama izin dicek di developer.android.com "Schedule alarms". Alarm inexact
          (setAndAllowWhileIdle) tidak butuh SCHEDULE_EXACT_ALARM. -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED"/>
+    <!-- Membuka penginstal sistem untuk APK pembaruan dari GitHub Releases (UpdateInstaller.kt); tiap pemasangan
+         tetap dikonfirmasi pengguna. -->
+    <uses-permission android:name="android.permission.REQUEST_INSTALL_PACKAGES"/>
 
     <application
         android:label="TermUL"
@@ -59,7 +62,8 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
-        <!-- Membagikan berkas ekspor lewat menu bagikan Android (FileSharer.kt): hanya cache/share/. -->
+        <!-- Membagikan berkas ekspor (FileSharer.kt, cache/share/) dan APK pembaruan ke penginstal (UpdateInstaller.kt,
+             cache/update/). -->
         <provider
             android:name="androidx.core.content.FileProvider"
             android:authorities="${applicationId}.fileprovider"

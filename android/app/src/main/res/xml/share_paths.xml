@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Hanya folder cache/share/ yang bisa dibagikan lewat FileProvider (lihat FileSharer.kt). -->
+<!-- Folder yang bisa dibagikan lewat FileProvider: cache/share/ (FileSharer.kt) dan cache/update/ (UpdateInstaller.kt). -->
 <paths>
     <cache-path name="share" path="share/" />
+    <cache-path name="update" path="update/" />
 </paths>

@@ -17,9 +17,11 @@ import '../../shared/widgets/termul_stepper.dart';
 import '../../shared/widgets/termul_toast.dart';
 import '../terminal/selection_overlay.dart' show SelectionHandleShape;
 import '../terminal/terminal_palette.dart';
+import '../update/update_section.dart';
 
-/// Layar Pengaturan. Sekarang hanya bagian Terminal (ukuran huruf dan tinggi baris, dengan pratinjau); perubahan
-/// langsung berlaku di sesi terminal yang sedang terbuka dan disimpan ke `settings.json`.
+/// Layar Pengaturan: Terminal (ukuran huruf, tinggi baris, gagang seleksi, dengan pratinjau), Koneksi, Keamanan, dan
+/// Pembaruan beserta keterangan versi di paling bawah. Perubahan langsung berlaku di sesi terminal yang sedang terbuka
+/// dan disimpan ke `settings.json`.
 class SettingsScreen extends ConsumerStatefulWidget {
   const SettingsScreen({super.key, this.showBack = true});
 
@@ -491,6 +493,8 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                     dangerTag: l.settingsDangerTag,
                     onChanged: _setVaultAlwaysOpen,
                   ),
+                  const SizedBox(height: TermulSpacing.space8),
+                  const UpdateSection(),
                 ],
               ),
             ),

@@ -20,6 +20,7 @@ import '../streak/streak_controller.dart';
 import '../streak/streak_screen.dart';
 import '../streak/streak_reminder.dart';
 import '../streak/streak_splash.dart';
+import '../update/update_controller.dart';
 import 'main_tab.dart';
 
 /// Kerangka layar utama: lima tab di `NavBar` (Host, Sesi, Snippet, Streak, Pengaturan). Tab SFTP dihapus (keputusan
@@ -59,6 +60,8 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
       if (!mounted) return;
       _onStreakEvent(ref.read(streakControllerProvider.notifier).openToday());
       _syncReminder();
+      // Sekali tiap aplikasi dibuka (bukan saat kembali dari latar belakang); hasilnya lencana di tab Pengaturan.
+      unawaited(ref.read(updateControllerProvider.notifier).check());
       _dayCheck = Timer.periodic(dayCheckInterval, (_) => _checkDay());
     });
   }
@@ -114,6 +117,7 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
     final index = _ids.indexOf(active).clamp(0, _ids.length - 1);
     _visited.add(index);
     final sessions = ref.watch(sessionManagerProvider).length + ref.watch(sftpSessionManagerProvider).length;
+    final hasUpdate = ref.watch(updateControllerProvider.select((s) => s.hasUpdate));
     final keyboardOpen = MediaQuery.viewInsetsOf(context).bottom > 0;
     final landscape = MediaQuery.orientationOf(context) == Orientation.landscape;
     final items = [
@@ -128,7 +132,13 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
       NavItem(id: 'snippets', label: l.navSnippets, icon: TermulIconName.snippets),
       // Merah api (tier 3) supaya tab Streak mencolok dibanding tab lain; permintaan pemilik 2026-10-17.
       NavItem(id: 'streak', label: l.navStreak, icon: TermulIconName.flame, highlight: TermulPalette.level3),
-      NavItem(id: 'settings', label: l.navSettings, icon: TermulIconName.settings),
+      NavItem(
+        id: 'settings',
+        label: l.navSettings,
+        icon: TermulIconName.settings,
+        dot: hasUpdate,
+        semanticLabel: hasUpdate ? l.navSettingsUpdate : null,
+      ),
     ];
     final pages = IndexedStack(
       index: index,

@@ -2075,4 +2075,116 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get snippetPanelManage => 'Kelola semua';
+
+  @override
+  String get navSettingsUpdate => 'Pengaturan, pembaruan tersedia';
+
+  @override
+  String get settingsUpdateSection => 'Pembaruan';
+
+  @override
+  String get updateRowLabel => 'Pembaruan aplikasi';
+
+  @override
+  String get updateStatusIdle => 'Belum diperiksa';
+
+  @override
+  String get updateStatusChecking => 'Memeriksa…';
+
+  @override
+  String get updateStatusUpToDate => 'Sudah versi terbaru';
+
+  @override
+  String get updateStatusNoRelease => 'Belum ada rilis di GitHub';
+
+  @override
+  String updateStatusAvailable(String version) {
+    return 'Versi $version tersedia';
+  }
+
+  @override
+  String updateStatusDownloading(String version) {
+    return 'Mengunduh versi $version';
+  }
+
+  @override
+  String updateStatusReady(String version) {
+    return 'Versi $version siap dipasang';
+  }
+
+  @override
+  String get updateStatusCheckFailed => 'Gagal memeriksa';
+
+  @override
+  String updateStatusDownloadFailed(String version) {
+    return 'Gagal mengunduh versi $version';
+  }
+
+  @override
+  String get updateStatusInstallFailed => 'Gagal membuka penginstal';
+
+  @override
+  String get updateFailureNetwork => 'Tidak bisa menghubungi GitHub. Periksa koneksi lalu coba lagi.';
+
+  @override
+  String get updateFailureServer => 'GitHub menolak permintaan saat ini. Coba lagi nanti.';
+
+  @override
+  String get updateFailureBadRelease => 'Rilis terbaru tidak berisi APK dan checksum yang dibutuhkan.';
+
+  @override
+  String get updateFailureChecksum => 'Berkas yang diunduh tidak sama dengan checksum rilis, jadi tidak dipasang.';
+
+  @override
+  String get updateFailureStorage => 'Berkas tidak bisa disimpan. Kosongkan ruang penyimpanan lalu coba lagi.';
+
+  @override
+  String get updateFailureInstall => 'Penginstal Android tidak bisa dibuka. Coba lagi.';
+
+  @override
+  String get updateCheck => 'Periksa';
+
+  @override
+  String get updateRetry => 'Coba lagi';
+
+  @override
+  String get updateDownload => 'Unduh dan pasang';
+
+  @override
+  String get updateCancel => 'Batalkan unduhan';
+
+  @override
+  String get updateInstall => 'Pasang';
+
+  @override
+  String updateSize(String size) {
+    return 'Ukuran $size';
+  }
+
+  @override
+  String updateProgress(String received, String total) {
+    return '$received dari $total';
+  }
+
+  @override
+  String get updateNotesLabel => 'Catatan rilis';
+
+  @override
+  String get updateInstallNote =>
+      'Android akan meminta konfirmasi. Host, snippet, dan vault tetap ada karena aplikasi diperbarui, bukan dipasang ulang.';
+
+  @override
+  String get updatePermissionTitle => 'Izinkan pemasangan dari TermUL';
+
+  @override
+  String get updatePermissionBody =>
+      'Aktifkan \"Izinkan dari sumber ini\" untuk TermUL, lalu kembali dan ketuk Pasang lagi.';
+
+  @override
+  String get updatePermissionOpen => 'Buka pengaturan';
+
+  @override
+  String updateVersionFooter(String name, int build) {
+    return 'TermUL Mobile $name · build $build';
+  }
 }

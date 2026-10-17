@@ -18,6 +18,7 @@ class MainActivity : FlutterFragmentActivity() {
     private var screenChannel: MethodChannel? = null
     private var downloadsChannel: MethodChannel? = null
     private var reminderChannel: MethodChannel? = null
+    private var updateChannel: MethodChannel? = null
     private var pendingNotificationResult: MethodChannel.Result? = null
 
     // Harus didaftarkan sebelum Activity mencapai STARTED, jadi sebagai properti.
@@ -115,6 +116,32 @@ class MainActivity : FlutterFragmentActivity() {
                 else -> result.notImplemented()
             }
         }
+        val update = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/update")
+        updateChannel = update
+        update.setMethodCallHandler { call, result ->
+            try {
+                when (call.method) {
+                    "version" -> result.success(UpdateInstaller.version(applicationContext))
+                    "canInstall" -> result.success(UpdateInstaller.canInstall(applicationContext))
+                    "openInstallSettings" -> {
+                        UpdateInstaller.openInstallSettings(this)
+                        result.success(null)
+                    }
+                    "install" -> {
+                        val path = call.argument<String>("path")
+                        if (path == null) {
+                            result.error("bad_args", "path wajib", null)
+                        } else {
+                            UpdateInstaller.install(this, path)
+                            result.success(null)
+                        }
+                    }
+                    else -> result.notImplemented()
+                }
+            } catch (e: Exception) {
+                result.error("update_failed", e.javaClass.simpleName, null)
+            }
+        }
         val share = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/share")
         share.setMethodCallHandler { call, result ->
             if (call.method != "shareFile") {
@@ -189,6 +216,8 @@ class MainActivity : FlutterFragmentActivity() {
         downloadsChannel = null
         reminderChannel?.setMethodCallHandler(null)
         reminderChannel = null
+        updateChannel?.setMethodCallHandler(null)
+        updateChannel = null
         channel?.setMethodCallHandler(null)
         channel = null
         super.cleanUpFlutterEngine(flutterEngine)

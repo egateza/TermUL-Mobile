@@ -60,7 +60,7 @@
    "y": 0,
    "w": 390,
    "h": 844,
-   "title": "6 · Pengaturan",
+   "title": "6 · Pengaturan (bagian Pembaruan dan versi di paling bawah)",
    "is_interactive": true,
    "radius": 28
   },
@@ -630,10 +630,28 @@
   "AppIcon.dc.html": {
    "x": 5640,
    "y": 964,
-   "w": 720,
+   "w": 800,
    "h": 440,
-   "title": "16 · Ikon aplikasi T-kursor: masker launcher, layar utama, ikon bertema (Android 13+)",
+   "title": "16 · Ikon aplikasi T-kursor: masker launcher, layar utama, ikon bertema (Android 13+), ikon notifikasi",
    "radius": 12
+  },
+  "SettingsUpdate.dc.html": {
+   "x": 3760,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "6c · Pengaturan: pembaruan tersedia (titik di tab Pengaturan, catatan rilis, Unduh dan pasang; versi dan build di baris terakhir)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SettingsUpdateInstall.dc.html": {
+   "x": 4230,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "6d · Pengaturan: pembaruan siap dipasang, izin \"Pasang aplikasi tidak dikenal\" belum diberikan",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -706,7 +724,9 @@
   "TerminalSnippets.dc.html",
   "StreakSoon.dc.html",
   "StreakSettings.dc.html",
-  "AppIcon.dc.html"
+  "AppIcon.dc.html",
+  "SettingsUpdate.dc.html",
+  "SettingsUpdateInstall.dc.html"
  ],
  "notes": {
   "judul": {

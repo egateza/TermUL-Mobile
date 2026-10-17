@@ -3053,5 +3053,174 @@
   "snippetPanelManage": "Kelola semua",
   "@snippetPanelManage": {
     "description": "Tautan di panel snippet terminal yang membuka tab Snippet."
+  },
+  "navSettingsUpdate": "Pengaturan, pembaruan tersedia",
+  "@navSettingsUpdate": {
+    "description": "Nama aksesibilitas tab Pengaturan bila ada versi baru (lencana titik)."
+  },
+  "settingsUpdateSection": "Pembaruan",
+  "@settingsUpdateSection": {
+    "description": "Judul bagian pembaruan aplikasi di Pengaturan."
+  },
+  "updateRowLabel": "Pembaruan aplikasi",
+  "@updateRowLabel": {
+    "description": "Label baris pembaruan di Pengaturan."
+  },
+  "updateStatusIdle": "Belum diperiksa",
+  "@updateStatusIdle": {
+    "description": "Status pembaruan sebelum pemeriksaan pertama."
+  },
+  "updateStatusChecking": "Memeriksa…",
+  "@updateStatusChecking": {
+    "description": "Status selagi memeriksa rilis di GitHub."
+  },
+  "updateStatusUpToDate": "Sudah versi terbaru",
+  "@updateStatusUpToDate": {
+    "description": "Status bila versi terpasang adalah yang terbaru."
+  },
+  "updateStatusNoRelease": "Belum ada rilis di GitHub",
+  "@updateStatusNoRelease": {
+    "description": "Status bila repo belum punya rilis."
+  },
+  "updateStatusAvailable": "Versi {version} tersedia",
+  "@updateStatusAvailable": {
+    "description": "Status bila ada versi baru.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateStatusDownloading": "Mengunduh versi {version}",
+  "@updateStatusDownloading": {
+    "description": "Status selagi mengunduh APK.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateStatusReady": "Versi {version} siap dipasang",
+  "@updateStatusReady": {
+    "description": "Status setelah APK diunduh dan cocok dengan checksum.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateStatusCheckFailed": "Gagal memeriksa",
+  "@updateStatusCheckFailed": {
+    "description": "Status bila pemeriksaan rilis gagal."
+  },
+  "updateStatusDownloadFailed": "Gagal mengunduh versi {version}",
+  "@updateStatusDownloadFailed": {
+    "description": "Status bila unduhan APK gagal.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateStatusInstallFailed": "Gagal membuka penginstal",
+  "@updateStatusInstallFailed": {
+    "description": "Status bila penginstal Android tidak bisa dibuka."
+  },
+  "updateFailureNetwork": "Tidak bisa menghubungi GitHub. Periksa koneksi lalu coba lagi.",
+  "@updateFailureNetwork": {
+    "description": "Alasan gagal: jaringan."
+  },
+  "updateFailureServer": "GitHub menolak permintaan saat ini. Coba lagi nanti.",
+  "@updateFailureServer": {
+    "description": "Alasan gagal: jawaban server (mis. batas permintaan)."
+  },
+  "updateFailureBadRelease": "Rilis terbaru tidak berisi APK dan checksum yang dibutuhkan.",
+  "@updateFailureBadRelease": {
+    "description": "Alasan gagal: isi rilis tidak sesuai."
+  },
+  "updateFailureChecksum": "Berkas yang diunduh tidak sama dengan checksum rilis, jadi tidak dipasang.",
+  "@updateFailureChecksum": {
+    "description": "Alasan gagal: checksum tidak cocok."
+  },
+  "updateFailureStorage": "Berkas tidak bisa disimpan. Kosongkan ruang penyimpanan lalu coba lagi.",
+  "@updateFailureStorage": {
+    "description": "Alasan gagal: penyimpanan."
+  },
+  "updateFailureInstall": "Penginstal Android tidak bisa dibuka. Coba lagi.",
+  "@updateFailureInstall": {
+    "description": "Alasan gagal: penginstal."
+  },
+  "updateCheck": "Periksa",
+  "@updateCheck": {
+    "description": "Tombol memeriksa pembaruan."
+  },
+  "updateRetry": "Coba lagi",
+  "@updateRetry": {
+    "description": "Tombol mengulang pemeriksaan, unduhan, atau pemasangan yang gagal."
+  },
+  "updateDownload": "Unduh dan pasang",
+  "@updateDownload": {
+    "description": "Tombol mengunduh versi baru."
+  },
+  "updateCancel": "Batalkan unduhan",
+  "@updateCancel": {
+    "description": "Tombol membatalkan unduhan APK."
+  },
+  "updateInstall": "Pasang",
+  "@updateInstall": {
+    "description": "Tombol membuka penginstal Android untuk APK yang sudah diunduh."
+  },
+  "updateSize": "Ukuran {size}",
+  "@updateSize": {
+    "description": "Ukuran APK rilis.",
+    "placeholders": {
+      "size": {
+        "type": "String"
+      }
+    }
+  },
+  "updateProgress": "{received} dari {total}",
+  "@updateProgress": {
+    "description": "Kemajuan unduhan APK.",
+    "placeholders": {
+      "received": {
+        "type": "String"
+      },
+      "total": {
+        "type": "String"
+      }
+    }
+  },
+  "updateNotesLabel": "Catatan rilis",
+  "@updateNotesLabel": {
+    "description": "Nama aksesibilitas kotak catatan rilis."
+  },
+  "updateInstallNote": "Android akan meminta konfirmasi. Host, snippet, dan vault tetap ada karena aplikasi diperbarui, bukan dipasang ulang.",
+  "@updateInstallNote": {
+    "description": "Catatan di bawah tombol Pasang."
+  },
+  "updatePermissionTitle": "Izinkan pemasangan dari TermUL",
+  "@updatePermissionTitle": {
+    "description": "Judul banner bila izin pasang aplikasi belum diberikan."
+  },
+  "updatePermissionBody": "Aktifkan \"Izinkan dari sumber ini\" untuk TermUL, lalu kembali dan ketuk Pasang lagi.",
+  "@updatePermissionBody": {
+    "description": "Isi banner izin pasang aplikasi."
+  },
+  "updatePermissionOpen": "Buka pengaturan",
+  "@updatePermissionOpen": {
+    "description": "Tombol membuka halaman izin pasang aplikasi."
+  },
+  "updateVersionFooter": "TermUL Mobile {name} · build {build}",
+  "@updateVersionFooter": {
+    "description": "Keterangan versi di paling bawah Pengaturan.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "build": {
+        "type": "int"
+      }
+    }
   }
 }

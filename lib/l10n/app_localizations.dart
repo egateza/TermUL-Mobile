@@ -3654,6 +3654,198 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Kelola semua'**
   String get snippetPanelManage;
+
+  /// Nama aksesibilitas tab Pengaturan bila ada versi baru (lencana titik).
+  ///
+  /// In id, this message translates to:
+  /// **'Pengaturan, pembaruan tersedia'**
+  String get navSettingsUpdate;
+
+  /// Judul bagian pembaruan aplikasi di Pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembaruan'**
+  String get settingsUpdateSection;
+
+  /// Label baris pembaruan di Pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembaruan aplikasi'**
+  String get updateRowLabel;
+
+  /// Status pembaruan sebelum pemeriksaan pertama.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum diperiksa'**
+  String get updateStatusIdle;
+
+  /// Status selagi memeriksa rilis di GitHub.
+  ///
+  /// In id, this message translates to:
+  /// **'Memeriksa…'**
+  String get updateStatusChecking;
+
+  /// Status bila versi terpasang adalah yang terbaru.
+  ///
+  /// In id, this message translates to:
+  /// **'Sudah versi terbaru'**
+  String get updateStatusUpToDate;
+
+  /// Status bila repo belum punya rilis.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada rilis di GitHub'**
+  String get updateStatusNoRelease;
+
+  /// Status bila ada versi baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Versi {version} tersedia'**
+  String updateStatusAvailable(String version);
+
+  /// Status selagi mengunduh APK.
+  ///
+  /// In id, this message translates to:
+  /// **'Mengunduh versi {version}'**
+  String updateStatusDownloading(String version);
+
+  /// Status setelah APK diunduh dan cocok dengan checksum.
+  ///
+  /// In id, this message translates to:
+  /// **'Versi {version} siap dipasang'**
+  String updateStatusReady(String version);
+
+  /// Status bila pemeriksaan rilis gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal memeriksa'**
+  String get updateStatusCheckFailed;
+
+  /// Status bila unduhan APK gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal mengunduh versi {version}'**
+  String updateStatusDownloadFailed(String version);
+
+  /// Status bila penginstal Android tidak bisa dibuka.
+  ///
+  /// In id, this message translates to:
+  /// **'Gagal membuka penginstal'**
+  String get updateStatusInstallFailed;
+
+  /// Alasan gagal: jaringan.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak bisa menghubungi GitHub. Periksa koneksi lalu coba lagi.'**
+  String get updateFailureNetwork;
+
+  /// Alasan gagal: jawaban server (mis. batas permintaan).
+  ///
+  /// In id, this message translates to:
+  /// **'GitHub menolak permintaan saat ini. Coba lagi nanti.'**
+  String get updateFailureServer;
+
+  /// Alasan gagal: isi rilis tidak sesuai.
+  ///
+  /// In id, this message translates to:
+  /// **'Rilis terbaru tidak berisi APK dan checksum yang dibutuhkan.'**
+  String get updateFailureBadRelease;
+
+  /// Alasan gagal: checksum tidak cocok.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas yang diunduh tidak sama dengan checksum rilis, jadi tidak dipasang.'**
+  String get updateFailureChecksum;
+
+  /// Alasan gagal: penyimpanan.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas tidak bisa disimpan. Kosongkan ruang penyimpanan lalu coba lagi.'**
+  String get updateFailureStorage;
+
+  /// Alasan gagal: penginstal.
+  ///
+  /// In id, this message translates to:
+  /// **'Penginstal Android tidak bisa dibuka. Coba lagi.'**
+  String get updateFailureInstall;
+
+  /// Tombol memeriksa pembaruan.
+  ///
+  /// In id, this message translates to:
+  /// **'Periksa'**
+  String get updateCheck;
+
+  /// Tombol mengulang pemeriksaan, unduhan, atau pemasangan yang gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Coba lagi'**
+  String get updateRetry;
+
+  /// Tombol mengunduh versi baru.
+  ///
+  /// In id, this message translates to:
+  /// **'Unduh dan pasang'**
+  String get updateDownload;
+
+  /// Tombol membatalkan unduhan APK.
+  ///
+  /// In id, this message translates to:
+  /// **'Batalkan unduhan'**
+  String get updateCancel;
+
+  /// Tombol membuka penginstal Android untuk APK yang sudah diunduh.
+  ///
+  /// In id, this message translates to:
+  /// **'Pasang'**
+  String get updateInstall;
+
+  /// Ukuran APK rilis.
+  ///
+  /// In id, this message translates to:
+  /// **'Ukuran {size}'**
+  String updateSize(String size);
+
+  /// Kemajuan unduhan APK.
+  ///
+  /// In id, this message translates to:
+  /// **'{received} dari {total}'**
+  String updateProgress(String received, String total);
+
+  /// Nama aksesibilitas kotak catatan rilis.
+  ///
+  /// In id, this message translates to:
+  /// **'Catatan rilis'**
+  String get updateNotesLabel;
+
+  /// Catatan di bawah tombol Pasang.
+  ///
+  /// In id, this message translates to:
+  /// **'Android akan meminta konfirmasi. Host, snippet, dan vault tetap ada karena aplikasi diperbarui, bukan dipasang ulang.'**
+  String get updateInstallNote;
+
+  /// Judul banner bila izin pasang aplikasi belum diberikan.
+  ///
+  /// In id, this message translates to:
+  /// **'Izinkan pemasangan dari TermUL'**
+  String get updatePermissionTitle;
+
+  /// Isi banner izin pasang aplikasi.
+  ///
+  /// In id, this message translates to:
+  /// **'Aktifkan \"Izinkan dari sumber ini\" untuk TermUL, lalu kembali dan ketuk Pasang lagi.'**
+  String get updatePermissionBody;
+
+  /// Tombol membuka halaman izin pasang aplikasi.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka pengaturan'**
+  String get updatePermissionOpen;
+
+  /// Keterangan versi di paling bawah Pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'TermUL Mobile {name} · build {build}'**
+  String updateVersionFooter(String name, int build);
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

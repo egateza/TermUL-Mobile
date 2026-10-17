@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/models/app_settings.dart';
 import 'core/platform/keepalive_platform.dart';
 import 'core/platform/reminder_platform.dart';
+import 'core/platform/update_platform.dart';
 import 'core/platform/screen_monitor.dart';
 import 'core/storage/host_repository.dart';
 import 'core/storage/json/json_host_repository.dart';
@@ -18,6 +19,7 @@ import 'core/storage/streak_repository.dart';
 import 'core/storage/ui_state_repository.dart';
 import 'core/storage/known_hosts_repository.dart';
 import 'core/storage/load_result.dart';
+import 'core/update/update_service.dart';
 import 'core/vault/credential_vault.dart';
 import 'core/vault/device_auth.dart';
 import 'core/vault/keystore_credential_vault.dart';
@@ -25,6 +27,7 @@ import 'core/vault/secret_store.dart';
 import 'core/vault/vault_index.dart';
 import 'core/vault/vault_lock.dart';
 import 'features/hosts/host_service.dart';
+import 'features/update/update_controller.dart' show updateRepo;
 
 /// Ringkasan keadaan penyimpanan saat aplikasi mulai, untuk ditampilkan ke pengguna.
 class BootReport {
@@ -72,6 +75,8 @@ class AppDependencies {
     this.uiState,
     this.streak,
     this.reminder,
+    this.updatePlatform,
+    this.updateService,
   });
 
   final HostRepository hosts;
@@ -107,6 +112,12 @@ class AppDependencies {
 
   /// Pengingat streak harian Android. `null` di tes (memakai `NoopReminder`).
   final ReminderPlatform? reminder;
+
+  /// Versi terpasang dan penginstal Android. `null` di tes (memakai `FakeUpdatePlatform`).
+  final UpdatePlatform? updatePlatform;
+
+  /// Rilis dari GitHub. `null` di tes (tanpa jaringan, tanpa rilis).
+  final UpdateService? updateService;
 }
 
 /// Membuka semua penyimpanan di folder pribadi aplikasi, memuatnya, dan menjalankan perawatan awal. Melempar
@@ -166,6 +177,8 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     uiState: uiState,
     streak: streakRepo,
     reminder: MethodChannelReminder(),
+    updatePlatform: MethodChannelUpdatePlatform(),
+    updateService: GitHubUpdateService(repo: updateRepo, tempDir: getTemporaryDirectory),
     report: BootReport(
       hosts: hostsLoad,
       knownHosts: knownLoad,
