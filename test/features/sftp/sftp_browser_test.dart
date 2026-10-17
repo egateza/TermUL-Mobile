@@ -128,6 +128,57 @@ void main() {
     expect(c.path, '/');
   });
 
+  test('back: kembali ke folder sebelumnya, bukan folder induk; tanpa riwayat mengembalikan false', () async {
+    await c.start();
+    expect(c.canGoBack, isFalse);
+    expect(await c.back(), isFalse);
+
+    await c.open('/home/u/proyek');
+    expect(c.canGoBack, isTrue);
+    expect(await c.back(), isTrue);
+    expect(c.path, '/home/u');
+    expect(c.canGoBack, isFalse, reason: 'folder awal: tidak ada lagi riwayat');
+
+    // Melompat lewat breadcrumb: kembali ke asal lompatan, bukan induknya.
+    await c.open('/home/u/proyek');
+    await c.open('/');
+    expect(c.history, ['/home/u', '/home/u/proyek']);
+    await c.back();
+    expect(c.path, '/home/u/proyek');
+    await c.back();
+    expect(c.path, '/home/u');
+  });
+
+  test('riwayat: muat ulang tidak menambah, galat membuka folder tidak mengubah, restore membawa riwayat', () async {
+    await c.start();
+    await c.refresh();
+    expect(c.canGoBack, isFalse);
+
+    fake.failures['/home/u/proyek'] = const SftpFailure(SftpFailureKind.permissionDenied, 'ditolak');
+    await c.open('/home/u/proyek');
+    expect(c.canGoBack, isFalse, reason: 'gagal dibuka: riwayat tetap');
+    fake.failures.clear();
+
+    await c.open('/home/u/proyek');
+    final saved = c.history;
+    final fresh = SftpBrowserController(fake);
+    addTearDown(fresh.dispose);
+    await fresh.start(restore: '/home/u/proyek', history: saved);
+    expect(fresh.path, '/home/u/proyek');
+    expect(await fresh.back(), isTrue);
+    expect(fresh.path, '/home/u');
+  });
+
+  test('back yang gagal membuka folder: riwayat tidak berkurang', () async {
+    await c.start();
+    await c.open('/home/u/proyek');
+    fake.failures['/home/u'] = const SftpFailure(SftpFailureKind.permissionDenied, 'ditolak');
+    await c.back();
+    expect(c.path, '/home/u/proyek');
+    expect(c.failure, isNotNull);
+    expect(c.canGoBack, isTrue);
+  });
+
   test('galat membuka folder: folder aktif tidak berubah dan galat dicatat', () async {
     await c.start();
     fake.failures['/home'] = const SftpFailure(SftpFailureKind.permissionDenied, 'ditolak');

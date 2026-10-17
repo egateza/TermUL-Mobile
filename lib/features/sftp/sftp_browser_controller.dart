@@ -17,6 +17,9 @@ class SftpBrowserController extends ChangeNotifier {
   SftpEntry? _selected;
   bool _disposed = false;
 
+  /// Folder yang dikunjungi sebelum folder aktif (yang terakhir di ujung), untuk [back]. Muat ulang tidak menambah.
+  final _history = <String>[];
+
   /// Menghindari balapan: hasil muatan lama dibuang bila pengguna sudah membuka folder lain.
   int _epoch = 0;
 
@@ -40,11 +43,20 @@ class SftpBrowserController extends ChangeNotifier {
 
   bool get atRoot => _path == '/';
 
+  /// Ada folder sebelumnya untuk kembali.
+  bool get canGoBack => _history.isNotEmpty;
+
+  /// Salinan riwayat (untuk dipindahkan ke penjelajah baru setelah sambung ulang).
+  List<String> get history => List.unmodifiable(_history);
+
   /// Membuka folder rumah (awal). Dengan [restore] (setelah sambung ulang) mencoba folder itu dulu; bila tidak bisa
   /// dibuka (hilang, izin berubah), jatuh ke folder rumah.
-  Future<void> start({String? restore}) async {
+  Future<void> start({String? restore, List<String> history = const []}) async {
     final epoch = ++_epoch;
     _begin();
+    _history
+      ..clear()
+      ..addAll(history);
     try {
       if (restore != null) {
         try {
@@ -71,7 +83,18 @@ class SftpBrowserController extends ChangeNotifier {
   Future<void> open(String path) async {
     final epoch = ++_epoch;
     _begin();
-    await _load(path, epoch);
+    await _load(path, epoch, pushFrom: path == _path ? null : _path);
+  }
+
+  /// Kembali ke folder yang dikunjungi sebelumnya (bukan selalu folder induk: setelah melompat lewat breadcrumb,
+  /// kembali ke tempat asal lompatan). Mengembalikan false bila tidak ada riwayat. Bila folder itu gagal dibuka,
+  /// riwayat tidak berubah.
+  Future<bool> back() async {
+    if (_history.isEmpty) return false;
+    final epoch = ++_epoch;
+    _begin();
+    await _load(_history.last, epoch, popHistory: true);
+    return true;
   }
 
   Future<void> up() => open(parentRemote(_path));
@@ -96,10 +119,12 @@ class SftpBrowserController extends ChangeNotifier {
     _notify();
   }
 
-  Future<void> _load(String path, int epoch) async {
+  Future<void> _load(String path, int epoch, {String? pushFrom, bool popHistory = false}) async {
     try {
       final list = await _sftp.list(path);
       if (epoch != _epoch) return;
+      if (popHistory && _history.isNotEmpty) _history.removeLast();
+      if (pushFrom != null) _history.add(pushFrom);
       _path = path;
       _entries = list;
       _selected = null;

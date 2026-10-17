@@ -327,6 +327,59 @@ void main() {
     });
   });
 
+  group('tombol kembali', () {
+    testWidgets('di dalam folder: sistem dan header kembali ke folder sebelumnya, tanpa konfirmasi keluar', (
+      tester,
+    ) async {
+      final fake = await pumpBrowser(tester);
+      await tester.tap(find.text('proyek'));
+      await tester.pumpAndSettle();
+      expect(find.text('a.conf'), findsOneWidget);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Keluar dari SFTP?'), findsNothing);
+      expect(find.text('catatan.txt'), findsOneWidget, reason: 'kembali ke /home/u');
+      expect(fake.listed.last, '/home/u');
+
+      await tester.tap(find.text('proyek'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.bySemanticsLabel('Kembali'));
+      await tester.pumpAndSettle();
+      expect(find.text('Keluar dari SFTP?'), findsNothing);
+      expect(find.text('catatan.txt'), findsOneWidget);
+    });
+
+    testWidgets('di folder awal: kembali menanyakan keluar', (tester) async {
+      await pumpBrowser(tester);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Keluar dari SFTP?'), findsOneWidget);
+    });
+
+    testWidgets('beberapa tingkat: kembali satu per satu sampai folder awal, lalu konfirmasi keluar', (tester) async {
+      final fake = await pumpBrowser(tester);
+      fake.tree['/home/u/proyek']!.add(dir('/home/u/proyek', 'dalam'));
+      fake.tree['/home/u/proyek/dalam'] = [file('/home/u/proyek/dalam', 'x.txt')];
+      await tester.tap(find.text('proyek'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('dalam'));
+      await tester.pumpAndSettle();
+      expect(find.text('x.txt'), findsOneWidget);
+
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('a.conf'), findsOneWidget);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('catatan.txt'), findsOneWidget);
+      expect(find.text('Keluar dari SFTP?'), findsNothing);
+      await tester.binding.handlePopRoute();
+      await tester.pumpAndSettle();
+      expect(find.text('Keluar dari SFTP?'), findsOneWidget);
+    });
+  });
+
   group('konfirmasi keluar', () {
     testWidgets('selalu muncul; Batal tetap di layar, Keluar menutup', (tester) async {
       await pumpBrowser(tester);

@@ -236,9 +236,10 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     _boundTo = service;
     // Setelah sambung ulang, kembali ke folder yang sedang dibuka.
     final restore = _browser?.path;
+    final history = _browser?.history ?? const <String>[];
     _browser?.dispose();
     _browser = SftpBrowserController(service);
-    unawaited(_browser!.start(restore: restore));
+    unawaited(_browser!.start(restore: restore, history: history));
   }
 
   void _onLink() {
@@ -340,6 +341,17 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     }
   }
 
+  /// Tombol kembali (header dan sistem): di dalam folder yang dibuka dari folder lain, kembali ke folder sebelumnya;
+  /// di folder awal baru menanyakan keluar. Selagi folder dimuat, ketukan kembali tidak keluar.
+  void _back() {
+    final browser = _browser;
+    if (browser != null && browser.canGoBack) {
+      unawaited(browser.back());
+      return;
+    }
+    unawaited(_requestLeave());
+  }
+
   /// Keluar selalu meminta konfirmasi selagi sambungan sudah terbuka. Bila ada transfer berjalan, isinya
   /// menyebut transfer itu dan akibat membatalkannya; pilihan aman (tetap di sini) menjadi tombol utama.
   Future<void> _requestLeave() async {
@@ -417,7 +429,7 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     return PopScope(
       canPop: link.service == null,
       onPopInvokedWithResult: (didPop, _) {
-        if (!didPop) unawaited(_requestLeave());
+        if (!didPop) _back();
       },
       child: Scaffold(
         body: SafeArea(
@@ -431,7 +443,7 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
                     ? l.sftpDisconnectedFrom(link.profile.name)
                     : l.sftpConnectedTo(link.profile.name),
                 subtitleColor: link.service != null && link.lost ? TermulPalette.bad : TermulPalette.ok,
-                onBack: () => unawaited(_requestLeave()),
+                onBack: _back,
                 onRefresh: browser == null || link.lost ? null : () => unawaited(browser.refresh()),
                 onUpload: browser == null || link.lost ? null : () => unawaited(_upload()),
               ),
