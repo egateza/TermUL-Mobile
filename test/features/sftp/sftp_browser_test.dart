@@ -1,4 +1,5 @@
 import 'dart:async';
+import 'dart:typed_data';
 
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
@@ -34,6 +35,60 @@ class FakeBrowsing implements SftpBrowsing {
     final t = tree[d];
     if (t == null) throw const SftpFailure(SftpFailureKind.notFound, 'tidak ada');
     return t;
+  }
+}
+
+/// Tiruan server dengan transfer: unduhan menulis [downloadBytes] (menunggu [hold] di tengah bila diisi), unggahan
+/// membaca seluruh aliran dan mencatatnya di [uploaded].
+class FakeFiles extends FakeBrowsing implements SftpFileOps {
+  FakeFiles(super.tree);
+
+  Uint8List downloadBytes = Uint8List.fromList(List.filled(1000, 7));
+  SftpFailure? downloadFailure;
+  SftpFailure? uploadFailure;
+  Completer<void>? hold;
+
+  /// Jumlah pemanggilan progres beruntun sebelum unduhan mulai (untuk menguji pembatasan laju).
+  int burst = 0;
+  final uploaded = <String, int>{};
+
+  @override
+  Future<int> download(
+    String remotePath,
+    StreamSink<List<int>> sink, {
+    void Function(int bytes)? onProgress,
+    SftpCancelToken? cancel,
+  }) async {
+    if (downloadFailure != null) throw downloadFailure!;
+    for (var i = 1; i <= burst; i++) {
+      onProgress?.call(i);
+    }
+    final half = downloadBytes.length ~/ 2;
+    sink.add(downloadBytes.sublist(0, half));
+    onProgress?.call(half);
+    if (hold != null) await hold!.future;
+    if (cancel?.isCancelled ?? false) throw const SftpFailure(SftpFailureKind.cancelled, 'Dibatalkan');
+    sink.add(downloadBytes.sublist(half));
+    onProgress?.call(downloadBytes.length);
+    return downloadBytes.length;
+  }
+
+  @override
+  Future<void> upload(
+    String remotePath,
+    Stream<Uint8List> data, {
+    void Function(int bytes)? onProgress,
+    SftpCancelToken? cancel,
+  }) async {
+    if (uploadFailure != null) throw uploadFailure!;
+    var n = 0;
+    await for (final c in data) {
+      n += c.length;
+      onProgress?.call(n);
+      if (hold != null) await hold!.future;
+      if (cancel?.isCancelled ?? false) throw const SftpFailure(SftpFailureKind.cancelled, 'Dibatalkan');
+    }
+    uploaded[remotePath] = n;
   }
 }
 
@@ -128,6 +183,11 @@ void main() {
 
     test('waktu ubah', () {
       expect(formatModified(l, now.subtract(const Duration(seconds: 20)), now), 'baru saja');
+      expect(
+        formatModified(l, now.add(const Duration(seconds: 40)), now),
+        'baru saja',
+        reason: 'jam server sedikit maju',
+      );
       expect(formatModified(l, now.subtract(const Duration(minutes: 5)), now), '5 menit lalu');
       expect(formatModified(l, now.subtract(const Duration(hours: 2)), now), '2 jam lalu');
       expect(formatModified(l, DateTime(2026, 10, 16, 23, 0), now), 'kemarin');

@@ -95,9 +95,26 @@ abstract interface class SftpBrowsing {
   Future<List<SftpEntry>> list(String dir);
 }
 
+/// Transfer berkas; dipisah dari [SftpBrowsing] supaya orkestrasi transfer bisa dites tanpa server.
+abstract interface class SftpFileOps {
+  Future<int> download(
+    String remotePath,
+    StreamSink<List<int>> sink, {
+    void Function(int bytes)? onProgress,
+    SftpCancelToken? cancel,
+  });
+
+  Future<void> upload(
+    String remotePath,
+    Stream<Uint8List> data, {
+    void Function(int bytes)? onProgress,
+    SftpCancelToken? cancel,
+  });
+}
+
 /// Operasi SFTP di atas satu [SftpClient]. Tidak memegang kredensial dan tidak menyambung sendiri; pemanggil
 /// yang membuka dan menutup sambungan SSH-nya (lihat `SftpSession` bila dipakai UI).
-class SftpService implements SftpBrowsing {
+class SftpService implements SftpBrowsing, SftpFileOps {
   SftpService(this._client);
 
   final SftpClient _client;
@@ -172,6 +189,7 @@ class SftpService implements SftpBrowsing {
 
   /// Mengunduh [remotePath] ke [sink]. [onProgress] menerima jumlah byte yang sudah diterima. Bila dibatalkan,
   /// melempar [SftpFailure] bertipe `cancelled`; menutup/menghapus berkas lokal adalah tugas pemanggil.
+  @override
   Future<int> download(
     String remotePath,
     StreamSink<List<int>> sink, {
@@ -194,16 +212,25 @@ class SftpService implements SftpBrowsing {
     }
   });
 
-  /// Mengunggah [data] ke [remotePath] (menimpa bila sudah ada). Bila dibatalkan atau gagal di tengah, berkas
-  /// parsial di server dihapus (spike K14: `abort` meninggalkan berkas parsial) dan galatnya dilempar.
+  /// Akhiran nama berkas sementara unggahan di server.
+  static const partialSuffix = '.termul-part';
+
+  /// Mengunggah [data] ke [remotePath] (menimpa bila sudah ada). Data ditulis ke `<nama>.termul-part` dulu, lalu
+  /// diganti namanya setelah selesai, jadi berkas lama tetap utuh bila unggahan dibatalkan atau gagal di tengah
+  /// (spike K14: `abort` meninggalkan berkas parsial; menulis langsung ke nama tujuan memotong berkas lama lebih
+  /// dulu). Berkas sementara dihapus bila gagal. SFTP v3 menolak mengganti nama ke berkas yang sudah ada (OpenSSH),
+  /// jadi berkas lama dihapus tepat sebelum penggantian nama; bila penggantian nama gagal berkas sementara dibiarkan
+  /// supaya hasil unggahan tidak hilang, dan galatnya dilaporkan.
+  @override
   Future<void> upload(
     String remotePath,
     Stream<Uint8List> data, {
     void Function(int bytes)? onProgress,
     SftpCancelToken? cancel,
   }) => _guard(() async {
+    final partial = '$remotePath$partialSuffix';
     final file = await _client.open(
-      remotePath,
+      partial,
       mode: SftpFileOpenMode.create | SftpFileOpenMode.truncate | SftpFileOpenMode.write,
     );
     final writer = file.write(data, onProgress: onProgress);
@@ -212,12 +239,12 @@ class SftpService implements SftpBrowsing {
       cancelled = true;
       unawaited(writer.abort());
     });
-    var ok = false;
+    var written = false;
     try {
       await writer.done;
       // `abort` menyelesaikan `done` secara normal, jadi pembatalan harus diperiksa di sini.
       if (cancelled) throw const SftpFailure(SftpFailureKind.cancelled, 'Dibatalkan');
-      ok = true;
+      written = true;
     } on SftpFailure {
       rethrow;
     } on Object {
@@ -229,13 +256,20 @@ class SftpService implements SftpBrowsing {
       } on Object {
         // sambungan mungkin sudah putus
       }
-      if (!ok) {
+      if (!written) {
         try {
-          await _client.remove(remotePath);
+          await _client.remove(partial);
         } on Object {
           // pembersihan terbaik-usaha; galat aslinya yang dilaporkan
         }
       }
+    }
+    try {
+      await _client.rename(partial, remotePath);
+    } on Object {
+      // Target sudah ada (OpenSSH menolak): hapus berkas lama lalu ganti nama.
+      await _client.remove(remotePath);
+      await _client.rename(partial, remotePath);
     }
   });
 

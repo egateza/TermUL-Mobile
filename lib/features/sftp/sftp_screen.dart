@@ -24,6 +24,7 @@ import '../connect/session_manager.dart';
 import 'sftp_browser_controller.dart';
 import 'sftp_format.dart';
 import 'sftp_link.dart';
+import 'sftp_transfer_actions.dart';
 import 'sftp_transfers.dart';
 
 /// Tab SFTP: memilih sumber sambungan. Sesi terminal yang sedang hidup di latar belakang bisa dipinjam
@@ -201,16 +202,21 @@ class _SourceRow extends StatelessWidget {
 
 /// Penjelajah folder satu sambungan ([SftpLink]). Menutup layar menutup koneksi SFTP sendiri (sesi yang dipinjam
 /// tetap hidup).
-class SftpBrowserScreen extends StatefulWidget {
+class SftpBrowserScreen extends ConsumerStatefulWidget {
   const SftpBrowserScreen({super.key, required this.link});
 
   final SftpLink link;
 
   @override
-  State<SftpBrowserScreen> createState() => _SftpBrowserScreenState();
+  ConsumerState<SftpBrowserScreen> createState() => _SftpBrowserScreenState();
 }
 
-class _SftpBrowserScreenState extends State<SftpBrowserScreen> {
+class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
+  late final SftpTransferActions _actions = SftpTransferActions(
+    link: widget.link,
+    saver: ref.read(downloadsSaverProvider),
+    tempDir: ref.read(tempDirProvider),
+  );
   SftpBrowserController? _browser;
   SftpBrowsing? _boundTo;
 
@@ -247,6 +253,80 @@ class _SftpBrowserScreenState extends State<SftpBrowserScreen> {
   }
 
   void _leave() => Navigator.of(context).pop();
+
+  String _reason(AppLocalizations l, SftpFailureKind kind) => switch (kind) {
+    SftpFailureKind.notFound => l.sftpErrNotFound,
+    SftpFailureKind.permissionDenied => l.sftpErrDenied,
+    SftpFailureKind.connectionLost => l.sftpErrLost,
+    _ => l.sftpErrOther,
+  };
+
+  void _toastOutcome(ScaffoldMessengerState messenger, AppLocalizations l, TransferOutcome o, {required bool upload}) {
+    switch (o) {
+      case TransferDone(:final location, :final savedName):
+        showTermulToastOn(
+          messenger,
+          upload ? l.sftpUploaded(o.name) : l.sftpDownloaded(location ?? 'Unduhan', savedName ?? o.name),
+        );
+      case TransferCancelled():
+        showTermulToastOn(messenger, l.sftpTransferCancelledToast(o.name), icon: TermulIconName.warning);
+      case TransferFailed(:final kind, :final saveFailed):
+        showTermulToastOn(
+          messenger,
+          saveFailed
+              ? l.sftpSaveFailed
+              : (upload ? l.sftpUploadFailed(_reason(l, kind)) : l.sftpDownloadFailed(_reason(l, kind))),
+          icon: TermulIconName.warning,
+        );
+    }
+  }
+
+  Future<void> _download(SftpEntry entry) async {
+    final messenger = ScaffoldMessenger.of(context);
+    final l = AppLocalizations.of(context);
+    final outcome = await _actions.download(entry);
+    if (!mounted) return;
+    _toastOutcome(messenger, l, outcome, upload: false);
+  }
+
+  /// Memilih berkas dari perangkat lalu mengunggahnya ke folder yang sedang dibuka. Nama yang sudah ada di folder
+  /// ini ditanyakan dulu (menimpa tidak bisa dibatalkan).
+  Future<void> _upload() async {
+    final browser = _browser;
+    if (browser == null) return;
+    final messenger = ScaffoldMessenger.of(context);
+    final l = AppLocalizations.of(context);
+    final files = await ref.read(uploadPickerProvider).pick();
+    if (!mounted || files.isEmpty) return;
+    final dir = browser.path;
+    for (final f in files) {
+      if (!mounted) return;
+      if (browser.entries.any((e) => e.name == f.name)) {
+        final ok = await _confirmOverwrite(f.name, dir);
+        if (!ok || !mounted) continue;
+      }
+      final outcome = await _actions.upload(f, dir);
+      if (!mounted) return;
+      _toastOutcome(messenger, l, outcome, upload: true);
+      if (outcome is TransferDone) unawaited(browser.refresh());
+    }
+  }
+
+  Future<bool> _confirmOverwrite(String name, String dir) async {
+    final l = AppLocalizations.of(context);
+    var ok = false;
+    await showTermulSheet<void>(
+      context,
+      title: l.sftpOverwriteTitle(name),
+      child: Text(l.sftpOverwriteBody(dir), style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
+      cancelLabel: l.actionCancel,
+      confirmLabel: l.sftpOverwriteConfirm,
+      confirmIsDanger: true,
+      cancelIsPrimary: true,
+      onConfirm: () => ok = true,
+    );
+    return ok;
+  }
 
   /// Keluar selalu meminta konfirmasi selagi sambungan sudah terbuka. Bila ada transfer berjalan, isinya
   /// menyebut transfer itu dan akibat membatalkannya; pilihan aman (tetap di sini) menjadi tombol utama.
@@ -308,13 +388,14 @@ class _SftpBrowserScreenState extends State<SftpBrowserScreen> {
                 subtitleColor: link.service != null && link.lost ? TermulPalette.bad : TermulPalette.ok,
                 onBack: () => unawaited(_requestLeave()),
                 onRefresh: browser == null || link.lost ? null : () => unawaited(browser.refresh()),
+                onUpload: browser == null || link.lost ? null : () => unawaited(_upload()),
               ),
               Expanded(
                 child: link.service == null || browser == null
                     ? _Connecting(link: link, state: state, onLeave: _leave)
                     : ListenableBuilder(
-                        listenable: Listenable.merge([browser, link]),
-                        builder: (context, _) => _Listing(browser: browser, link: link),
+                        listenable: Listenable.merge([browser, link, link.transfers]),
+                        builder: (context, _) => _Listing(browser: browser, link: link, onDownload: _download),
                       ),
               ),
             ],
@@ -379,6 +460,7 @@ class _Header extends StatelessWidget {
     required this.subtitleColor,
     required this.onBack,
     required this.onRefresh,
+    required this.onUpload,
   });
 
   final String title;
@@ -386,6 +468,7 @@ class _Header extends StatelessWidget {
   final Color subtitleColor;
   final VoidCallback onBack;
   final VoidCallback? onRefresh;
+  final VoidCallback? onUpload;
 
   @override
   Widget build(BuildContext context) {
@@ -418,6 +501,7 @@ class _Header extends StatelessWidget {
               ],
             ),
           ),
+          TermulIconButton(icon: TermulIconName.upload, label: l.sftpUploadAction, onPressed: onUpload),
           TermulIconButton(icon: TermulIconName.refresh, label: l.sftpRefresh, onPressed: onRefresh),
         ],
       ),
@@ -525,7 +609,9 @@ class _Problem extends StatelessWidget {
 }
 
 class _Listing extends StatelessWidget {
-  const _Listing({required this.browser, required this.link});
+  const _Listing({required this.browser, required this.link, required this.onDownload});
+
+  final void Function(SftpEntry) onDownload;
 
   final SftpBrowserController browser;
   final SftpLink link;
@@ -650,7 +736,10 @@ class _Listing extends StatelessWidget {
                   ),
                 ),
         ),
-        if (browser.selected != null) _SelectionBar(entry: browser.selected!),
+        if (link.transfers.isBusy) _TransferPanel(tracker: link.transfers),
+        if (browser.selected != null && !link.lost)
+          _SelectionBar(entry: browser.selected!, onDownload: () => onDownload(browser.selected!)),
+        if (browser.selected != null && link.lost) _SelectionBar(entry: browser.selected!),
       ],
     );
   }
@@ -787,9 +876,12 @@ class _EntryRow extends StatelessWidget {
 }
 
 class _SelectionBar extends StatelessWidget {
-  const _SelectionBar({required this.entry});
+  const _SelectionBar({required this.entry, this.onDownload});
 
   final SftpEntry entry;
+
+  /// null bila sambungan putus (unduh tidak bisa dimulai).
+  final VoidCallback? onDownload;
 
   @override
   Widget build(BuildContext context) {
@@ -816,15 +908,111 @@ class _SelectionBar extends StatelessWidget {
             overflow: TextOverflow.ellipsis,
             style: TermulText.caption.copyWith(fontFamily: TermulFonts.mono, color: TermulPalette.inkSoft),
           ),
-          TermulButton(
-            label: l.sftpCopyPath,
-            icon: TermulIconName.copy,
-            onPressed: () async {
-              final messenger = ScaffoldMessenger.of(context);
-              await Clipboard.setData(ClipboardData(text: entry.path));
-              showTermulToastOn(messenger, l.sftpPathCopied);
-            },
+          Row(
+            spacing: TermulSpacing.space3,
+            children: [
+              if (onDownload != null)
+                Expanded(
+                  flex: 2,
+                  child: TermulButton(
+                    label: l.sftpDownloadAction,
+                    icon: TermulIconName.download,
+                    variant: TermulButtonVariant.primary,
+                    onPressed: onDownload,
+                  ),
+                ),
+              Expanded(
+                flex: 2,
+                child: TermulButton(
+                  label: l.sftpCopyPath,
+                  icon: TermulIconName.copy,
+                  onPressed: () async {
+                    final messenger = ScaffoldMessenger.of(context);
+                    await Clipboard.setData(ClipboardData(text: entry.path));
+                    showTermulToastOn(messenger, l.sftpPathCopied);
+                  },
+                ),
+              ),
+            ],
           ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Transfer yang sedang berjalan: nama, persen, bilah kemajuan, dan tombol batal per transfer.
+class _TransferPanel extends StatelessWidget {
+  const _TransferPanel({required this.tracker});
+
+  final SftpTransferTracker tracker;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Container(
+      padding: const EdgeInsets.fromLTRB(
+        TermulSpacing.space5,
+        TermulSpacing.space3,
+        TermulSpacing.space3,
+        TermulSpacing.space3,
+      ),
+      decoration: const BoxDecoration(
+        color: TermulPalette.surface,
+        border: Border(top: BorderSide(color: TermulPalette.line)),
+      ),
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          for (final t in tracker.active)
+            Row(
+              key: ValueKey('transfer-${t.id}'),
+              children: [
+                Expanded(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: TermulSpacing.space2,
+                    children: [
+                      Row(
+                        children: [
+                          Expanded(
+                            child: Text(
+                              t.upload ? l.sftpTransferUpload(t.name) : l.sftpTransferDownload(t.name),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TermulText.bodySm.copyWith(fontFamily: TermulFonts.mono, color: TermulPalette.ink),
+                            ),
+                          ),
+                          if (t.percent != null)
+                            Text(
+                              l.sftpTransferPercent(t.percent!),
+                              style: TermulText.bodySm.copyWith(
+                                fontFamily: TermulFonts.mono,
+                                color: TermulPalette.accent,
+                              ),
+                            ),
+                        ],
+                      ),
+                      ClipRRect(
+                        borderRadius: BorderRadius.circular(2),
+                        child: LinearProgressIndicator(
+                          value: t.percent == null ? null : t.percent! / 100,
+                          minHeight: 4,
+                          backgroundColor: TermulPalette.lineStrong,
+                          color: TermulPalette.accent,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                TermulIconButton(
+                  icon: TermulIconName.close,
+                  label: l.sftpTransferCancel,
+                  onPressed: t.cancel.isCancelled ? null : t.cancel.cancel,
+                ),
+              ],
+            ),
         ],
       ),
     );

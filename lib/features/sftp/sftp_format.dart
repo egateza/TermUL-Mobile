@@ -20,6 +20,8 @@ const _months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 
 /// bukan tahun ini.
 String formatModified(AppLocalizations l, DateTime when, DateTime now) {
   final diff = now.difference(when);
+  // Jam server bisa beberapa menit lebih maju dari jam HP: selisih kecil di masa depan dianggap baru saja.
+  if (diff.isNegative && diff > const Duration(minutes: -5)) return l.sftpJustNow;
   if (!diff.isNegative) {
     if (diff.inMinutes < 1) return l.sftpJustNow;
     if (diff.inHours < 1) return l.sftpAgoMinutes(diff.inMinutes);

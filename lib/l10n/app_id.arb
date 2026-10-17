@@ -1461,5 +1461,91 @@
   "sftpReconnectingBody": "Folder yang dibuka tetap terlihat.",
   "@sftpReconnectingBody": {
     "description": "Isi banner saat SFTP menyambung ulang."
+  },
+  "sftpUploadAction": "Unggah berkas",
+  "@sftpUploadAction": {
+    "description": "Nama tombol unggah di header SFTP."
+  },
+  "sftpDownloadAction": "Unduh",
+  "@sftpDownloadAction": {
+    "description": "Tombol unduh di bar berkas terpilih."
+  },
+  "sftpDownloaded": "Diunduh ke {location} · {name}",
+  "@sftpDownloaded": {
+    "description": "Toast setelah berkas diunduh.",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpUploaded": "Diunggah · {name}",
+  "@sftpUploaded": {
+    "description": "Toast setelah berkas diunggah.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpTransferCancelledToast": "Dibatalkan · {name}",
+  "@sftpTransferCancelledToast": {
+    "description": "Toast bila transfer dibatalkan.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpDownloadFailed": "Unduhan gagal · {reason}",
+  "@sftpDownloadFailed": {
+    "description": "Toast bila unduhan gagal.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpUploadFailed": "Unggahan gagal · {reason}",
+  "@sftpUploadFailed": {
+    "description": "Toast bila unggahan gagal.",
+    "placeholders": {
+      "reason": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpSaveFailed": "Berkas diterima, tetapi tidak bisa disimpan ke Unduhan",
+  "@sftpSaveFailed": {
+    "description": "Toast bila penyimpanan ke Unduhan gagal."
+  },
+  "sftpOverwriteTitle": "Timpa {name}?",
+  "@sftpOverwriteTitle": {
+    "description": "Judul konfirmasi menimpa berkas di server.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpOverwriteBody": "Berkas dengan nama ini sudah ada di {dir}. Isinya akan diganti.",
+  "@sftpOverwriteBody": {
+    "description": "Isi konfirmasi menimpa berkas.",
+    "placeholders": {
+      "dir": {
+        "type": "String"
+      }
+    }
+  },
+  "sftpOverwriteConfirm": "Timpa",
+  "@sftpOverwriteConfirm": {
+    "description": "Tombol konfirmasi menimpa."
+  },
+  "sftpTransferCancel": "Batalkan transfer",
+  "@sftpTransferCancel": {
+    "description": "Nama tombol membatalkan satu transfer."
   }
 }

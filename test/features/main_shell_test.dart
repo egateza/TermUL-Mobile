@@ -20,31 +20,32 @@ void main() {
     expect(bar.active, 'hosts');
   });
 
-  testWidgets('tab Sesi dan Pengaturan tanpa tombol Kembali; SFTP menampilkan pilihan host dan Snippet menyatakan belum tersedia', (
-    tester,
-  ) async {
-    await Harness().pump(tester);
-    await tester.tap(tab('Sesi'));
-    await tester.pumpAndSettle();
-    expect(find.byType(SessionsScreen), findsOneWidget);
-    expect(find.text('Tidak ada sesi di latar belakang'), findsOneWidget);
-    expect(find.bySemanticsLabel('Kembali'), findsNothing);
+  testWidgets(
+    'tab Sesi dan Pengaturan tanpa tombol Kembali; SFTP menampilkan pilihan host dan Snippet menyatakan belum tersedia',
+    (tester) async {
+      await Harness().pump(tester);
+      await tester.tap(tab('Sesi'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SessionsScreen), findsOneWidget);
+      expect(find.text('Tidak ada sesi di latar belakang'), findsOneWidget);
+      expect(find.bySemanticsLabel('Kembali'), findsNothing);
 
-    await tester.tap(tab('SFTP'));
-    await tester.pumpAndSettle();
-    expect(find.textContaining('Pilih host untuk menjelajah berkasnya'), findsOneWidget);
-    expect(find.text('Belum ada host. Tambahkan dulu di tab Host.'), findsOneWidget);
+      await tester.tap(tab('SFTP'));
+      await tester.pumpAndSettle();
+      expect(find.textContaining('Pilih host untuk menjelajah berkasnya'), findsOneWidget);
+      expect(find.text('Belum ada host. Tambahkan dulu di tab Host.'), findsOneWidget);
 
-    await tester.tap(tab('Snippet'));
-    await tester.pumpAndSettle();
-    expect(find.text('Belum tersedia'), findsOneWidget);
-    expect(find.textContaining('perintah yang sering dipakai'), findsOneWidget);
+      await tester.tap(tab('Snippet'));
+      await tester.pumpAndSettle();
+      expect(find.text('Belum tersedia'), findsOneWidget);
+      expect(find.textContaining('perintah yang sering dipakai'), findsOneWidget);
 
-    await tester.tap(tab('Pengaturan'));
-    await tester.pumpAndSettle();
-    expect(find.byType(SettingsScreen), findsOneWidget);
-    expect(find.bySemanticsLabel('Kembali'), findsNothing);
-  });
+      await tester.tap(tab('Pengaturan'));
+      await tester.pumpAndSettle();
+      expect(find.byType(SettingsScreen), findsOneWidget);
+      expect(find.bySemanticsLabel('Kembali'), findsNothing);
+    },
+  );
 
   testWidgets('pencarian di Host bertahan saat berpindah tab', (tester) async {
     await Harness().pump(tester);

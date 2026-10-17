@@ -148,6 +148,34 @@ void main() {
       expect([for (final e in await sftp.list(base)) e.name], isNot(contains('besar.bin')));
     });
 
+    test(
+      'menimpa berkas lama: isi diganti utuh; batal di tengah menyisakan berkas lama tanpa berkas sementara',
+      () async {
+        final path = joinRemote(base, 'tetap.bin');
+        await sftp.upload(path, bytes(1000));
+        expect((await sftp.list(base)).single.size, 1000);
+
+        await sftp.upload(path, bytes(2000));
+        expect((await sftp.list(base)).single.size, 2000, reason: 'ditimpa');
+
+        final token = SftpCancelToken();
+        await expectLater(
+          sftp.upload(
+            path,
+            bytes(20 * 1024 * 1024),
+            onProgress: (b) {
+              if (b > 512 * 1024) token.cancel();
+            },
+            cancel: token,
+          ),
+          throwsA(isA<SftpFailure>().having((f) => f.kind, 'kind', SftpFailureKind.cancelled)),
+        );
+        final after = await sftp.list(base);
+        expect([for (final e in after) e.name], ['tetap.bin'], reason: 'tanpa .termul-part');
+        expect(after.single.size, 2000, reason: 'berkas lama tidak rusak');
+      },
+    );
+
     test('batal unduh: melempar cancelled', () async {
       final path = joinRemote(base, 'd.bin');
       await sftp.upload(path, bytes(8 * 1024 * 1024));

@@ -1902,6 +1902,78 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Folder yang dibuka tetap terlihat.'**
   String get sftpReconnectingBody;
+
+  /// Nama tombol unggah di header SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Unggah berkas'**
+  String get sftpUploadAction;
+
+  /// Tombol unduh di bar berkas terpilih.
+  ///
+  /// In id, this message translates to:
+  /// **'Unduh'**
+  String get sftpDownloadAction;
+
+  /// Toast setelah berkas diunduh.
+  ///
+  /// In id, this message translates to:
+  /// **'Diunduh ke {location} · {name}'**
+  String sftpDownloaded(String location, String name);
+
+  /// Toast setelah berkas diunggah.
+  ///
+  /// In id, this message translates to:
+  /// **'Diunggah · {name}'**
+  String sftpUploaded(String name);
+
+  /// Toast bila transfer dibatalkan.
+  ///
+  /// In id, this message translates to:
+  /// **'Dibatalkan · {name}'**
+  String sftpTransferCancelledToast(String name);
+
+  /// Toast bila unduhan gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Unduhan gagal · {reason}'**
+  String sftpDownloadFailed(String reason);
+
+  /// Toast bila unggahan gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Unggahan gagal · {reason}'**
+  String sftpUploadFailed(String reason);
+
+  /// Toast bila penyimpanan ke Unduhan gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas diterima, tetapi tidak bisa disimpan ke Unduhan'**
+  String get sftpSaveFailed;
+
+  /// Judul konfirmasi menimpa berkas di server.
+  ///
+  /// In id, this message translates to:
+  /// **'Timpa {name}?'**
+  String sftpOverwriteTitle(String name);
+
+  /// Isi konfirmasi menimpa berkas.
+  ///
+  /// In id, this message translates to:
+  /// **'Berkas dengan nama ini sudah ada di {dir}. Isinya akan diganti.'**
+  String sftpOverwriteBody(String dir);
+
+  /// Tombol konfirmasi menimpa.
+  ///
+  /// In id, this message translates to:
+  /// **'Timpa'**
+  String get sftpOverwriteConfirm;
+
+  /// Nama tombol membatalkan satu transfer.
+  ///
+  /// In id, this message translates to:
+  /// **'Batalkan transfer'**
+  String get sftpTransferCancel;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

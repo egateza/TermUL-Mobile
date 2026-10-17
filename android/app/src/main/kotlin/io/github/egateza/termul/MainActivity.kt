@@ -16,6 +16,7 @@ import io.flutter.plugin.common.MethodChannel
 class MainActivity : FlutterFragmentActivity() {
     private var channel: MethodChannel? = null
     private var screenChannel: MethodChannel? = null
+    private var downloadsChannel: MethodChannel? = null
     private var pendingNotificationResult: MethodChannel.Result? = null
 
     // Harus didaftarkan sebelum Activity mencapai STARTED, jadi sebagai properti.
@@ -39,6 +40,29 @@ class MainActivity : FlutterFragmentActivity() {
             if (call.method == "screenOffCount") result.success(ScreenOffTracker.count) else result.notImplemented()
         }
         ScreenOffTracker.onScreenOff = { runOnUiThread { screen.invokeMethod("screenOff", null) } }
+        val downloads = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/downloads")
+        downloadsChannel = downloads
+        downloads.setMethodCallHandler { call, result ->
+            if (call.method != "save") {
+                result.notImplemented()
+                return@setMethodCallHandler
+            }
+            val path = call.argument<String>("path")
+            val name = call.argument<String>("name")
+            if (path == null || name == null) {
+                result.error("bad_args", "path dan name wajib", null)
+                return@setMethodCallHandler
+            }
+            // Berkas bisa ratusan MB: salin di thread latar belakang, jawab di thread utama.
+            Thread {
+                try {
+                    val saved = DownloadsSaver.save(applicationContext, path, name)
+                    runOnUiThread { result.success(mapOf("name" to saved.name, "location" to saved.location)) }
+                } catch (e: Exception) {
+                    runOnUiThread { result.error("save_failed", e.javaClass.simpleName, null) }
+                }
+            }.start()
+        }
         ch.setMethodCallHandler { call, result ->
             when (call.method) {
                 "update" -> {
@@ -89,6 +113,8 @@ class MainActivity : FlutterFragmentActivity() {
         ScreenOffTracker.onScreenOff = null
         screenChannel?.setMethodCallHandler(null)
         screenChannel = null
+        downloadsChannel?.setMethodCallHandler(null)
+        downloadsChannel = null
         channel?.setMethodCallHandler(null)
         channel = null
         super.cleanUpFlutterEngine(flutterEngine)

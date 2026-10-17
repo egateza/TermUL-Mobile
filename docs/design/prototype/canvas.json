@@ -437,6 +437,24 @@
    "title": "4g · SFTP: sambung ulang menunggu verifikasi",
    "is_interactive": true,
    "radius": 28
+  },
+  "SftpTransfer.dc.html": {
+   "x": 2820,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4h · SFTP: unduhan berjalan (panel transfer)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "SftpOverwrite.dc.html": {
+   "x": 3290,
+   "y": 6672,
+   "w": 390,
+   "h": 844,
+   "title": "4i · SFTP: konfirmasi menimpa berkas",
+   "is_interactive": true,
+   "radius": 28
   }
  },
  "order": [
@@ -487,7 +505,9 @@
   "SftpLeaveBusy.dc.html",
   "SftpLost.dc.html",
   "SftpWaiting.dc.html",
-  "SftpNeedsAuth.dc.html"
+  "SftpNeedsAuth.dc.html",
+  "SftpTransfer.dc.html",
+  "SftpOverwrite.dc.html"
  ],
  "notes": {
   "judul": {

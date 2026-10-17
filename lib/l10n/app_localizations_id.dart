@@ -1042,4 +1042,54 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get sftpReconnectingBody => 'Folder yang dibuka tetap terlihat.';
+
+  @override
+  String get sftpUploadAction => 'Unggah berkas';
+
+  @override
+  String get sftpDownloadAction => 'Unduh';
+
+  @override
+  String sftpDownloaded(String location, String name) {
+    return 'Diunduh ke $location · $name';
+  }
+
+  @override
+  String sftpUploaded(String name) {
+    return 'Diunggah · $name';
+  }
+
+  @override
+  String sftpTransferCancelledToast(String name) {
+    return 'Dibatalkan · $name';
+  }
+
+  @override
+  String sftpDownloadFailed(String reason) {
+    return 'Unduhan gagal · $reason';
+  }
+
+  @override
+  String sftpUploadFailed(String reason) {
+    return 'Unggahan gagal · $reason';
+  }
+
+  @override
+  String get sftpSaveFailed => 'Berkas diterima, tetapi tidak bisa disimpan ke Unduhan';
+
+  @override
+  String sftpOverwriteTitle(String name) {
+    return 'Timpa $name?';
+  }
+
+  @override
+  String sftpOverwriteBody(String dir) {
+    return 'Berkas dengan nama ini sudah ada di $dir. Isinya akan diganti.';
+  }
+
+  @override
+  String get sftpOverwriteConfirm => 'Timpa';
+
+  @override
+  String get sftpTransferCancel => 'Batalkan transfer';
 }

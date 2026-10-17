@@ -19,17 +19,13 @@ Future<bool> tcpProbe(String host, int port, {Duration timeout = const Duration(
 /// Jeda antar percobaan sambung ulang: naik bertahap lalu tetap di nilai terakhir.
 class ReconnectBackoff {
   const ReconnectBackoff([
-    this.delays = const [
-      Duration(seconds: 2),
-      Duration(seconds: 5),
-      Duration(seconds: 10),
-      Duration(seconds: 30),
-    ],
+    this.delays = const [Duration(seconds: 2), Duration(seconds: 5), Duration(seconds: 10), Duration(seconds: 30)],
   ]);
 
   /// Tidak boleh kosong.
   final List<Duration> delays;
 
   /// Jeda sebelum percobaan ke-[attempt] (mulai dari 0) setelah percobaan sebelumnya gagal.
-  Duration delayAfter(int attempt) => delays[attempt < 0 ? 0 : (attempt >= delays.length ? delays.length - 1 : attempt)];
+  Duration delayAfter(int attempt) =>
+      delays[attempt < 0 ? 0 : (attempt >= delays.length ? delays.length - 1 : attempt)];
 }

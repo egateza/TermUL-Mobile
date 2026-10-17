@@ -1,9 +1,13 @@
+import 'dart:io';
+
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart' show getTemporaryDirectory;
 import 'package:flutter_riverpod/misc.dart' show Override;
 
 import 'bootstrap.dart';
 import 'core/keys/key_file_picker.dart';
 import 'core/models/app_settings.dart';
+import 'core/platform/downloads_saver.dart';
 import 'core/platform/keepalive_platform.dart';
 import 'core/platform/screen_monitor.dart';
 import 'core/models/profile_snapshot.dart';
@@ -18,6 +22,7 @@ import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
 import 'features/terminal/shell_channel.dart';
 import 'features/hosts/host_service.dart';
+import 'features/sftp/upload_picker.dart';
 
 /// Penyimpanan dan vault dibuat sekali di `bootstrap()` lalu disuntikkan lewat `overrides`.
 final hostRepositoryProvider = Provider<HostRepository>((ref) => throw UnimplementedError('Suntikkan lewat bootstrap'));
@@ -86,6 +91,15 @@ final sshConnectorProvider = Provider<SshConnector>(
 
 /// Fungsi sambung yang dipakai alur sambung; diganti di tes.
 final connectFunctionProvider = Provider<ConnectFunction>((ref) => ref.watch(sshConnectorProvider).connect);
+
+/// Menyimpan hasil unduhan SFTP ke Unduhan/TermUL; diganti di tes.
+final downloadsSaverProvider = Provider<DownloadsSaver>((ref) => MethodChannelDownloadsSaver());
+
+/// Pemilih berkas untuk unggahan SFTP; diganti di tes.
+final uploadPickerProvider = Provider<UploadPicker>((ref) => const FileSelectorUploadPicker());
+
+/// Folder berkas sementara unduhan (cache aplikasi); diganti di tes.
+final tempDirProvider = Provider<Future<Directory> Function()>((ref) => getTemporaryDirectory);
 
 /// Pemeriksa keterjangkauan host sebelum sambung ulang; diganti di tes.
 final hostProbeProvider = Provider<HostProbe>((ref) => tcpProbe);
