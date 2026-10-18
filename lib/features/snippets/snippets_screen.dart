@@ -4,6 +4,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import 'dart:convert';
 import 'dart:io';
+import 'dart:typed_data';
 
 import 'package:file_selector/file_selector.dart';
 
@@ -153,14 +154,43 @@ class _SnippetsScreenState extends ConsumerState<SnippetsScreen> {
   }
 
   Future<void> _export() async {
+    var destination = '';
+    await showTermulActions(
+      context,
+      title: 'Ekspor snippet',
+      actions: [
+        SheetAction(
+          label: 'Bagikan',
+          icon: TermulIconName.upload,
+          primary: true,
+          onSelected: () => destination = 'share',
+        ),
+        SheetAction(
+          label: 'Simpan ke perangkat',
+          icon: TermulIconName.download,
+          onSelected: () => destination = 'device',
+        ),
+        SheetAction(label: 'Batal', onSelected: () {}),
+      ],
+    );
+    if (destination.isEmpty || !mounted) return;
+
     try {
       final library = ref.read(snippetLibraryProvider);
       final text = const JsonEncoder.withIndent('  ').convert(library.toJson());
+      const name = 'termul-snippets.json';
+      if (destination == 'device') {
+        final saved = await ref
+            .read(deviceDocumentSaverProvider)
+            .save(name: name, mimeType: 'application/json', bytes: Uint8List.fromList(utf8.encode(text)));
+        if (saved && mounted) showTermulToast(context, 'Snippet berhasil disimpan ke perangkat');
+        return;
+      }
+
       final dir = await ref.read(tempDirProvider)();
       final shareDir = Directory('${dir.path}${Platform.pathSeparator}share');
       if (shareDir.existsSync()) shareDir.deleteSync(recursive: true);
       shareDir.createSync(recursive: true);
-      const name = 'termul-snippets.json';
       final file = File('${shareDir.path}${Platform.pathSeparator}$name');
       await file.writeAsString(text, encoding: utf8, flush: true);
       await ref
@@ -222,8 +252,8 @@ class _SnippetsScreenState extends ConsumerState<SnippetsScreen> {
           icon: _sorting ? TermulIconName.check : TermulIconName.sort,
           onSelected: () => setState(() => _sorting = !_sorting),
         ),
-      SheetAction(label: 'Impor snippet', icon: TermulIconName.upload, onSelected: _import),
-      SheetAction(label: 'Ekspor snippet', icon: TermulIconName.download, onSelected: _export),
+      SheetAction(label: 'Impor snippet', icon: TermulIconName.download, onSelected: _import),
+      SheetAction(label: 'Ekspor snippet', icon: TermulIconName.upload, onSelected: _export),
       SheetAction(
         label: 'Kelola kategori',
         icon: TermulIconName.edit,

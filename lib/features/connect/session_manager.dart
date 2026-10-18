@@ -11,18 +11,34 @@ import 'session_controller.dart';
 /// dibuka lagi dari "Sesi aktif". Sesi yang sedang tampil di layar tidak ada di daftar ini.
 class SessionManager extends Notifier<List<SessionController>> {
   int _nextId = 0;
+  int _nextGroupId = 0;
   final _all = <SessionController>[];
 
   @override
   List<SessionController> build() => const [];
 
   /// Membuat sesi baru ke [profile]. Alur sambung belum dimulai; pemanggil memanggil `start()`.
-  SessionController create(HostProfile profile, {required String unlockReason, required String reconnectedMarker}) {
+  String newGroupId() => 'multi-${_nextGroupId++}';
+
+  List<SessionController> forGroup(String groupId) => [
+    for (final c in _all)
+      if (c.groupId == groupId) c,
+  ];
+
+  void notifyGroupChanged() => _setState(List.of(state));
+
+  SessionController create(
+    HostProfile profile, {
+    required String unlockReason,
+    required String reconnectedMarker,
+    String? groupId,
+  }) {
     final ordinal = _all.where((c) => c.profile.id == profile.id).length + 1;
     late final SessionController controller;
     controller = SessionController(
       id: _nextId++,
       ordinal: ordinal,
+      groupId: groupId ?? newGroupId(),
       profile: profile,
       flow: ConnectFlow(
         profile: profile,
@@ -41,6 +57,7 @@ class SessionManager extends Notifier<List<SessionController>> {
       onEndedWhileDetached: () => release(controller),
     );
     _all.add(controller);
+    notifyGroupChanged();
     return controller;
   }
 

@@ -1285,6 +1285,30 @@ class AppLocalizationsId extends AppLocalizations {
   String get sessionsHint => 'Ketuk sesi untuk melanjutkannya.';
 
   @override
+  String sessionsMulti(int count) {
+    return 'Multi sesi · $count';
+  }
+
+  @override
+  String get sessionsMultiExpand => 'Ketuk untuk melihat sesi';
+
+  @override
+  String get sessionsMultiCollapse => 'Ketuk untuk menutup daftar sesi';
+
+  @override
+  String get sessionsDisconnectMultiBody =>
+      'Semua sesi di grup ini akan ditutup. Shell yang berjalan berakhir dan transfer SFTP dibatalkan.';
+
+  @override
+  String get sessionsDisconnectSftpBody => 'Koneksi SFTP ditutup dan transfer yang sedang berjalan dibatalkan.';
+
+  @override
+  String get sessionsAdd => 'Tambah sesi';
+
+  @override
+  String get sessionsAddHint => 'Pilih host dan jenis sesi untuk ditambahkan ke grup ini.';
+
+  @override
   String sessionsNumber(int n) {
     return 'sesi $n';
   }
@@ -1328,7 +1352,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get sessionsDisconnectAllBody =>
-      'Semua shell di server ikut berakhir dan program yang sedang berjalan berhenti.';
+      'Semua sesi Terminal dan SFTP akan ditutup. Shell berakhir dan transfer SFTP dibatalkan.';
 
   @override
   String get terminalLeaveChoiceTitle => 'Keluar dari terminal?';
@@ -1792,7 +1816,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get exportNote =>
-      'Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Menu bagikan Android akan terbuka: kirim ke aplikasi lain atau simpan ke penyimpanan. Password, passphrase, dan kunci tidak ikut.';
+      'Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Pilih Bagikan untuk mengirim lewat aplikasi lain atau Simpan ke perangkat untuk memilih lokasi penyimpanan. Password, passphrase, dan kunci tidak ikut.';
 
   @override
   String exportKeyConverted(int n) {
@@ -1803,7 +1827,13 @@ class AppLocalizationsId extends AppLocalizations {
   String get exportNothing => 'Belum ada profil untuk diekspor.';
 
   @override
-  String get exportFailed => 'Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.';
+  String get exportSaveToDevice => 'Simpan ke perangkat';
+
+  @override
+  String get exportSaved => 'Profil berhasil disimpan ke perangkat';
+
+  @override
+  String get exportFailed => 'Ekspor gagal. Berkas tidak bisa dibagikan atau disimpan; coba lagi.';
 
   @override
   String get snippetsAdd => 'Snippet baru';

@@ -28,6 +28,9 @@ fun git(vararg args: String): String? = try {
 }
 val commitCount: Int? = git("rev-list", "--count", "HEAD")?.toIntOrNull()
 val dirtyTree: Boolean = !git("status", "--porcelain").isNullOrEmpty()
+// Build uji lewat adb boleh dipasang berdampingan dengan aplikasi rilis: TERMUL_PREVIEW=true
+// memakai application id terpisah dan nama yang jelas. Build biasa tetap memakai id rilis.
+val previewBuild: Boolean = providers.environmentVariable("TERMUL_PREVIEW").orNull == "true"
 
 android {
     namespace = "io.github.egateza.termul"
@@ -40,7 +43,8 @@ android {
     }
 
     defaultConfig {
-        applicationId = "io.github.egateza.termul"
+        applicationId = if (previewBuild) "io.github.egateza.termul.preview" else "io.github.egateza.termul"
+        manifestPlaceholders["appLabel"] = if (previewBuild) "TermUL Preview" else "TermUL"
         // You can update the following values to match your application needs.
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         // Dikunci 24: local_auth butuh 24 (flutter_secure_storage 23). Keputusan tetap di CLAUDE.md.

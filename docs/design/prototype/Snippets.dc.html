@@ -159,9 +159,22 @@ Pengaturan
 <sc-if value="{{canSort}}" hint-placeholder-val="{{ true }}">
 <button type="button" onClick="{{manageSort}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M4 17l3 3 3-3M17 20V4M14 7l3-3 3 3"/></svg><span>{{sortLabel}}</span></button>
 </sc-if>
-<button type="button" onClick="{{manageImport}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5M7 10l5-5 5 5M5 19h14"/></svg><span>Impor snippet</span></button>
-<button type="button" onClick="{{manageExport}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v11M7 11l5 5 5-5M5 19h14"/></svg><span>Ekspor snippet</span></button>
+<button type="button" onClick="{{manageImport}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v11M7 11l5 5 5-5M5 19h14"/></svg><span>Impor snippet</span></button>
+<button type="button" onClick="{{manageExport}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5M7 10l5-5 5 5M5 19h14"/></svg><span>Ekspor snippet</span></button>
 <button type="button" onClick="{{manageCategories}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4"/></svg><span>Kelola kategori</span></button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{exportOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: 6">
+<button type="button" onClick="{{closeExport}}" aria-label="Tutup" style="position: absolute; inset: 0; width: 100%; border: none; background: rgba(5, 8, 10, 0.62); cursor: pointer"></button>
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 10px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto 4px auto" aria-hidden="true"></div>
+<h2 style="margin: 4px 0 6px 0; font-size: 20px; font-weight: 600">Ekspor snippet</h2>
+<button type="button" onClick="{{exportShare}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: none; background: #F0B34A; color: #1B1406; display: flex; align-items: center; gap: 12px; text-align: left; font: 600 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5M7 10l5-5 5 5M5 19h14"/></svg><span>Bagikan</span></button>
+<button type="button" onClick="{{exportDevice}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v11M7 11l5 5 5-5M5 19h14"/></svg><span>Simpan ke perangkat</span></button>
+<button type="button" onClick="{{closeExport}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><span>Batal</span></button>
 </div>
 </div>
 </sc-if>
@@ -600,7 +613,11 @@ class Component extends DCLogic {
       closeManage: () => this.setState({ manageOpen: false }),
       manageSort: () => this.setState({ manageOpen: false, sorting: !sorting }),
       manageImport: () => { this.setState({ manageOpen: false }); flash('Pilih berkas JSON untuk mengimpor snippet'); },
-      manageExport: () => { this.setState({ manageOpen: false }); flash('Berkas termul-snippets.json siap dibagikan'); },
+      manageExport: () => this.setState({ manageOpen: false, exportOpen: true }),
+      exportOpen: s.exportOpen || false,
+      closeExport: () => this.setState({ exportOpen: false }),
+      exportShare: () => { this.setState({ exportOpen: false }); flash('Berkas termul-snippets.json siap dibagikan'); },
+      exportDevice: () => { this.setState({ exportOpen: false }); flash('Pilih lokasi untuk menyimpan termul-snippets.json'); },
       manageCategories: () => this.setState({ manageOpen: false, catsOpen: true }),
       sortRows: list.map((sn) => ({
         title: sn.title,

@@ -36,6 +36,7 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
   SessionController({
     required this.id,
     required this.ordinal,
+    this.groupId = 'session',
     required this.profile,
     required this.flow,
     required this._registry,
@@ -58,6 +59,9 @@ class SessionController extends ChangeNotifier with WidgetsBindingObserver {
 
   /// Nomor sesi di antara sesi ke profil yang sama (1, 2, ...), supaya beberapa sesi ke host yang sama bisa dibedakan.
   final int ordinal;
+
+  /// Id grup multi sesi yang dibentuk dari layar terminal.
+  final String groupId;
   final HostProfile profile;
   final ConnectFlow flow;
   final DateTime startedAt;

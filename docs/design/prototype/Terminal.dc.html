@@ -1,4 +1,4 @@
-<!doctype html>
+﻿<!doctype html>
 <html lang="id">
 <head>
 <meta charset="utf-8">
@@ -15,7 +15,7 @@ a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
 </style>
 </helmet>
-<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
 
 <div style="display: flex; align-items: center; gap: 4px; padding: 12px 8px 8px 8px">
 <a href="Main.dc.html" aria-label="Kembali ke daftar host" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
@@ -34,16 +34,82 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </div>
 
 <div style="display: flex; gap: 6px; padding: 0 12px 8px 12px">
-<sc-for list="{{tabs}}" as="t" hint-placeholder-count="2">
-<button type="button" onClick="{{t.pick}}" aria-pressed="{{t.on}}" style="min-height: 44px; padding: 0 16px; display: flex; align-items: center; gap: 8px; border-radius: 12px; border: 1px solid {{t.bd}}; background: {{t.bg}}; color: {{t.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; cursor: pointer">
+<sc-for list="{{visibleTabs}}" as="t" hint-placeholder-count="3">
+<button type="button" onClick="{{t.pick}}" onPointerDown="{{t.startNameHold}}" onPointerUp="{{endNameHold}}" onPointerLeave="{{endNameHold}}" title="{{t.label}}" aria-label="{{t.label}}" aria-pressed="{{t.on}}" style="flex: 1; min-width: 0; min-height: 44px; padding: 0 10px; display: flex; align-items: center; gap: 8px; border-radius: 12px; border: 1px solid {{t.bd}}; background: {{t.bg}}; color: {{t.fg}}; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; cursor: pointer">
 <span style="width: 7px; height: 7px; border-radius: 50%; background: {{t.dot}}"></span>
-{{t.label}}
+<span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{t.label}}</span>
+<sc-if value="{{t.isSftp}}" hint-placeholder-val="{{ false }}"><span style="padding: 1px 5px; border-radius: 6px; border: 1px solid #3A474E; font-family: 'IBM Plex Sans', sans-serif; font-size: 10px">SFTP</span></sc-if>
 </button>
 </sc-for>
-<button type="button" aria-label="Sesi baru" style="width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px dashed #2A343A; background: transparent; color: #9AA8AF; cursor: pointer">
+<sc-if value="{{hasOverflow}}" hint-placeholder-val="{{ false }}">
+<button type="button" onClick="{{showAllSessions}}" aria-label="Lihat semua sesi" style="height: 44px; padding: 0 12px; display: flex; align-items: center; gap: 6px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font: 500 13px 'JetBrains Mono', monospace; cursor: pointer">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 6l6 6-6 6M13 6l6 6-6 6"/></svg><sc-if value="{{hasHiddenSessions}}" hint-placeholder-val="{{ false }}">+{{overflowCount}}</sc-if>
+</button>
+</sc-if>
+<sc-if value="{{showAddButton}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{addSession}}" aria-label="Tambah sesi ke multi sesi" style="width: 44px; min-height: 44px; display: flex; align-items: center; justify-content: center; border-radius: 12px; border: 1px dashed #2A343A; background: transparent; color: #9AA8AF; cursor: pointer">
 <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
 </button>
+</sc-if>
 </div>
+
+<sc-if value="{{fullName}}" hint-placeholder-val="{{ false }}">
+<div role="status" style="position: absolute; z-index: 9; top: 68px; left: 20px; right: 20px; padding: 12px 14px; border: 1px solid #5C6A71; border-radius: 12px; background: #1E262B; color: #E8EEF0; font: 500 14px 'JetBrains Mono', monospace; text-align: center">{{fullName}}</div>
+</sc-if>
+
+<sc-if value="{{showOverflow}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 7; display: flex; align-items: flex-end; justify-content: center; box-sizing: border-box">
+<button type="button" onClick="{{closeOverflow}}" aria-label="Tutup semua sesi" style="position: absolute; inset: 0; width: 100%; border: 0; background: rgba(5,8,10,.68); cursor: pointer"></button>
+<section role="dialog" aria-modal="true" aria-labelledby="allSessionsTitle" style="position: relative; width: 100%; max-height: 84%; box-sizing: border-box; overflow: hidden; display: flex; flex-direction: column; gap: 8px; padding: 12px; border: 1px solid #3A474E; border-bottom: 0; border-radius: 18px 18px 0 0; background: #161C20">
+<div style="display: flex; align-items: center; justify-content: space-between; padding: 2px 4px 4px"><h2 id="allSessionsTitle" style="margin: 0; font-size: 16px; font-weight: 600">Semua sesi ({{sessionCount}})</h2><button type="button" onClick="{{closeOverflow}}" aria-label="Tutup" style="width: 40px; height: 40px; border: 0; background: transparent; color: #9AA8AF; font-size: 22px; cursor: pointer">×</button></div>
+<div style="overflow-y: auto; display: flex; flex-direction: column; gap: 6px"><sc-for list="{{allTabs}}" as="t" hint-placeholder-count="5"><div style="min-height: 56px; display: flex; align-items: center; gap: 6px; padding: 0 8px 0 12px; border-radius: 12px; border: 1px solid {{t.bd}}; background: #1E262B"><button type="button" onClick="{{t.pick}}" onPointerDown="{{t.startNameHold}}" onPointerUp="{{endNameHold}}" onPointerLeave="{{endNameHold}}" title="{{t.label}}" aria-label="{{t.label}}" style="flex: 1; min-width: 0; min-height: 54px; display: flex; align-items: center; gap: 10px; border: 0; background: transparent; color: #E8EEF0; text-align: left; cursor: pointer"><span style="width: 7px; height: 7px; flex: none; border-radius: 50%; background: {{t.dot}}"></span><span style="min-width: 0; flex: 1; display: flex; flex-direction: column"><span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font: 500 13px 'JetBrains Mono', monospace">{{t.label}} <sc-if value="{{t.isSftp}}" hint-placeholder-val="{{ false }}"><small>SFTP</small></sc-if></span><span style="font-size: 11px; color: #9AA8AF">{{t.status}}</span></span><sc-if value="{{t.on}}" hint-placeholder-val="{{ false }}"><span style="color: #F0B34A; font-size: 11px; font-weight: 600">Aktif</span></sc-if></button><button type="button" onClick="{{t.remove}}" aria-label="Putuskan sesi {{t.label}}" style="width: 36px; height: 40px; border: 0; background: transparent; color: #9AA8AF; font-size: 20px; cursor: pointer">×</button></div></sc-for></div>
+<button type="button" onClick="{{newFromOverflow}}" style="min-height: 48px; border-radius: 12px; border: 1px solid #5C6A71; background: transparent; color: #E8EEF0; font: 600 14px 'IBM Plex Sans', sans-serif; cursor: pointer">＋&nbsp; Sesi baru</button>
+</section></div>
+</sc-if>
+
+<sc-if value="{{adding}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 6">
+<button type="button" onClick="{{closeAdd}}" aria-label="Tutup tambah sesi" style="position: absolute; inset: 0; width: 100%; border: none; background: rgba(5, 8, 10, 0.62); cursor: pointer"></button>
+<section role="dialog" aria-modal="true" aria-labelledby="addTitle" style="position: absolute; left: 0; right: 0; bottom: 0; height: 84%; max-height: 84%; overflow: hidden; box-sizing: border-box; padding: 12px 20px 24px; border-radius: 24px 24px 0 0; border: 1px solid #2A343A; border-bottom: 0; background: #161C20; display: flex; flex-direction: column; gap: 8px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto 4px" aria-hidden="true"></div>
+<div style="display: flex; align-items: center; gap: 8px">
+<h2 id="addTitle" style="flex: 1; min-width: 0; margin: 4px 0 2px; font-size: 20px; font-weight: 600">Tambah sesi</h2>
+<button type="button" onClick="{{closeAdd}}" aria-label="Tutup" style="width: 40px; height: 40px; border: 0; border-radius: 10px; background: transparent; color: #9AA8AF; font-size: 22px; cursor: pointer">×</button>
+</div>
+<p style="flex: none; margin: 0; color: #9AA8AF; font-size: 13px">Pilih host dan jenis sesi untuk ditambahkan ke grup ini.</p>
+<label style="flex: none; height: 48px; box-sizing: border-box; display: flex; align-items: center; gap: 10px; padding: 0 14px; border-radius: 12px; border: 1px solid #5C6A71; background: #161C20; color: #9AA8AF">
+<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="10.8" cy="10.8" r="6.8"/><path d="m16 16 5 5"/></svg>
+<input type="search" onInput="{{filterAddSessions}}" value="{{addQuery}}" aria-label="Cari nama, user, atau IP" placeholder="Cari nama, user, atau IP" style="width: 100%; min-width: 0; border: 0; outline: 0; background: transparent; color: #E8EEF0; font: 14px 'IBM Plex Sans', sans-serif">
+</label>
+<div style="flex: 1; min-height: 0; overflow-y: auto; display: flex; flex-direction: column; gap: 4px; padding: 0 0 8px">
+<sc-if value="{{noAddGroups}}" hint-placeholder-val="{{ false }}"><p style="margin: 24px 8px; color: #9AA8AF; font-size: 14px; text-align: center">Tidak ada host yang cocok.</p></sc-if>
+<sc-for list="{{addGroups}}" as="g">
+<div style="display: flex; flex-direction: column; gap: 4px">
+<button type="button" onClick="{{g.toggle}}" aria-expanded="{{g.open}}" style="flex: none; min-height: 44px; padding: 0 8px; display: flex; align-items: center; gap: 8px; border: 0; background: transparent; color: #9AA8AF; text-align: left; cursor: pointer">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: rotate({{g.rotation}}deg)"><path d="m6 9 6 6 6-6"/></svg>
+<span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 12px; letter-spacing: 1.2px; text-transform: uppercase">{{g.name}}</span>
+<span style="font: 12px 'JetBrains Mono', monospace">{{g.count}}</span>
+</button>
+<sc-if value="{{g.open}}" hint-placeholder-val="{{ true }}">
+<sc-for list="{{g.hosts}}" as="h">
+<article style="flex: none; padding: 10px 12px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<div style="min-width: 0; display: flex; flex-direction: column; gap: 2px; margin-bottom: 8px">
+<strong style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; font-weight: 500">{{h.name}}</strong>
+<span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap; color: #9AA8AF; font: 12px 'JetBrains Mono', monospace">{{h.address}}</span>
+</div>
+<div style="display: flex; gap: 6px">
+<button type="button" onClick="{{h.addTerminal}}" style="flex: 1; min-width: 0; min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid #5C6A71; background: transparent; color: #E8EEF0; font: 500 13px 'IBM Plex Sans', sans-serif; cursor: pointer">Terminal</button>
+<sc-if value="{{h.hasSftp}}" hint-placeholder-val="{{ true }}"><button type="button" onClick="{{h.addSftp}}" style="flex: 1; min-width: 0; min-height: 44px; padding: 0 8px; border-radius: 10px; border: 1px solid #5C6A71; background: transparent; color: #E8EEF0; font: 500 13px 'IBM Plex Sans', sans-serif; cursor: pointer">SFTP</button></sc-if>
+</div>
+</article>
+</sc-for>
+</sc-if>
+</div>
+</sc-for>
+</div>
+</section>
+</div>
+</sc-if>
 
 <sc-if value="{{reconnecting}}" hint-placeholder-val="{{ false }}">
 <div style="display: flex; align-items: center; gap: 12px; margin: 0 12px 8px 12px; padding: 10px 12px; border-radius: 12px; border: 1px solid #5A4720; background: #231C0E">
@@ -258,23 +324,40 @@ class Component extends DCLogic {
     const inTmux = this.props.session !== 'biasa';
     const showKeyboard = this.props.showKeyboard !== false;
 
-    const tabDefs = [
-      { id: 'app', label: 'app-01' },
-      { id: 'db', label: 'db-01' },
-      { id: 'top', label: 'htop' }
+    const defaultTabs = [
+      { id: 'app', label: 'app-01', kind: 'Terminal' },
+      { id: 'db', label: 'db-01', kind: 'Terminal' },
+      { id: 'files', label: 'db-01', kind: 'SFTP' },
+      { id: 'web-demo', label: 'web-01', kind: 'Terminal' },
+      { id: 'worker-demo', label: 'worker-01', kind: 'SFTP' }
     ];
+    const tabDefs = s.sessionTabs || [...defaultTabs, ...(s.extraTabs || [])];
     const tabs = tabDefs.map((t) => {
       const on = tab === t.id;
       return {
         label: t.label,
+        isSftp: t.kind === 'SFTP',
         on: on,
         bg: on ? '#1E262B' : '#161C20',
         fg: on ? '#E8EEF0' : '#9AA8AF',
         bd: on ? '#F0B34A' : '#2A343A',
         dot: reconnecting && on ? '#F0B34A' : '#5ED3A6',
+        status: on && reconnecting ? 'menyambung ulang' : 'terhubung · 18 ms',
         pick: () => {
           if (this._term) this._term.scrollTop = 0;
-          this.setState({ tab: t.id, sel: null, more: false, free: false, atBottom: true, pasteMenu: false, confirm: false });
+          this.setState({ tab: t.id, showOverflow: false, sel: null, more: false, free: false, atBottom: true, pasteMenu: false, confirm: false });
+        },
+        remove: () => {
+          const remaining = tabDefs.filter((x) => x.id !== t.id);
+          this.setState({ sessionTabs: remaining, tab: t.id === tab ? (remaining[0] || {}).id : tab });
+        },
+        startNameHold: () => {
+          clearTimeout(this._nameHoldTimer);
+          this._nameHoldTimer = setTimeout(() => {
+            this.setState({ fullName: t.label });
+            this._nameHoldTimer = null;
+            this._fullNameTimer = setTimeout(() => this.setState({ fullName: '' }), 1800);
+          }, 550);
         }
       };
     });
@@ -440,6 +523,33 @@ class Component extends DCLogic {
       setTimeout(() => this.setState({ toast: null }), 2200);
     };
 
+    const addQuery = s.addQuery || '';
+    const addCatalog = [
+      { name: 'app-02', address: 'deploy@app-02', group: 'Production', sftp: true, addTerminal: () => this._addSessionTab(s, 'app-02', 'Terminal'), addSftp: () => this._addSessionTab(s, 'app-02', 'SFTP') },
+      { name: 'db-01', address: 'deploy@db-01', group: 'Production', sftp: true, addTerminal: () => this._addSessionTab(s, 'db-01', 'Terminal'), addSftp: () => this._addSessionTab(s, 'db-01', 'SFTP') },
+      { name: 'web-01', address: 'deploy@web-01', group: 'Development', sftp: true, addTerminal: () => this._addSessionTab(s, 'web-01', 'Terminal'), addSftp: () => this._addSessionTab(s, 'web-01', 'SFTP') },
+      { name: 'edge-gateway-production-europe', address: 'ops@edge-gateway', group: 'Development', sftp: false, addTerminal: () => this._addSessionTab(s, 'edge-gateway-production-europe', 'Terminal') }
+    ];
+    const addGroups = ['Production', 'Development'].map((name) => {
+      const q = addQuery.trim().toLowerCase();
+      const hosts = addCatalog
+        .filter((h) => h.group === name && (!q || `${h.name} ${h.address}`.toLowerCase().includes(q)))
+        .map((h) => ({ ...h, hasSftp: h.sftp }));
+      const collapsed = new Set(s.addCollapsed || []);
+      return {
+        name: name,
+        count: hosts.length,
+        hosts: hosts,
+        open: !!q || !collapsed.has(name),
+        rotation: !!q || !collapsed.has(name) ? 0 : -90,
+        toggle: () => {
+          if (q) return;
+          if (collapsed.has(name)) collapsed.delete(name); else collapsed.add(name);
+          this.setState({ addCollapsed: [...collapsed] });
+        }
+      };
+    }).filter((g) => g.count > 0);
+
     const panel = !!s.panel;
     const page = s.page || 'rec';
     const recentNow = s.recent || ['Ctrl+C', 'Esc', 'Tab', 'Ctrl+R', '\u2191', 'Ctrl+L'];
@@ -579,7 +689,7 @@ class Component extends DCLogic {
     });
 
     return {
-      hostName: tab === 'db' ? 'db-01' : (tab === 'top' ? 'app-01 \u00b7 htop' : 'app-01'),
+      hostName: (tabDefs.find((t) => t.id === tab) || tabDefs[0]).label,
       statusColor: (waiting || needsAuth) ? '#FF7F70' : (reconnecting ? '#F0B34A' : '#5ED3A6'),
       statusText: waiting ? 'terputus · mencoba lagi 5 dtk' : (needsAuth ? 'terputus · perlu verifikasi' : reconnecting ? 'menyambung ulang · percobaan 2/5' : (tab === 'db' ? 'terhubung · 21 ms' : 'terhubung · 18 ms')),
       reconnecting: reconnecting,
@@ -591,6 +701,31 @@ class Component extends DCLogic {
       showSudo: tab === 'app' && !reconnecting && !selecting && !confirm,
       showKeyboard: showKeyboard,
       tabs: tabs,
+      visibleTabs: (() => {
+        const active = tabs.findIndex((t) => t.on);
+        return active > 2 ? [...tabs.slice(0, 2), tabs[active]] : tabs.slice(0, 3);
+      })(),
+      allTabs: tabs,
+      hasOverflow: tabs.length >= 3,
+      overflowCount: Math.max(0, tabs.length - 3),
+      hasHiddenSessions: tabs.length > 3,
+      showAddButton: tabs.length < 3,
+      sessionCount: tabs.length,
+      showOverflow: !!s.showOverflow,
+      showAllSessions: () => this.setState({ showOverflow: true }),
+      closeOverflow: () => this.setState({ showOverflow: false }),
+      newFromOverflow: () => this.setState({ showOverflow: false, adding: true }),
+      endNameHold: () => {
+        clearTimeout(this._nameHoldTimer);
+        this._nameHoldTimer = null;
+      },
+      adding: !!s.adding,
+      addQuery: addQuery,
+      addGroups: addGroups,
+      noAddGroups: addGroups.every((group) => group.hosts.length === 0),
+      filterAddSessions: (event) => this.setState({ addQuery: event?.target?.value || '' }),
+      addSession: () => this.setState({ adding: true }),
+      closeAdd: () => this.setState({ adding: false, addQuery: '' }),
       keys: keys,
       lines: lines,
       selecting: selecting,
@@ -685,6 +820,20 @@ class Component extends DCLogic {
       fsBtnBg: free ? '#6CB4FF' : 'transparent',
       fsBtnFg: free ? '#08141C' : '#6CB4FF'
     };
+  }
+
+  _addSessionTab(s, host, kind) {
+    const existing = s.sessionTabs || [
+      { id: 'app', label: 'app-01', kind: 'Terminal' },
+      { id: 'db', label: 'db-01', kind: 'Terminal' },
+      { id: 'files', label: 'db-01', kind: 'SFTP' },
+      { id: 'web-demo', label: 'web-01', kind: 'Terminal' },
+      { id: 'worker-demo', label: 'worker-01', kind: 'SFTP' },
+      ...(s.extraTabs || [])
+    ];
+    const id = 'added-' + (existing.length + 1);
+    const tab = { id, label: host, kind };
+    this.setState({ sessionTabs: [...existing, tab], tab: id, adding: false });
   }
 }
 </script>

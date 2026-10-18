@@ -20,8 +20,10 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../terminal/terminal_palette.dart';
 import '../terminal/terminal_screen.dart';
+import '../terminal/session_group_bar.dart';
 import '../settings/settings_screen.dart';
-import '../sftp/sftp_screen.dart' show openSftpFromSession;
+import '../sftp/sftp_screen.dart' show openSftpFromSession, openSftpSession, replaceWithSftpSession;
+import '../sftp/sftp_session_manager.dart';
 import '../snippets/snippet_detail_sheet.dart';
 import '../snippets/snippets_screen.dart';
 import '../snippets/snippet_target.dart';
@@ -35,12 +37,13 @@ import 'session_manager.dart';
 /// layar yang ditutup biasa menutup sesinya, tetapi lewat "Tetap terhubung" sesi dibiarkan hidup di latar belakang
 /// dan dibuka lagi dengan [controller].
 class ConnectScreen extends ConsumerStatefulWidget {
-  const ConnectScreen({super.key, required this.profile, this.controller});
+  const ConnectScreen({super.key, required this.profile, this.controller, this.groupId});
 
   final HostProfile profile;
 
   /// Sesi yang sudah ada (dibuka lagi dari "Sesi aktif"); kosong = sesi baru.
   final SessionController? controller;
+  final String? groupId;
 
   @override
   ConsumerState<ConnectScreen> createState() => _ConnectScreenState();
@@ -49,6 +52,7 @@ class ConnectScreen extends ConsumerStatefulWidget {
 class _ConnectScreenState extends ConsumerState<ConnectScreen> {
   late final SessionManager _manager;
   SessionController? _c;
+  String? _groupId;
 
   /// Pengguna memilih "Tetap terhubung": sesi dibiarkan hidup saat layar ditutup.
   bool _keep = false;
@@ -67,6 +71,7 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
     final SessionController controller;
     if (existing != null) {
       controller = existing;
+      _groupId = widget.groupId ?? existing.groupId;
       _manager.take(existing);
     } else {
       final l = AppLocalizations.of(context);
@@ -74,7 +79,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
         widget.profile,
         unlockReason: l.unlockReason(widget.profile.name),
         reconnectedMarker: l.reconnectedMarker,
+        groupId: widget.groupId,
       );
+      _groupId = controller.groupId;
     }
     _c = controller;
     controller.addListener(_onController);
@@ -155,6 +162,44 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
 
   void _openSettings() => Navigator.of(context).push(MaterialPageRoute<void>(builder: (_) => const SettingsScreen()));
 
+  void _openGroupTerminal(SessionController controller) {
+    if (identical(controller, _c)) return;
+    _keep = true;
+    Navigator.of(context).pushReplacement<void, void>(
+      MaterialPageRoute(
+        builder: (_) => ConnectScreen(profile: controller.profile, controller: controller, groupId: _groupId),
+      ),
+    );
+  }
+
+  void _openGroupSftp(SftpSession session) {
+    _keep = true;
+    openSftpSession(context, ref, session, replace: true);
+  }
+
+  Future<void> _addGroupSession() async {
+    final choice = await pickSessionGroupMember(context, ref);
+    if (!mounted || choice == null) return;
+    final l = AppLocalizations.of(context);
+    if (choice.kind == SessionGroupKind.terminal) {
+      _keep = true;
+      Navigator.of(context).pushReplacement<void, void>(
+        MaterialPageRoute(
+          // Biarkan layar baru membuat controller dan memanggil start(). Jika controller dibuat di sini lalu
+          // dikirim sebagai `controller`, ConnectScreen menganggapnya sesi lama dan hanya memanggil reconnect(),
+          // yang tidak berjalan karena controller baru belum berstatus putus.
+          builder: (_) => ConnectScreen(profile: choice.profile, groupId: _groupId),
+        ),
+      );
+    } else {
+      final session = ref
+          .read(sftpSessionManagerProvider.notifier)
+          .create(choice.profile, unlockReason: l.unlockReason(choice.profile.name), groupId: _groupId);
+      _keep = true;
+      replaceWithSftpSession(context, ref, session);
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     final c = _c!;
@@ -191,6 +236,13 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               keepAliveEnabled: keepAlive,
               onOpenSettings: _openSettings,
               onOpenSftp: () => openSftpFromSession(context, c, confirmLeave: false),
+              sessionGroupTabs: SessionGroupBar(
+                groupId: _groupId!,
+                activeKey: 't-${c.id}',
+                onTerminal: _openGroupTerminal,
+                onSftp: _openGroupSftp,
+                onAdd: _addGroupSession,
+              ),
               snippets: usableSnippets,
               onSnippetDetail: (s) => _openSnippetDetail(c, s),
               onManageSnippets: _manageSnippets,
@@ -201,6 +253,13 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               profile: widget.profile,
               session: session,
               link: TerminalLink.reconnecting,
+              sessionGroupTabs: SessionGroupBar(
+                groupId: _groupId!,
+                activeKey: 't-${c.id}',
+                onTerminal: _openGroupTerminal,
+                onSftp: _openGroupSftp,
+                onAdd: _addGroupSession,
+              ),
               textStyle: style,
               handleStyle: handle,
               confirmSingleLinePaste: confirmPaste,
@@ -211,6 +270,13 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               profile: widget.profile,
               session: session,
               link: TerminalLink.lost,
+              sessionGroupTabs: SessionGroupBar(
+                groupId: _groupId!,
+                activeKey: 't-${c.id}',
+                onTerminal: _openGroupTerminal,
+                onSftp: _openGroupSftp,
+                onAdd: _addGroupSession,
+              ),
               failureText: _failureSummary(l, state),
               onReconnect: () => c.reconnect(manual: true),
               retryInSeconds: c.secondsUntilRetry,

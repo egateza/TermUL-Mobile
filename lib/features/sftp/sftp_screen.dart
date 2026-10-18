@@ -18,7 +18,7 @@ import '../../shared/widgets/termul_action_sheet.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_toast.dart';
 import '../connect/connect_flow.dart';
-import '../connect/connect_screen.dart' show connectFailureText;
+import '../connect/connect_screen.dart' show connectFailureText, ConnectScreen;
 import '../connect/host_key_prompt.dart';
 import '../connect/session_controller.dart';
 import 'sftp_browser_controller.dart';
@@ -28,6 +28,8 @@ import 'sftp_session_manager.dart';
 import 'sftp_transfer_actions.dart';
 import 'unique_name.dart';
 import 'sftp_transfers.dart';
+import '../terminal/session_group_bar.dart';
+import '../connect/session_manager.dart';
 
 void _pushLink(BuildContext context, SftpLink link, {bool confirmLeave = true}) {
   unawaited(link.start());
@@ -62,17 +64,29 @@ void openSftpOwn(BuildContext context, WidgetRef ref, HostProfile profile) {
 }
 
 /// Membuka lagi sesi SFTP yang hidup di latar belakang (dari tab Sesi).
-void openSftpSession(BuildContext context, WidgetRef ref, SftpSession session) {
+void openSftpSession(BuildContext context, WidgetRef ref, SftpSession session, {bool replace = false}) {
+  if (replace) {
+    replaceWithSftpSession(context, ref, session);
+    return;
+  }
   ref.read(sftpSessionManagerProvider.notifier).take(session);
   _pushSession(context, session);
 }
 
-void _pushSession(BuildContext context, SftpSession session) {
-  Navigator.of(context).push<void>(
-    MaterialPageRoute(
-      builder: (_) => SftpBrowserScreen(link: session.link, session: session),
-    ),
+void replaceWithSftpSession(BuildContext context, WidgetRef ref, SftpSession session) {
+  ref.read(sftpSessionManagerProvider.notifier).take(session);
+  _pushSession(context, session, replace: true);
+}
+
+void _pushSession(BuildContext context, SftpSession session, {bool replace = false}) {
+  final route = MaterialPageRoute<void>(
+    builder: (_) => SftpBrowserScreen(link: session.link, session: session),
   );
+  if (replace) {
+    Navigator.of(context).pushReplacement<void, void>(route);
+  } else {
+    Navigator.of(context).push<void>(route);
+  }
 }
 
 /// Penjelajah folder satu sambungan ([SftpLink]). Menutup layar menutup koneksi SFTP sendiri (sesi yang dipinjam
@@ -146,6 +160,58 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
   }
 
   void _leave() => Navigator.of(context).pop();
+
+  void _openGroupTerminal(SessionController controller) {
+    final groupId = widget.session?.groupId;
+    if (groupId == null || !mounted) return;
+    _keep = true;
+    widget.link.resumePath = _browser?.path;
+    widget.link.resumeHistory = _browser?.history ?? const [];
+    Navigator.of(context).pushReplacement<void, void>(
+      MaterialPageRoute(
+        builder: (_) => ConnectScreen(profile: controller.profile, controller: controller, groupId: groupId),
+      ),
+    );
+  }
+
+  void _openGroupSftp(SftpSession session) {
+    if (identical(widget.session, session)) return;
+    _keep = true;
+    widget.link.resumePath = _browser?.path;
+    widget.link.resumeHistory = _browser?.history ?? const [];
+    replaceWithSftpSession(context, ref, session);
+  }
+
+  Future<void> _addGroupSession() async {
+    final groupId = widget.session?.groupId;
+    if (groupId == null) return;
+    final choice = await pickSessionGroupMember(context, ref);
+    if (!mounted || choice == null) return;
+    final l = AppLocalizations.of(context);
+    widget.link.resumePath = _browser?.path;
+    widget.link.resumeHistory = _browser?.history ?? const [];
+    _keep = true;
+    if (choice.kind == SessionGroupKind.terminal) {
+      final controller = ref
+          .read(sessionManagerProvider.notifier)
+          .create(
+            choice.profile,
+            unlockReason: l.unlockReason(choice.profile.name),
+            reconnectedMarker: l.reconnectedMarker,
+            groupId: groupId,
+          );
+      Navigator.of(context).pushReplacement<void, void>(
+        MaterialPageRoute(
+          builder: (_) => ConnectScreen(profile: choice.profile, controller: controller, groupId: groupId),
+        ),
+      );
+    } else {
+      final session = ref
+          .read(sftpSessionManagerProvider.notifier)
+          .create(choice.profile, unlockReason: l.unlockReason(choice.profile.name), groupId: groupId);
+      replaceWithSftpSession(context, ref, session);
+    }
+  }
 
   String _reason(AppLocalizations l, SftpFailureKind kind) => switch (kind) {
     SftpFailureKind.notFound => l.sftpErrNotFound,
@@ -477,6 +543,14 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
         body: SafeArea(
           child: Column(
             children: [
+              if (widget.session?.groupId case final groupId?)
+                SessionGroupBar(
+                  groupId: groupId,
+                  activeKey: 's-${widget.session!.id}',
+                  onTerminal: _openGroupTerminal,
+                  onSftp: _openGroupSftp,
+                  onAdd: _addGroupSession,
+                ),
               _Header(
                 title: l.navSftp,
                 subtitle: link.service == null

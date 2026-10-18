@@ -2,7 +2,7 @@
 <html lang="id">
 <head>
 <meta charset="utf-8">
-<title>Sesi aktif</title>
+<title>Sesi aktif · Multi sesi</title>
 <script src="./support.js"></script>
 </head>
 <body>
@@ -15,7 +15,7 @@ a{color:inherit;text-decoration:none}
 a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
 </style>
 </helmet>
-<div style="width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
 
 <div style="display: flex; align-items: center; gap: 4px; padding: 20px 20px 8px 8px">
 <a href="Main.dc.html" aria-label="Kembali" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
@@ -25,45 +25,111 @@ a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2p
 </div>
 
 <div style="flex: 1; min-height: 0; overflow-y: auto; padding: 4px 20px 24px 20px; display: flex; flex-direction: column; gap: 10px">
-<p style="margin: 0 12px 6px 12px; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">Ketuk sesi untuk melanjutkannya.</p>
-
-<sc-for list="{{rows}}" as="r" hint-placeholder-count="3">
-<div style="display: flex; align-items: center; gap: 4px; padding: 10px 6px 10px 16px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
-<a href="{{r.href}}" aria-label="{{r.aria}}" style="flex: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; justify-content: center; gap: 4px">
-<span style="display: flex; align-items: center; gap: 8px; min-width: 0"><span style="font-size: 16px; font-weight: 500; color: #E8EEF0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.title}}</span><sc-if value="{{r.sftp}}" hint-placeholder-val="{{ false }}"><span style="flex: none; padding: 1px 6px; border-radius: 6px; border: 1px solid #3A474E; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #C5D0D5">SFTP</span></sc-if></span>
-<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12.5px; color: #9AA8AF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.target}}</span>
-<span style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: {{r.color}}">
-<span style="width: 8px; height: 8px; border-radius: 50%; background: {{r.color}}"></span>
-{{r.status}}
+<p style="margin: 0 12px 6px 12px; font-size: 12.5px; line-height: 1.4; color: #9AA8AF">Multi sesi yang dibuat dari terminal. Ketuk grup untuk melihat sesi di dalamnya.</p>
+<sc-for list="{{groups}}" as="g" hint-placeholder-count="2">
+<div style="display: flex; flex-direction: column; gap: 6px">
+<div style="display: flex; align-items: center; gap: 4px; padding: 8px 6px 8px 16px; border-radius: 14px; border: 1px solid #2A343A; background: #161C20">
+<button type="button" onClick="{{g.toggle}}" aria-expanded="{{g.open}}" style="flex: 1; min-width: 0; min-height: 56px; display: flex; align-items: center; gap: 10px; padding: 0; border: none; background: transparent; color: #E8EEF0; cursor: pointer; text-align: left">
+<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; justify-content: center; gap: 4px">
+<span style="font-size: 16px; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{g.title}}</span>
+<span style="font-size: 12.5px; color: #9AA8AF">{{g.subtitle}}</span>
 </span>
-</a>
-<button type="button" aria-label="{{r.closeAria}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 12px; background: transparent; color: #9AA8AF; cursor: pointer">
+<span style="display: flex; align-items: center; gap: 8px; color: #9AA8AF; font-size: 13px"><span>{{g.count}}</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="transform: rotate({{g.rot}}deg)"><path d="M6 9l6 6 6-6"/></svg></span>
+</button>
+<button type="button" onClick="{{g.disconnect}}" aria-label="Putuskan semua sesi {{g.host}}" title="Putuskan semua sesi di {{g.host}}" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 12px; background: transparent; color: #9AA8AF; cursor: pointer">
 <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
 </button>
 </div>
+<sc-if value="{{g.open}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; flex-direction: column; gap: 6px; padding-left: 14px; border-left: 1px solid #3A474E; margin-left: 10px">
+<sc-for list="{{g.sessions}}" as="r" hint-placeholder-count="2">
+<div style="display: flex; align-items: center; gap: 4px; padding: 9px 5px 9px 12px; border-radius: 12px; border: 1px solid #2A343A; background: #161C20">
+<a href="{{r.href}}" aria-label="{{r.aria}}" style="flex: 1; min-width: 0; min-height: 56px; display: flex; flex-direction: column; justify-content: center; gap: 4px">
+<span style="display: flex; align-items: center; gap: 8px; min-width: 0"><span style="font-size: 15px; font-weight: 500; color: #E8EEF0; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.title}}</span><span style="flex: none; padding: 1px 6px; border-radius: 6px; border: 1px solid #3A474E; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11px; color: #C5D0D5">{{r.kind}}</span></span>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #9AA8AF; white-space: nowrap; overflow: hidden; text-overflow: ellipsis">{{r.target}}</span>
+<span style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; color: {{r.color}}"><span style="width: 7px; height: 7px; border-radius: 50%; background: {{r.color}}"></span>{{r.status}}</span>
+</a>
+<button type="button" onClick="{{r.disconnect}}" aria-label="Putuskan {{r.closeTitle}}" style="width: 40px; height: 40px; display: flex; align-items: center; justify-content: center; border: none; border-radius: 12px; background: transparent; color: #9AA8AF; cursor: pointer">
+<svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M6 6l12 12M18 6L6 18"/></svg>
+</button>
+</div>
+</sc-for>
+</div>
+</sc-if>
+</div>
 </sc-for>
 
-<button type="button" style="margin-top: 10px; min-height: 48px; border-radius: 12px; border: 1px solid #5C6A71; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Putuskan semua</button>
+<button type="button" onClick="{{disconnectAll}}" style="margin-top: 10px; min-height: 48px; border-radius: 12px; border: 1px solid #5C6A71; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Putuskan semua sesi</button>
 </div>
+
+<sc-if value="{{confirmTitle}}" hint-placeholder-val="Putuskan sesi?">
+<div style="position: absolute; inset: 0; z-index: 5">
+<button type="button" onClick="{{cancelConfirm}}" aria-label="Tutup konfirmasi" style="position: absolute; inset: 0; width: 100%; border: none; background: rgba(5, 8, 10, 0.62); cursor: pointer"></button>
+<section role="dialog" aria-modal="true" aria-labelledby="confirmTitle" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 12px 20px 24px; border-radius: 24px 24px 0 0; border: 1px solid #2A343A; border-bottom: 0; background: #161C20; display: flex; flex-direction: column; gap: 14px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto 4px" aria-hidden="true"></div>
+<h2 id="confirmTitle" style="margin: 4px 0 0; font-size: 20px; font-weight: 600">{{confirmTitle}}</h2>
+<p style="margin: 0; color: #C5D0D5; font-size: 15px; line-height: 1.5">{{confirmBody}}</p>
+<div style="display: flex; gap: 10px; margin-top: 4px">
+<button type="button" onClick="{{cancelConfirm}}" style="flex: 2; min-height: 52px; border-radius: 14px; border: 1px solid #3A474E; background: transparent; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; cursor: pointer">Batal</button>
+<button type="button" onClick="{{confirmDisconnect}}" style="flex: 3; min-height: 52px; border-radius: 14px; border: 1px solid #FF7F70; background: #FF7F70; color: #14100C; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 16px; font-weight: 500; cursor: pointer">Putuskan</button>
+</div>
+</section>
+</div>
+</sc-if>
 
 </div>
 </x-dc>
 <script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
 class Component extends DCLogic {
   renderVals() {
-    const OK = '#5ED3A6', BAD = '#FF7F70', BUSY = '#F0B34A';
-    const rows = [
-      { title: 'app-01', target: 'deploy@10.0.1.11:22 · mulai 14.02', status: 'Tersambung', color: OK },
-      { title: 'app-01 · sesi 2', target: 'deploy@10.0.1.11:22 · mulai 14.20', status: 'Tersambung', color: OK },
-      { title: 'db-01', target: 'postgres@10.0.1.21:22 · mulai 13.47', status: 'Terputus', color: BAD },
-      { title: 'app-01', sftp: true, target: 'deploy@10.0.1.11:22 · mulai 14.31', status: 'Tersambung', color: OK }
-    ].map((r) => Object.assign({}, r, {
-      sftp: r.sftp === true,
-      href: r.sftp ? 'Sftp.dc.html' : 'Terminal.dc.html',
-      aria: r.title + (r.sftp ? ' · SFTP' : '') + ', ' + r.status.toLowerCase() + '. Ketuk untuk melanjutkan.',
-      closeAria: 'Putuskan ' + r.title + (r.sftp ? ' · SFTP' : '')
-    }));
-    return { rows: rows };
+    const s = this.state || {};
+    const OK = '#5ED3A6', BAD = '#FF7F70';
+    const makeSession = (title, kind, target, time, status, color, href) => ({
+      title, kind, target: target + ' · mulai ' + time, status, color, href,
+      closeTitle: title + ' · ' + kind,
+      aria: title + ' · ' + kind + ', ' + status.toLowerCase() + '. Ketuk untuk melanjutkan.',
+      disconnect: () => this.setState({
+        confirmTitle: 'Putuskan sesi?',
+        confirmBody: kind === 'SFTP'
+          ? 'Koneksi SFTP ke ' + target.split('@')[1].split(':')[0] + ' akan ditutup dan transfer yang berjalan dibatalkan.'
+          : 'Shell di ' + target.split('@')[1].split(':')[0] + ' ikut berakhir dan program yang sedang berjalan berhenti.'
+      })
+    });
+    const firstGroup = [
+      makeSession('Terminal', 'Terminal', 'deploy@10.0.1.11:22', '14.02', 'Tersambung', OK, 'Terminal.dc.html'),
+      makeSession('Terminal', 'Terminal', 'postgres@10.0.1.21:22', '14.20', 'Tersambung', OK, 'Terminal.dc.html'),
+      makeSession('Penjelajah berkas', 'SFTP', 'ops@10.0.1.31:22', '14.31', 'Tersambung', OK, 'Sftp.dc.html')
+    ];
+    const secondGroup = [
+      makeSession('Penjelajah berkas', 'SFTP', 'deploy@10.0.1.12:22', '13.47', 'Terputus', BAD, 'Sftp.dc.html'),
+      makeSession('Terminal', 'Terminal', 'postgres@10.0.1.22:22', '13.52', 'Terputus', BAD, 'Terminal.dc.html')
+    ];
+    const group = (id, name, sessions, open) => ({
+      host: name, sessions, open, count: sessions.length,
+      title: name + ' - multi sesi',
+      subtitle: sessions.length + ' sesi - beberapa host',
+      rot: open ? 180 : 0,
+      toggle: () => this.setState({ [id]: !s[id] }),
+      disconnect: () => this.setState({
+        confirmTitle: 'Putuskan ' + sessions.length + ' sesi?',
+        confirmBody: 'Semua sesi di grup ini akan ditutup. Shell yang berjalan berakhir dan transfer SFTP dibatalkan.'
+      })
+    });
+    const groups = [
+      group('multi-1', 'Multi sesi 1', firstGroup, s['multi-1'] !== false),
+      group('multi-2', 'Multi sesi 2', secondGroup, s['multi-2'] === true)
+    ];
+    return {
+      groups,
+      confirmTitle: s.confirmTitle,
+      confirmBody: s.confirmBody,
+      cancelConfirm: () => this.setState({ confirmTitle: '', confirmBody: '' }),
+      confirmDisconnect: () => this.setState({ confirmTitle: '', confirmBody: '' }),
+      disconnectAll: () => this.setState({
+        confirmTitle: 'Putuskan 5 sesi?',
+        confirmBody: 'Semua sesi akan ditutup. Shell yang berjalan berakhir dan transfer SFTP dibatalkan.'
+      })
+    };
   }
 }
 </script>

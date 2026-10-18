@@ -1840,6 +1840,39 @@
   "@sessionsHint": {
     "description": "Petunjuk di atas daftar sesi aktif."
   },
+  "sessionsMulti": "Multi sesi · {count}",
+  "@sessionsMulti": {
+    "description": "Label grup sesi yang dibuat pengguna, dapat melintasi host dan jenis koneksi.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "sessionsMultiExpand": "Ketuk untuk melihat sesi",
+  "@sessionsMultiExpand": {
+    "description": "Petunjuk membuka grup multi sesi."
+  },
+  "sessionsMultiCollapse": "Ketuk untuk menutup daftar sesi",
+  "@sessionsMultiCollapse": {
+    "description": "Petunjuk menutup grup multi sesi."
+  },
+  "sessionsDisconnectMultiBody": "Semua sesi di grup ini akan ditutup. Shell yang berjalan berakhir dan transfer SFTP dibatalkan.",
+  "@sessionsDisconnectMultiBody": {
+    "description": "Konsekuensi memutus semua sesi dalam grup multi sesi."
+  },
+  "sessionsDisconnectSftpBody": "Koneksi SFTP ditutup dan transfer yang sedang berjalan dibatalkan.",
+  "@sessionsDisconnectSftpBody": {
+    "description": "Konsekuensi memutus satu sesi SFTP."
+  },
+  "sessionsAdd": "Tambah sesi",
+  "@sessionsAdd": {
+    "description": "Judul pemilih jenis dan host untuk menambah sesi ke grup multi sesi."
+  },
+  "sessionsAddHint": "Pilih host dan jenis sesi untuk ditambahkan ke grup ini.",
+  "@sessionsAddHint": {
+    "description": "Petunjuk pada pemilih host untuk menambahkan sesi ke grup multi sesi."
+  },
   "sessionsNumber": "sesi {n}",
   "@sessionsNumber": {
     "description": "Nomor sesi untuk membedakan beberapa sesi ke host yang sama.",
@@ -1913,7 +1946,7 @@
       }
     }
   },
-  "sessionsDisconnectAllBody": "Semua shell di server ikut berakhir dan program yang sedang berjalan berhenti.",
+  "sessionsDisconnectAllBody": "Semua sesi Terminal dan SFTP akan ditutup. Shell berakhir dan transfer SFTP dibatalkan.",
   "@sessionsDisconnectAllBody": {
     "description": "Isi konfirmasi memutus semua sesi."
   },
@@ -2625,11 +2658,11 @@
   },
   "exportTitle": "Ekspor profil",
   "@exportTitle": {
-    "description": "Judul panel konfirmasi ekspor."
+    "description": "Judul panel pilihan ekspor profil."
   },
   "exportConfirm": "Bagikan",
   "@exportConfirm": {
-    "description": "Tombol konfirmasi ekspor."
+    "description": "Aksi untuk membagikan berkas ekspor lewat Android."
   },
   "exportCount": "{n} profil akan diekspor",
   "@exportCount": {
@@ -2640,7 +2673,7 @@
       }
     }
   },
-  "exportNote": "Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Menu bagikan Android akan terbuka: kirim ke aplikasi lain atau simpan ke penyimpanan. Password, passphrase, dan kunci tidak ikut.",
+  "exportNote": "Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Pilih Bagikan untuk mengirim lewat aplikasi lain atau Simpan ke perangkat untuk memilih lokasi penyimpanan. Password, passphrase, dan kunci tidak ikut.",
   "@exportNote": {
     "description": "Catatan di panel ekspor."
   },
@@ -2657,9 +2690,17 @@
   "@exportNothing": {
     "description": "Galat bila daftar host kosong."
   },
-  "exportFailed": "Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.",
+  "exportSaveToDevice": "Simpan ke perangkat",
+  "@exportSaveToDevice": {
+    "description": "Aksi ekspor profil untuk memilih folder penyimpanan di perangkat."
+  },
+  "exportSaved": "Profil berhasil disimpan ke perangkat",
+  "@exportSaved": {
+    "description": "Konfirmasi setelah lokasi dan nama berkas ekspor dipilih dan disimpan."
+  },
+  "exportFailed": "Ekspor gagal. Berkas tidak bisa dibagikan atau disimpan; coba lagi.",
   "@exportFailed": {
-    "description": "Galat bila berkas ekspor tidak bisa disimpan."
+    "description": "Galat bila berkas ekspor tidak bisa dibagikan atau disimpan."
   },
   "snippetsAdd": "Snippet baru",
   "@snippetsAdd": {

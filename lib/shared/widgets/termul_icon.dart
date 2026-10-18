@@ -21,6 +21,7 @@ enum TermulIconName {
   chevronDown('M6 9l6 6 6-6'),
   chevronLeft('M15 6l-6 6 6 6'),
   chevronRight('M9 6l6 6-6 6'),
+  chevronsRight('M5 6l6 6-6 6M13 6l6 6-6 6'),
   warning('M12 4l10 17H2zM12 10v5M12 18h.01'),
   shield('M12 3l8 3v6c0 4.5-3.2 8-8 9-4.8-1-8-4.5-8-9V6zM9 12l2 2 4-4'),
   lock('M8 11V8a4 4 0 0 1 8 0v3'),

@@ -20,7 +20,7 @@ import '../sftp/sftp_session_manager.dart';
 /// Daftar sesi yang dibiarkan hidup di latar belakang ("Tetap terhubung"). Mengetuk sesi membukanya lagi untuk
 /// dilanjutkan; beberapa sesi ke profil yang sama dibedakan nomor dan jam mulainya. Tab "Sesi" di `NavBar`
 /// ([showBack] false); tombol kembali hanya bila dibuka sebagai layar tersendiri.
-class SessionsScreen extends ConsumerWidget {
+class SessionsScreen extends ConsumerStatefulWidget {
   const SessionsScreen({super.key, this.showBack = true});
 
   final bool showBack;
@@ -34,6 +34,13 @@ class SessionsScreen extends ConsumerWidget {
   };
 
   static String _time(DateTime t) => '${t.hour.toString().padLeft(2, '0')}.${t.minute.toString().padLeft(2, '0')}';
+
+  @override
+  ConsumerState<SessionsScreen> createState() => _SessionsScreenState();
+}
+
+class _SessionsScreenState extends ConsumerState<SessionsScreen> {
+  final Set<String> _expanded = {};
 
   void _open(BuildContext context, SessionController c) {
     Navigator.of(context).push<void>(
@@ -92,7 +99,8 @@ class SessionsScreen extends ConsumerWidget {
   }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
+    final ref = this.ref;
     final l = AppLocalizations.of(context);
     final sessions = ref.watch(sessionManagerProvider);
     final sftp = ref.watch(sftpSessionManagerProvider);
@@ -104,7 +112,7 @@ class SessionsScreen extends ConsumerWidget {
           children: [
             Padding(
               padding: EdgeInsets.fromLTRB(
-                showBack ? TermulSpacing.space3 : TermulSpacing.space8,
+                widget.showBack ? TermulSpacing.space3 : TermulSpacing.space8,
                 // Landscape: header lebih rendah supaya isi mendapat tinggi layar.
                 landscape ? TermulSpacing.space1 : TermulSpacing.space5,
                 TermulSpacing.space8,
@@ -112,7 +120,7 @@ class SessionsScreen extends ConsumerWidget {
               ),
               child: Row(
                 children: [
-                  if (showBack) ...[
+                  if (widget.showBack) ...[
                     TermulIconButton(
                       icon: TermulIconName.chevronLeft,
                       label: l.actionBack,
@@ -175,20 +183,21 @@ class SessionsScreen extends ConsumerWidget {
                             style: TermulText.caption.copyWith(color: TermulPalette.inkMuted),
                           ),
                         ),
-                        for (final c in sessions) ...[
-                          _SessionRow(
-                            controller: c,
-                            onOpen: () => _open(context, c),
-                            onDisconnect: () => _confirmDisconnect(context, c),
-                          ),
-                          const SizedBox(height: TermulSpacing.space3),
-                        ],
-                        for (final s in sftp) ...[
-                          _SftpSessionRow(
-                            session: s,
-                            onOpen: () => openSftpSession(context, ref, s),
-                            onDisconnect: () => _confirmDisconnectSftp(context, ref, s),
-                          ),
+                        for (final group in _groups(sessions, sftp)) ...[
+                          if (!group.isMulti)
+                            _sessionItem(context, ref, group.items.single)
+                          else
+                            _MultiSessionGroup(
+                              count: group.items.length,
+                              expanded: _expanded.contains(group.groupId),
+                              onToggle: () => setState(() {
+                                if (!_expanded.add(group.groupId!)) _expanded.remove(group.groupId);
+                              }),
+                              onDisconnect: () => _confirmDisconnectGroup(context, ref, group),
+                              children: _expanded.contains(group.groupId)
+                                  ? [for (final item in group.items) _sessionItem(context, ref, item)]
+                                  : const [],
+                            ),
                           const SizedBox(height: TermulSpacing.space3),
                         ],
                         if (total > 1) ...[
@@ -204,6 +213,153 @@ class SessionsScreen extends ConsumerWidget {
           ],
         ),
       ),
+    );
+  }
+
+  Widget _sessionItem(BuildContext context, WidgetRef ref, _KeptSession item) => item.terminal != null
+      ? _SessionRow(
+          controller: item.terminal!,
+          onOpen: () => _open(context, item.terminal!),
+          onDisconnect: () => _confirmDisconnect(context, item.terminal!),
+        )
+      : _SftpSessionRow(
+          session: item.sftp!,
+          onOpen: () => openSftpSession(context, ref, item.sftp!),
+          onDisconnect: () => _confirmDisconnectSftp(context, ref, item.sftp!),
+        );
+
+  Future<void> _confirmDisconnectGroup(BuildContext context, WidgetRef ref, _SessionGroup group) {
+    final l = AppLocalizations.of(context);
+    return showTermulSheet<void>(
+      context,
+      title: l.sessionsDisconnectAllTitle(group.items.length),
+      child: Text(l.sessionsDisconnectMultiBody, style: TermulText.body.copyWith(color: TermulPalette.inkSoft)),
+      cancelLabel: l.actionCancel,
+      confirmLabel: l.actionDisconnect,
+      confirmIsDanger: true,
+      onConfirm: () {
+        for (final item in group.items) {
+          if (item.terminal case final c?) {
+            ref.read(sessionManagerProvider.notifier).release(c);
+          } else if (item.sftp case final s?) {
+            ref.read(sftpSessionManagerProvider.notifier).release(s);
+          }
+        }
+      },
+    );
+  }
+
+  List<_SessionGroup> _groups(List<SessionController> terminals, List<SftpSession> sftp) {
+    final byGroup = <String, List<_KeptSession>>{};
+    for (final c in terminals) {
+      byGroup.putIfAbsent(c.groupId, () => []).add(_KeptSession(terminal: c));
+    }
+    for (final s in sftp) {
+      if (s.groupId != null) byGroup.putIfAbsent(s.groupId!, () => []).add(_KeptSession(sftp: s));
+    }
+    final groups = [
+      for (final entry in byGroup.entries) _SessionGroup(groupId: entry.key, items: entry.value),
+      for (final c in sftp)
+        if (c.groupId == null) _SessionGroup(groupId: null, items: [_KeptSession(sftp: c)]),
+    ];
+    groups.sort(
+      (a, b) => a.items
+          .map((e) => e.startedAt)
+          .reduce((x, y) => x.isBefore(y) ? x : y)
+          .compareTo(b.items.map((e) => e.startedAt).reduce((x, y) => x.isBefore(y) ? x : y)),
+    );
+    return groups;
+  }
+}
+
+class _KeptSession {
+  _KeptSession({this.terminal, this.sftp}) : assert((terminal == null) != (sftp == null));
+  final SessionController? terminal;
+  final SftpSession? sftp;
+  String get name => terminal?.profile.name ?? sftp!.profile.name;
+  DateTime get startedAt => terminal?.startedAt ?? sftp!.startedAt;
+}
+
+class _SessionGroup {
+  const _SessionGroup({required this.groupId, required this.items});
+  final String? groupId;
+  final List<_KeptSession> items;
+  bool get isMulti => groupId != null && items.length > 1;
+}
+
+class _MultiSessionGroup extends StatelessWidget {
+  const _MultiSessionGroup({
+    required this.count,
+    required this.expanded,
+    required this.onToggle,
+    required this.onDisconnect,
+    required this.children,
+  });
+  final int count;
+  final bool expanded;
+  final VoidCallback onToggle;
+  final VoidCallback onDisconnect;
+  final List<Widget> children;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        TermulCard(
+          child: Row(
+            children: [
+              Expanded(
+                child: Pressable(
+                  onPressed: onToggle,
+                  semanticLabel: l.sessionsMulti(count),
+                  radius: TermulRadius.radiusMd,
+                  minHeight: 56,
+                  builder: (context, pressed) => Row(
+                    children: [
+                      Expanded(
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          spacing: TermulSpacing.space2,
+                          children: [
+                            Text(
+                              l.sessionsMulti(count),
+                              maxLines: 1,
+                              overflow: TextOverflow.ellipsis,
+                              style: TermulText.title.copyWith(
+                                color: pressed ? TermulPalette.accent : TermulPalette.ink,
+                              ),
+                            ),
+                            Text(
+                              expanded ? l.sessionsMultiCollapse : l.sessionsMultiExpand,
+                              style: TermulText.caption.copyWith(color: TermulPalette.inkMuted),
+                            ),
+                          ],
+                        ),
+                      ),
+                      Icon(expanded ? Icons.expand_less : Icons.expand_more, color: TermulPalette.inkMuted),
+                    ],
+                  ),
+                ),
+              ),
+              TermulIconButton(icon: TermulIconName.close, label: l.sessionsDisconnectAll, onPressed: onDisconnect),
+            ],
+          ),
+        ),
+        if (expanded)
+          Padding(
+            padding: const EdgeInsets.only(left: TermulSpacing.space5, top: TermulSpacing.space2),
+            child: Column(
+              children: [
+                for (var i = 0; i < children.length; i++) ...[
+                  children[i],
+                  if (i < children.length - 1) const SizedBox(height: TermulSpacing.space2),
+                ],
+              ],
+            ),
+          ),
+      ],
     );
   }
 }

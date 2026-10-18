@@ -61,6 +61,7 @@ class TerminalScreen extends StatefulWidget {
     this.keepAliveEnabled = true,
     this.onOpenSettings,
     this.onOpenSftp,
+    this.sessionGroupTabs,
     this.snippets,
     this.onSnippetDetail,
     this.onManageSnippets,
@@ -105,6 +106,9 @@ class TerminalScreen extends StatefulWidget {
 
   /// Membuka SFTP lewat sambungan sesi ini (tombol folder di header). Kosong = tombol tidak ditampilkan.
   final VoidCallback? onOpenSftp;
+
+  /// Tabs dan tombol tambah untuk beberapa koneksi yang dikelompokkan pengguna.
+  final Widget? sessionGroupTabs;
 
   /// Snippet yang berlaku untuk host ini (panel snippet dari ikon di bilah tombol cepat). Null = ikon tidak ditampilkan.
   final List<Snippet>? snippets;
@@ -582,6 +586,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                           onBack: Navigator.of(context).maybePop,
                           onOpenSftp: widget.onOpenSftp,
                         ),
+                      if (widget.sessionGroupTabs != null) widget.sessionGroupTabs!,
                       if (widget.link != TerminalLink.up)
                         Padding(
                           padding: EdgeInsets.fromLTRB(

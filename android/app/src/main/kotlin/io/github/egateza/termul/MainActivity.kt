@@ -19,13 +19,33 @@ class MainActivity : FlutterFragmentActivity() {
     private var downloadsChannel: MethodChannel? = null
     private var reminderChannel: MethodChannel? = null
     private var updateChannel: MethodChannel? = null
+    private var documentsChannel: MethodChannel? = null
     private var pendingNotificationResult: MethodChannel.Result? = null
+    private var pendingDocumentSaveResult: MethodChannel.Result? = null
+    private var pendingDocumentBytes: ByteArray? = null
 
     // Harus didaftarkan sebelum Activity mencapai STARTED, jadi sebagai properti.
     private val notificationPermission =
         registerForActivityResult(ActivityResultContracts.RequestPermission()) {
             pendingNotificationResult?.success(notificationsEnabled())
             pendingNotificationResult = null
+        }
+
+    private val createDocument =
+        registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { activityResult ->
+            val result = pendingDocumentSaveResult ?: return@registerForActivityResult
+            val bytes = pendingDocumentBytes
+            pendingDocumentSaveResult = null
+            pendingDocumentBytes = null
+            if (bytes == null) {
+                result.error("save_failed", "Data ekspor tidak tersedia", null)
+                return@registerForActivityResult
+            }
+            try {
+                result.success(DeviceDocumentSaver.write(this, activityResult, bytes))
+            } catch (e: Exception) {
+                result.error("save_failed", e.javaClass.simpleName, null)
+            }
         }
 
     override fun configureFlutterEngine(flutterEngine: FlutterEngine) {
@@ -178,6 +198,34 @@ class MainActivity : FlutterFragmentActivity() {
                 result.error("share_failed", e.javaClass.simpleName, null)
             }
         }
+        val documents = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/documents")
+        documentsChannel = documents
+        documents.setMethodCallHandler { call, result ->
+            if (call.method != "saveDocument") {
+                result.notImplemented()
+                return@setMethodCallHandler
+            }
+            val name = call.argument<String>("name")
+            val mimeType = call.argument<String>("mimeType")
+            val bytes = call.argument<ByteArray>("bytes")
+            if (name.isNullOrBlank() || mimeType.isNullOrBlank() || bytes == null) {
+                result.error("bad_args", "name, mimeType, dan bytes wajib", null)
+                return@setMethodCallHandler
+            }
+            if (pendingDocumentSaveResult != null) {
+                result.error("busy", "Pemilih lokasi sedang terbuka", null)
+                return@setMethodCallHandler
+            }
+            pendingDocumentSaveResult = result
+            pendingDocumentBytes = bytes
+            try {
+                createDocument.launch(DeviceDocumentSaver.createIntent(name, mimeType))
+            } catch (e: Exception) {
+                pendingDocumentSaveResult = null
+                pendingDocumentBytes = null
+                result.error("save_failed", e.javaClass.simpleName, null)
+            }
+        }
         ch.setMethodCallHandler { call, result ->
             when (call.method) {
                 "update" -> {
@@ -234,6 +282,8 @@ class MainActivity : FlutterFragmentActivity() {
         reminderChannel = null
         updateChannel?.setMethodCallHandler(null)
         updateChannel = null
+        documentsChannel?.setMethodCallHandler(null)
+        documentsChannel = null
         channel?.setMethodCallHandler(null)
         channel = null
         super.cleanUpFlutterEngine(flutterEngine)

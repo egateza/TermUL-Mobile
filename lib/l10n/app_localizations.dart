@@ -2347,6 +2347,48 @@ abstract class AppLocalizations {
   /// **'Ketuk sesi untuk melanjutkannya.'**
   String get sessionsHint;
 
+  /// Label grup sesi yang dibuat pengguna, dapat melintasi host dan jenis koneksi.
+  ///
+  /// In id, this message translates to:
+  /// **'Multi sesi · {count}'**
+  String sessionsMulti(int count);
+
+  /// Petunjuk membuka grup multi sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk untuk melihat sesi'**
+  String get sessionsMultiExpand;
+
+  /// Petunjuk menutup grup multi sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Ketuk untuk menutup daftar sesi'**
+  String get sessionsMultiCollapse;
+
+  /// Konsekuensi memutus semua sesi dalam grup multi sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Semua sesi di grup ini akan ditutup. Shell yang berjalan berakhir dan transfer SFTP dibatalkan.'**
+  String get sessionsDisconnectMultiBody;
+
+  /// Konsekuensi memutus satu sesi SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Koneksi SFTP ditutup dan transfer yang sedang berjalan dibatalkan.'**
+  String get sessionsDisconnectSftpBody;
+
+  /// Judul pemilih jenis dan host untuk menambah sesi ke grup multi sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah sesi'**
+  String get sessionsAdd;
+
+  /// Petunjuk pada pemilih host untuk menambahkan sesi ke grup multi sesi.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih host dan jenis sesi untuk ditambahkan ke grup ini.'**
+  String get sessionsAddHint;
+
   /// Nomor sesi untuk membedakan beberapa sesi ke host yang sama.
   ///
   /// In id, this message translates to:
@@ -2410,7 +2452,7 @@ abstract class AppLocalizations {
   /// Isi konfirmasi memutus semua sesi.
   ///
   /// In id, this message translates to:
-  /// **'Semua shell di server ikut berakhir dan program yang sedang berjalan berhenti.'**
+  /// **'Semua sesi Terminal dan SFTP akan ditutup. Shell berakhir dan transfer SFTP dibatalkan.'**
   String get sessionsDisconnectAllBody;
 
   /// Judul dialog keluar dari terminal dengan pilihan tetap terhubung.
@@ -3151,13 +3193,13 @@ abstract class AppLocalizations {
   /// **'Ekspor profil'**
   String get exportAction;
 
-  /// Judul panel konfirmasi ekspor.
+  /// Judul panel pilihan ekspor profil.
   ///
   /// In id, this message translates to:
   /// **'Ekspor profil'**
   String get exportTitle;
 
-  /// Tombol konfirmasi ekspor.
+  /// Aksi untuk membagikan berkas ekspor lewat Android.
   ///
   /// In id, this message translates to:
   /// **'Bagikan'**
@@ -3172,7 +3214,7 @@ abstract class AppLocalizations {
   /// Catatan di panel ekspor.
   ///
   /// In id, this message translates to:
-  /// **'Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Menu bagikan Android akan terbuka: kirim ke aplikasi lain atau simpan ke penyimpanan. Password, passphrase, dan kunci tidak ikut.'**
+  /// **'Berkas JSON ini bisa diimpor lagi di HP atau dimuat TermUL desktop. Pilih Bagikan untuk mengirim lewat aplikasi lain atau Simpan ke perangkat untuk memilih lokasi penyimpanan. Password, passphrase, dan kunci tidak ikut.'**
   String get exportNote;
 
   /// Catatan profil KEY yang diubah di ekspor.
@@ -3187,10 +3229,22 @@ abstract class AppLocalizations {
   /// **'Belum ada profil untuk diekspor.'**
   String get exportNothing;
 
-  /// Galat bila berkas ekspor tidak bisa disimpan.
+  /// Aksi ekspor profil untuk memilih folder penyimpanan di perangkat.
   ///
   /// In id, this message translates to:
-  /// **'Ekspor gagal. Menu bagikan tidak bisa dibuka; coba lagi.'**
+  /// **'Simpan ke perangkat'**
+  String get exportSaveToDevice;
+
+  /// Konfirmasi setelah lokasi dan nama berkas ekspor dipilih dan disimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Profil berhasil disimpan ke perangkat'**
+  String get exportSaved;
+
+  /// Galat bila berkas ekspor tidak bisa dibagikan atau disimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekspor gagal. Berkas tidak bisa dibagikan atau disimpan; coba lagi.'**
   String get exportFailed;
 
   /// Tombol tambah di layar Snippet.

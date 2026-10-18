@@ -11,7 +11,7 @@ import 'sftp_link.dart';
 
 /// Satu sesi SFTP mandiri (koneksi SFTP sendiri ke satu host, bukan pinjaman dari sesi terminal).
 class SftpSession {
-  SftpSession({required this.id, required this.ordinal, required this.profile, required this.link})
+  SftpSession({required this.id, required this.ordinal, required this.profile, required this.link, this.groupId})
     : startedAt = DateTime.now();
 
   final int id;
@@ -20,6 +20,7 @@ class SftpSession {
   final int ordinal;
   final HostProfile profile;
   final SftpLink link;
+  final String? groupId;
   final DateTime startedAt;
 }
 
@@ -34,8 +35,15 @@ class SftpSessionManager extends Notifier<List<SftpSession>> {
   @override
   List<SftpSession> build() => const [];
 
+  List<SftpSession> forGroup(String groupId) => [
+    for (final s in _all)
+      if (s.groupId == groupId) s,
+  ];
+
+  void notifyGroupChanged() => _setState(List.of(state));
+
   /// Membuat sesi SFTP baru ke [profile] dan memulai sambungannya. Layar penjelajah yang membukanya.
-  SftpSession create(HostProfile profile, {required String unlockReason}) {
+  SftpSession create(HostProfile profile, {required String unlockReason, String? groupId}) {
     final link = SftpLink.own(
       profile: profile,
       flow: ConnectFlow(
@@ -50,17 +58,18 @@ class SftpSessionManager extends Notifier<List<SftpSession>> {
       screenMonitor: ref.read(screenMonitorProvider),
       autoReconnect: () => ref.read(appSettingsProvider).connection.autoReconnect,
     );
-    final session = adopt(profile, link);
+    final session = adopt(profile, link, groupId: groupId);
     unawaited(link.start());
     return session;
   }
 
   /// Mendaftarkan [link] sebagai sesi (ke daftar dan ke foreground service). Dipakai [create]; terbuka untuk tes.
   @visibleForTesting
-  SftpSession adopt(HostProfile profile, SftpLink link) {
+  SftpSession adopt(HostProfile profile, SftpLink link, {String? groupId}) {
     final ordinal = _all.where((s) => s.profile.id == profile.id).length + 1;
-    final session = SftpSession(id: _nextId++, ordinal: ordinal, profile: profile, link: link);
+    final session = SftpSession(id: _nextId++, ordinal: ordinal, profile: profile, link: link, groupId: groupId);
     _all.add(session);
+    notifyGroupChanged();
     // Id foreground service dibedakan dari sesi terminal (yang memakai id non-negatif) dengan nilai negatif.
     ref
         .read(activeSessionsProvider.notifier)
