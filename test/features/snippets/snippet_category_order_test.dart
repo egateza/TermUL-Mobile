@@ -86,7 +86,9 @@ Future<SlowRepo> openSlowManager(WidgetTester tester, Duration delay) async {
   await Harness().pump(tester, overrides: [snippetRepositoryProvider.overrideWithValue(repo)]);
   await tester.tap(find.descendant(of: find.byType(TermulNavBar), matching: find.text('Snippet')));
   await tester.pumpAndSettle();
-  await tester.tap(find.byTooltip('Kelola kategori'));
+  await tester.tap(find.byTooltip('Kelola snippet'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Kelola kategori'));
   await tester.pumpAndSettle();
   return repo;
 }
@@ -143,7 +145,9 @@ void main() {
   glitchTests();
 
   Future<void> openManager(WidgetTester tester) async {
-    await tester.tap(find.byTooltip('Kelola kategori'));
+    await tester.tap(find.byTooltip('Kelola snippet'));
+    await tester.pumpAndSettle();
+    await tester.tap(find.text('Kelola kategori'));
     await tester.pumpAndSettle();
   }
 

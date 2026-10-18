@@ -311,7 +311,9 @@ void main() {
 
   group('kategori', () {
     Future<void> openManager(WidgetTester tester) async {
-      await tester.tap(find.byTooltip('Kelola kategori'));
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Kelola kategori'));
       await tester.pumpAndSettle();
     }
 
@@ -803,7 +805,9 @@ void main() {
       tester,
     ) async {
       final repo = await openTab(tester, initial: [a, b, c]);
-      await tester.tap(find.byTooltip('Urutkan snippet'));
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Urutkan snippet'));
       await tester.pumpAndSettle();
       expect(find.byTooltip('Hapus Satu'), findsOneWidget);
       expect(find.byTooltip('Hapus Dua'), findsOneWidget);
@@ -817,12 +821,16 @@ void main() {
       expect(repo.library.snippets.map((s) => s.id), ['a', 'c']);
       // Masih di mode urut dengan dua snippet.
       expect(find.byType(ReorderableDragStartListener), findsNWidgets(2));
-      expect(find.byTooltip('Selesai mengurutkan'), findsOneWidget);
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      expect(find.text('Selesai mengurutkan'), findsOneWidget);
     });
 
     testWidgets('mode urut: menghapus sampai tinggal satu mengakhiri mode', (tester) async {
       final repo = await openTab(tester, initial: [a, b]);
-      await tester.tap(find.byTooltip('Urutkan snippet'));
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      await tester.tap(find.text('Urutkan snippet'));
       await tester.pumpAndSettle();
       await tester.tap(find.byTooltip('Hapus Satu'));
       await tester.pumpAndSettle();

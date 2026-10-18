@@ -25,7 +25,16 @@ List<String> titlesTopToBottom(WidgetTester tester, List<String> titles) {
 }
 
 Future<void> enterSort(WidgetTester tester) async {
-  await tester.tap(find.byTooltip('Urutkan snippet'));
+  await tester.tap(find.byTooltip('Kelola snippet'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Urutkan snippet'));
+  await tester.pumpAndSettle();
+}
+
+Future<void> exitSort(WidgetTester tester) async {
+  await tester.tap(find.byTooltip('Kelola snippet'));
+  await tester.pumpAndSettle();
+  await tester.tap(find.text('Selesai mengurutkan'));
   await tester.pumpAndSettle();
 }
 
@@ -44,17 +53,23 @@ void main() {
   group('tombol urutkan', () {
     testWidgets('tidak ada bila snippet kurang dari dua', (tester) async {
       await openTab(tester);
-      expect(find.byTooltip('Urutkan snippet'), findsNothing);
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      expect(find.text('Urutkan snippet'), findsNothing);
     });
 
     testWidgets('satu snippet: tidak ada tombol', (tester) async {
       await openTab(tester, initial: [_a]);
-      expect(find.byTooltip('Urutkan snippet'), findsNothing);
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      expect(find.text('Urutkan snippet'), findsNothing);
     });
 
     testWidgets('dua snippet atau lebih: ada tombol', (tester) async {
       await openTab(tester, initial: [_a, _b]);
-      expect(find.byTooltip('Urutkan snippet'), findsOneWidget);
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      expect(find.text('Urutkan snippet'), findsOneWidget);
     });
   });
 
@@ -69,7 +84,9 @@ void main() {
       expect(find.byType(FilterChipButton), findsNothing);
       expect(find.textContaining('geser ikon titik'), findsOneWidget);
       expect(find.byType(ReorderableDragStartListener), findsNWidgets(3));
-      expect(find.byTooltip('Selesai mengurutkan'), findsOneWidget);
+      await tester.tap(find.byTooltip('Kelola snippet'));
+      await tester.pumpAndSettle();
+      expect(find.text('Selesai mengurutkan'), findsOneWidget);
       expect(titlesTopToBottom(tester, names), ['Satu', 'Dua', 'Tiga']);
     });
 
@@ -84,8 +101,7 @@ void main() {
       await enterSort(tester);
       expect(titlesTopToBottom(tester, names), ['Satu', 'Dua', 'Tiga']); // semua tampil
 
-      await tester.tap(find.byTooltip('Selesai mengurutkan'));
-      await tester.pumpAndSettle();
+      await exitSort(tester);
       expect(find.byType(FilterChipButton), findsWidgets);
       expect(tester.widget<FilterChipButton>(find.widgetWithText(FilterChipButton, 'Favorit')).selected, isTrue);
       expect(find.text('Satu'), findsNothing); // filter Favorit masih berlaku
@@ -100,8 +116,7 @@ void main() {
       expect([for (final s in repo.library.snippets) s.title], ['Tiga', 'Satu', 'Dua']);
       expect(titlesTopToBottom(tester, names), ['Tiga', 'Satu', 'Dua']);
 
-      await tester.tap(find.byTooltip('Selesai mengurutkan'));
-      await tester.pumpAndSettle();
+      await exitSort(tester);
       expect(titlesTopToBottom(tester, names), ['Tiga', 'Satu', 'Dua']);
     });
 

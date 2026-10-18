@@ -22,18 +22,8 @@ input::placeholder,textarea::placeholder{color:#7F8D94}
 <div style="display: flex; align-items: center; justify-content: space-between; padding: 20px 20px 12px 20px">
 <h1 style="margin: 0; font-size: 28px; font-weight: 600; letter-spacing: -0.01em">Snippet</h1>
 <div style="display: flex; align-items: center; gap: 6px">
-<sc-if value="{{canSort}}" hint-placeholder-val="{{ true }}">
-<button type="button" onClick="{{toggleSort}}" aria-label="{{sortLabel}}" aria-pressed="{{sorting}}" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: {{sortBg}}; color: {{sortFg}}; display: flex; align-items: center; justify-content: center; cursor: pointer">
-<sc-if value="{{sorting}}" hint-placeholder-val="{{ false }}">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12l5 5 9-10"/></svg>
-</sc-if>
-<sc-if value="{{notSorting}}" hint-placeholder-val="{{ true }}">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M4 17l3 3 3-3M17 20V4M14 7l3-3 3 3"/></svg>
-</sc-if>
-</button>
-</sc-if>
-<button type="button" onClick="{{openCats}}" aria-label="Kelola kategori" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: transparent; color: #E8EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer">
-<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4"/></svg>
+<button type="button" onClick="{{openManage}}" aria-label="Kelola snippet" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: transparent; color: #E8EEF0; display: flex; align-items: center; justify-content: center; cursor: pointer">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 6h.01M12 12h.01M12 18h.01"/></svg>
 </button>
 <button type="button" onClick="{{newSnip}}" aria-label="Snippet baru" style="width: 44px; height: 44px; border-radius: 12px; border: none; background: #F0B34A; color: #1B1406; display: flex; align-items: center; justify-content: center; cursor: pointer">
 <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>
@@ -159,6 +149,22 @@ Streak
 Pengaturan
 </a>
 </nav>
+
+<sc-if value="{{manageOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0; z-index: 5">
+<button type="button" onClick="{{closeManage}}" aria-label="Tutup" style="position: absolute; inset: 0; width: 100%; border: none; background: rgba(5, 8, 10, 0.62); cursor: pointer"></button>
+<div class="sheet" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; padding: 12px 20px 24px 20px; border-radius: 24px 24px 0 0; border-top: 1px solid #2A343A; background: #161C20; display: flex; flex-direction: column; gap: 10px">
+<div style="width: 36px; height: 4px; border-radius: 2px; background: #2A343A; margin: 0 auto 4px auto" aria-hidden="true"></div>
+<h2 style="margin: 4px 0 6px 0; font-size: 20px; font-weight: 600">Kelola snippet</h2>
+<sc-if value="{{canSort}}" hint-placeholder-val="{{ true }}">
+<button type="button" onClick="{{manageSort}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M7 4v16M4 17l3 3 3-3M17 20V4M14 7l3-3 3 3"/></svg><span>{{sortLabel}}</span></button>
+</sc-if>
+<button type="button" onClick="{{manageImport}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 16V5M7 10l5-5 5 5M5 19h14"/></svg><span>Impor snippet</span></button>
+<button type="button" onClick="{{manageExport}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M12 5v11M7 11l5 5 5-5M5 19h14"/></svg><span>Ekspor snippet</span></button>
+<button type="button" onClick="{{manageCategories}}" style="min-height: 52px; padding: 0 14px; border-radius: 14px; border: 1px solid #2A343A; background: transparent; color: #E8EEF0; display: flex; align-items: center; gap: 12px; text-align: left; font: 500 16px 'IBM Plex Sans', sans-serif; cursor: pointer"><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 20h4L19 9a2.8 2.8 0 0 0-4-4L4 16zM14 6l4 4"/></svg><span>Kelola kategori</span></button>
+</div>
+</div>
+</sc-if>
 
 <sc-if value="{{detail}}" hint-placeholder-val="{{ false }}">
 <div style="position: absolute; left: 0; top: 0; right: 0; bottom: 0">
@@ -401,6 +407,7 @@ Kategori baru
 class Component extends DCLogic {
   renderVals() {
     const s = this.state || {};
+    const manageOpen = !!s.manageOpen;
     const STARTS = ['list', 'new', 'edit', 'empty', 'sort', 'categories', 'categoryName', 'warn', 'delete'];
     const startAt = STARTS.indexOf(this.props.startAt) >= 0 ? this.props.startAt : 'list';
     const prefill = this.props.prefill || '';
@@ -588,6 +595,13 @@ class Component extends DCLogic {
       sortBg: sorting ? '#F0B34A' : 'transparent',
       sortFg: sorting ? '#1B1406' : '#E8EEF0',
       toggleSort: () => this.setState({ sorting: !sorting }),
+      manageOpen: manageOpen,
+      openManage: () => this.setState({ manageOpen: true }),
+      closeManage: () => this.setState({ manageOpen: false }),
+      manageSort: () => this.setState({ manageOpen: false, sorting: !sorting }),
+      manageImport: () => { this.setState({ manageOpen: false }); flash('Pilih berkas JSON untuk mengimpor snippet'); },
+      manageExport: () => { this.setState({ manageOpen: false }); flash('Berkas termul-snippets.json siap dibagikan'); },
+      manageCategories: () => this.setState({ manageOpen: false, catsOpen: true }),
       sortRows: list.map((sn) => ({
         title: sn.title,
         first: firstLine(sn.cmd),
@@ -597,6 +611,8 @@ class Component extends DCLogic {
         askDel: () => this.setState({ delId: sn.id })
       })),
       openCats: () => this.setState({ catsOpen: true }),
+      importSnippets: () => flash('Pilih berkas JSON untuk mengimpor snippet'),
+      exportSnippets: () => flash('Berkas termul-snippets.json siap dibagikan'),
       newSnip: () => this.setState({ edit: newEdit('') }),
       hasToast: !!toast,
       toast: toast,

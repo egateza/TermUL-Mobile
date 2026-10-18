@@ -987,6 +987,14 @@ Keadaan kosong; editor dengan keyboard terbuka (Batal/Simpan tetap terlihat, cin
 
 Tombol "Tetap salin" dan isi papan klip sesudah Salin (tempel lewat `KEYCODE_PASTE` tidak memunculkan teks di kolom Flutter, jadi tidak terbukti lewat adb); ubah nama kategori dan hapus kategori berisi snippet; edit snippet; cakupan satu host; filter dan cari dengan banyak snippet; banner berkas rusak. **Rasa mulus geseran** (kategori dan snippet) hanya dinilai dari tangkapan layar dan tes, bukan rekaman (tidak ada ffmpeg di mesin ini); perlu dicoba langsung oleh pemilik. Layar hanya potret.
 
+### 11af. Impor, ekspor, dan menu kelola snippet (2026-10-18)
+
+- Header tab diringkas menjadi tombol **Kelola snippet** dan **Snippet baru**. Sheet Kelola snippet memuat Urutkan snippet (bila ada sedikitnya dua), Impor snippet, Ekspor snippet, dan Kelola kategori. Aksi tetap menggunakan `showTermulActions` dan ikon sistem TermUL.
+- Ekspor menulis pustaka versi 2 ke `termul-snippets.json` di folder berbagi sementara lalu membukanya melalui Android Sharesheet.
+- Impor membaca berkas JSON maksimal 2 MiB, memvalidasi dengan `SnippetLibrary.fromJson`, mencocokkan kategori berdasarkan nama tanpa membedakan kapital, membuat id baru untuk setiap snippet, dan melepas `hostId` agar ekspor portabel. Data yang sudah ada tetap dipertahankan.
+- Prototipe lokal `Snippets.dc.html` diperbarui untuk menu ini. Artifact Claude tidak dapat dibuka dari sesi ini; versi artifact daring belum diperbarui. README design system lokal mencatat perilaku baru.
+- Tes widget yang mengakses urutkan dan kategori disesuaikan agar membuka menu Kelola terlebih dahulu. `flutter analyze` bersih; `flutter test`: **792 lulus, 2 dilewati**. Di antara dua tes penuh, tes snippet pertama kali menunjukkan 15 pemanggil lama yang masih membuka kontrol header secara langsung; helper diperbarui dan tes ulang lulus.
+
 ### Irisan 2: menempel snippet ke terminal (2026-10-17)
 
 Pemilik memilih kedua jalur. Terminal mengikuti prototipe 2 (tombol Snippet di bilah dan panel), sehingga jalur yang saya buat lebih dulu (tombol di baris tombol dan pemilih lembar) diganti.

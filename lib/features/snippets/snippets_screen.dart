@@ -2,6 +2,11 @@ import 'package:flutter/foundation.dart' show listEquals;
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
+import 'dart:convert';
+import 'dart:io';
+
+import 'package:file_selector/file_selector.dart';
+
 import '../../app_providers.dart';
 import '../../core/models/snippet.dart';
 import '../../core/models/snippet_library.dart';
@@ -12,6 +17,7 @@ import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_chip.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
+import '../../shared/widgets/termul_action_sheet.dart';
 import '../../shared/widgets/termul_sheet.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../../shared/widgets/termul_toast.dart';
@@ -146,6 +152,86 @@ class _SnippetsScreenState extends ConsumerState<SnippetsScreen> {
     }
   }
 
+  Future<void> _export() async {
+    try {
+      final library = ref.read(snippetLibraryProvider);
+      final text = const JsonEncoder.withIndent('  ').convert(library.toJson());
+      final dir = await ref.read(tempDirProvider)();
+      final shareDir = Directory('${dir.path}${Platform.pathSeparator}share');
+      if (shareDir.existsSync()) shareDir.deleteSync(recursive: true);
+      shareDir.createSync(recursive: true);
+      const name = 'termul-snippets.json';
+      final file = File('${shareDir.path}${Platform.pathSeparator}$name');
+      await file.writeAsString(text, encoding: utf8, flush: true);
+      await ref
+          .read(fileSharerProvider)
+          .shareFile(path: file.path, name: name, mimeType: 'application/json', title: 'Ekspor snippet');
+    } on Object {
+      if (mounted) setState(() => _error = 'Snippet tidak bisa diekspor. Coba lagi.');
+    }
+  }
+
+  Future<void> _import() async {
+    try {
+      final file = await openFile();
+      if (file == null) return;
+      if (await file.length() > 2 * 1024 * 1024) throw const FormatException('Berkas terlalu besar.');
+      final incoming = SnippetLibrary.fromJson(
+        jsonDecode(utf8.decode(await file.readAsBytes())) as Map<String, Object?>,
+      );
+      final repo = ref.read(snippetRepositoryProvider);
+      final current = repo.library;
+      final ids = <String, String>{};
+      for (final category in incoming.categories) {
+        final existing = current.categories
+            .where((c) => c.name.toLowerCase() == category.name.toLowerCase())
+            .firstOrNull;
+        if (existing != null) {
+          ids[category.id] = existing.id;
+        } else {
+          final created = SnippetCategory.create(category.name);
+          await repo.saveCategory(created);
+          ids[category.id] = created.id;
+        }
+      }
+      for (final snippet in incoming.snippets) {
+        await repo.save(
+          Snippet.create(
+            title: snippet.title,
+            command: snippet.command,
+            categoryId: ids[snippet.categoryId],
+            favorite: snippet.favorite,
+            dangerous: snippet.dangerous,
+            defaults: snippet.defaults,
+          ),
+        );
+      }
+      if (mounted) showTermulToast(context, 'Impor ${incoming.snippets.length} snippet selesai');
+    } on Object {
+      if (mounted) setState(() => _error = 'Berkas snippet tidak valid atau gagal dibaca.');
+    }
+  }
+
+  Future<void> _manage(List<Snippet> all) => showTermulActions(
+    context,
+    title: 'Kelola snippet',
+    actions: [
+      if (all.length > 1)
+        SheetAction(
+          label: _sorting ? 'Selesai mengurutkan' : 'Urutkan snippet',
+          icon: _sorting ? TermulIconName.check : TermulIconName.sort,
+          onSelected: () => setState(() => _sorting = !_sorting),
+        ),
+      SheetAction(label: 'Impor snippet', icon: TermulIconName.upload, onSelected: _import),
+      SheetAction(label: 'Ekspor snippet', icon: TermulIconName.download, onSelected: _export),
+      SheetAction(
+        label: 'Kelola kategori',
+        icon: TermulIconName.edit,
+        onSelected: () => showSnippetCategoryManager(context),
+      ),
+    ],
+  );
+
   Future<void> _open(Snippet snippet) async {
     final l = AppLocalizations.of(context);
     final category = ref.read(snippetLibraryProvider).categoryOf(snippet.categoryId);
@@ -216,20 +302,7 @@ class _SnippetsScreenState extends ConsumerState<SnippetsScreen> {
                       child: Text(l.navSnippets, style: TermulText.h1.copyWith(color: TermulPalette.ink)),
                     ),
                   ),
-                  if (all.length > 1) ...[
-                    TermulIconButton(
-                      icon: sorting ? TermulIconName.check : TermulIconName.sort,
-                      label: sorting ? l.snippetsSortDone : l.snippetsSort,
-                      pressed: sorting,
-                      onPressed: () => setState(() => _sorting = !sorting),
-                    ),
-                    const SizedBox(width: TermulSpacing.space3),
-                  ],
-                  TermulIconButton(
-                    icon: TermulIconName.edit,
-                    label: l.snippetsManageCategories,
-                    onPressed: () => showSnippetCategoryManager(context),
-                  ),
+                  TermulIconButton(icon: TermulIconName.more, label: 'Kelola snippet', onPressed: () => _manage(all)),
                   const SizedBox(width: TermulSpacing.space3),
                   TermulIconButton(
                     icon: TermulIconName.plus,
