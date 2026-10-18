@@ -33,7 +33,7 @@ class AppLocalizationsId extends AppLocalizations {
   String get hostStatusUnreachable => 'tidak terjangkau';
 
   @override
-  String get hostStatusNotChecked => 'belum diperiksa';
+  String get hostStatusNotChecked => 'Belum diperiksa';
 
   @override
   String get actionCancel => 'Batal';

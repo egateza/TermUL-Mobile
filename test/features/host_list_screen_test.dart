@@ -43,7 +43,7 @@ void main() {
       final names = tester.widgetList<HostRow>(find.byType(HostRow)).map((r) => r.name).toList();
       expect(names, ['app-01', 'db-01', 'lab-01']);
       expect(find.text('postgres@192.0.2.21'), findsOneWidget);
-      expect(find.text('belum diperiksa'), findsNWidgets(3));
+      expect(find.text('Belum diperiksa'), findsNWidgets(3));
     });
 
     testWidgets('pencarian menyaring menurut nama, user, dan IP; tanpa hasil memberi pesan', (tester) async {

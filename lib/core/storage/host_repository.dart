@@ -13,6 +13,12 @@ abstract interface class HostRepository {
   /// Mengumumkan snapshot baru setiap kali ada perubahan.
   Stream<ProfileSnapshot> get changes;
 
+  /// Waktu sambungan terakhir yang berhasil per host, disimpan terpisah dari `profiles.json` desktop.
+  Map<String, DateTime> get lastUsed;
+
+  /// Mengumumkan perubahan waktu pemakaian.
+  Stream<Map<String, DateTime>> get usageChanges;
+
   Future<LoadResult> load();
 
   /// Menambah profil baru atau mengganti profil dengan id yang sama.

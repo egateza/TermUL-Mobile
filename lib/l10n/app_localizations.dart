@@ -133,10 +133,10 @@ abstract class AppLocalizations {
   /// **'tidak terjangkau'**
   String get hostStatusUnreachable;
 
-  /// Status baris host sebelum pengecekan pertama (cache, bukan fakta).
+  /// Host belum pernah berhasil tersambung.
   ///
   /// In id, this message translates to:
-  /// **'belum diperiksa'**
+  /// **'Belum diperiksa'**
   String get hostStatusNotChecked;
 
   /// Tombol batal di sheet dan form.

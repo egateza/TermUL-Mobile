@@ -7,8 +7,8 @@ import 'pressable.dart';
 import 'status_dot.dart';
 import 'termul_icon.dart';
 
-/// Baris daftar satu host: titik status, nama, `user@alamat`, dan status dengan kata. Seluruh baris adalah
-/// target sentuh (minimal 64 px). Status adalah cache; `null` berarti belum pernah diperiksa.
+/// Baris daftar satu host: titik status, nama, `user@alamat`, dan keterangan pemakaian/koneksi dengan kata.
+/// Seluruh baris adalah target sentuh (minimal 64 px). [lastUsedAt] hanya terisi setelah koneksi berhasil.
 class HostRow extends StatelessWidget {
   const HostRow({
     super.key,
@@ -20,6 +20,7 @@ class HostRow extends StatelessWidget {
     this.onLongPress,
     this.actionsLabel,
     this.favorite = false,
+    this.lastUsedAt,
   });
 
   final String name;
@@ -34,11 +35,12 @@ class HostRow extends StatelessWidget {
 
   /// Host favorit: bintang beraksen di sebelah nama (kata "Favorit" untuk pembaca layar).
   final bool favorite;
+  final DateTime? lastUsedAt;
 
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
-    final (text, color, dot) = switch (status) {
+    final (defaultText, color, dot) = switch (status) {
       HostStatus.online => (
         latencyMs == null ? l.statusOnline : l.hostStatusOnlineMs(latencyMs!),
         TermulPalette.ok,
@@ -48,6 +50,7 @@ class HostRow extends StatelessWidget {
       HostStatus.busy => (l.statusBusy, TermulPalette.accent, HostStatus.busy),
       HostStatus.idle || null => (l.hostStatusNotChecked, TermulPalette.inkMuted, HostStatus.idle),
     };
+    final text = lastUsedAt == null ? defaultText : _lastUsedLabel(lastUsedAt!, DateTime.now());
     return Semantics(
       customSemanticsActions: {
         if (onLongPress != null && actionsLabel != null) CustomSemanticsAction(label: actionsLabel!): onLongPress!,
@@ -99,16 +102,47 @@ class HostRow extends StatelessWidget {
                         overflow: TextOverflow.ellipsis,
                         style: TermulText.terminalSm.copyWith(color: TermulPalette.inkMuted, fontSize: 12.5),
                       ),
+                      if (lastUsedAt != null) ...[
+                        const SizedBox(height: 3),
+                        Text(
+                          text,
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                          style: TermulText.terminalSm.copyWith(color: TermulPalette.inkMuted),
+                        ),
+                      ],
                     ],
                   ),
                 ),
-                const SizedBox(width: TermulSpacing.space3),
-                Text(text, style: TermulText.terminalSm.copyWith(color: color)),
+                if (lastUsedAt == null) ...[
+                  const SizedBox(width: TermulSpacing.space3),
+                  Text(text, style: TermulText.terminalSm.copyWith(color: color)),
+                ],
               ],
             ),
           ),
         ),
       ),
     );
+  }
+
+  String _lastUsedLabel(DateTime usedAt, DateTime now) {
+    final elapsed = now.difference(usedAt);
+    final value = elapsed.isNegative ? Duration.zero : elapsed;
+    String relative;
+    if (value.inSeconds < 60) {
+      final seconds = value.inSeconds;
+      relative = seconds <= 1 ? 'beberapa detik yang lalu' : '$seconds detik yang lalu';
+    } else if (value.inMinutes < 60) {
+      relative = '${value.inMinutes} menit yang lalu';
+    } else if (value.inHours < 24) {
+      relative = '${value.inHours} jam yang lalu';
+    } else {
+      final local = usedAt.toLocal();
+      String two(int n) => n.toString().padLeft(2, '0');
+      relative =
+          '${local.year}-${two(local.month)}-${two(local.day)} ${two(local.hour)}:${two(local.minute)}:${two(local.second)}';
+    }
+    return 'Terakhir digunakan $relative';
   }
 }

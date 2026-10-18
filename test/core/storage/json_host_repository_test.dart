@@ -49,6 +49,24 @@ void main() {
     expect(b.snapshot.profiles.last.privateKeyPath, isNull);
   });
 
+  test('waktu koneksi sukses disimpan terpisah, dimuat kembali, dan dibersihkan saat profil dihapus', () async {
+    final a = repo();
+    await a.load();
+    await a.save(p(1));
+    expect(a.lastUsed, isEmpty);
+
+    await a.markUsed(uid(1));
+    final first = a.lastUsed[uid(1)];
+    expect(first, isNotNull);
+    expect(await File('${file.path}.usage.json').exists(), isTrue);
+
+    final b = repo();
+    await b.load();
+    expect(b.lastUsed[uid(1)], first);
+    await b.delete(uid(1));
+    expect(b.lastUsed, isEmpty);
+  });
+
   test('berkas di disk berformat JSON dengan version, groups, profiles, favorites, recent', () async {
     final r = repo();
     await r.load();

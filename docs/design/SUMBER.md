@@ -2,6 +2,8 @@
 
 Tanggal salin: 2026-10-15
 
+**Perubahan lokal setelah artifact terkini (2026-10-18):** `HostRow`, `Main.dc.html`, dan `MainLandscape.dc.html` kini menunjukkan “Belum diperiksa” hanya sebelum host berhasil tersambung; sesudahnya mereka menunjukkan waktu terakhir dipakai (relatif di bawah 24 jam, lalu tanggal 24 jam). Metadata waktu disimpan terpisah dari berkas profil. `README.md`, komponen `HostRow`, dan `docs/implementation-plan.md` mencatat aturan tersebut. Artifact Claude tidak tersedia dari sesi ini; perubahan belum dipublish. Prototipe `Main` dan `MainLandscape` sudah dirender lokal di Chrome.
+
 **Perubahan lokal setelah artifact terkini (2026-10-18):** pemilih tambah sesi di `Terminal.dc.html` kini menggambarkan pencarian host dan jenis sesi per grup, daftar bergulir dalam sheet dengan tinggi terbatas, dan status tidak ada hasil. `README.md` design system dan `docs/implementation-plan.md` mencatat perilaku yang sama. Artifact daring tidak tersedia untuk dibaca atau dipublish dari sesi ini; perubahan ini hanya ada di salinan lokal dan belum disinkronkan.
 
 **Perubahan lokal setelah versi artifact terkini (2026-10-18):** prototipe `Snippets.dc.html` mendapat sheet Kelola snippet dengan Urutkan, Impor, Ekspor, Kelola kategori, dan ikon yang mengikuti pustaka ikon TermUL. Prototipe `Terminal.dc.html` dan `Sessions.dc.html` mencatat multi sesi eksplisit lintas host dan jenis koneksi, maksimal tiga tab terlihat dengan elipsis dan tooltip nama lengkap lewat tekan lama; tombol tambah beralih menjadi tombol overflow pada sesi ketiga, yang membuka sheet semua sesi; README design system lokal menjelaskan perilaku tersebut. Artifact Claude tidak dapat dibuka dari sesi ini, jadi perubahan belum dipublish ke artifact daring atau dirender di Chrome.

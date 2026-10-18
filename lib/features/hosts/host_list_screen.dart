@@ -150,6 +150,7 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final snapshot = ref.watch(hostSnapshotProvider);
+    final hostUsage = ref.watch(hostUsageProvider);
     final listState = ref.watch(hostListProvider);
     final report = ref.watch(bootReportProvider);
     final groups = buildHostGroups(snapshot, query: listState.query, filter: listState.filter);
@@ -381,6 +382,7 @@ class _HostListScreenState extends ConsumerState<HostListScreen> {
                           _Group(
                             group: g,
                             favorites: snapshot.favorites.toSet(),
+                            hostUsage: hostUsage,
                             expanded: searching || typing || !listState.collapsed.contains(g.path),
                             showHeader: !typing,
                             onToggle: () => ref.read(hostListProvider.notifier).toggleGroup(g.path),
@@ -424,6 +426,7 @@ class _Group extends StatelessWidget {
   const _Group({
     required this.group,
     required this.favorites,
+    required this.hostUsage,
     required this.expanded,
     required this.onToggle,
     required this.onOpen,
@@ -433,6 +436,7 @@ class _Group extends StatelessWidget {
 
   final HostGroupView group;
   final Set<String> favorites;
+  final Map<String, DateTime> hostUsage;
 
   /// Judul grup disembunyikan selagi mengetik di landscape (tinggi tersisa hanya cukup untuk satu-dua baris host).
   final bool showHeader;
@@ -489,6 +493,7 @@ class _Group extends StatelessWidget {
                 onLongPress: () => onActions(p),
                 actionsLabel: l.hostActionsTitle(p.name),
                 favorite: favorites.contains(p.id),
+                lastUsedAt: hostUsage[p.id],
               ),
             ),
       ],

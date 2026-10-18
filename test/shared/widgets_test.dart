@@ -119,7 +119,21 @@ void main() {
       await row(HostStatus.offline, null);
       expect(find.text('tidak terjangkau'), findsOneWidget);
       await row(null, null);
-      expect(find.text('belum diperiksa'), findsOneWidget);
+      expect(find.text('Belum diperiksa'), findsOneWidget);
+    });
+
+    testWidgets('HostRow menampilkan waktu penggunaan relatif dan tanggal 24 jam', (tester) async {
+      Future<void> row(DateTime time) => pumpApp(
+        tester,
+        SizedBox(
+          width: 360,
+          child: HostRow(name: 'app-01', target: 'deploy@192.0.2.1', lastUsedAt: time, onPressed: () {}),
+        ),
+      );
+      await row(DateTime.now().subtract(const Duration(minutes: 5)));
+      expect(find.text('Terakhir digunakan 5 menit yang lalu'), findsOneWidget);
+      await row(DateTime(2020, 1, 2, 9, 19, 33));
+      expect(find.text('Terakhir digunakan 2020-01-02 09:19:33'), findsOneWidget);
     });
 
     testWidgets('HostRow punya satu nama semantik berisi nama, alamat, dan status', (tester) async {

@@ -195,6 +195,19 @@ class HostSnapshotNotifier extends Notifier<ProfileSnapshot> {
 
 final hostSnapshotProvider = NotifierProvider<HostSnapshotNotifier, ProfileSnapshot>(HostSnapshotNotifier.new);
 
+/// Waktu koneksi host terakhir yang berhasil.
+class HostUsageNotifier extends Notifier<Map<String, DateTime>> {
+  @override
+  Map<String, DateTime> build() {
+    final repo = ref.watch(hostRepositoryProvider);
+    final sub = repo.usageChanges.listen((value) => state = value);
+    ref.onDispose(sub.cancel);
+    return repo.lastUsed;
+  }
+}
+
+final hostUsageProvider = NotifierProvider<HostUsageNotifier, Map<String, DateTime>>(HostUsageNotifier.new);
+
 /// Kategori dan snippet terbaru; berubah setiap repository mengumumkan perubahan.
 class SnippetLibraryNotifier extends Notifier<SnippetLibrary> {
   @override

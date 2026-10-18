@@ -33,9 +33,9 @@
   "@hostStatusUnreachable": {
     "description": "Status baris host saat server tidak terjangkau."
   },
-  "hostStatusNotChecked": "belum diperiksa",
+  "hostStatusNotChecked": "Belum diperiksa",
   "@hostStatusNotChecked": {
-    "description": "Status baris host sebelum pengecekan pertama (cache, bukan fakta)."
+    "description": "Host belum pernah berhasil tersambung."
   },
   "actionCancel": "Batal",
   "@actionCancel": {
