@@ -1223,3 +1223,10 @@ Catatan di atas merekam implementasi awal. Implementasi saat ini menggantikan AP
 - UI menyediakan state metadata lewat `hostUsageProvider`; waktu terakhir ditampilkan di bawah alamat host agar label panjang tetap terbaca.
 - **Pemeriksaan:** `flutter analyze` bersih; `flutter test` lulus (794 lulus, 2 dilewati). Prototipe potret dan landscape dirender di Chrome. Di Xiaomi 25053PC47G, paket `TermUL Preview` tampil dengan label “Belum diperiksa” pada host yang belum punya riwayat; paket rilis `io.github.egateza.termul` tetap terpasang. Sambungan nyata tidak dicoba, jadi perubahan label setelah koneksi berhasil belum diverifikasi lewat adb.
 - Artifact Claude tidak tersedia dari sesi ini; salinan lokal design system dan prototipe sudah diperbarui sesuai persetujuan pemilik dan belum disinkronkan ke artifact daring.
+
+## 11ai. Kembali ke baris terbaru terminal (2026-10-18)
+
+- Terminal menampilkan tombol mengambang **Ke bawah** ketika pengguna menggulir lebih dari 24 dp dari ujung terbaru scrollback. Tombol mengikuti prototipe `Terminal` (panah turun, latar `surface-raised`, tepi/teks aksen), memiliki target sentuh 44 dp dan label aksesibilitas Bahasa Indonesia. Ketukan menggulir halus ke `maxScrollExtent`; tombol hilang saat sudah dekat ujung.
+- Desainnya sudah ada di `docs/design/prototype/Terminal.dc.html` (versi lokal tercatat di `SUMBER.md`); tidak ada perubahan artifact atau token desain.
+- **Tes:** widget test terminal memuat keluaran panjang, menggeser scroll ke awal, memastikan tombol dan ukuran sentuhnya, lalu mengetuknya dan memastikan tombol hilang.
+- **Belum diuji di HP:** posisi dan keterbacaan tombol saat terminal nyata berisi banyak keluaran, termasuk dengan keyboard terbuka. Belum ada sesi uji Android fisik untuk irisan ini.

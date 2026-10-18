@@ -116,6 +116,22 @@ void expectRowsFit(WidgetTester tester) {
 }
 
 void main() {
+  testWidgets('tombol Ke bawah muncul saat scrollback dan kembali menyembunyikan tombol', (tester) async {
+    final rig = await pumpTerminal(tester);
+    rig.session.terminal.write(List.generate(80, (i) => 'baris $i\r\n').join());
+    await tester.pumpAndSettle();
+    final scroll = terminalView(tester).scrollController!;
+    expect(scroll.position.maxScrollExtent, greaterThan(24));
+    scroll.jumpTo(0);
+    await tester.pump();
+    final button = find.bySemanticsLabel('Ke bawah');
+    expect(button, findsOneWidget);
+    expect(tester.getSize(button).height, greaterThanOrEqualTo(44));
+    await tester.tap(button);
+    await tester.pumpAndSettle();
+    expect(button, findsNothing);
+  });
+
   testWidgets('tombol SFTP di header tidak ada bila onOpenSftp tidak diberikan', (tester) async {
     await pumpTerminal(tester);
     expect(find.bySemanticsLabel('Buka panel SFTP'), findsNothing);

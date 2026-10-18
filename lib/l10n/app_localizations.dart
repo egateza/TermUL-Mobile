@@ -594,6 +594,7 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Kembali'**
   String get actionBack;
+  String get terminalScrollToBottom;
 
   /// Tombol memutus sambungan.
   ///

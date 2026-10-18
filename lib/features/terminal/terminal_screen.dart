@@ -134,6 +134,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
 
   /// Panel snippet terbuka: keyboard sistem disembunyikan dan panel 240 dp tampil di bawah bilah tombol cepat.
   bool _snippetsOpen = false;
+  bool _showScrollToBottom = false;
   final _bodyKey = GlobalKey();
 
   /// Popover Tempel di kursor prompt; null bila tertutup.
@@ -144,7 +145,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
     super.initState();
     _session.onInput = _clearSelectionOnInput;
     _session.terminal.addListener(_closeMenuIfCursorMoved);
-    _scrollController.addListener(_closePasteMenu);
+    _scrollController.addListener(_onTerminalScroll);
     _controller.addListener(_dropSelectionWhileMenuOpen);
     // Buka shell setelah layout pertama supaya PTY langsung berukuran layar sebenarnya, bukan 80x24.
     WidgetsBinding.instance.addPostFrameCallback((_) {
@@ -155,7 +156,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
   @override
   void dispose() {
     _session.terminal.removeListener(_closeMenuIfCursorMoved);
-    _scrollController.removeListener(_closePasteMenu);
+    _scrollController.removeListener(_onTerminalScroll);
     _controller.removeListener(_dropSelectionWhileMenuOpen);
     _longPressTimer?.cancel();
     if (_session.onInput == _clearSelectionOnInput) _session.onInput = null;
@@ -174,6 +175,20 @@ class _TerminalScreenState extends State<TerminalScreen> {
   void _closePasteMenu() {
     if (_pasteMenu == null) return;
     if (mounted) setState(() => _pasteMenu = null);
+  }
+
+  void _onTerminalScroll() {
+    _closePasteMenu();
+    final c = _scrollController;
+    if (!c.hasClients || !c.position.hasContentDimensions) return;
+    final show = c.position.maxScrollExtent - c.position.pixels > 24;
+    if (show != _showScrollToBottom && mounted) setState(() => _showScrollToBottom = show);
+  }
+
+  void _scrollToBottom() {
+    final c = _scrollController;
+    if (!c.hasClients) return;
+    c.animateTo(c.position.maxScrollExtent, duration: const Duration(milliseconds: 220), curve: Curves.easeOut);
   }
 
   void _closeMenuIfCursorMoved() {
@@ -642,6 +657,35 @@ class _TerminalScreenState extends State<TerminalScreen> {
                                   viewKey: _viewKey,
                                   style: widget.handleStyle,
                                 ),
+                                if (_showScrollToBottom)
+                                  Positioned(
+                                    right: TermulSpacing.space3,
+                                    bottom: TermulSpacing.space3,
+                                    child: Pressable(
+                                      onPressed: _scrollToBottom,
+                                      semanticLabel: l.terminalScrollToBottom,
+                                      minHeight: 44,
+                                      radius: 22,
+                                      builder: (context, pressed) => Container(
+                                        constraints: const BoxConstraints(minHeight: 44),
+                                        padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space5),
+                                        decoration: BoxDecoration(
+                                          color: pressed ? TermulPalette.accent : TermulPalette.surfaceRaised,
+                                          border: Border.all(color: TermulPalette.accent),
+                                          borderRadius: BorderRadius.circular(22),
+                                        ),
+                                        child: Row(mainAxisSize: MainAxisSize.min, children: [
+                                          TermulIcon(TermulIconName.arrowDown, size: 18,
+                                            color: pressed ? TermulPalette.onAccent : TermulPalette.accent),
+                                          const SizedBox(width: TermulSpacing.space2),
+                                          Text(l.terminalScrollToBottom, style: TermulText.label.copyWith(
+                                            color: pressed ? TermulPalette.onAccent : TermulPalette.accent,
+                                            fontWeight: FontWeight.w500,
+                                          )),
+                                        ]),
+                                      ),
+                                    ),
+                                  ),
                               ],
                             ),
                           ),
