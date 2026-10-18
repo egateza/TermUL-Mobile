@@ -287,6 +287,7 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get actionBack => 'Kembali';
+
   @override
   String get terminalScrollToBottom => 'Ke bawah';
 

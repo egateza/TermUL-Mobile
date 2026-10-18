@@ -394,6 +394,10 @@
   "@actionBack": {
     "description": "Tombol kembali ke daftar host."
   },
+  "terminalScrollToBottom": "Ke bawah",
+  "@terminalScrollToBottom": {
+    "description": "Tombol menggulir terminal ke baris terbaru."
+  },
   "actionDisconnect": "Putuskan",
   "@actionDisconnect": {
     "description": "Tombol memutus sambungan."

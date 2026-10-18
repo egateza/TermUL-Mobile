@@ -594,6 +594,11 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Kembali'**
   String get actionBack;
+
+  /// Tombol menggulir terminal ke baris terbaru.
+  ///
+  /// In id, this message translates to:
+  /// **'Ke bawah'**
   String get terminalScrollToBottom;
 
   /// Tombol memutus sambungan.
