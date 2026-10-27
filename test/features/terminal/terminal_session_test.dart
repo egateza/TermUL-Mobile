@@ -42,6 +42,8 @@ Future<void> settle() => Future<void>.delayed(const Duration(milliseconds: 30));
 String screenText(Terminal t) => t.buffer.getText();
 
 void main() {
+  TestWidgetsFlutterBinding.ensureInitialized(); // HardwareKeyboard dibaca saat Enter (LF) diketik
+
   group('applyModifiers', () {
     test('Ctrl+huruf menjadi kode kontrol, huruf besar dan kecil sama', () {
       expect(applyModifiers('c', ctrl: true, alt: false), '\x03');
@@ -61,6 +63,16 @@ void main() {
       expect(applyModifiers('1', ctrl: true, alt: false), '1');
       expect(applyModifiers('\x1b[A', ctrl: true, alt: true), '\x1b[A');
       expect(applyModifiers('', ctrl: true, alt: true), '');
+    });
+  });
+
+  group('enterAsCarriageReturn', () {
+    test('LF tunggal menjadi CR; CRLF dan teks tanpa LF tidak berubah', () {
+      expect(enterAsCarriageReturn('\n'), '\r');
+      expect(enterAsCarriageReturn('ls\n'), 'ls\r');
+      expect(enterAsCarriageReturn('\r\n'), '\r\n');
+      expect(enterAsCarriageReturn('\r'), '\r');
+      expect(enterAsCarriageReturn('abc'), 'abc');
     });
   });
 
@@ -186,6 +198,25 @@ void main() {
       session.pressKey(TerminalKey.arrowLeft);
       expect(shell.sent, '\x1b[1;5D');
       expect(session.ctrl, isFalse);
+    });
+
+    test('Enter dari keyboard layar (teks LF, mis. Gboard) dikirim sebagai CR', () async {
+      await session.start();
+      session.terminal.textInput('\n');
+      expect(shell.sent, '\r');
+    });
+
+    test('^J dari tombol cepat tetap LF', () async {
+      await session.start();
+      session.pressControl('j');
+      expect(shell.written, [10]);
+    });
+
+    test('Ctrl sekali pakai lalu j dari keyboard layar tetap LF', () async {
+      await session.start();
+      session.toggleCtrl();
+      session.terminal.textInput('j');
+      expect(shell.written, [10]);
     });
 
     test('^C dan ^D mengirim kode kontrol', () async {

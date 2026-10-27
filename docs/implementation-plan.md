@@ -1305,3 +1305,12 @@ Catatan di atas merekam implementasi awal. Implementasi saat ini menggantikan AP
 - **Tes:** skenario 11al diganti (sentuh berkas kedua memindahkan pilihan, tahan menambah), ditambah skenario sentuh item yang sama melepas dan sentuh folder membuka folder. `test/features/sftp` 79 tes lulus; suite penuh 825 lulus, 14 dilewati.
 - **Desain:** design system versi 75 (`README.md`, kalimat seleksi SFTP); prototipe tidak berubah (`SftpSelect` 4k menggambarkan hasil seleksi ganda).
 - **Belum diuji di HP.**
+
+## 11aq. Enter keyboard layar dikirim sebagai CR (MikroTik RouterOS v6) (2026-10-27)
+
+- **Laporan pengguna:** di RouterOS v6, Enter di Gboard tidak berbuat apa-apa; tombol cepat ⏎ berfungsi.
+- **Penyebab:** Gboard memasukkan Enter sebagai teks `"\n"`. `TerminalView` `xterm` 4.0.0 (`_onInsert`) tidak memetakannya ke `TerminalKey.enter` dan meneruskannya lewat `textInput`, sehingga server menerima LF. Shell Linux dan RouterOS v7 menerima LF sebagai Enter; console RouterOS v6 hanya menerima CR. Tombol cepat ⏎ memakai `TerminalKey.enter` (CR), karena itu berfungsi.
+- **Perbaikan:** `TerminalSession._onOutput` mengubah LF tunggal menjadi CR (`enterAsCarriageReturn` di `key_codes.dart`), seperti terminal sungguhan dan JuiceSSH. Tidak diubah: `\r\n` (mode line feed), `^J` dari tombol cepat (`pressControl`), Ctrl sekali pakai + `j`, dan Ctrl+J dari keyboard fisik (Ctrl ditekan menurut `HardwareKeyboard`). Tempel sudah memakai CR.
+- **Tes:** `terminal_session_test.dart` +4 (fungsi normalisasi; Enter keyboard layar menjadi CR; `^J` tombol cepat dan Ctrl sekali pakai + `j` tetap LF). `flutter analyze` bersih; suite penuh lulus.
+- **Belum diuji di HP:** Enter Gboard ke RouterOS v6 dan ke shell Linux setelah perubahan; keyboard lain (SwiftKey, keyboard bawaan pabrikan) yang mungkin mengirim key event, bukan teks; Ctrl+J keyboard fisik.
+- **Desain:** tidak ada perubahan tampilan.

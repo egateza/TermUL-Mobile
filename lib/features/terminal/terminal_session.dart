@@ -2,6 +2,7 @@ import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart' show HardwareKeyboard;
 import 'package:xterm/xterm.dart';
 
 import 'key_codes.dart';
@@ -43,6 +44,9 @@ class TerminalSession extends ChangeNotifier {
   TerminalSessionState _state = TerminalSessionState.opening;
   bool _ctrl = false;
   bool _alt = false;
+
+  /// Sedang mengirim kode kontrol dari [pressControl]; jangan diubah [enterAsCarriageReturn].
+  bool _literal = false;
   bool _disposed = false;
 
   TerminalSessionState get state => _state;
@@ -118,7 +122,10 @@ class TerminalSession extends ChangeNotifier {
 
   void _onOutput(String data) {
     onInput?.call();
-    final out = applyModifiers(data, ctrl: _ctrl, alt: _alt);
+    // ^J (tombol cepat, atau Ctrl fisik ditekan) tetap LF; LF lain adalah Enter keyboard layar.
+    final literal = _literal || (data.contains('\n') && HardwareKeyboard.instance.isControlPressed);
+    final typed = literal ? data : enterAsCarriageReturn(data);
+    final out = applyModifiers(typed, ctrl: _ctrl, alt: _alt);
     _releaseModifiers();
     final channel = _channel;
     if (channel == null || _state != TerminalSessionState.running) return;
@@ -158,9 +165,14 @@ class TerminalSession extends ChangeNotifier {
     _releaseModifiers();
   }
 
-  /// Ctrl+[letter] langsung, mis. `^C` dan `^D`.
+  /// Ctrl+[letter] langsung, mis. `^C` dan `^D`. Dikirim apa adanya: `^J` tetap LF.
   void pressControl(String letter) {
-    terminal.charInput(letter.toLowerCase().codeUnitAt(0), ctrl: true);
+    _literal = true;
+    try {
+      terminal.charInput(letter.toLowerCase().codeUnitAt(0), ctrl: true);
+    } finally {
+      _literal = false;
+    }
     _releaseModifiers();
   }
 

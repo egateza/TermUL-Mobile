@@ -10,3 +10,10 @@ String applyModifiers(String data, {required bool ctrl, required bool alt}) {
   }
   return alt ? '\x1b$out' : out;
 }
+
+final _bareLineFeed = RegExp(r'(?<!\r)\n');
+
+/// Enter dari keyboard layar menjadi CR, seperti terminal sungguhan. Gboard memasukkan Enter sebagai teks `"\n"`
+/// yang diteruskan `xterm` apa adanya (LF); shell Linux menerimanya, tetapi console MikroTik RouterOS v6 tidak.
+/// `\r\n` (mode line feed) tidak diubah.
+String enterAsCarriageReturn(String data) => data.contains('\n') ? data.replaceAll(_bareLineFeed, '\r') : data;
