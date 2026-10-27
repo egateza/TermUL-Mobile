@@ -300,17 +300,6 @@ void main() {
     expect(find.bySemanticsLabel('Tempel dari papan klip'), findsOneWidget);
   });
 
-  testWidgets('tekan lama memilih satu kata dan memunculkan bilah', (tester) async {
-    await pumpTerminal(tester);
-    terminalView(tester).terminal.write('halo dunia');
-    await tester.pump();
-    final origin = tester.getTopLeft(find.byType(TerminalView));
-    await tester.longPressAt(origin + const Offset(20, 10));
-    await tester.pump();
-    expect(find.textContaining('karakter dipilih'), findsOneWidget);
-    expect(find.bySemanticsLabel('Gagang awal pilihan'), findsOneWidget);
-  });
-
   test('warna seleksi tembus pandang supaya teks di bawahnya tetap terlihat', () {
     expect(termulTerminalTheme.selection.a, lessThan(1));
   });

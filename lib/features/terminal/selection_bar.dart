@@ -16,6 +16,7 @@ class SelectionBar extends StatelessWidget {
     required this.onSelectAll,
     required this.onCancel,
     this.compact = false,
+    this.guide,
   });
 
   final int count;
@@ -25,6 +26,10 @@ class SelectionBar extends StatelessWidget {
 
   /// Landscape ringkas: satu baris, tanpa petunjuk, tombol 44 dp berdampingan dengan jumlah.
   final bool compact;
+
+  /// Panduan langkah dari "Pilih teks" di menu tekan-tahan ("1/2 Seret gagang ke awal pilihan"); menggantikan
+  /// petunjuk biasa, juga di mode ringkas. Null: petunjuk biasa.
+  final SelectionGuide? guide;
 
   @override
   Widget build(BuildContext context) {
@@ -37,7 +42,24 @@ class SelectionBar extends StatelessWidget {
           liveRegion: true,
           child: Text(l.selectionCount(count), style: TermulText.terminalSm.copyWith(color: TermulPalette.ink)),
         ),
-        if (!compact) Text(l.selectionHint, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
+        if (guide case final g?)
+          Semantics(
+            liveRegion: true,
+            child: Text.rich(
+              TextSpan(
+                children: [
+                  TextSpan(
+                    text: '${l.selectionGuideStep(g.step, SelectionGuide.total)}  ',
+                    style: TermulText.terminalSm.copyWith(color: TermulPalette.accent),
+                  ),
+                  TextSpan(text: g.step == 1 ? l.selectionGuideStart : l.selectionGuideEnd),
+                ],
+              ),
+              style: TermulText.caption.copyWith(color: TermulPalette.ink),
+            ),
+          )
+        else if (!compact)
+          Text(l.selectionHint, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
       ],
     );
     final cancel = Pressable(
@@ -139,4 +161,13 @@ class SelectionBar extends StatelessWidget {
       },
     );
   }
+}
+
+/// Langkah panduan seleksi: 1 = geser ke awal pilihan, 2 = geser ke akhir pilihan.
+class SelectionGuide {
+  const SelectionGuide(this.step) : assert(step == 1 || step == 2);
+
+  final int step;
+
+  static const total = 2;
 }

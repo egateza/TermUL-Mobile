@@ -28,6 +28,7 @@ class SelectionHandles extends StatefulWidget {
     required this.scrollController,
     required this.viewKey,
     this.style = SelectionHandleStyle.drop,
+    this.onDragEnd,
   });
 
   final Terminal terminal;
@@ -37,6 +38,9 @@ class SelectionHandles extends StatefulWidget {
 
   /// Bentuk gagang (pengaturan Terminal).
   final SelectionHandleStyle style;
+
+  /// Dipanggil setiap kali jari melepas gagang (panduan langkah "Pilih teks").
+  final VoidCallback? onDragEnd;
 
   /// Jarak pusat bulatan dari bawah sel, supaya jari tidak menutupi huruf yang dipilih.
   static const _gap = 14.0;
@@ -244,6 +248,7 @@ class _SelectionHandlesState extends State<SelectionHandles> with SingleTickerPr
     _lastGlobal = null;
     if (_drag == null) return;
     setState(() => _drag = null);
+    widget.onDragEnd?.call();
   }
 
   Widget _handle(Offset anchor, {required bool isStart, required Size cell, required Size area}) {

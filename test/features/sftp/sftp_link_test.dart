@@ -290,17 +290,19 @@ void main() {
       final rig = _Rig();
       final link = await rig.own();
       await tester.pumpWidget(
-        MaterialApp(
-          theme: termulTheme(),
-          locale: const Locale('id'),
-          supportedLocales: const [Locale('id')],
-          localizationsDelegates: const [
-            AppLocalizations.delegate,
-            GlobalMaterialLocalizations.delegate,
-            GlobalWidgetsLocalizations.delegate,
-            GlobalCupertinoLocalizations.delegate,
-          ],
-          home: const Scaffold(body: Text('akar')),
+        ProviderScope(
+          child: MaterialApp(
+            theme: termulTheme(),
+            locale: const Locale('id'),
+            supportedLocales: const [Locale('id')],
+            localizationsDelegates: const [
+              AppLocalizations.delegate,
+              GlobalMaterialLocalizations.delegate,
+              GlobalWidgetsLocalizations.delegate,
+              GlobalCupertinoLocalizations.delegate,
+            ],
+            home: const Scaffold(body: Text('akar')),
+          ),
         ),
       );
       unawaited(link.start());

@@ -120,11 +120,6 @@ void main() {
       return rig;
     }
 
-    Future<void> holdAt(WidgetTester tester, Offset at) async {
-      await tester.longPressAt(at);
-      await tester.pumpAndSettle();
-    }
-
     Rect cursorRect(WidgetTester tester) => tester.state<TerminalViewState>(find.byType(TerminalView)).globalCursorRect;
 
     testWidgets('tombol Tempel: teks pendek tampil di popover, belum masuk; Tempel di popover mengirimnya', (
@@ -195,33 +190,6 @@ void main() {
       expect(find.text('Tempel 2 baris?'), findsOneWidget);
     });
 
-    testWidgets('tekan-tahan di area kosong menjalankan alur yang sama, popover di atas jari dan dalam layar', (
-      tester,
-    ) async {
-      await open(tester, 'ls -la');
-      final finger = Offset(14, cursorRect(tester).center.dy + 90);
-      await holdAt(tester, finger);
-      expect(popover, findsOneWidget);
-      final box = tester.getRect(popover);
-      expect(box.left, greaterThanOrEqualTo(8));
-      expect(box.right, lessThanOrEqualTo(390 - 8));
-      expect(box.bottom, lessThan(finger.dy));
-    });
-
-    testWidgets('tekan-tahan di area kosong dengan papan klip kosong: toast, tanpa popover', (tester) async {
-      await open(tester, null);
-      await holdAt(tester, Offset(14, cursorRect(tester).center.dy + 90));
-      expect(popover, findsNothing);
-      expect(find.text('Papan klip kosong'), findsOneWidget);
-    });
-
-    testWidgets('tekan-tahan di atas teks memilih kata dan tidak membuka popover', (tester) async {
-      await open(tester, 'ls');
-      await holdAt(tester, Offset(cursorRect(tester).left - 40, cursorRect(tester).center.dy));
-      expect(popover, findsNothing);
-      expect(terminalView(tester).controller!.selection, isNotNull);
-    });
-
     testWidgets('ketukan di luar popover menutupnya: di terminal, di bar atas, atau di tombol cepat', (tester) async {
       await open(tester, 'ls');
 
@@ -241,7 +209,8 @@ void main() {
 
       await tapPaste(tester);
       expect(popover, findsOneWidget);
-      await tester.tap(find.byType(KeyButton).at(1)); // tombol cepat (tanpa Esc)
+      // Tombol cepat lain yang terlihat setelah bilah digeser ke Tempel (PgDn tepat di sebelahnya).
+      await tester.tap(find.bySemanticsLabel('Page Down'));
       await tester.pumpAndSettle();
       expect(popover, findsNothing);
     });
@@ -279,12 +248,11 @@ void main() {
       await pumpTerminal(tester, size: const Size(853, 393), keyboard: 209, padding: const EdgeInsets.only(top: 24));
       terminalView(tester).terminal.write('${'\r\n' * 20}user@host:~\$ ');
       await tester.pump();
-      final cursor = tester.state<TerminalViewState>(find.byType(TerminalView)).globalCursorRect;
 
-      // Dari tombol Tempel dan dari tekan-tahan di sisa baris prompt.
+      // Dari tombol Tempel (tekan-tahan kini membuka menu terminal; lihat hold_menu_test.dart).
       await tapPaste(tester);
       expect(popover, findsOneWidget);
-      var box = tester.getRect(popover);
+      final box = tester.getRect(popover);
       expect(box.top, greaterThanOrEqualTo(24 + 8), reason: 'tidak menimpa bilah status');
       expect(box.bottom, lessThanOrEqualTo(393 - 209), reason: 'di atas keyboard');
       expect(box.height, lessThan(80), reason: 'susunan mendatar di layar pendek');
@@ -294,29 +262,8 @@ void main() {
       await tester.pump(const Duration(milliseconds: 400));
       await tester.pumpAndSettle();
       expect(popover, findsNothing);
-
-      await holdAt(tester, Offset(600, cursor.center.dy));
-      expect(popover, findsOneWidget);
-      box = tester.getRect(popover);
-      expect(box.top, greaterThanOrEqualTo(24 + 8));
-      expect(box.bottom, lessThanOrEqualTo(393 - 209));
     });
 
-    testWidgets('layar alternatif (tmux, vim): tekan-tahan di sel kosong membuka popover', (tester) async {
-      await open(tester, 'ls');
-      terminalView(tester).terminal.write('\x1b[?1049h');
-      await tester.pump();
-      await holdAt(tester, const Offset(14, 400));
-      expect(popover, findsOneWidget);
-    });
-
-    testWidgets('mouse mode (tmux -mouse): tekan-tahan di sel kosong tetap membuka popover', (tester) async {
-      await open(tester, 'ls');
-      terminalView(tester).terminal.write('\x1b[?1000h\x1b[?1006h');
-      await tester.pump();
-      await holdAt(tester, const Offset(14, 400));
-      expect(popover, findsOneWidget);
-    });
   });
 
   group('tombol Tempel di layar terminal', () {
@@ -425,10 +372,13 @@ void main() {
       expect(rig.shell.sent, '\x1b[200~${text.replaceAll('\n', '\r')}\x1b[201~');
     });
 
-    testWidgets('saat sambungan putus, tombol Tempel tidak tersedia', (tester) async {
+    testWidgets('saat sambungan putus, tombol Tempel tetap di tempatnya tetapi nonaktif', (tester) async {
       setClipboard(tester, 'ls');
       await pumpTerminal(tester, link: TerminalLink.lost);
-      expect(find.bySemanticsLabel('Tempel dari papan klip'), findsNothing);
+      final paste = find.bySemanticsLabel('Tempel dari papan klip');
+      expect(paste, findsOneWidget);
+      final button = tester.widget<KeyButton>(find.ancestor(of: paste, matching: find.byType(KeyButton)));
+      expect(button.onPressed, isNull);
     });
   });
 }

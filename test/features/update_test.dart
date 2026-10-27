@@ -85,10 +85,7 @@ class _Setup {
   Future<void> launch(WidgetTester tester) async {
     await Harness(settings: settings, uiState: uiState, saveSettings: (s) async => saved.add(s)).pump(
       tester,
-      overrides: [
-        updateServiceProvider.overrideWithValue(service),
-        updatePlatformProvider.overrideWithValue(platform),
-      ],
+      overrides: [updateServiceProvider.overrideWithValue(service), updatePlatformProvider.overrideWithValue(platform)],
     );
   }
 
@@ -96,7 +93,13 @@ class _Setup {
     await tester.tap(find.text('Pengaturan'));
     await tester.pumpAndSettle();
     expect(find.byType(SettingsScreen), findsOneWidget);
-    await tester.scrollUntilVisible(find.byKey(const ValueKey('version-footer')), 300);
+    await tester.scrollUntilVisible(
+      find.byKey(const ValueKey('version-footer')),
+      300,
+      scrollable: find
+          .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+          .first,
+    );
     await tester.pumpAndSettle();
   }
 
@@ -168,7 +171,10 @@ void main() {
   });
 
   testWidgets('saklar Periksa update otomatis mati: tidak diperiksa saat dibuka; menyalakan tersimpan', (tester) async {
-    final setup = _Setup(release: _release(), settings: const AppSettings(update: UpdateSettings(autoCheck: false)));
+    final setup = _Setup(
+      release: _release(),
+      settings: const AppSettings(update: UpdateSettings(autoCheck: false)),
+    );
     await setup.launch(tester);
     expect(setup.service.latestCalls, 0);
     expect(_dot, findsNothing);

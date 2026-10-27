@@ -5,9 +5,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:xterm/xterm.dart';
 
-import '../../core/models/app_settings.dart' show SelectionHandleStyle;
+import '../../core/models/app_settings.dart' show QuickKeySettings, SelectionHandleStyle;
 import '../../core/models/host_profile.dart';
 import '../../core/models/snippet.dart';
+import '../../core/platform/screen_awake.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/pressable.dart';
@@ -26,8 +27,10 @@ import 'paste_popover.dart';
 import 'quick_key_bar.dart';
 import 'selection_bar.dart';
 import 'selection_overlay.dart';
+import 'terminal_hold_menu.dart';
 import 'terminal_palette.dart';
 import 'terminal_session.dart';
+import 'terminal_transcript.dart';
 
 /// Keadaan sambungan di bawah layar terminal.
 enum TerminalLink {
@@ -57,6 +60,7 @@ class TerminalScreen extends StatefulWidget {
     this.textStyle,
     this.handleStyle = SelectionHandleStyle.drop,
     this.confirmSingleLinePaste = true,
+    this.quickKeys = const QuickKeySettings(),
     this.onKeepInBackground,
     this.keepAliveEnabled = true,
     this.onOpenSettings,
@@ -65,6 +69,8 @@ class TerminalScreen extends StatefulWidget {
     this.snippets,
     this.onSnippetDetail,
     this.onManageSnippets,
+    this.transcripts,
+    this.screenAwake,
   });
 
   final HostProfile profile;
@@ -93,6 +99,9 @@ class TerminalScreen extends StatefulWidget {
   /// banyak baris, atau berisiko selalu lewat dialog konfirmasi.
   final bool confirmSingleLinePaste;
 
+  /// Susunan dua baris tombol cepat dari Pengaturan > Tombol cepat.
+  final QuickKeySettings quickKeys;
+
   /// Dipanggil bila pengguna memilih "Tetap terhubung" saat keluar: layar ditutup tanpa menutup sesi. Kosong =
   /// pilihan itu tidak ditawarkan (hanya Putuskan atau Batal).
   final VoidCallback? onKeepInBackground;
@@ -119,6 +128,12 @@ class TerminalScreen extends StatefulWidget {
   /// Membuka tab Snippet ("Kelola semua" di panel).
   final VoidCallback? onManageSnippets;
 
+  /// Simpan dan bagikan transkrip dari menu tekan-tahan. Null: keduanya menampilkan toast gagal.
+  final TranscriptExporter? transcripts;
+
+  /// "Layar tetap menyala" dari menu tekan-tahan; dilepas saat layar ini ditutup. Null: saklar hanya mengubah tampilan.
+  final ScreenAwake? screenAwake;
+
   static const compactBelowDp = 480.0;
 
   @override
@@ -140,6 +155,15 @@ class _TerminalScreenState extends State<TerminalScreen> {
   /// Popover Tempel di kursor prompt; null bila tertutup.
   _PasteMenu? _pasteMenu;
 
+  /// Menu tekan-tahan sedang terbuka (seleksi kata dari tekan lama xterm yang datang belakangan dibuang).
+  bool _holdMenuOpen = false;
+
+  /// Saklar "Layar tetap menyala" di menu tekan-tahan; berlaku selama layar terminal ini terbuka.
+  bool _keepOn = false;
+
+  /// Panduan langkah setelah "Pilih teks"; hilang setelah gagang dilepas dua kali atau seleksi berakhir.
+  SelectionGuide? _guide;
+
   @override
   void initState() {
     super.initState();
@@ -147,6 +171,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
     _session.terminal.addListener(_closeMenuIfCursorMoved);
     _scrollController.addListener(_onTerminalScroll);
     _controller.addListener(_dropSelectionWhileMenuOpen);
+    _controller.addListener(_dropGuideWithoutSelection);
     // Buka shell setelah layout pertama supaya PTY langsung berukuran layar sebenarnya, bukan 80x24.
     WidgetsBinding.instance.addPostFrameCallback((_) {
       if (mounted) _session.start();
@@ -158,7 +183,9 @@ class _TerminalScreenState extends State<TerminalScreen> {
     _session.terminal.removeListener(_closeMenuIfCursorMoved);
     _scrollController.removeListener(_onTerminalScroll);
     _controller.removeListener(_dropSelectionWhileMenuOpen);
+    _controller.removeListener(_dropGuideWithoutSelection);
     _longPressTimer?.cancel();
+    if (_keepOn) widget.screenAwake?.release(this);
     if (_session.onInput == _clearSelectionOnInput) _session.onInput = null;
     _controller.dispose();
     _focus.dispose();
@@ -201,8 +228,8 @@ class _TerminalScreenState extends State<TerminalScreen> {
   Offset? _downAt;
   Timer? _longPressTimer;
 
-  /// Tekan-tahan di area kosong membuka popover Tempel; ditunggu sedikit lebih singkat dari tekan lama xterm
-  /// (500 ms) supaya seleksi bawaannya bisa dibatalkan.
+  /// Tekan-tahan membuka menu terminal; ditunggu sedikit lebih singkat dari tekan lama xterm (500 ms) supaya seleksi
+  /// kata bawaannya bisa dibuang.
   static const _emptyHold = Duration(milliseconds: 450);
 
   void _onPointerDown(PointerDownEvent e) {
@@ -222,9 +249,9 @@ class _TerminalScreenState extends State<TerminalScreen> {
     _downAt = null;
   }
 
-  /// Pemicu popover lewat sentuhan: hanya saat sesi berjalan. Tetap aktif di layar alternatif (`tmux`, `vim`,
-  /// `htop`) dan di mouse mode, karena yang dicari adalah sel kosong (tekan-tahan di atas teks tidak memicunya).
-  bool get _canHoldToPaste => _alive && _session.state == TerminalSessionState.running;
+  /// Tempel dan snippet hanya saat sesi berjalan; menu sendiri tetap bisa dibuka saat sambungan putus (salin dan
+  /// simpan transkrip tetap berguna).
+  bool get _canType => _alive && _session.state == TerminalSessionState.running;
 
   final _menuKey = GlobalKey();
 
@@ -237,23 +264,174 @@ class _TerminalScreenState extends State<TerminalScreen> {
     _closePasteMenu();
   }
 
-  /// Tekan-tahan di area kosong (sisa baris di kanan teks, baris kosong, atau ruang di bawah prompt) menjalankan
-  /// alur tempel dengan popover di dekat jari. Di atas teks, tekan lama tetap memilih kata (xterm).
+  /// Tekan-tahan di mana saja di terminal (di atas teks maupun area kosong, juga di `tmux`, `vim`, `htop`) membuka
+  /// menu terminal (prototipe `TerminalHoldMenu`). Selama ada seleksi, tekan lama dibiarkan ke xterm (memilih kata).
   Future<void> _onHoldAt(Offset global) async {
-    if (!mounted || _downAt == null || _pasteMenu != null || !_canHoldToPaste) return;
+    if (!mounted || _downAt == null || _pasteMenu != null || _holdMenuOpen) return;
+    if (_controller.selection != null) return;
+    final view = _viewKey.currentState;
+    if (view == null || !view.renderTerminal.attached) return;
+    _downAt = null;
+    HapticFeedback.selectionClick();
+    await _openHoldMenu(global);
+  }
+
+  Future<void> _openHoldMenu(Offset global) async {
+    setState(() => _holdMenuOpen = true);
+    String? clip;
+    try {
+      clip = (await Clipboard.getData(Clipboard.kTextPlain))?.text;
+    } on Object {
+      clip = null;
+    }
+    if (!mounted) return;
+    final terminal = _session.terminal;
+    final p = widget.profile;
+    final action = await showTerminalHoldMenu(
+      context,
+      target: '${p.username}@${p.host}',
+      lineCount: TerminalTranscript.of(terminal).lineCount,
+      keepScreenOn: _keepOn,
+      onKeepScreenOn: _setKeepOn,
+      clipText: clip,
+      canPaste: _canType,
+      canSnippets: _canType && widget.snippets != null,
+      canClear: !terminal.isUsingAltBuffer,
+    );
+    if (!mounted) return;
+    setState(() => _holdMenuOpen = false);
+    if (_controller.selection != null) _controller.clearSelection();
+    switch (action) {
+      case null:
+        return;
+      case TerminalMenuAction.select:
+        _startSelectAt(global);
+      case TerminalMenuAction.copyAll:
+        await _copyAll();
+      case TerminalMenuAction.paste:
+        // Tempel dipilih sendiri dari menu: satu baris aman langsung masuk; selain itu dialog seperti biasa.
+        await _pasteText(clip ?? '', direct: true);
+      case TerminalMenuAction.snippets:
+        setState(() => _snippetsOpen = true);
+        _focus.unfocus();
+      case TerminalMenuAction.saveTranscript:
+        await _saveTranscript();
+      case TerminalMenuAction.shareTranscript:
+        await _shareTranscript();
+      case TerminalMenuAction.clear:
+        _clearScreen();
+    }
+  }
+
+  void _setKeepOn(bool on) {
+    if (on == _keepOn || !mounted) return;
+    setState(() => _keepOn = on);
+    final awake = widget.screenAwake;
+    if (awake == null) return;
+    on ? awake.acquire(this) : awake.release(this);
+  }
+
+  /// "Pilih teks": kata di bawah jari terpilih (satu sel bila jari di ruang kosong), lalu panduan dua langkah.
+  void _startSelectAt(Offset global) {
     final view = _viewKey.currentState;
     if (view == null || !view.renderTerminal.attached) return;
     final render = view.renderTerminal;
-    final cell = render.getCellOffset(render.globalToLocal(global));
-    final buffer = _session.terminal.buffer;
-    final empty = cell.y >= buffer.lines.length || cell.x >= buffer.lines[cell.y].getTrimmedLength();
-    if (!empty) return;
-    _downAt = null;
-    HapticFeedback.selectionClick();
-    // Tekan lama xterm bisa sempat memilih kata kosong: buang supaya bilah seleksi tidak menggantikan tombol cepat.
-    if (_controller.selection != null) _controller.clearSelection();
-    // Area jari: popover muncul di atasnya, tidak tertutup jari.
-    await _paste(anchor: Rect.fromCenter(center: global, width: 1, height: 40));
+    final local = render.globalToLocal(global);
+    render.selectWord(local);
+    final range = _controller.selection?.normalized;
+    if (range == null || range.isCollapsed) render.selectCharacters(local);
+    if (_controller.selection == null) return;
+    setState(() => _guide = const SelectionGuide(1));
+  }
+
+  void _advanceGuide() {
+    final g = _guide;
+    if (g == null || !mounted) return;
+    setState(() => _guide = g.step == 1 ? const SelectionGuide(2) : null);
+  }
+
+  void _dropGuideWithoutSelection() {
+    if (_guide != null && _controller.selection == null && mounted) setState(() => _guide = null);
+  }
+
+  double get _toastOffset => TermulSize.tapMin + TermulSpacing.space3 * 3;
+
+  /// Mengambil transkrip; kosong menampilkan toast dan menghasilkan null.
+  TerminalTranscript? _transcriptOrToast(AppLocalizations l, ScaffoldMessengerState messenger) {
+    final t = TerminalTranscript.of(_session.terminal);
+    if (!t.isEmpty) return t;
+    showTermulToastOn(messenger, l.terminalTranscriptEmpty, icon: TermulIconName.warning, bottomOffset: _toastOffset);
+    return null;
+  }
+
+  Future<void> _copyAll() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final t = _transcriptOrToast(l, messenger);
+    if (t == null) return;
+    try {
+      await Clipboard.setData(ClipboardData(text: t.text));
+    } on Object {
+      return;
+    }
+    showTermulToastOn(messenger, l.terminalCopiedLines(t.lineCount), bottomOffset: _toastOffset);
+  }
+
+  String get _transcriptName => TerminalTranscript.fileName(widget.profile.name, DateTime.now());
+
+  Future<void> _saveTranscript() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final t = _transcriptOrToast(l, messenger);
+    if (t == null) return;
+    final exporter = widget.transcripts;
+    try {
+      if (exporter == null) throw StateError('transcripts');
+      final saved = await exporter.save(_transcriptName, t.text);
+      showTermulToastOn(messenger, l.terminalTranscriptSaved(saved.location, saved.name), bottomOffset: _toastOffset);
+    } on Object {
+      showTermulToastOn(
+        messenger,
+        l.terminalTranscriptSaveFailed,
+        icon: TermulIconName.warning,
+        bottomOffset: _toastOffset,
+      );
+    }
+  }
+
+  Future<void> _shareTranscript() async {
+    final l = AppLocalizations.of(context);
+    final messenger = ScaffoldMessenger.of(context);
+    final t = _transcriptOrToast(l, messenger);
+    if (t == null) return;
+    final exporter = widget.transcripts;
+    try {
+      if (exporter == null) throw StateError('transcripts');
+      await exporter.share(_transcriptName, t.text, title: l.terminalTranscriptShareTitle);
+    } on Object {
+      showTermulToastOn(
+        messenger,
+        l.terminalTranscriptShareFailed,
+        icon: TermulIconName.warning,
+        bottomOffset: _toastOffset,
+      );
+    }
+  }
+
+  /// Bersihkan layar di HP saja (tidak dikirim ke server): scrollback dihapus dan baris kursor (prompt) digeser ke
+  /// atas layar, jadi prompt tetap terlihat dan ketikan berikutnya berlanjut di tempat yang sama. Tidak dipakai di
+  /// layar alternatif (`vim`, `htop`), karena programnya menggambar layar sendiri.
+  void _clearScreen() {
+    final terminal = _session.terminal;
+    if (terminal.isUsingAltBuffer) return;
+    final b = terminal.buffer;
+    final y = b.cursorY;
+    terminal.write('\x1b[3J${y > 0 ? '\x1b[${y}S' : ''}\x1b[1;${b.cursorX + 1}H');
+    showTermulToastOn(
+      ScaffoldMessenger.of(context),
+      AppLocalizations.of(context).terminalCleared,
+      bottomOffset: _toastOffset,
+    );
   }
 
   /// Titik tempat popover muncul bila dipicu tombol Tempel di panel: di atas baris prompt (kursor), supaya baris
@@ -283,9 +461,9 @@ class _TerminalScreenState extends State<TerminalScreen> {
     );
   }
 
-  /// Seleksi kosong dari tekan lama xterm yang terlambat datang saat popover terbuka dibuang.
+  /// Seleksi kata dari tekan lama xterm yang terlambat datang saat popover atau menu terbuka dibuang.
   void _dropSelectionWhileMenuOpen() {
-    if (_pasteMenu != null && _controller.selection != null) _controller.clearSelection();
+    if ((_pasteMenu != null || _holdMenuOpen) && _controller.selection != null) _controller.clearSelection();
   }
 
   Widget _pasteMenuOverlay(BuildContext context) {
@@ -303,18 +481,6 @@ class _TerminalScreenState extends State<TerminalScreen> {
   bool get _alive =>
       widget.link == TerminalLink.up &&
       (_session.state == TerminalSessionState.opening || _session.state == TerminalSessionState.running);
-
-  /// Membuka atau menutup panel snippet. Terbuka: keyboard sistem disembunyikan (fokus terminal dilepas); tertutup:
-  /// fokus kembali ke terminal supaya keyboard muncul lagi.
-  void _toggleSnippets() {
-    final open = !_snippetsOpen;
-    setState(() => _snippetsOpen = open);
-    if (open) {
-      _focus.unfocus();
-    } else {
-      _focus.requestFocus();
-    }
-  }
 
   void _closeSnippets({bool refocus = true}) {
     if (!_snippetsOpen) return;
@@ -600,6 +766,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                           word: word,
                           onBack: Navigator.of(context).maybePop,
                           onOpenSftp: widget.onOpenSftp,
+                          keepOn: _keepOn,
                         ),
                       if (widget.sessionGroupTabs != null) widget.sessionGroupTabs!,
                       if (widget.link != TerminalLink.up)
@@ -656,6 +823,7 @@ class _TerminalScreenState extends State<TerminalScreen> {
                                   scrollController: _scrollController,
                                   viewKey: _viewKey,
                                   style: widget.handleStyle,
+                                  onDragEnd: _advanceGuide,
                                 ),
                                 if (_showScrollToBottom)
                                   Positioned(
@@ -703,12 +871,9 @@ class _TerminalScreenState extends State<TerminalScreen> {
                                 if (range == null || range.isCollapsed) {
                                   return QuickKeyBar(
                                     session: _session,
+                                    layout: widget.quickKeys,
                                     compact: compact,
                                     onPaste: widget.link == TerminalLink.up ? _paste : null,
-                                    onSnippets: widget.link == TerminalLink.up && widget.snippets != null
-                                        ? _toggleSnippets
-                                        : null,
-                                    snippetsOpen: _snippetsOpen,
                                   );
                                 }
                                 return SelectionBar(
@@ -717,9 +882,12 @@ class _TerminalScreenState extends State<TerminalScreen> {
                                   onCopy: _copySelection,
                                   onSelectAll: _selectAll,
                                   onCancel: _controller.clearSelection,
+                                  guide: _guide,
                                 );
                               },
                             ),
+                            // Tombol Snippet di bilah tombol cepat dihapus (keputusan pemilik 2026-10-27); panel menunggu
+                            // titik masuk dari prototipe Snippet berikutnya, jadi untuk sementara tidak pernah terbuka.
                             if (_snippetsOpen && widget.link == TerminalLink.up && widget.snippets != null)
                               SnippetPanel(
                                 snippets: widget.snippets!,
@@ -756,6 +924,7 @@ class _Header extends StatelessWidget {
     required this.word,
     required this.onBack,
     this.onOpenSftp,
+    this.keepOn = false,
   });
 
   final HostProfile profile;
@@ -763,6 +932,9 @@ class _Header extends StatelessWidget {
   final String word;
   final VoidCallback onBack;
   final VoidCallback? onOpenSftp;
+
+  /// "Layar tetap menyala" aktif: chip "menyala" di kanan judul.
+  final bool keepOn;
 
   @override
   Widget build(BuildContext context) {
@@ -800,6 +972,27 @@ class _Header extends StatelessWidget {
                 ),
               ),
             ),
+            if (keepOn)
+              Semantics(
+                label: l.terminalKeepOnChipAria,
+                excludeSemantics: true,
+                child: Container(
+                  height: 28,
+                  padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3),
+                  decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(TermulRadius.radiusPill),
+                    border: Border.all(color: TermulPalette.lineStrong),
+                  ),
+                  child: Row(
+                    mainAxisSize: MainAxisSize.min,
+                    spacing: TermulSpacing.space1,
+                    children: [
+                      const TermulIcon(TermulIconName.sun, size: 14, color: TermulPalette.inkSoft),
+                      Text(l.terminalKeepOnChip, style: TermulText.caption.copyWith(color: TermulPalette.inkSoft)),
+                    ],
+                  ),
+                ),
+              ),
             if (onOpenSftp != null)
               TermulIconButton(icon: TermulIconName.sftp, label: l.terminalOpenSftp, onPressed: onOpenSftp),
           ],

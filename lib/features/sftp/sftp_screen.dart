@@ -5,6 +5,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_providers.dart';
+import '../../core/models/app_settings.dart';
 import '../../core/models/host_profile.dart';
 import '../../core/sftp/sftp_service.dart';
 import '../../core/theme/termul_theme.dart';
@@ -24,6 +25,7 @@ import '../connect/session_controller.dart';
 import 'sftp_browser_controller.dart';
 import 'sftp_format.dart';
 import 'sftp_link.dart';
+import 'sftp_remote_editor_screen.dart';
 import 'sftp_session_manager.dart';
 import 'sftp_transfer_actions.dart';
 import 'unique_name.dart';
@@ -362,6 +364,14 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
     }
   }
 
+  void _openEditor(SftpEntry entry) {
+    Navigator.of(context).push<void>(
+      MaterialPageRoute(
+        builder: (_) => SftpRemoteEditorScreen(link: widget.link, entry: entry),
+      ),
+    );
+  }
+
   /// Muat ulang dari tombol header atau tarik ke bawah: toast hanya bila berhasil (galat tampil di banner).
   Future<void> _refresh() async {
     final browser = _browser;
@@ -528,6 +538,7 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final link = widget.link;
+    final editorSettings = ref.watch(appSettingsProvider).sftpEditor;
     final flow = link.flow;
     final state = flow?.state;
     if (state is ConnectNeedsHostKey) {
@@ -568,8 +579,14 @@ class _SftpBrowserScreenState extends ConsumerState<SftpBrowserScreen> {
                     ? _Connecting(link: link, state: state, onLeave: _leave)
                     : ListenableBuilder(
                         listenable: Listenable.merge([browser, link, link.transfers]),
-                        builder: (context, _) =>
-                            _Listing(browser: browser, link: link, onDownload: _download, onRefresh: _refresh),
+                        builder: (context, _) => _Listing(
+                          browser: browser,
+                          link: link,
+                          editorSettings: editorSettings,
+                          onDownload: _download,
+                          onEditFile: _openEditor,
+                          onRefresh: _refresh,
+                        ),
                       ),
               ),
             ],
@@ -783,7 +800,14 @@ class _Problem extends StatelessWidget {
 }
 
 class _Listing extends StatelessWidget {
-  const _Listing({required this.browser, required this.link, required this.onDownload, required this.onRefresh});
+  const _Listing({
+    required this.browser,
+    required this.link,
+    required this.editorSettings,
+    required this.onDownload,
+    required this.onEditFile,
+    required this.onRefresh,
+  });
 
   final Future<void> Function() onRefresh;
 
@@ -791,6 +815,8 @@ class _Listing extends StatelessWidget {
 
   final SftpBrowserController browser;
   final SftpLink link;
+  final SftpEditorSettings editorSettings;
+  final ValueChanged<SftpEntry> onEditFile;
 
   static String _failureText(AppLocalizations l, SftpFailure f) => switch (f.kind) {
     SftpFailureKind.notFound => l.sftpErrNotFound,
@@ -873,8 +899,26 @@ class _Listing extends StatelessWidget {
           icon: e.isDirectory ? TermulIconName.folder : TermulIconName.file,
           iconColor: e.isDirectory ? TermulPalette.info : TermulPalette.inkSoft,
           selected: browser.isSelected(e),
-          onLongPress: () => browser.toggle(e),
-          onPressed: () => browser.hasSelection || !e.isDirectory ? browser.toggle(e) : unawaited(browser.open(e.path)),
+          onLongPress: () {
+            if (!browser.hasSelection || browser.selectionCount > 1 || !browser.isSelected(e)) {
+              browser.toggle(e);
+            }
+          },
+          onPressed: () {
+            if (!browser.hasSelection) {
+              if (e.isDirectory) {
+                unawaited(browser.open(e.path));
+              } else {
+                browser.toggle(e);
+              }
+            } else if (browser.selectionCount == 1) {
+              // Pilihan tunggal tidak berkembang lewat ketukan biasa. Tahan item kedua
+              // untuk masuk ke seleksi ganda; ketukan pada item terpilih melepasnya.
+              if (browser.isSelected(e)) browser.clearSelection();
+            } else {
+              browser.toggle(e);
+            }
+          },
         ),
     ];
     return Column(
@@ -921,6 +965,18 @@ class _Listing extends StatelessWidget {
         if (browser.hasSelection)
           _SelectionBar(
             browser: browser,
+            onEdit:
+                !link.lost &&
+                    editorSettings.enabled &&
+                    browser.selection.length == 1 &&
+                    !browser.selection.single.isDirectory &&
+                    editorSettings.allows(browser.selection.single.name)
+                ? () {
+                    final selected = browser.selection.single;
+                    browser.clearSelection();
+                    onEditFile(selected);
+                  }
+                : null,
             // Pilihan dilepas begitu aksi ditekan: unduhan berjalan di panel transfer dan tombol tidak bisa ditekan
             // berulang untuk berkas yang sama.
             onDownload: link.lost
@@ -1101,9 +1157,11 @@ class _EntryRow extends StatelessWidget {
 }
 
 class _SelectionBar extends StatelessWidget {
-  const _SelectionBar({required this.browser, this.onDownload});
+  const _SelectionBar({required this.browser, this.onEdit, this.onDownload});
 
   final SftpBrowserController browser;
+
+  final VoidCallback? onEdit;
 
   /// null bila sambungan putus (unduh tidak bisa dimulai).
   final VoidCallback? onDownload;
@@ -1161,13 +1219,23 @@ class _SelectionBar extends StatelessWidget {
           Row(
             spacing: TermulSpacing.space3,
             children: [
+              if (onEdit != null)
+                Expanded(
+                  flex: 2,
+                  child: TermulButton(
+                    label: l.sftpEditAction,
+                    icon: TermulIconName.edit,
+                    variant: TermulButtonVariant.primary,
+                    onPressed: onEdit,
+                  ),
+                ),
               if (onDownload != null)
                 Expanded(
                   flex: 2,
                   child: TermulButton(
                     label: l.sftpDownloadAction,
                     icon: TermulIconName.download,
-                    variant: TermulButtonVariant.primary,
+                    variant: onEdit == null ? TermulButtonVariant.primary : TermulButtonVariant.secondary,
                     onPressed: onDownload,
                   ),
                 ),

@@ -7,6 +7,7 @@ import android.content.Intent
 import android.net.Uri
 import android.os.Build
 import android.provider.Settings
+import android.view.WindowManager
 import androidx.activity.result.contract.ActivityResultContracts
 import io.flutter.embedding.android.FlutterFragmentActivity
 import io.flutter.embedding.engine.FlutterEngine
@@ -62,6 +63,20 @@ class MainActivity : FlutterFragmentActivity() {
             if (call.method == "screenOffCount") result.success(ScreenOffTracker.count) else result.notImplemented()
         }
         ScreenOffTracker.onScreenOff = { runOnUiThread { screen.invokeMethod("screenOff", null) } }
+        // "Layar tetap menyala" dari menu terminal: bendera jendela, hanya berlaku selama aplikasi terlihat.
+        MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/window")
+            .setMethodCallHandler { call, result ->
+                if (call.method != "keepScreenOn") {
+                    result.notImplemented()
+                    return@setMethodCallHandler
+                }
+                if (call.argument<Boolean>("on") == true) {
+                    window.addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                } else {
+                    window.clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
+                }
+                result.success(null)
+            }
         val downloads = MethodChannel(flutterEngine.dartExecutor.binaryMessenger, "io.github.egateza.termul/downloads")
         downloadsChannel = downloads
         downloads.setMethodCallHandler { call, result ->

@@ -3936,6 +3936,552 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Yang baru di {version}'**
   String whatsNewTitle(String version);
+
+  /// Judul bagian pengaturan editor file SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Editor SFTP'**
+  String get settingsSftpEditorSection;
+
+  /// Saklar untuk mengaktifkan editor file SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Editor file'**
+  String get settingsSftpEditorLabel;
+
+  /// Keterangan saklar editor file SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Izinkan file server dibuka dan disunting di aplikasi'**
+  String get settingsSftpEditorDesc;
+
+  /// Judul daftar ekstensi file yang dapat diedit.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekstensi file yang dapat diedit'**
+  String get settingsSftpExtensionsLabel;
+
+  /// Keterangan daftar ekstensi editor SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Aksi Edit muncul untuk satu file dengan ekstensi yang ada di daftar ini.'**
+  String get settingsSftpExtensionsDesc;
+
+  /// Label kolom untuk menambahkan ekstensi yang dapat diedit.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekstensi baru'**
+  String get settingsSftpExtensionInput;
+
+  /// Contoh pola ekstensi di kolom input.
+  ///
+  /// In id, this message translates to:
+  /// **'Contoh: *.yaml'**
+  String get settingsSftpExtensionPlaceholder;
+
+  /// Petunjuk format ekstensi editor SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Gunakan pola seperti *.yaml. Ketuk tombol hapus untuk menghapus ekstensi.'**
+  String get settingsSftpExtensionHelper;
+
+  /// Tombol menambahkan pola ekstensi.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah'**
+  String get settingsSftpExtensionAdd;
+
+  /// Label aksesibilitas tombol hapus pola ekstensi.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus {extension}'**
+  String settingsSftpExtensionRemove(String extension);
+
+  /// Galat pola ekstensi yang tidak didukung.
+  ///
+  /// In id, this message translates to:
+  /// **'Masukkan ekstensi seperti *.yaml.'**
+  String get settingsSftpExtensionInvalid;
+
+  /// Galat saat menambahkan ekstensi duplikat.
+  ///
+  /// In id, this message translates to:
+  /// **'Ekstensi itu sudah ada.'**
+  String get settingsSftpExtensionExists;
+
+  /// Keadaan kosong daftar ekstensi editor SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Belum ada ekstensi. Semua file tidak dapat diedit.'**
+  String get settingsSftpExtensionEmpty;
+
+  /// Aksi mengedit satu file yang didukung dari pilihan SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Edit'**
+  String get sftpEditAction;
+
+  /// Judul layar editor file SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'Edit file'**
+  String get sftpEditorTitle;
+
+  /// Status saat isi file SFTP sedang dibaca.
+  ///
+  /// In id, this message translates to:
+  /// **'Membaca file…'**
+  String get sftpEditorLoading;
+
+  /// Galat saat membaca file SFTP untuk diedit.
+  ///
+  /// In id, this message translates to:
+  /// **'File tidak dapat dibuka. Periksa izin dan sambungan SFTP.'**
+  String get sftpEditorLoadFailed;
+
+  /// File terlalu besar untuk dibuka di editor SFTP.
+  ///
+  /// In id, this message translates to:
+  /// **'File lebih dari batas editor 1 MB.'**
+  String get sftpEditorTooLarge;
+
+  /// Isi file tidak valid sebagai teks UTF-8.
+  ///
+  /// In id, this message translates to:
+  /// **'File bukan teks UTF-8 yang dapat diedit.'**
+  String get sftpEditorNotText;
+
+  /// Tombol menyimpan perubahan file ke server.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan'**
+  String get sftpEditorSaveAction;
+
+  /// Status saat editor mengunggah perubahan.
+  ///
+  /// In id, this message translates to:
+  /// **'Menyimpan…'**
+  String get sftpEditorSaving;
+
+  /// Status setelah perubahan berhasil dikirim ke server.
+  ///
+  /// In id, this message translates to:
+  /// **'Tersimpan dan diunggah'**
+  String get sftpEditorSaved;
+
+  /// Status saat editor memiliki perubahan yang belum disimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Perubahan belum diunggah'**
+  String get sftpEditorUnsaved;
+
+  /// Galat saat menyimpan file editor ke server.
+  ///
+  /// In id, this message translates to:
+  /// **'Perubahan gagal disimpan. File asli di server tetap dipertahankan.'**
+  String get sftpEditorSaveFailed;
+
+  /// Galat saat menyimpan ketika sambungan SFTP terputus.
+  ///
+  /// In id, this message translates to:
+  /// **'Sambungan SFTP terputus. Sambungkan ulang sebelum menyimpan.'**
+  String get sftpEditorConnectionLost;
+
+  /// Konfirmasi keluar dari editor dengan perubahan yang belum disimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Buang perubahan?'**
+  String get sftpEditorLeaveTitle;
+
+  /// Isi konfirmasi keluar dari editor file.
+  ///
+  /// In id, this message translates to:
+  /// **'Perubahan yang belum disimpan akan hilang.'**
+  String get sftpEditorLeaveBody;
+
+  /// Aksi konfirmasi untuk membuang perubahan editor.
+  ///
+  /// In id, this message translates to:
+  /// **'Buang perubahan'**
+  String get sftpEditorLeaveAction;
+
+  /// Label aksesibilitas tombol backspace.
+  ///
+  /// In id, this message translates to:
+  /// **'Backspace'**
+  String get keyBackspace;
+
+  /// Label aksesibilitas tombol Enter.
+  ///
+  /// In id, this message translates to:
+  /// **'Enter'**
+  String get keyEnter;
+
+  /// Label aksesibilitas tombol Ins.
+  ///
+  /// In id, this message translates to:
+  /// **'Insert'**
+  String get keyInsert;
+
+  /// Label aksesibilitas tombol Del.
+  ///
+  /// In id, this message translates to:
+  /// **'Delete'**
+  String get keyDelete;
+
+  /// Label aksesibilitas tombol ^Z.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl Z, jeda proses'**
+  String get keyCtrlZ;
+
+  /// Label aksesibilitas tombol ^L.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl L, bersihkan layar'**
+  String get keyCtrlL;
+
+  /// Label aksesibilitas tombol ^R.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl R, cari riwayat'**
+  String get keyCtrlR;
+
+  /// Label aksesibilitas tombol ^A.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl A, awal baris'**
+  String get keyCtrlA;
+
+  /// Label aksesibilitas tombol ^E.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl E, akhir baris'**
+  String get keyCtrlE;
+
+  /// Label aksesibilitas tombol ^W.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl W, hapus kata'**
+  String get keyCtrlW;
+
+  /// Label aksesibilitas tombol ^U.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl U, hapus baris'**
+  String get keyCtrlU;
+
+  /// Label aksesibilitas tombol ^K.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl K, hapus ke akhir baris'**
+  String get keyCtrlK;
+
+  /// Label aksesibilitas tombol ^B.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl B, awalan tmux'**
+  String get keyCtrlB;
+
+  /// Label aksesibilitas tombol ^X.
+  ///
+  /// In id, this message translates to:
+  /// **'Ctrl X'**
+  String get keyCtrlX;
+
+  /// Baris di Pengaturan > Terminal yang membuka pengaturan tombol cepat.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol cepat'**
+  String get settingsQuickKeysLabel;
+
+  /// Keterangan baris Tombol cepat di Pengaturan.
+  ///
+  /// In id, this message translates to:
+  /// **'2 baris · {count} tombol'**
+  String settingsQuickKeysSummary(int count);
+
+  /// Judul layar pengaturan tombol cepat.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol cepat'**
+  String get quickKeysTitle;
+
+  /// Label semantik pratinjau bilah.
+  ///
+  /// In id, this message translates to:
+  /// **'Pratinjau bilah tombol cepat'**
+  String get quickKeysPreviewLabel;
+
+  /// Catatan cara bilah tombol cepat digeser.
+  ///
+  /// In id, this message translates to:
+  /// **'Tujuh kolom pertama terlihat tanpa digeser; sisanya digeser bersama kedua baris.'**
+  String get quickKeysFixedNote;
+
+  /// Judul daftar tombol per baris.
+  ///
+  /// In id, this message translates to:
+  /// **'Baris {n}'**
+  String quickKeysRow(int n);
+
+  /// Jumlah tombol di baris dan batasnya.
+  ///
+  /// In id, this message translates to:
+  /// **'{count}/{max}'**
+  String quickKeysCount(int count, int max);
+
+  /// Daftar baris tanpa tombol.
+  ///
+  /// In id, this message translates to:
+  /// **'Baris ini kosong.'**
+  String get quickKeysEmptyRow;
+
+  /// Tombol membuka katalog untuk baris itu.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah tombol'**
+  String get quickKeysAdd;
+
+  /// Pengganti Tambah tombol saat baris sudah 10 tombol.
+  ///
+  /// In id, this message translates to:
+  /// **'Baris penuh'**
+  String get quickKeysFull;
+
+  /// Label tombol hapus per tombol.
+  ///
+  /// In id, this message translates to:
+  /// **'Hapus {name}'**
+  String quickKeysRemove(String name);
+
+  /// Label pegangan geser.
+  ///
+  /// In id, this message translates to:
+  /// **'Geser untuk mengubah urutan {name}'**
+  String quickKeysDragLabel(String name);
+
+  /// Judul sheet katalog tombol.
+  ///
+  /// In id, this message translates to:
+  /// **'Tambah ke baris {n}'**
+  String quickKeysAddTitle(int n);
+
+  /// Keterangan sheet katalog.
+  ///
+  /// In id, this message translates to:
+  /// **'Tombol yang sudah dipakai di salah satu baris diredupkan.'**
+  String get quickKeysAddHint;
+
+  /// Label semantik tombol katalog yang sudah dipakai.
+  ///
+  /// In id, this message translates to:
+  /// **'{name}, sudah dipakai'**
+  String quickKeysUsed(String name);
+
+  /// Kelompok katalog.
+  ///
+  /// In id, this message translates to:
+  /// **'Pengubah dan aksi'**
+  String get quickKeysGroupAction;
+
+  /// Kelompok katalog.
+  ///
+  /// In id, this message translates to:
+  /// **'Navigasi'**
+  String get quickKeysGroupNav;
+
+  /// Kelompok katalog.
+  ///
+  /// In id, this message translates to:
+  /// **'Pintasan Ctrl'**
+  String get quickKeysGroupCtrl;
+
+  /// Kelompok katalog.
+  ///
+  /// In id, this message translates to:
+  /// **'Simbol'**
+  String get quickKeysGroupSymbol;
+
+  /// Judul menu tekan-tahan di terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Terminal'**
+  String get terminalMenuTitle;
+
+  /// Subjudul menu terminal: user@host dan jumlah baris scrollback.
+  ///
+  /// In id, this message translates to:
+  /// **'{target} · {lines} baris'**
+  String terminalMenuTarget(String target, int lines);
+
+  /// Ubin menu terminal: mulai memilih teks dari kata yang ditekan.
+  ///
+  /// In id, this message translates to:
+  /// **'Pilih teks'**
+  String get terminalMenuSelect;
+
+  /// Ubin menu terminal: salin seluruh scrollback.
+  ///
+  /// In id, this message translates to:
+  /// **'Salin semua'**
+  String get terminalMenuCopyAll;
+
+  /// Ubin menu terminal: tempel dari papan klip.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel'**
+  String get terminalMenuPaste;
+
+  /// Label aksesibilitas ubin Tempel yang nonaktif.
+  ///
+  /// In id, this message translates to:
+  /// **'Tempel, papan klip kosong'**
+  String get terminalMenuPasteEmpty;
+
+  /// Ubin menu terminal: buka panel snippet.
+  ///
+  /// In id, this message translates to:
+  /// **'Snippet'**
+  String get terminalMenuSnippets;
+
+  /// Label pratinjau isi papan klip di menu terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Papan klip:'**
+  String get terminalMenuClipboard;
+
+  /// Baris menu terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Simpan transkrip'**
+  String get terminalMenuSave;
+
+  /// Keterangan Simpan transkrip.
+  ///
+  /// In id, this message translates to:
+  /// **'Seluruh scrollback sebagai .txt di Unduhan/TermUL'**
+  String get terminalMenuSaveBody;
+
+  /// Baris menu terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Bagikan transkrip'**
+  String get terminalMenuShare;
+
+  /// Keterangan Bagikan transkrip.
+  ///
+  /// In id, this message translates to:
+  /// **'Kirim lewat aplikasi lain di HP'**
+  String get terminalMenuShareBody;
+
+  /// Saklar menu terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Layar tetap menyala'**
+  String get terminalMenuKeepOn;
+
+  /// Keterangan saklar layar tetap menyala saat nyala.
+  ///
+  /// In id, this message translates to:
+  /// **'Nyala selama terminal ini terbuka'**
+  String get terminalMenuKeepOnOn;
+
+  /// Keterangan saklar layar tetap menyala saat mati.
+  ///
+  /// In id, this message translates to:
+  /// **'Mati; layar padam mengikuti pengaturan HP'**
+  String get terminalMenuKeepOnOff;
+
+  /// Baris menu terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Bersihkan layar'**
+  String get terminalMenuClear;
+
+  /// Keterangan Bersihkan layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Scrollback di HP dihapus; sesi di server tetap berjalan'**
+  String get terminalMenuClearBody;
+
+  /// Keterangan Bersihkan layar saat layar alternatif aktif.
+  ///
+  /// In id, this message translates to:
+  /// **'Tidak tersedia selagi program layar penuh berjalan (vim, htop)'**
+  String get terminalMenuClearUnavailable;
+
+  /// Chip di header terminal saat layar tetap menyala.
+  ///
+  /// In id, this message translates to:
+  /// **'menyala'**
+  String get terminalKeepOnChip;
+
+  /// Label aksesibilitas chip layar tetap menyala.
+  ///
+  /// In id, this message translates to:
+  /// **'Layar tetap menyala'**
+  String get terminalKeepOnChipAria;
+
+  /// Langkah 1 panduan Pilih teks dari menu terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Seret gagang ke awal pilihan'**
+  String get selectionGuideStart;
+
+  /// Langkah 2 panduan Pilih teks dari menu terminal.
+  ///
+  /// In id, this message translates to:
+  /// **'Sekarang seret ke akhir pilihan'**
+  String get selectionGuideEnd;
+
+  /// Nomor langkah panduan seleksi.
+  ///
+  /// In id, this message translates to:
+  /// **'{step}/{total}'**
+  String selectionGuideStep(int step, int total);
+
+  /// Toast setelah Salin semua.
+  ///
+  /// In id, this message translates to:
+  /// **'Disalin · {count} baris'**
+  String terminalCopiedLines(int count);
+
+  /// Toast bila tidak ada teks untuk disalin atau disimpan.
+  ///
+  /// In id, this message translates to:
+  /// **'Terminal masih kosong'**
+  String get terminalTranscriptEmpty;
+
+  /// Toast setelah Simpan transkrip.
+  ///
+  /// In id, this message translates to:
+  /// **'Disimpan ke {location} · {name}'**
+  String terminalTranscriptSaved(String location, String name);
+
+  /// Toast bila simpan transkrip gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Transkrip gagal disimpan'**
+  String get terminalTranscriptSaveFailed;
+
+  /// Toast bila bagikan transkrip gagal.
+  ///
+  /// In id, this message translates to:
+  /// **'Menu bagikan tidak bisa dibuka'**
+  String get terminalTranscriptShareFailed;
+
+  /// Judul menu bagikan Android.
+  ///
+  /// In id, this message translates to:
+  /// **'Bagikan transkrip'**
+  String get terminalTranscriptShareTitle;
+
+  /// Toast setelah Bersihkan layar.
+  ///
+  /// In id, this message translates to:
+  /// **'Layar dibersihkan'**
+  String get terminalCleared;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

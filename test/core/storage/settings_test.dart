@@ -7,6 +7,42 @@ import 'package:termul_mobile/core/storage/json/json_settings_repository.dart';
 
 void main() {
   group('AppSettings', () {
+    test('pengaturan editor SFTP: bawaan, pencocokan ekstensi, validasi, dan serialisasi', () {
+      const defaults = SftpEditorSettings();
+      expect(defaults.enabled, isTrue);
+      expect(defaults.extensions, ['*.conf', '*.txt', '*.log', '*.json', '*.yml']);
+      expect(defaults.allows('DEFAULT.CONF'), isTrue);
+      expect(defaults.allows('data.yml'), isTrue);
+      expect(defaults.allows('data.yaml'), isFalse);
+      expect(defaults.allows('conf'), isFalse);
+      expect(SftpEditorSettings.normalizePattern('.yaml'), '*.yaml');
+      expect(SftpEditorSettings.normalizePattern('*.ini'), '*.ini');
+      expect(SftpEditorSettings.normalizePattern('a/*.ini'), isNull);
+
+      const configured = SftpEditorSettings(enabled: false, extensions: ['*.yaml']);
+      expect(AppSettings.fromJson(AppSettings(sftpEditor: configured).toJson()).sftpEditor, configured);
+      expect(
+        AppSettings.fromJson({
+          'sftpEditor': {'extensions': <String>[]},
+        }).sftpEditor.extensions,
+        isEmpty,
+      );
+      expect(
+        () => AppSettings.fromJson({
+          'sftpEditor': {'enabled': 'ya'},
+        }),
+        throwsFormatException,
+      );
+      expect(
+        () => AppSettings.fromJson({
+          'sftpEditor': {
+            'extensions': ['*.bad/pattern'],
+          },
+        }),
+        throwsFormatException,
+      );
+    });
+
     test('bawaan: huruf 13 sp, tinggi baris 1,3', () {
       const s = AppSettings();
       expect(s.terminal.fontSize, 13);
@@ -117,7 +153,12 @@ void main() {
       });
       expect(off.update.autoCheck, isFalse);
       expect(AppSettings.fromJson(off.toJson()).update, const UpdateSettings(autoCheck: false));
-      expect(() => AppSettings.fromJson({'update': {'autoCheck': 'ya'}}), throwsFormatException);
+      expect(
+        () => AppSettings.fromJson({
+          'update': {'autoCheck': 'ya'},
+        }),
+        throwsFormatException,
+      );
     });
 
     test('toJson lalu fromJson menghasilkan nilai yang sama', () {

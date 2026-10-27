@@ -1,37 +1,37 @@
+import 'dart:math' as math;
+
 import 'package:flutter/material.dart';
 import 'package:xterm/xterm.dart';
 
+import '../../core/models/quick_key_settings.dart';
 import '../../core/theme/termul_theme.dart';
 import '../../l10n/app_localizations.dart';
 import '../../shared/widgets/key_button.dart';
-import '../../shared/widgets/termul_icon.dart';
-import '../../shared/widgets/termul_icon_button.dart';
+import 'quick_key_catalog.dart';
 import 'terminal_session.dart';
 
-/// Baris tombol khusus di atas keyboard: Esc, Tab, Ctrl dan Alt (sekali pakai), ^C, ^D, panah, Home, End, PgUp,
-/// PgDn, simbol, dan Fn yang menukar baris dengan F1 sampai F12. Satu baris yang bisa digeser; [compact]
-/// (36 dp) hanya untuk landscape ringkas. Tombol tidak mengambil fokus sehingga keyboard sistem tetap terbuka.
+/// Bilah tombol cepat di atas keyboard. Di potret dua baris: grid tujuh kolom selebar sama yang terlihat tanpa
+/// digeser; kolom berikutnya digeser mendatar, kedua baris bersama supaya kolom tetap sejajar. Isi baris dari [layout] (Pengaturan > Tombol cepat). Fn menukar
+/// kedua baris dengan F1 sampai F12. [compact] (landscape ringkas, 36 dp) menggabungkan kedua baris menjadi satu.
+/// Tombol tidak mengambil fokus sehingga keyboard sistem tetap terbuka.
 class QuickKeyBar extends StatefulWidget {
   const QuickKeyBar({
     super.key,
     required this.session,
+    this.layout = const QuickKeySettings(),
     this.compact = false,
     this.onPaste,
-    this.onSnippets,
-    this.snippetsOpen = false,
   });
 
   final TerminalSession session;
+  final QuickKeySettings layout;
   final bool compact;
 
-  /// Dipanggil saat tombol Tempel ditekan (membaca papan klip dan meminta konfirmasi bila perlu).
+  /// Dipanggil saat tombol Tempel ditekan. Kosong = Tempel nonaktif (tetap di tempatnya supaya grid tidak bergeser).
   final VoidCallback? onPaste;
 
-  /// Dipanggil saat ikon Snippet ditekan (membuka atau menutup panel snippet). Kosong = ikon tidak ditampilkan.
-  final VoidCallback? onSnippets;
-
-  /// Panel snippet sedang terbuka: tombolnya menyala penuh (isian `accent`); tertutup, ikonnya kuning.
-  final bool snippetsOpen;
+  /// Kolom yang terlihat tanpa digeser di potret.
+  static const visibleColumns = 7;
 
   @override
   State<QuickKeyBar> createState() => _QuickKeyBarState();
@@ -40,86 +40,155 @@ class QuickKeyBar extends StatefulWidget {
 class _QuickKeyBarState extends State<QuickKeyBar> {
   bool _functionRow = false;
 
+  /// Dipakai bersama bilah potret dan ringkas; kembali ke kolom pertama saat Fn atau ABC ditekan, supaya ABC dan F1
+  /// langsung terlihat.
+  final _scroll = ScrollController();
+
+  @override
+  void dispose() {
+    _scroll.dispose();
+    super.dispose();
+  }
+
+  void _setFunctionRow(bool on) {
+    setState(() => _functionRow = on);
+    if (_scroll.hasClients) _scroll.jumpTo(0);
+  }
+
+  /// Lebar tombol untuk baris yang sedang dibangun (grid selebar sama, atau 56 dp di mode ringkas).
+  double _keyWidth = 56;
+
+  static const _gap = TermulSpacing.space2;
+
   @override
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final s = widget.session;
-    final height = widget.compact ? 36.0 : TermulSize.tapMin;
+    final keyHeight = widget.compact ? 36.0 : TermulSize.tapMin;
     return Semantics(
       container: true,
       label: l.quickKeysLabel,
       child: Container(
-        height: height + TermulSpacing.space3 * 2,
+        padding: const EdgeInsets.all(TermulSpacing.space3),
         decoration: const BoxDecoration(
           color: TermulPalette.ground,
           border: Border(top: BorderSide(color: TermulPalette.line)),
         ),
-        child: Row(
-          children: [
-            // Ikon Snippet tetap di kiri (tidak ikut tergulir), seperti tombol Snippet di prototipe terminal.
-            if (widget.onSnippets != null)
-              Padding(
-                padding: const EdgeInsets.only(left: TermulSpacing.space3),
-                child: TermulIconButton(
-                  icon: TermulIconName.snippets,
-                  tone: IconButtonTone.accentIcon,
-                  label: l.keySnippetsAria,
-                  pressed: widget.snippetsOpen,
-                  onPressed: widget.onSnippets,
-                ),
-              ),
-            Expanded(
-              child: ListenableBuilder(
-                listenable: s,
-                builder: (context, _) => ListView(
+        child: ListenableBuilder(
+          listenable: s,
+          builder: (context, _) {
+            if (widget.compact) {
+              // Semua tombol dibangun (paling banyak 20), supaya tombol di luar layar tetap bisa dicapai.
+              return SizedBox(
+                height: keyHeight,
+                child: SingleChildScrollView(
+                  controller: _scroll,
                   scrollDirection: Axis.horizontal,
-                  padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space3, vertical: TermulSpacing.space3),
-                  children: _functionRow ? _functionKeys(l) : _mainKeys(l, s),
+                  child: Row(children: [for (final k in _compactRow(l)) _cell(k)]),
                 ),
-              ),
-            ),
-          ],
+              );
+            }
+            return LayoutBuilder(
+              builder: (context, constraints) {
+                const cols = QuickKeyBar.visibleColumns;
+                final width = math
+                    .max(TermulSize.tapMin, (constraints.maxWidth - _gap * (cols - 1)) / cols)
+                    .floorToDouble();
+                _keyWidth = width;
+                return SingleChildScrollView(
+                  key: const ValueKey('quick-keys-scroll'),
+                  controller: _scroll,
+                  scrollDirection: Axis.horizontal,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(children: [for (final k in _row(l, 0)) _cell(k)]),
+                      const SizedBox(height: _gap),
+                      Row(children: [for (final k in _row(l, 1)) _cell(k)]),
+                    ],
+                  ),
+                );
+              },
+            );
+          },
         ),
       ),
     );
   }
 
-  Widget _gap() => const SizedBox(width: TermulSpacing.space2);
-
-  Widget _key(String label, String aria, VoidCallback onPressed, {bool pressed = false, double width = 56}) => Padding(
-    padding: const EdgeInsets.only(right: TermulSpacing.space2),
-    child: KeyButton(
-      label: label,
-      ariaLabel: aria,
-      onPressed: onPressed,
-      pressed: pressed,
-      compact: widget.compact,
-      width: width,
-    ),
+  /// Satu sel grid: tombol, atau sel kosong (null) supaya kolom tetap sejajar.
+  Widget _cell(Widget? key) => Padding(
+    padding: const EdgeInsets.only(right: _gap),
+    child: key ?? SizedBox(width: _keyWidth, height: widget.compact ? 36 : TermulSize.tapMin),
   );
 
-  List<Widget> _mainKeys(AppLocalizations l, TerminalSession s) => [
-    _key('Esc', l.keyEsc, () => s.pressKey(TerminalKey.escape)),
-    _key('Tab', l.keyTab, () => s.pressKey(TerminalKey.tab)),
-    _key('Ctrl', l.keyCtrl, s.toggleCtrl, pressed: s.ctrl),
-    _key('Alt', l.keyAlt, s.toggleAlt, pressed: s.alt),
-    _key('Fn', l.keyFunctionToggle, () => setState(() => _functionRow = true)),
-    if (widget.onPaste != null) _key(l.keyPaste, l.keyPasteAria, widget.onPaste!, width: 72),
-    _key('^C', l.keyCtrlC, () => s.pressControl('c')),
-    _key('^D', l.keyCtrlD, () => s.pressControl('d')),
-    _key('←', l.keyArrowLeft, () => s.pressKey(TerminalKey.arrowLeft)),
-    _key('↓', l.keyArrowDown, () => s.pressKey(TerminalKey.arrowDown)),
-    _key('↑', l.keyArrowUp, () => s.pressKey(TerminalKey.arrowUp)),
-    _key('→', l.keyArrowRight, () => s.pressKey(TerminalKey.arrowRight)),
-    _key('Home', l.keyHome, () => s.pressKey(TerminalKey.home)),
-    _key('End', l.keyEnd, () => s.pressKey(TerminalKey.end)),
-    _key('PgUp', l.keyPageUp, () => s.pressKey(TerminalKey.pageUp)),
-    _key('PgDn', l.keyPageDown, () => s.pressKey(TerminalKey.pageDown)),
-    _key('|', l.keyPipe, () => s.pressText('|')),
-    _key('~', l.keyTilde, () => s.pressText('~')),
-    _key('/', l.keySlash, () => s.pressText('/')),
-    _key('-', l.keyDash, () => s.pressText('-')),
-  ];
+  List<Widget?> _compactRow(AppLocalizations l) {
+    _keyWidth = 56;
+    return [..._row(l, 0), ..._row(l, 1)];
+  }
+
+  List<Widget?> _row(AppLocalizations l, int index) {
+    if (_functionRow) {
+      if (widget.compact) {
+        return index == 0 ? [_abc(l), for (var i = 0; i < 12; i++) _fKey(l, i)] : const [];
+      }
+      // ABC dan F1 sampai F6 di atas; sel kosong di bawah ABC supaya F1 sejajar dengan F7.
+      return index == 0
+          ? [_abc(l), for (var i = 0; i < 6; i++) _fKey(l, i)]
+          : [null, for (var i = 6; i < 12; i++) _fKey(l, i)];
+    }
+    return [
+      for (final id in widget.layout.row(index))
+        if (quickKeyById(id) case final def?) _keyFor(l, def),
+    ];
+  }
+
+  Widget _button(String label, String aria, VoidCallback? onPressed, {bool pressed = false}) => KeyButton(
+    label: label,
+    ariaLabel: aria,
+    onPressed: onPressed,
+    pressed: pressed,
+    compact: widget.compact,
+    width: _keyWidth,
+  );
+
+  Widget _abc(AppLocalizations l) => _button('ABC', l.keyFunctionBack, () => _setFunctionRow(false));
+
+  Widget _fKey(AppLocalizations l, int i) =>
+      _button('F${i + 1}', l.keyFunction(i + 1), () => widget.session.pressKey(_fKeys[i]));
+
+  Widget _keyFor(AppLocalizations l, QuickKeyDef def) {
+    final s = widget.session;
+    final label = def.label(l);
+    final aria = def.aria(l);
+    final letter = def.controlLetter;
+    if (letter != null) return _button(label, aria, () => s.pressControl(letter));
+    return switch (def.id) {
+      'ctrl' => _button(label, aria, s.toggleCtrl, pressed: s.ctrl),
+      'alt' => _button(label, aria, s.toggleAlt, pressed: s.alt),
+      'fn' => _button(label, aria, () => _setFunctionRow(true)),
+      'paste' => _button(label, aria, widget.onPaste),
+      'pipe' || 'tilde' || 'slash' || 'dash' => _button(label, aria, () => s.pressText(label)),
+      _ => _button(label, aria, () => s.pressKey(_terminalKeys[def.id]!)),
+    };
+  }
+
+  static const _terminalKeys = {
+    'esc': TerminalKey.escape,
+    'tab': TerminalKey.tab,
+    'bksp': TerminalKey.backspace,
+    'enter': TerminalKey.enter,
+    'up': TerminalKey.arrowUp,
+    'down': TerminalKey.arrowDown,
+    'left': TerminalKey.arrowLeft,
+    'right': TerminalKey.arrowRight,
+    'home': TerminalKey.home,
+    'end': TerminalKey.end,
+    'pgup': TerminalKey.pageUp,
+    'pgdn': TerminalKey.pageDown,
+    'ins': TerminalKey.insert,
+    'del': TerminalKey.delete,
+  };
 
   static const _fKeys = [
     TerminalKey.f1,
@@ -135,13 +204,4 @@ class _QuickKeyBarState extends State<QuickKeyBar> {
     TerminalKey.f11,
     TerminalKey.f12,
   ];
-
-  List<Widget> _functionKeys(AppLocalizations l) {
-    final s = widget.session;
-    return [
-      _key('ABC', l.keyFunctionBack, () => setState(() => _functionRow = false)),
-      for (var i = 0; i < _fKeys.length; i++) _key('F${i + 1}', l.keyFunction(i + 1), () => s.pressKey(_fKeys[i])),
-      _gap(),
-    ];
-  }
 }

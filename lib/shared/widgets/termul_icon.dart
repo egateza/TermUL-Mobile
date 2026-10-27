@@ -58,7 +58,15 @@ enum TermulIconName {
   // Folder berpanah naik-turun: folder di server jauh (SFTP), berbeda dari `folder` polos.
   sftp(
     'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2zM9.5 16v-5.5M7.5 12.5l2-2 2 2M14.5 10.5V16M12.5 14l2 2 2-2',
-  );
+  ),
+  // Ikon menu tekan-tahan terminal (prototipe TerminalHoldMenu): papan klip, bagikan, layar menyala, penghapus.
+  paste('M9 4V3h6v1M9 10h6M9 14h4'),
+  // Huruf T dalam sudut seleksi: Pilih teks. Lembar bertumpuk berisi baris: Salin semua (seluruh teks).
+  textSelect('M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8.5 8.5h7M12 8.5v7.5'),
+  copyText('M5 17V5a2 2 0 0 1 2-2h9M11 11h6M11 14h6M11 17h4'),
+  share('M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4'),
+  sun('M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4'),
+  eraser('M16 4l4 4-9.5 9.5H6.5l-2.5-2.5zM11 9l4 4M10 20h10');
 
   const TermulIconName(this._extra);
 
@@ -77,6 +85,10 @@ enum TermulIconName {
     terminal => '${_rect(3, 4, 18, 16, 2)} $_extra',
     key => '${_circle(8, 15, 4)} $_extra',
     copy => '${_rect(9, 9, 11, 11, 2)} $_extra',
+    paste => '${_rect(6, 4, 12, 17, 2)} $_extra',
+    copyText => '${_rect(8, 7, 12, 14, 2)} $_extra',
+    share => '${_circle(18, 5, 2.5)} ${_circle(6, 12, 2.5)} ${_circle(18, 19, 2.5)} $_extra',
+    sun => '${_circle(12, 12, 4)} $_extra',
     _ => _extra,
   };
 }

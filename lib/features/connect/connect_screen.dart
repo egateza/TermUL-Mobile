@@ -20,6 +20,7 @@ import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_text_field.dart';
 import '../terminal/terminal_palette.dart';
 import '../terminal/terminal_screen.dart';
+import '../terminal/terminal_transcript.dart';
 import '../terminal/session_group_bar.dart';
 import '../settings/settings_screen.dart';
 import '../sftp/sftp_screen.dart' show openSftpFromSession, openSftpSession, replaceWithSftpSession;
@@ -216,6 +217,13 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
         final confirmPaste = settings.terminal.confirmSingleLinePaste;
         final keepAlive = settings.connection.keepAlive;
         // Snippet yang berlaku untuk host ini (semua host, atau khusus host ini).
+        // Simpan/bagikan transkrip dan layar tetap menyala dari menu tekan-tahan terminal.
+        final transcripts = TranscriptExporter(
+          tempDir: ref.read(tempDirProvider),
+          saver: ref.read(downloadsSaverProvider),
+          sharer: ref.read(fileSharerProvider),
+        );
+        final screenAwake = ref.read(screenAwakeProvider);
         final usableSnippets = [
           for (final s in ref.watch(snippetLibraryProvider).snippets)
             if (s.hostId == null || s.hostId == widget.profile.id) s,
@@ -232,6 +240,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               textStyle: style,
               handleStyle: handle,
               confirmSingleLinePaste: confirmPaste,
+              quickKeys: settings.quickKeys,
+              transcripts: transcripts,
+              screenAwake: screenAwake,
               onKeepInBackground: _keepInBackground,
               keepAliveEnabled: keepAlive,
               onOpenSettings: _openSettings,
@@ -263,6 +274,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               textStyle: style,
               handleStyle: handle,
               confirmSingleLinePaste: confirmPaste,
+              quickKeys: settings.quickKeys,
+              transcripts: transcripts,
+              screenAwake: screenAwake,
             );
           }
           if (state is ConnectFailed || state is ConnectAuthDenied) {
@@ -284,6 +298,9 @@ class _ConnectScreenState extends ConsumerState<ConnectScreen> {
               textStyle: style,
               handleStyle: handle,
               confirmSingleLinePaste: confirmPaste,
+              quickKeys: settings.quickKeys,
+              transcripts: transcripts,
+              screenAwake: screenAwake,
             );
           }
         }

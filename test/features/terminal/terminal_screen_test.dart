@@ -4,10 +4,13 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
 import 'package:termul_mobile/core/models/app_settings.dart';
+import 'package:termul_mobile/core/models/snippet.dart';
+import 'package:termul_mobile/core/platform/screen_awake.dart';
 import 'package:termul_mobile/core/theme/termul_theme.dart';
 import 'package:termul_mobile/features/terminal/terminal_palette.dart';
 import 'package:termul_mobile/features/terminal/terminal_screen.dart';
 import 'package:termul_mobile/features/terminal/terminal_session.dart';
+import 'package:termul_mobile/features/terminal/terminal_transcript.dart';
 import 'package:termul_mobile/shared/widgets/key_button.dart';
 import 'package:xterm/xterm.dart';
 
@@ -69,6 +72,10 @@ Future<TermRig> pumpTerminal(
   TerminalStyle? textStyle,
   bool confirmSingleLinePaste = true,
   VoidCallback? onOpenSftp,
+  QuickKeySettings quickKeys = const QuickKeySettings(),
+  TranscriptExporter? transcripts,
+  ScreenAwake? screenAwake,
+  List<Snippet>? snippets,
 }) async {
   tester.view.devicePixelRatio = 1;
   tester.view.physicalSize = size;
@@ -93,6 +100,10 @@ Future<TermRig> pumpTerminal(
               textStyle: textStyle,
               confirmSingleLinePaste: confirmSingleLinePaste,
               onOpenSftp: onOpenSftp,
+              quickKeys: quickKeys,
+              transcripts: transcripts,
+              screenAwake: screenAwake,
+              snippets: snippets,
             ),
           ),
         ),
@@ -247,6 +258,9 @@ void main() {
 
   testWidgets('Fn menukar baris dengan F1 sampai F12 dan ABC mengembalikannya', (tester) async {
     final rig = await pumpTerminal(tester);
+    // Fn ada di kolom setelah enam kolom pertama: geser dulu.
+    await tester.ensureVisible(find.bySemanticsLabel('Tombol F1 sampai F12'));
+    await tester.pumpAndSettle();
     await tester.tap(find.bySemanticsLabel('Tombol F1 sampai F12'));
     await tester.pump();
     expect(find.bySemanticsLabel('Tombol Escape'), findsNothing);
@@ -257,6 +271,46 @@ void main() {
     await tester.tap(find.bySemanticsLabel('Kembali ke tombol biasa'));
     await tester.pump();
     expect(find.bySemanticsLabel('Tombol Escape'), findsOneWidget);
+  });
+
+  testWidgets('tombol cepat dua baris: tujuh kolom terlihat selebar sama, Home panah atas End di atas panah kiri bawah kanan', (tester) async {
+    await pumpTerminal(tester);
+    Rect rect(String label) => tester.getRect(find.bySemanticsLabel(label));
+    expect(rect('Panah atas').center.dx, moreOrLessEquals(rect('Panah bawah').center.dx));
+    expect(rect('Home').center.dx, moreOrLessEquals(rect('Panah kiri').center.dx));
+    expect(rect('End').center.dx, moreOrLessEquals(rect('Panah kanan').center.dx));
+    expect(rect('Panah atas').top, lessThan(rect('Panah bawah').top));
+    final esc = rect('Tombol Escape');
+    expect(esc.width, greaterThanOrEqualTo(44));
+    expect(rect('Tombol Tab').width, moreOrLessEquals(esc.width));
+    // Kolom ketujuh (PgUp) masih di dalam layar 390 dp; kolom kedelapan (Fn) di luar dan perlu digeser.
+    expect(esc.left, moreOrLessEquals(8));
+    expect(rect('Page Up').right, lessThanOrEqualTo(390));
+    expect(rect('Tombol F1 sampai F12').right, greaterThan(390));
+  });
+
+  testWidgets('tanpa tombol Snippet di bilah (menunggu prototipe Snippet berikutnya)', (tester) async {
+    await pumpTerminal(tester);
+    expect(find.byTooltip('Snippet'), findsNothing);
+  });
+
+  testWidgets('susunan dari pengaturan dipakai: pintasan Ctrl mengirim kode kontrol', (tester) async {
+    final rig = await pumpTerminal(
+      tester,
+      quickKeys: const QuickKeySettings(row1: ['ctrll', 'del'], row2: ['enter']),
+    );
+    expect(find.bySemanticsLabel('Tombol Escape'), findsNothing);
+    await tester.tap(find.bySemanticsLabel('Ctrl L, bersihkan layar'));
+    await tester.pump();
+    expect(rig.shell.sent, '\x0c');
+    rig.shell.clear();
+    await tester.tap(find.bySemanticsLabel('Delete'));
+    await tester.pump();
+    expect(rig.shell.sent, '\x1b[3~');
+    rig.shell.clear();
+    await tester.tap(find.bySemanticsLabel('Enter'));
+    await tester.pump();
+    expect(rig.shell.sent, '\r');
   });
 
   testWidgets('tombol cepat tidak mengambil fokus dari terminal (keyboard sistem tetap terbuka)', (tester) async {

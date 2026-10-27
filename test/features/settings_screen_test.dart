@@ -54,6 +54,47 @@ void main() {
     expect(_previewFontSize(tester), 13);
   });
 
+  testWidgets('mematikan Editor file ikut menonaktifkan masukan ekstensi', (tester) async {
+    await _Setup().open(tester);
+    await tester.scrollUntilVisible(
+      find.text('Editor file'),
+      200,
+      scrollable: find
+          .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+          .first,
+    );
+    await tester.tap(find.text('Editor file'));
+    await tester.pumpAndSettle();
+    expect(_current(tester).sftpEditor.enabled, isFalse);
+    final field = tester.widget<TextField>(find.byType(TextField));
+    expect(field.enabled, isFalse);
+  });
+
+  testWidgets('kolom ekstensi dan tombol Tambah sebaris dengan tinggi sama', (tester) async {
+    await _Setup().open(tester);
+    final add = find.byKey(const ValueKey('sftp-extension-add'));
+    await tester.scrollUntilVisible(
+      add,
+      200,
+      scrollable: find
+          .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+          .first,
+    );
+    await tester.pumpAndSettle();
+    final input = find
+        .ancestor(of: find.byType(TextField), matching: find.byType(Container))
+        .first;
+    final inputRect = tester.getRect(input);
+    final addRect = tester.getRect(add);
+    expect(addRect.top, moreOrLessEquals(inputRect.top));
+    expect(addRect.height, moreOrLessEquals(inputRect.height));
+    expect(find.text('Ekstensi baru'), findsNothing);
+    expect(
+      find.byWidgetPredicate((widget) => widget is Semantics && widget.properties.label == 'Ekstensi baru'),
+      findsOneWidget,
+    );
+  });
+
   testWidgets('tombol font mengubah nilai, pratinjau, dan menyimpan', (tester) async {
     final setup = _Setup();
     await setup.open(tester);
@@ -96,7 +137,13 @@ void main() {
       await tester.tap(find.text('Segitiga'));
       await tester.pumpAndSettle();
       expect(setup.saved.last.terminal.handleStyle, SelectionHandleStyle.triangle);
-      await tester.scrollUntilVisible(find.bySemanticsLabel('Besarkan font'), -100);
+      await tester.scrollUntilVisible(
+        find.bySemanticsLabel('Besarkan font'),
+        -100,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.bySemanticsLabel('Besarkan font'));
       await tester.pumpAndSettle();
@@ -138,13 +185,31 @@ void main() {
   testWidgets('Kembalikan bawaan menulis nilai bawaan dan nonaktif bila sudah bawaan', (tester) async {
     final setup = _Setup();
     await setup.open(tester, initial: const AppSettings(terminal: TerminalSettings(fontSize: 18, lineHeight: 1.8)));
-    await tester.scrollUntilVisible(find.text('Kembalikan bawaan'), 200);
+    await tester.scrollUntilVisible(
+      find.text('Kembalikan bawaan'),
+      200,
+      scrollable: find
+          .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+          .first,
+    );
     await tester.tap(find.text('Kembalikan bawaan'));
     await tester.pumpAndSettle();
     expect(setup.saved.single.terminal, const TerminalSettings());
-    await tester.scrollUntilVisible(find.text('13 px'), -200);
+    await tester.scrollUntilVisible(
+      find.text('13 px'),
+      -200,
+      scrollable: find
+          .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+          .first,
+    );
     expect(find.text('13 px'), findsOneWidget);
-    await tester.scrollUntilVisible(find.text('Kembalikan bawaan'), 200);
+    await tester.scrollUntilVisible(
+      find.text('Kembalikan bawaan'),
+      200,
+      scrollable: find
+          .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+          .first,
+    );
     await tester.tap(find.text('Kembalikan bawaan'));
     await tester.pumpAndSettle();
     expect(setup.saved, hasLength(1));
@@ -176,7 +241,13 @@ void main() {
 
   group('bagian Koneksi', () {
     Future<void> scrollToKoneksi(WidgetTester tester) async {
-      await tester.scrollUntilVisible(find.text('Pertahankan koneksi di latar belakang'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Pertahankan koneksi di latar belakang'),
+        200,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       await tester.pumpAndSettle();
     }
 
@@ -187,7 +258,13 @@ void main() {
       await setup.open(tester);
       await scrollToKoneksi(tester);
       // Bagian Streak di bawah membuat daftar lebih panjang: judul bagian bisa sudah tergulir ke atas.
-      await tester.scrollUntilVisible(find.text('KONEKSI'), -100);
+      await tester.scrollUntilVisible(
+        find.text('KONEKSI'),
+        -100,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       expect(find.text('KONEKSI'), findsOneWidget);
       await scrollToKoneksi(tester);
       expect(find.text('Pembatasan baterai HP'), findsNothing);
@@ -196,7 +273,13 @@ void main() {
       await tester.pumpAndSettle();
       expect(setup.saved.last.connection.keepAlive, isTrue);
       expect(_current(tester).connection.keepAlive, isTrue);
-      await tester.scrollUntilVisible(find.text('Pembatasan baterai HP'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Pembatasan baterai HP'),
+        200,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       expect(find.text('Izin notifikasi'), findsOneWidget);
       expect(find.text('Diizinkan'), findsOneWidget);
       expect(find.textContaining('tidak menjaminnya'), findsOneWidget);
@@ -210,7 +293,13 @@ void main() {
       await scrollToKoneksi(tester);
       expect(_current(tester).connection.autoReconnect, isTrue);
 
-      await tester.scrollUntilVisible(find.text('Sambung ulang otomatis'), -200);
+      await tester.scrollUntilVisible(
+        find.text('Sambung ulang otomatis'),
+        -200,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       await tester.tap(find.text('Sambung ulang otomatis'));
       await tester.pumpAndSettle();
       expect(setup.saved.last.connection.autoReconnect, isFalse);
@@ -226,7 +315,13 @@ void main() {
       await scrollToKoneksi(tester);
       await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
       await tester.pumpAndSettle();
-      await tester.scrollUntilVisible(find.text('Izin notifikasi diperlukan untuk menjaga koneksi'), -100);
+      await tester.scrollUntilVisible(
+        find.text('Izin notifikasi diperlukan untuk menjaga koneksi'),
+        -100,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       expect(find.text('Izin notifikasi diperlukan untuk menjaga koneksi'), findsOneWidget);
       expect(_current(tester).connection.keepAlive, isFalse);
       expect(setup.saved, isEmpty);
@@ -236,7 +331,13 @@ void main() {
       final setup = _Setup();
       setup.keepAlive.enabled = false;
       await setup.open(tester, initial: const AppSettings(connection: ConnectionSettings(keepAlive: true)));
-      await tester.scrollUntilVisible(find.text('Izin notifikasi'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Izin notifikasi'),
+        200,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       expect(find.text('Belum diizinkan'), findsOneWidget);
       setup.keepAlive.grantOnRequest = true;
       await tester.ensureVisible(find.text('Izinkan'));
@@ -250,12 +351,24 @@ void main() {
     testWidgets('Buka pengaturan memanggil platform; mematikan saklar menyimpan mati', (tester) async {
       final setup = _Setup();
       await setup.open(tester, initial: const AppSettings(connection: ConnectionSettings(keepAlive: true)));
-      await tester.scrollUntilVisible(find.text('Buka pengaturan'), 200);
+      await tester.scrollUntilVisible(
+        find.text('Buka pengaturan'),
+        200,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       await tester.ensureVisible(find.text('Buka pengaturan'));
       await tester.pumpAndSettle();
       await tester.tap(find.text('Buka pengaturan'));
       expect(setup.keepAlive.settingsOpened, 1);
-      await tester.scrollUntilVisible(find.text('Pertahankan koneksi di latar belakang'), -200);
+      await tester.scrollUntilVisible(
+        find.text('Pertahankan koneksi di latar belakang'),
+        -200,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       await tester.pumpAndSettle();
       await tester.tap(find.text('Pertahankan koneksi di latar belakang'));
       await tester.pumpAndSettle();

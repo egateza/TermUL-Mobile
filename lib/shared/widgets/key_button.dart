@@ -45,7 +45,14 @@ class KeyButton extends StatelessWidget {
             color: on ? TermulPalette.accent : TermulPalette.surfaceRaised,
             borderRadius: BorderRadius.circular(TermulRadius.radiusMd),
           ),
-          child: Text(label, style: TermulText.key.copyWith(color: on ? TermulPalette.onAccent : TermulPalette.ink)),
+          // Label lebih dari empat huruf (mis. "Tempel") memakai 12 px supaya muat di tombol grid sekitar 47 dp.
+          child: Text(
+            label,
+            style: TermulText.key.copyWith(
+              color: on ? TermulPalette.onAccent : TermulPalette.ink,
+              fontSize: label.length > 4 ? 12 : null,
+            ),
+          ),
         );
       },
     );

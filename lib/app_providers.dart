@@ -11,6 +11,7 @@ import 'core/keys/key_file_picker.dart';
 import 'core/models/app_settings.dart';
 import 'core/platform/downloads_saver.dart';
 import 'core/platform/file_sharer.dart';
+import 'core/platform/screen_awake.dart';
 import 'core/platform/device_document_saver.dart';
 import 'core/platform/keepalive_platform.dart';
 import 'core/platform/screen_monitor.dart';
@@ -140,6 +141,9 @@ final uploadPickerProvider = Provider<UploadPicker>((ref) => const FileSelectorU
 
 /// Menu bagikan bawaan Android untuk berkas ekspor; diganti di tes.
 final fileSharerProvider = Provider<FileSharer>((ref) => MethodChannelFileSharer());
+
+/// Bendera layar tetap menyala (menu terminal); satu penghitung pemegang untuk seluruh aplikasi; diganti di tes.
+final screenAwakeProvider = Provider<ScreenAwake>((ref) => MethodChannelScreenAwake());
 
 /// Penyimpan berkas ekspor melalui pemilih lokasi Android; diganti di tes.
 final deviceDocumentSaverProvider = Provider<DeviceDocumentSaver>((ref) => MethodChannelDeviceDocumentSaver());

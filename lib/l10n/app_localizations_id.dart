@@ -2238,4 +2238,301 @@ class AppLocalizationsId extends AppLocalizations {
   String whatsNewTitle(String version) {
     return 'Yang baru di $version';
   }
+
+  @override
+  String get settingsSftpEditorSection => 'Editor SFTP';
+
+  @override
+  String get settingsSftpEditorLabel => 'Editor file';
+
+  @override
+  String get settingsSftpEditorDesc => 'Izinkan file server dibuka dan disunting di aplikasi';
+
+  @override
+  String get settingsSftpExtensionsLabel => 'Ekstensi file yang dapat diedit';
+
+  @override
+  String get settingsSftpExtensionsDesc => 'Aksi Edit muncul untuk satu file dengan ekstensi yang ada di daftar ini.';
+
+  @override
+  String get settingsSftpExtensionInput => 'Ekstensi baru';
+
+  @override
+  String get settingsSftpExtensionPlaceholder => 'Contoh: *.yaml';
+
+  @override
+  String get settingsSftpExtensionHelper => 'Gunakan pola seperti *.yaml. Ketuk tombol hapus untuk menghapus ekstensi.';
+
+  @override
+  String get settingsSftpExtensionAdd => 'Tambah';
+
+  @override
+  String settingsSftpExtensionRemove(String extension) {
+    return 'Hapus $extension';
+  }
+
+  @override
+  String get settingsSftpExtensionInvalid => 'Masukkan ekstensi seperti *.yaml.';
+
+  @override
+  String get settingsSftpExtensionExists => 'Ekstensi itu sudah ada.';
+
+  @override
+  String get settingsSftpExtensionEmpty => 'Belum ada ekstensi. Semua file tidak dapat diedit.';
+
+  @override
+  String get sftpEditAction => 'Edit';
+
+  @override
+  String get sftpEditorTitle => 'Edit file';
+
+  @override
+  String get sftpEditorLoading => 'Membaca file…';
+
+  @override
+  String get sftpEditorLoadFailed => 'File tidak dapat dibuka. Periksa izin dan sambungan SFTP.';
+
+  @override
+  String get sftpEditorTooLarge => 'File lebih dari batas editor 1 MB.';
+
+  @override
+  String get sftpEditorNotText => 'File bukan teks UTF-8 yang dapat diedit.';
+
+  @override
+  String get sftpEditorSaveAction => 'Simpan';
+
+  @override
+  String get sftpEditorSaving => 'Menyimpan…';
+
+  @override
+  String get sftpEditorSaved => 'Tersimpan dan diunggah';
+
+  @override
+  String get sftpEditorUnsaved => 'Perubahan belum diunggah';
+
+  @override
+  String get sftpEditorSaveFailed => 'Perubahan gagal disimpan. File asli di server tetap dipertahankan.';
+
+  @override
+  String get sftpEditorConnectionLost => 'Sambungan SFTP terputus. Sambungkan ulang sebelum menyimpan.';
+
+  @override
+  String get sftpEditorLeaveTitle => 'Buang perubahan?';
+
+  @override
+  String get sftpEditorLeaveBody => 'Perubahan yang belum disimpan akan hilang.';
+
+  @override
+  String get sftpEditorLeaveAction => 'Buang perubahan';
+
+  @override
+  String get keyBackspace => 'Backspace';
+
+  @override
+  String get keyEnter => 'Enter';
+
+  @override
+  String get keyInsert => 'Insert';
+
+  @override
+  String get keyDelete => 'Delete';
+
+  @override
+  String get keyCtrlZ => 'Ctrl Z, jeda proses';
+
+  @override
+  String get keyCtrlL => 'Ctrl L, bersihkan layar';
+
+  @override
+  String get keyCtrlR => 'Ctrl R, cari riwayat';
+
+  @override
+  String get keyCtrlA => 'Ctrl A, awal baris';
+
+  @override
+  String get keyCtrlE => 'Ctrl E, akhir baris';
+
+  @override
+  String get keyCtrlW => 'Ctrl W, hapus kata';
+
+  @override
+  String get keyCtrlU => 'Ctrl U, hapus baris';
+
+  @override
+  String get keyCtrlK => 'Ctrl K, hapus ke akhir baris';
+
+  @override
+  String get keyCtrlB => 'Ctrl B, awalan tmux';
+
+  @override
+  String get keyCtrlX => 'Ctrl X';
+
+  @override
+  String get settingsQuickKeysLabel => 'Tombol cepat';
+
+  @override
+  String settingsQuickKeysSummary(int count) {
+    return '2 baris · $count tombol';
+  }
+
+  @override
+  String get quickKeysTitle => 'Tombol cepat';
+
+  @override
+  String get quickKeysPreviewLabel => 'Pratinjau bilah tombol cepat';
+
+  @override
+  String get quickKeysFixedNote => 'Tujuh kolom pertama terlihat tanpa digeser; sisanya digeser bersama kedua baris.';
+
+  @override
+  String quickKeysRow(int n) {
+    return 'Baris $n';
+  }
+
+  @override
+  String quickKeysCount(int count, int max) {
+    return '$count/$max';
+  }
+
+  @override
+  String get quickKeysEmptyRow => 'Baris ini kosong.';
+
+  @override
+  String get quickKeysAdd => 'Tambah tombol';
+
+  @override
+  String get quickKeysFull => 'Baris penuh';
+
+  @override
+  String quickKeysRemove(String name) {
+    return 'Hapus $name';
+  }
+
+  @override
+  String quickKeysDragLabel(String name) {
+    return 'Geser untuk mengubah urutan $name';
+  }
+
+  @override
+  String quickKeysAddTitle(int n) {
+    return 'Tambah ke baris $n';
+  }
+
+  @override
+  String get quickKeysAddHint => 'Tombol yang sudah dipakai di salah satu baris diredupkan.';
+
+  @override
+  String quickKeysUsed(String name) {
+    return '$name, sudah dipakai';
+  }
+
+  @override
+  String get quickKeysGroupAction => 'Pengubah dan aksi';
+
+  @override
+  String get quickKeysGroupNav => 'Navigasi';
+
+  @override
+  String get quickKeysGroupCtrl => 'Pintasan Ctrl';
+
+  @override
+  String get quickKeysGroupSymbol => 'Simbol';
+
+  @override
+  String get terminalMenuTitle => 'Terminal';
+
+  @override
+  String terminalMenuTarget(String target, int lines) {
+    return '$target · $lines baris';
+  }
+
+  @override
+  String get terminalMenuSelect => 'Pilih teks';
+
+  @override
+  String get terminalMenuCopyAll => 'Salin semua';
+
+  @override
+  String get terminalMenuPaste => 'Tempel';
+
+  @override
+  String get terminalMenuPasteEmpty => 'Tempel, papan klip kosong';
+
+  @override
+  String get terminalMenuSnippets => 'Snippet';
+
+  @override
+  String get terminalMenuClipboard => 'Papan klip:';
+
+  @override
+  String get terminalMenuSave => 'Simpan transkrip';
+
+  @override
+  String get terminalMenuSaveBody => 'Seluruh scrollback sebagai .txt di Unduhan/TermUL';
+
+  @override
+  String get terminalMenuShare => 'Bagikan transkrip';
+
+  @override
+  String get terminalMenuShareBody => 'Kirim lewat aplikasi lain di HP';
+
+  @override
+  String get terminalMenuKeepOn => 'Layar tetap menyala';
+
+  @override
+  String get terminalMenuKeepOnOn => 'Nyala selama terminal ini terbuka';
+
+  @override
+  String get terminalMenuKeepOnOff => 'Mati; layar padam mengikuti pengaturan HP';
+
+  @override
+  String get terminalMenuClear => 'Bersihkan layar';
+
+  @override
+  String get terminalMenuClearBody => 'Scrollback di HP dihapus; sesi di server tetap berjalan';
+
+  @override
+  String get terminalMenuClearUnavailable => 'Tidak tersedia selagi program layar penuh berjalan (vim, htop)';
+
+  @override
+  String get terminalKeepOnChip => 'menyala';
+
+  @override
+  String get terminalKeepOnChipAria => 'Layar tetap menyala';
+
+  @override
+  String get selectionGuideStart => 'Seret gagang ke awal pilihan';
+
+  @override
+  String get selectionGuideEnd => 'Sekarang seret ke akhir pilihan';
+
+  @override
+  String selectionGuideStep(int step, int total) {
+    return '$step/$total';
+  }
+
+  @override
+  String terminalCopiedLines(int count) {
+    return 'Disalin · $count baris';
+  }
+
+  @override
+  String get terminalTranscriptEmpty => 'Terminal masih kosong';
+
+  @override
+  String terminalTranscriptSaved(String location, String name) {
+    return 'Disimpan ke $location · $name';
+  }
+
+  @override
+  String get terminalTranscriptSaveFailed => 'Transkrip gagal disimpan';
+
+  @override
+  String get terminalTranscriptShareFailed => 'Menu bagikan tidak bisa dibuka';
+
+  @override
+  String get terminalTranscriptShareTitle => 'Bagikan transkrip';
+
+  @override
+  String get terminalCleared => 'Layar dibersihkan';
 }

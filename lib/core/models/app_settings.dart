@@ -1,4 +1,7 @@
 import 'json_fields.dart';
+import 'quick_key_settings.dart';
+
+export 'quick_key_settings.dart';
 
 /// Bentuk gagang seleksi teks di terminal. Tambahan di luar desain (desain hanya menggambar satu bentuk).
 enum SelectionHandleStyle {
@@ -183,6 +186,72 @@ class UpdateSettings {
   int get hashCode => autoCheck.hashCode;
 }
 
+/// Pengaturan editor file di SFTP. Editor aktif secara bawaan; pola ekstensi awal mengikuti prototipe SFTP.
+class SftpEditorSettings {
+  const SftpEditorSettings({this.enabled = true, this.extensions = defaultExtensions});
+
+  static const defaultExtensions = ['*.conf', '*.txt', '*.log', '*.json', '*.yml'];
+
+  final bool enabled;
+  final List<String> extensions;
+
+  SftpEditorSettings copyWith({bool? enabled, List<String>? extensions}) => SftpEditorSettings(
+    enabled: enabled ?? this.enabled,
+    extensions: extensions == null ? this.extensions : List.unmodifiable(extensions),
+  );
+
+  /// Menormalkan masukan menjadi pola ekstensi sederhana, misalnya `.yaml` atau `yaml` menjadi `*.yaml`.
+  /// Wildcard lain, pemisah jalur, dan nama kosong ditolak.
+  static String? normalizePattern(String input) {
+    var value = input.trim().toLowerCase();
+    if (value.startsWith('*.')) {
+      value = value.substring(2);
+    } else if (value.startsWith('.')) {
+      value = value.substring(1);
+    }
+    if (value.isEmpty ||
+        value.contains('*') ||
+        value.contains('?') ||
+        value.contains('/') ||
+        value.contains('\\') ||
+        value.contains(RegExp(r'\s')) ||
+        !RegExp(r'^[a-z0-9][a-z0-9._+-]*$').hasMatch(value)) {
+      return null;
+    }
+    return '*.$value';
+  }
+
+  bool allows(String fileName) {
+    final name = fileName.toLowerCase();
+    return extensions.any((pattern) {
+      final normalized = normalizePattern(pattern);
+      return normalized != null && name.endsWith(normalized.substring(1));
+    });
+  }
+
+  factory SftpEditorSettings.fromJson(Map<String, Object?> json) {
+    final extensions = json.containsKey('extensions') ? stringList(json, 'extensions') : defaultExtensions;
+    for (final pattern in extensions) {
+      if (normalizePattern(pattern) != pattern.toLowerCase()) {
+        throw const FormatException('Pola ekstensi editor SFTP tidak valid');
+      }
+    }
+    return SftpEditorSettings(enabled: optBool(json, 'enabled') ?? true, extensions: List.unmodifiable(extensions));
+  }
+
+  Map<String, Object?> toJson() => {'enabled': enabled, 'extensions': extensions};
+
+  @override
+  bool operator ==(Object other) =>
+      other is SftpEditorSettings &&
+      other.enabled == enabled &&
+      other.extensions.length == extensions.length &&
+      other.extensions.asMap().entries.every((entry) => extensions[entry.key] == entry.value);
+
+  @override
+  int get hashCode => Object.hash(enabled, Object.hashAll(extensions));
+}
+
 /// Isi `settings.json`:
 /// `{"version": 1, "terminal": {"fontSize": 13, "lineHeight": 1.3, "handleStyle": "drop"}, "connection": {"keepAlive": false, "autoReconnect": true}}`.
 /// Properti yang tidak dikenal diabaikan; bagian yang hilang memakai bawaan.
@@ -193,6 +262,8 @@ class AppSettings {
     this.security = const SecuritySettings(),
     this.streak = const StreakSettings(),
     this.update = const UpdateSettings(),
+    this.sftpEditor = const SftpEditorSettings(),
+    this.quickKeys = const QuickKeySettings(),
   });
 
   static const currentVersion = 1;
@@ -202,6 +273,8 @@ class AppSettings {
   final SecuritySettings security;
   final StreakSettings streak;
   final UpdateSettings update;
+  final SftpEditorSettings sftpEditor;
+  final QuickKeySettings quickKeys;
 
   AppSettings copyWith({
     TerminalSettings? terminal,
@@ -209,12 +282,16 @@ class AppSettings {
     SecuritySettings? security,
     StreakSettings? streak,
     UpdateSettings? update,
+    SftpEditorSettings? sftpEditor,
+    QuickKeySettings? quickKeys,
   }) => AppSettings(
     terminal: terminal ?? this.terminal,
     connection: connection ?? this.connection,
     security: security ?? this.security,
     streak: streak ?? this.streak,
     update: update ?? this.update,
+    sftpEditor: sftpEditor ?? this.sftpEditor,
+    quickKeys: quickKeys ?? this.quickKeys,
   );
 
   factory AppSettings.fromJson(Map<String, Object?> json) {
@@ -223,12 +300,16 @@ class AppSettings {
     final s = optObject(json, 'security');
     final k = optObject(json, 'streak');
     final u = optObject(json, 'update');
+    final e = optObject(json, 'sftpEditor');
+    final q = optObject(json, 'quickKeys');
     return AppSettings(
       terminal: t == null ? const TerminalSettings() : TerminalSettings.fromJson(t),
       connection: c == null ? const ConnectionSettings() : ConnectionSettings.fromJson(c),
       security: s == null ? const SecuritySettings() : SecuritySettings.fromJson(s),
       streak: k == null ? const StreakSettings() : StreakSettings.fromJson(k),
       update: u == null ? const UpdateSettings() : UpdateSettings.fromJson(u),
+      sftpEditor: e == null ? const SftpEditorSettings() : SftpEditorSettings.fromJson(e),
+      quickKeys: q == null ? const QuickKeySettings() : QuickKeySettings.fromJson(q),
     );
   }
 
@@ -239,5 +320,7 @@ class AppSettings {
     'security': security.toJson(),
     'streak': streak.toJson(),
     'update': update.toJson(),
+    'sftpEditor': sftpEditor.toJson(),
+    'quickKeys': quickKeys.toJson(),
   };
 }

@@ -600,6 +600,33 @@
    "is_interactive": true,
    "radius": 28
   },
+  "TerminalHoldMenuOpen.dc.html": {
+   "x": 5280,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2q · Tekan-tahan di terminal: menu Terminal (Pilih teks, Salin semua, Tempel, Snippet, transkrip, layar tetap menyala, bersihkan layar)",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalHoldMenuSelect.dc.html": {
+   "x": 5750,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2r · Pilih teks dari menu: kata di bawah jari terpilih, panduan 1/2 di bilah seleksi",
+   "is_interactive": true,
+   "radius": 28
+  },
+  "TerminalHoldMenuSelected.dc.html": {
+   "x": 6220,
+   "y": 5732,
+   "w": 390,
+   "h": 844,
+   "title": "2s · Pilih teks: setelah gagang diseret dua kali, bilah seleksi biasa",
+   "is_interactive": true,
+   "radius": 28
+  },
   "TerminalSnippets.dc.html": {
    "x": 4700,
    "y": 2892,
@@ -736,7 +763,10 @@
   "AppIcon.dc.html",
   "SettingsUpdate.dc.html",
   "SettingsUpdateInstall.dc.html",
-  "SettingsWhatsNew.dc.html"
+  "SettingsWhatsNew.dc.html",
+  "TerminalHoldMenuOpen.dc.html",
+  "TerminalHoldMenuSelect.dc.html",
+  "TerminalHoldMenuSelected.dc.html"
  ],
  "notes": {
   "judul": {

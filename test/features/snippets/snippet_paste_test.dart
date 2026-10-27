@@ -225,7 +225,7 @@ void main() {
       expect(find.byType(SnippetsScreen), findsOneWidget);
       expect(find.byTooltip('Snippet baru'), findsOneWidget);
     });
-  });
+  }, skip: 'Tombol Snippet di bilah tombol cepat dihapus (keputusan pemilik 2026-10-27); panel menunggu titik masuk dari prototipe Snippet berikutnya.');
 
   group('dari tab Snippet (tanpa tempel ke sesi)', () {
     Future<void> toSnippetTab(WidgetTester tester) async {

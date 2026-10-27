@@ -9,6 +9,7 @@ import '../../shared/widgets/switch_row.dart';
 import '../../shared/widgets/termul_banner.dart';
 import '../../shared/widgets/termul_button.dart';
 import '../../shared/widgets/termul_card.dart';
+import '../../shared/widgets/pressable.dart';
 import '../../shared/widgets/termul_icon.dart';
 import '../../shared/widgets/termul_icon_button.dart';
 import '../../shared/widgets/termul_segmented.dart';
@@ -18,6 +19,8 @@ import '../../shared/widgets/termul_toast.dart';
 import '../terminal/selection_overlay.dart' show SelectionHandleShape;
 import '../terminal/terminal_palette.dart';
 import '../update/update_section.dart';
+import 'quick_keys_screen.dart';
+import 'sftp_editor_settings_section.dart';
 
 /// Layar Pengaturan: Terminal (ukuran huruf, tinggi baris, gagang seleksi, dengan pratinjau), Koneksi, Keamanan, dan
 /// Pembaruan beserta keterangan versi di paling bawah. Perubahan langsung berlaku di sesi terminal yang sedang terbuka
@@ -180,6 +183,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
   Widget build(BuildContext context) {
     final l = AppLocalizations.of(context);
     final t = ref.watch(appSettingsProvider).terminal;
+    final quickKeys = ref.watch(appSettingsProvider).quickKeys;
     final isDefault = t == const TerminalSettings();
     final keepAlive = ref.watch(appSettingsProvider).connection.keepAlive;
     final autoReconnect = ref.watch(appSettingsProvider).connection.autoReconnect;
@@ -333,6 +337,7 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                               ],
                             ),
                           ),
+                          _QuickKeysRow(count: quickKeys.row1.length + quickKeys.row2.length),
                         ],
                       ),
                     ),
@@ -360,6 +365,23 @@ class _SettingsScreenState extends ConsumerState<SettingsScreen> with WidgetsBin
                       onPressed: isDefault ? null : () => _apply((_) => const TerminalSettings()),
                     ),
                   ),
+                  const SizedBox(height: TermulSpacing.space8),
+                  Padding(
+                    padding: const EdgeInsets.fromLTRB(
+                      TermulSpacing.space3,
+                      0,
+                      TermulSpacing.space3,
+                      TermulSpacing.space3,
+                    ),
+                    child: Semantics(
+                      header: true,
+                      child: Text(
+                        l.settingsSftpEditorSection.toUpperCase(),
+                        style: TermulText.overline.copyWith(color: TermulPalette.inkMuted),
+                      ),
+                    ),
+                  ),
+                  const SftpEditorSettingsSection(),
                   const SizedBox(height: TermulSpacing.space8),
                   Padding(
                     padding: const EdgeInsets.fromLTRB(
@@ -540,6 +562,50 @@ class _Preview extends StatelessWidget {
           maxLines: 2,
           softWrap: false,
           overflow: TextOverflow.clip,
+        ),
+      ),
+    );
+  }
+}
+
+/// Baris di kartu Terminal yang membuka "Tombol cepat" (prototipe `Settings` dan 6f).
+class _QuickKeysRow extends StatelessWidget {
+  const _QuickKeysRow({required this.count});
+
+  final int count;
+
+  @override
+  Widget build(BuildContext context) {
+    final l = AppLocalizations.of(context);
+    return Pressable(
+      onPressed: () => openQuickKeysSettings(context),
+      semanticLabel: l.settingsQuickKeysLabel,
+      minHeight: TermulSize.rowComfy,
+      builder: (context, down) => Container(
+        constraints: const BoxConstraints(minHeight: TermulSize.rowComfy),
+        padding: const EdgeInsets.symmetric(horizontal: TermulSpacing.space6, vertical: TermulSpacing.space3),
+        decoration: BoxDecoration(
+          color: down ? TermulPalette.surfaceRaised : null,
+          border: const Border(top: BorderSide(color: TermulPalette.line)),
+        ),
+        child: Row(
+          spacing: TermulSpacing.space5,
+          children: [
+            Expanded(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                spacing: 2,
+                children: [
+                  Text(l.settingsQuickKeysLabel, style: TermulText.body.copyWith(color: TermulPalette.ink)),
+                  Text(
+                    l.settingsQuickKeysSummary(count),
+                    style: TermulText.caption.copyWith(color: TermulPalette.inkMuted),
+                  ),
+                ],
+              ),
+            ),
+            const TermulIcon(TermulIconName.chevronRight, size: 18, color: TermulPalette.inkMuted),
+          ],
         ),
       ),
     );

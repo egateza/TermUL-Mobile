@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:termul_mobile/app_providers.dart';
@@ -58,7 +59,13 @@ void main() {
       await tester.tap(find.bySemanticsLabel('Pengaturan'));
       await tester.pumpAndSettle();
       expect(find.byType(SettingsScreen), findsOneWidget);
-      await tester.scrollUntilVisible(find.text('Jangan kunci vault'), 300);
+      await tester.scrollUntilVisible(
+        find.text('Jangan kunci vault'),
+        300,
+        scrollable: find
+            .byWidgetPredicate((widget) => widget is Scrollable && widget.axisDirection == AxisDirection.down)
+            .first,
+      );
       await tester.pumpAndSettle();
       return h;
     }

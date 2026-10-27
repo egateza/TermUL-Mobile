@@ -1,5 +1,7 @@
 ﻿# Sumber dokumentasi desain
 
+**Dipublish 2026-10-27 (menu tekan-tahan terminal):** prototipe versi 74 (`1793101179-1a66`; dari versi 73 (`1793074337-3681`) hanya `canvas.json` (papan 2q, 2r, 2s di y 5732) dan empat berkas baru `TerminalHoldMenu`, `TerminalHoldMenuOpen`, `TerminalHoldMenuSelect`, `TerminalHoldMenuSelected`; `canvas.json` digabung di atas versi artifact yang dibaca ulang, prototipe dirender di Chrome), design system versi 74 (`1793101227-960a`; dari versi `1793068987-9d39` hanya `README.md` (butir "Menu tekan-tahan terminal", butir "Tempel di terminal" diperbarui) dan `components/Icon/README.md` (ikon `text-select`, `copy-text`, `paste`, `share`, `sun`, `eraser`); keduanya digabung di atas versi artifact yang dibaca ulang). Salinan lokal di `docs/design/` memakai isi yang sama di atas salinan lokal yang ada; perubahan lokal lain yang belum dipublish (lihat catatan di bawah dan staging `quick-keys`) tetap belum ada di artifact.
+
 Tanggal salin: 2026-10-15
 
 **Perubahan lokal setelah artifact terkini (2026-10-18):** `HostRow`, `Main.dc.html`, dan `MainLandscape.dc.html` kini menunjukkan “Belum diperiksa” hanya sebelum host berhasil tersambung; sesudahnya mereka menunjukkan waktu terakhir dipakai (relatif di bawah 24 jam, lalu tanggal 24 jam). Metadata waktu disimpan terpisah dari berkas profil. `README.md`, komponen `HostRow`, dan `docs/implementation-plan.md` mencatat aturan tersebut. Artifact Claude tidak tersedia dari sesi ini; perubahan belum dipublish. Prototipe `Main` dan `MainLandscape` sudah dirender lokal di Chrome.

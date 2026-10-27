@@ -1,0 +1,359 @@
+<!doctype html>
+<html lang="id">
+<head>
+<meta charset="utf-8">
+<title>Menu tekan-tahan terminal</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+body{margin:0}
+a{color:inherit;text-decoration:none}
+a:focus-visible,button:focus-visible{outline:2px solid #F0B34A;outline-offset:2px}
+</style>
+</helmet>
+<div style="position: relative; width: 390px; height: 844px; box-sizing: border-box; display: flex; flex-direction: column; background: #0F1316; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; overflow: hidden">
+
+<div style="display: flex; align-items: center; gap: 4px; padding: 12px 8px 8px 8px">
+<a href="Main.dc.html" aria-label="Kembali ke daftar host" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #E8EEF0">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M15 6l-6 6 6 6"/></svg>
+</a>
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-size: 16px; font-weight: 600">app-01</span>
+<span style="display: flex; align-items: center; gap: 6px; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #5ED3A6">
+<span style="width: 8px; height: 8px; border-radius: 50%; background: #5ED3A6"></span>
+terhubung · deploy@10.0.4.21
+</span>
+</div>
+<sc-if value="{{keepOn}}" hint-placeholder-val="{{ false }}">
+<span title="Layar tetap menyala" style="display: flex; align-items: center; gap: 4px; padding: 0 8px; height: 28px; border-radius: 14px; border: 1px solid #5C6A71; color: #C5D0D5; font-size: 11px">
+<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+menyala
+</span>
+</sc-if>
+<a href="Sftp.dc.html" aria-label="Buka panel SFTP" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #9AA8AF">
+<svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><path d="M9.5 16v-5.5M7.5 12.5l2-2 2 2M14.5 10.5V16M12.5 14l2 2 2-2"/></svg>
+</a>
+</div>
+
+<div style="flex: 1; min-height: 0; margin: 0 12px; position: relative; display: flex; flex-direction: column">
+<div onPointerDown="{{holdStart}}" onPointerUp="{{holdEnd}}" onPointerLeave="{{holdEnd}}" onContextMenu="{{noMenu}}" style="flex: 1; min-height: 0; padding: 10px; box-sizing: border-box; border-radius: 12px; background: #0A0E10; border: 1px solid {{termBd}}; overflow-y: auto; display: flex; flex-direction: column-reverse; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 11.5px; line-height: 1.55; color: #C9D4D9; user-select: none; -webkit-user-select: none; touch-action: manipulation">
+<div style="flex: none; margin-bottom: auto">
+<sc-for list="{{lines}}" as="ln" hint-placeholder-count="14">
+<div style="white-space: pre-wrap; min-height: 17.8px"><sc-for list="{{ln.toks}}" as="w" hint-placeholder-count="5"><span onPointerDown="{{w.down}}" onClick="{{w.pick}}" style="position: relative; border-radius: 2px; background: {{w.bg}}; color: {{w.fg}}; cursor: text">{{w.t}}<sc-if value="{{w.startHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; left: -8px; top: 100%; margin-top: 3px; width: 16px; height: 16px; box-sizing: border-box; border: 3px solid #0F1316; border-radius: 0 50% 50% 50%; background: #F0B34A; transform: rotate(45deg); transform-origin: 50% 50%; pointer-events: none"></span></sc-if><sc-if value="{{w.endHandle}}" hint-placeholder-val="{{ false }}"><span aria-hidden="true" style="position: absolute; right: -8px; top: 100%; margin-top: 3px; width: 16px; height: 16px; box-sizing: border-box; border: 3px solid #0F1316; border-radius: 0 50% 50% 50%; background: #F0B34A; transform: rotate(45deg); pointer-events: none"></span></sc-if></span></sc-for><sc-if value="{{ln.cursor}}" hint-placeholder-val="{{ false }}"><span style="display: inline-block; width: 7px; height: 13px; vertical-align: text-bottom; background: #E8EEF0"></span></sc-if></div>
+</sc-for>
+</div>
+</div>
+
+<sc-if value="{{holding}}" hint-placeholder-val="{{ false }}">
+<div aria-hidden="true" style="position: absolute; left: {{holdX}}px; top: {{holdY}}px; width: 56px; height: 56px; margin: -28px 0 0 -28px; border-radius: 50%; background: rgba(240, 179, 74, 0.18); border: 1px solid rgba(240, 179, 74, 0.5); pointer-events: none"></div>
+</sc-if>
+
+<sc-if value="{{hasToast}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; left: 12px; right: 12px; bottom: 12px; display: flex; justify-content: center; pointer-events: none">
+<div role="status" style="display: flex; align-items: center; gap: 8px; max-width: 100%; box-sizing: border-box; padding: 10px 14px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-size: 13px">
+<svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#5ED3A6" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M5 12l5 5 9-10"/></svg>
+<span style="overflow: hidden; text-overflow: ellipsis; white-space: nowrap">{{toast}}</span>
+</div>
+</div>
+</sc-if>
+</div>
+
+<sc-if value="{{showKeys}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; gap: 6px; padding: 8px 12px; overflow-x: auto; scrollbar-width: none">
+<sc-for list="{{keys}}" as="k" hint-placeholder-count="8">
+<span style="flex: none; min-width: 44px; min-height: 44px; padding: 0 10px; box-sizing: border-box; display: flex; align-items: center; justify-content: center; border-radius: 10px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">{{k}}</span>
+</sc-for>
+</div>
+</sc-if>
+
+<sc-if value="{{selecting}}" hint-placeholder-val="{{ false }}">
+<div style="flex: none; display: flex; flex-direction: column; gap: 8px; padding: 8px; border-top: 1px solid #2A343A; background: #0F1316">
+<div style="display: flex; align-items: center; gap: 8px; padding-left: 4px">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 13px">{{selCount}} karakter dipilih</span>
+<sc-if value="{{showGuide}}" hint-placeholder-val="{{ false }}">
+<span role="status" style="font-size: 12.5px; color: #E8EEF0"><span style="font-family: 'JetBrains Mono', ui-monospace, monospace; color: #F0B34A">{{guideStep}}</span>&nbsp; {{guideText}}</span>
+</sc-if>
+<sc-if value="{{showHint}}" hint-placeholder-val="{{ true }}">
+<span style="font-size: 12px; color: #9AA8AF">Seret gagang untuk mengubah pilihan</span>
+</sc-if>
+</div>
+<button type="button" onClick="{{cancelSel}}" style="flex: none; min-height: 44px; padding: 0 12px; border: none; background: transparent; color: #C5D0D5; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 15px; cursor: pointer">Batal</button>
+</div>
+<div style="display: flex; gap: 8px">
+<button type="button" onClick="{{copySel}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; border: 1px solid #F0B34A; background: #F0B34A; color: #1B1406; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; font-weight: 600; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="9" y="9" width="11" height="11" rx="2"/><path d="M5 15V6a2 2 0 0 1 2-2h8"/></svg>
+Salin
+</button>
+<button type="button" onClick="{{selectAll}}" style="flex: 1; min-height: 56px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; font-weight: 600; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 8V6a2 2 0 0 1 2-2h2M16 4h2a2 2 0 0 1 2 2v2M20 16v2a2 2 0 0 1-2 2h-2M8 20H6a2 2 0 0 1-2-2v-2M8 12h8"/></svg>
+Semua
+</button>
+</div>
+</div>
+</sc-if>
+
+<sc-if value="{{showKeyboard}}" hint-placeholder-val="{{ true }}">
+<div style="height: 240px; flex: none; display: flex; align-items: center; justify-content: center; border-top: 1px solid #2A343A; background: #161C20; color: #7F8D94; font-size: 13px">Area keyboard sistem</div>
+</sc-if>
+
+<sc-if value="{{menuOpen}}" hint-placeholder-val="{{ false }}">
+<div style="position: absolute; inset: 0; z-index: 8">
+<button type="button" onClick="{{closeMenu}}" aria-label="Tutup menu terminal" style="position: absolute; inset: 0; width: 100%; border: none; background: rgba(5, 8, 10, 0.62); cursor: pointer"></button>
+<section role="dialog" aria-modal="true" aria-labelledby="holdMenuTitle" style="position: absolute; left: 0; right: 0; bottom: 0; box-sizing: border-box; display: flex; flex-direction: column; gap: 10px; padding: 12px 16px 20px 16px; border-radius: 28px 28px 0 0; border: 1px solid #2A343A; border-bottom: none; background: #161C20">
+<div aria-hidden="true" style="align-self: center; width: 40px; height: 4px; border-radius: 2px; background: #5C6A71"></div>
+<div style="display: flex; align-items: center; gap: 8px; padding: 0 4px">
+<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">
+<h2 id="holdMenuTitle" style="margin: 0; font-size: 18px; font-weight: 600">Terminal</h2>
+<span style="font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: 12px; color: #9AA8AF">deploy@app-01 · {{lineTotal}} baris</span>
+</div>
+<button type="button" onClick="{{closeMenu}}" aria-label="Tutup" style="width: 44px; height: 44px; border: 0; border-radius: 10px; background: transparent; color: #9AA8AF; font-size: 22px; cursor: pointer">×</button>
+</div>
+
+<div style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 6px">
+<button type="button" onClick="{{startSelect}}" style="min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 7V5a1 1 0 0 1 1-1h2M17 4h2a1 1 0 0 1 1 1v2M20 17v2a1 1 0 0 1-1 1h-2M7 20H5a1 1 0 0 1-1-1v-2M8.5 8.5h7M12 8.5v7.5"/></svg>
+Pilih teks
+</button>
+<button type="button" onClick="{{copyAll}}" style="min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="8" y="7" width="12" height="14" rx="2"/><path d="M5 17V5a2 2 0 0 1 2-2h9M11 11h6M11 14h6M11 17h4"/></svg>
+Salin semua
+</button>
+<button type="button" onClick="{{paste}}" disabled="{{clipEmpty}}" aria-label="{{pasteAria}}" style="min-height: 64px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-family: 'IBM Plex Sans', system-ui, sans-serif; font-size: 12px; opacity: {{pasteOpacity}}; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="6" y="4" width="12" height="17" rx="2"/><path d="M9 4V3h6v1M9 10h6M9 14h4"/></svg>
+Tempel
+</button>
+<a href="TerminalSnippets.dc.html" style="min-height: 64px; box-sizing: border-box; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 5px; border-radius: 12px; border: 1px solid #2A343A; background: #1E262B; color: #E8EEF0; font-size: 12px">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#F0B34A" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M8 4c-2 0-3 1-3 3v2c0 1-1 3-2 3 1 0 2 2 2 3v2c0 2 1 3 3 3M16 4c2 0 3 1 3 3v2c0 1 1 3 2 3-1 0-2 2-2 3v2c0 2-1 3-3 3"/></svg>
+Snippet
+</a>
+</div>
+<sc-if value="{{showClip}}" hint-placeholder-val="{{ true }}">
+<div style="display: flex; align-items: center; gap: 8px; padding: 0 4px; font-size: 12px; color: #9AA8AF">
+<span style="flex: none">Papan klip:</span>
+<span style="flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-family: 'JetBrains Mono', ui-monospace, monospace; color: #C5D0D5">{{clipText}}</span>
+</div>
+</sc-if>
+
+<div style="display: flex; flex-direction: column; border-radius: 14px; border: 1px solid #2A343A; overflow: hidden">
+<button type="button" onClick="{{saveTranscript}}" style="min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; border: none; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M12 5v11M7 11l5 5 5-5M5 19h14"/></svg>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px">Simpan transkrip</span><span style="font-size: 12.5px; color: #9AA8AF">Seluruh scrollback sebagai .txt di Unduhan/TermUL</span></span>
+</button>
+<button type="button" onClick="{{shareTranscript}}" style="min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><circle cx="18" cy="5" r="2.5"/><circle cx="6" cy="12" r="2.5"/><circle cx="18" cy="19" r="2.5"/><path d="M8.2 10.8l7.6-4.4M8.2 13.2l7.6 4.4"/></svg>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px">Bagikan transkrip</span><span style="font-size: 12.5px; color: #9AA8AF">Kirim lewat aplikasi lain di HP</span></span>
+</button>
+<button type="button" onClick="{{toggleKeepOn}}" role="switch" aria-checked="{{keepOn}}" style="min-height: 64px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.9 4.9l1.4 1.4M17.7 17.7l1.4 1.4M2 12h2M20 12h2M4.9 19.1l1.4-1.4M17.7 6.3l1.4-1.4"/></svg>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px">Layar tetap menyala</span><span style="font-size: 12.5px; color: #9AA8AF">{{keepOnDesc}}</span></span>
+<span style="width: 48px; height: 28px; flex: none; border-radius: 14px; box-sizing: border-box; padding: 3px; border: 1px solid {{swBd}}; background: {{swBg}}; display: flex; justify-content: {{swAlign}}"><span style="width: 20px; height: 20px; border-radius: 50%; background: {{swKnob}}"></span></span>
+</button>
+<button type="button" onClick="{{clearScreen}}" style="min-height: 56px; display: flex; align-items: center; gap: 12px; padding: 8px 14px; border: none; border-top: 1px solid #2A343A; background: transparent; color: #E8EEF0; text-align: left; font-family: 'IBM Plex Sans', system-ui, sans-serif; cursor: pointer">
+<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#9AA8AF" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex: none"><path d="M16 4l4 4-9.5 9.5H6.5l-2.5-2.5z"/><path d="M11 9l4 4M10 20h10"/></svg>
+<span style="flex: 1; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px">Bersihkan layar</span><span style="font-size: 12.5px; color: #9AA8AF">Scrollback di HP dihapus; sesi di server tetap berjalan</span></span>
+</button>
+</div>
+</section>
+</div>
+</sc-if>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{"stage":{"editor":"enum","default":"normal","options":["normal","menu","pilih-awal","pilih-akhir","dipilih"],"section":"Tampilan"},"clipboard":{"editor":"enum","default":"aman","options":["aman","kosong"],"section":"Papan klip"},"keepOn":{"editor":"boolean","default":false,"section":"Tampilan"},"showKeyboard":{"editor":"boolean","default":true,"section":"Tampilan"},"$preview":{"width":390,"height":844}}'>
+class Component extends DCLogic {
+  renderVals() {
+    const s = this.state || {};
+    const stage = s.stage || this.props.stage || 'normal';
+    const keepOn = s.keepOn !== undefined ? s.keepOn : this.props.keepOn === true;
+    const clipEmpty = this.props.clipboard === 'kosong';
+    const clip = 'systemctl status nginx';
+    const M = '#9AA8AF', N = '#C9D4D9', G = '#5ED3A6', Y = '#F0B34A', B = '#6CB4FF';
+
+    const motd = [
+      [['Welcome to Ubuntu 22.04.4 LTS (GNU/Linux 5.15)', N]],
+      [],
+      [[' * Documentation:  ', N], ['https://help.ubuntu.com', B]],
+      [],
+      [['  System load:  0.42    Processes:  182', M]],
+      [['  Usage of /:   41.3%   Users:      1', M]],
+      [['  Memory usage: 23%     IPv4:       10.0.4.21', M]],
+      [],
+      [['4 updates can be applied immediately.', N]],
+      [['2 of these updates are security updates.', N]],
+      [['To see them run: apt list --upgradable', N]],
+      [],
+      [['Last login: Tue Oct 27 16:58 from 10.0.4.7', N]],
+      [['deploy@app-01', G], [':', N], ['~', B], ['$ ', N], ['^C', N]],
+      [['deploy@app-01', G], [':', N], ['~', B], ['$ ', N]]
+    ];
+    const pasted = s.pasted ? [[clip, N]] : [];
+    const src = s.cleared ? [motd[motd.length - 1]] : motd;
+    const lastIdx = src.length - 1;
+    const all = src.map((ln, i) => (i === lastIdx ? ln.concat(pasted) : ln));
+
+    // Pecah tiap segmen menjadi kata dan spasi, beri indeks global.
+    let idx = 0;
+    const flat = [];
+    const rows = all.map((segs, li) => {
+      const toks = [];
+      segs.forEach(([text, color]) => {
+        text.split(/(\s+)/).forEach((part) => {
+          if (!part) return;
+          const tok = { t: part, c: color, i: idx++, line: li, word: /\S/.test(part) };
+          toks.push(tok);
+          flat.push(tok);
+        });
+      });
+      return { toks, cursor: li === lastIdx };
+    });
+
+    // Kata awal bawaan bila tekan-tahan tidak mengenai kata: "updates" di baris pembaruan.
+    const fallback = (flat.find((t) => t.t === 'updates') || flat[0] || { i: 0 }).i;
+    let a = s.selA !== undefined ? s.selA : (stage === 'normal' || stage === 'menu' ? null : fallback);
+    let b = s.selB !== undefined ? s.selB : (stage === 'dipilih' ? (flat.find((t) => t.t === 'status' && t.i > fallback) || {}).i || a : a);
+    if (stage === 'pilih-akhir' && s.selB === undefined && this.props.stage === 'pilih-akhir') {
+      a = (flat.find((t) => t.t === '4') || { i: fallback }).i;
+      b = a;
+    }
+    if (stage === 'dipilih' && s.selA === undefined) {
+      a = (flat.find((t) => t.t === '4') || { i: fallback }).i;
+      b = (flat.find((t) => t.t === '--upgradable') || { i: a }).i;
+    }
+    const lo = a === null ? null : Math.min(a, b);
+    const hi = a === null ? null : Math.max(a, b);
+    const selecting = stage === 'pilih-awal' || stage === 'pilih-akhir' || stage === 'dipilih';
+
+    const lines = rows.map((r) => ({
+      cursor: r.cursor,
+      toks: r.toks.map((t) => {
+        const on = selecting && lo !== null && t.i >= lo && t.i <= hi;
+        return {
+          t: t.t,
+          bg: on ? '#2C4F6B' : 'transparent',
+          fg: on ? '#F4F8FA' : t.c,
+          startHandle: selecting && t.i === lo,
+          endHandle: selecting && t.i === hi,
+          down: () => { this._tok = t.word ? t.i : null; },
+          pick: () => {
+            if (!t.word) return;
+            if (stage === 'pilih-awal') this.setState({ stage: 'pilih-akhir', selA: t.i, selB: t.i });
+            else if (stage === 'pilih-akhir' || stage === 'dipilih') this.setState({ stage: 'dipilih', selA: a, selB: t.i });
+          }
+        };
+      })
+    }));
+
+    let selCount = 0;
+    if (lo !== null) {
+      flat.forEach((t, k) => {
+        if (t.i < lo || t.i > hi) return;
+        selCount += t.t.length;
+        const next = flat[k + 1];
+        if (next && next.line !== t.line && next.i <= hi) selCount += 1;
+      });
+    }
+
+    const toast = (msg, ms) => {
+      clearTimeout(this._toastTimer);
+      this.setState({ toast: msg });
+      this._toastTimer = setTimeout(() => this.setState({ toast: null }), ms || 2000);
+    };
+    const swOn = keepOn;
+
+    return {
+      lines,
+      keys: ['ESC', 'TAB', 'CTRL', 'ALT', '/', '|', '-', 'HOME', '↑', 'END', 'PGUP'],
+      keepOn: swOn,
+      keepOnDesc: swOn ? 'Nyala selama terminal ini terbuka' : 'Mati; layar padam mengikuti pengaturan HP',
+      swBg: swOn ? '#F0B34A' : 'transparent',
+      swBd: swOn ? '#F0B34A' : '#5C6A71',
+      swAlign: swOn ? 'flex-end' : 'flex-start',
+      swKnob: swOn ? '#1B1406' : '#C5D0D5',
+      showKeyboard: this.props.showKeyboard !== false,
+      menuOpen: stage === 'menu',
+      termBd: '#2A343A',
+      showGuide: stage === 'pilih-awal' || stage === 'pilih-akhir',
+      guideStep: stage === 'pilih-awal' ? '1/2' : '2/2',
+      guideText: stage === 'pilih-awal' ? 'Seret gagang ke awal pilihan' : 'Sekarang seret ke akhir pilihan',
+      showHint: stage === 'dipilih',
+      showKeys: !selecting,
+      selecting,
+      selCount: selCount.toLocaleString('id-ID'),
+      lineTotal: (s.cleared ? 1 : 1240).toLocaleString('id-ID'),
+      clipEmpty,
+      clipText: clip,
+      showClip: !clipEmpty,
+      pasteOpacity: clipEmpty ? 0.4 : 1,
+      pasteAria: clipEmpty ? 'Tempel, papan klip kosong' : 'Tempel',
+      holding: !!s.holding,
+      holdX: s.holdX || 0,
+      holdY: s.holdY || 0,
+      hasToast: !!s.toast,
+      toast: s.toast || '',
+      noMenu: (e) => { if (e && e.preventDefault) e.preventDefault(); },
+      holdStart: (e) => {
+        if (stage !== 'normal') return;
+        const box = e && e.currentTarget ? e.currentTarget.getBoundingClientRect() : null;
+        const x = box ? e.clientX - box.left : 0;
+        const y = box ? e.clientY - box.top : 0;
+        clearTimeout(this._holdTimer);
+        this.setState({ holding: true, holdX: x, holdY: y });
+        // Tekan-tahan 450 ms membuka menu; kata yang ditekan menjadi titik awal "Pilih teks".
+        this._holdTimer = setTimeout(() => {
+          this._heldTok = this._tok;
+          this.setState({ holding: false, stage: 'menu' });
+        }, 450);
+      },
+      holdEnd: () => {
+        clearTimeout(this._holdTimer);
+        this._tok = null;
+        if (s.holding) this.setState({ holding: false });
+      },
+      closeMenu: () => this.setState({ stage: 'normal', selA: undefined, selB: undefined }),
+      startSelect: () => {
+        const start = this._heldTok !== null && this._heldTok !== undefined ? this._heldTok : fallback;
+        this.setState({ stage: 'pilih-awal', selA: start, selB: start });
+      },
+      cancelSel: () => this.setState({ stage: 'normal', selA: undefined, selB: undefined }),
+      selectAll: () => {
+        if (!flat.length) return;
+        this.setState({ stage: 'dipilih', selA: flat[0].i, selB: flat[flat.length - 1].i });
+      },
+      copySel: () => {
+        this.setState({ stage: 'normal', selA: undefined, selB: undefined });
+        toast('Disalin · ' + selCount.toLocaleString('id-ID') + ' karakter');
+      },
+      copyAll: () => {
+        this.setState({ stage: 'normal' });
+        toast('Disalin · ' + (s.cleared ? 1 : 1240).toLocaleString('id-ID') + ' baris');
+      },
+      paste: () => {
+        if (clipEmpty) return;
+        // Tempel dipilih sendiri dari menu: satu baris aman langsung masuk (banyak baris atau berisiko tetap lewat dialog).
+        this.setState({ stage: 'normal', pasted: true });
+        toast('Ditempel · 1 baris · belum dijalankan');
+      },
+      saveTranscript: () => {
+        this.setState({ stage: 'normal' });
+        toast('Disimpan ke Unduhan/TermUL · app-01-20261027-1723.txt', 2600);
+      },
+      shareTranscript: () => {
+        this.setState({ stage: 'normal' });
+        toast('Lembar berbagi Android terbuka');
+      },
+      toggleKeepOn: () => this.setState({ keepOn: !swOn }),
+      clearScreen: () => {
+        this.setState({ stage: 'normal', cleared: true, pasted: false });
+        toast('Layar dibersihkan');
+      }
+    };
+  }
+}
+</script>
+</body>
+</html>

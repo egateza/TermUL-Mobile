@@ -3292,5 +3292,441 @@
         "type": "String"
       }
     }
+  },
+  "settingsSftpEditorSection": "Editor SFTP",
+  "@settingsSftpEditorSection": {
+    "description": "Judul bagian pengaturan editor file SFTP."
+  },
+  "settingsSftpEditorLabel": "Editor file",
+  "@settingsSftpEditorLabel": {
+    "description": "Saklar untuk mengaktifkan editor file SFTP."
+  },
+  "settingsSftpEditorDesc": "Izinkan file server dibuka dan disunting di aplikasi",
+  "@settingsSftpEditorDesc": {
+    "description": "Keterangan saklar editor file SFTP."
+  },
+  "settingsSftpExtensionsLabel": "Ekstensi file yang dapat diedit",
+  "@settingsSftpExtensionsLabel": {
+    "description": "Judul daftar ekstensi file yang dapat diedit."
+  },
+  "settingsSftpExtensionsDesc": "Aksi Edit muncul untuk satu file dengan ekstensi yang ada di daftar ini.",
+  "@settingsSftpExtensionsDesc": {
+    "description": "Keterangan daftar ekstensi editor SFTP."
+  },
+  "settingsSftpExtensionInput": "Ekstensi baru",
+  "@settingsSftpExtensionInput": {
+    "description": "Label kolom untuk menambahkan ekstensi yang dapat diedit."
+  },
+  "settingsSftpExtensionPlaceholder": "Contoh: *.yaml",
+  "@settingsSftpExtensionPlaceholder": {
+    "description": "Contoh pola ekstensi di kolom input."
+  },
+  "settingsSftpExtensionHelper": "Gunakan pola seperti *.yaml. Ketuk tombol hapus untuk menghapus ekstensi.",
+  "@settingsSftpExtensionHelper": {
+    "description": "Petunjuk format ekstensi editor SFTP."
+  },
+  "settingsSftpExtensionAdd": "Tambah",
+  "@settingsSftpExtensionAdd": {
+    "description": "Tombol menambahkan pola ekstensi."
+  },
+  "settingsSftpExtensionRemove": "Hapus {extension}",
+  "@settingsSftpExtensionRemove": {
+    "description": "Label aksesibilitas tombol hapus pola ekstensi.",
+    "placeholders": {
+      "extension": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsSftpExtensionInvalid": "Masukkan ekstensi seperti *.yaml.",
+  "@settingsSftpExtensionInvalid": {
+    "description": "Galat pola ekstensi yang tidak didukung."
+  },
+  "settingsSftpExtensionExists": "Ekstensi itu sudah ada.",
+  "@settingsSftpExtensionExists": {
+    "description": "Galat saat menambahkan ekstensi duplikat."
+  },
+  "settingsSftpExtensionEmpty": "Belum ada ekstensi. Semua file tidak dapat diedit.",
+  "@settingsSftpExtensionEmpty": {
+    "description": "Keadaan kosong daftar ekstensi editor SFTP."
+  },
+  "sftpEditAction": "Edit",
+  "@sftpEditAction": {
+    "description": "Aksi mengedit satu file yang didukung dari pilihan SFTP."
+  },
+  "sftpEditorTitle": "Edit file",
+  "@sftpEditorTitle": {
+    "description": "Judul layar editor file SFTP."
+  },
+  "sftpEditorLoading": "Membaca file…",
+  "@sftpEditorLoading": {
+    "description": "Status saat isi file SFTP sedang dibaca."
+  },
+  "sftpEditorLoadFailed": "File tidak dapat dibuka. Periksa izin dan sambungan SFTP.",
+  "@sftpEditorLoadFailed": {
+    "description": "Galat saat membaca file SFTP untuk diedit."
+  },
+  "sftpEditorTooLarge": "File lebih dari batas editor 1 MB.",
+  "@sftpEditorTooLarge": {
+    "description": "File terlalu besar untuk dibuka di editor SFTP."
+  },
+  "sftpEditorNotText": "File bukan teks UTF-8 yang dapat diedit.",
+  "@sftpEditorNotText": {
+    "description": "Isi file tidak valid sebagai teks UTF-8."
+  },
+  "sftpEditorSaveAction": "Simpan",
+  "@sftpEditorSaveAction": {
+    "description": "Tombol menyimpan perubahan file ke server."
+  },
+  "sftpEditorSaving": "Menyimpan…",
+  "@sftpEditorSaving": {
+    "description": "Status saat editor mengunggah perubahan."
+  },
+  "sftpEditorSaved": "Tersimpan dan diunggah",
+  "@sftpEditorSaved": {
+    "description": "Status setelah perubahan berhasil dikirim ke server."
+  },
+  "sftpEditorUnsaved": "Perubahan belum diunggah",
+  "@sftpEditorUnsaved": {
+    "description": "Status saat editor memiliki perubahan yang belum disimpan."
+  },
+  "sftpEditorSaveFailed": "Perubahan gagal disimpan. File asli di server tetap dipertahankan.",
+  "@sftpEditorSaveFailed": {
+    "description": "Galat saat menyimpan file editor ke server."
+  },
+  "sftpEditorConnectionLost": "Sambungan SFTP terputus. Sambungkan ulang sebelum menyimpan.",
+  "@sftpEditorConnectionLost": {
+    "description": "Galat saat menyimpan ketika sambungan SFTP terputus."
+  },
+  "sftpEditorLeaveTitle": "Buang perubahan?",
+  "@sftpEditorLeaveTitle": {
+    "description": "Konfirmasi keluar dari editor dengan perubahan yang belum disimpan."
+  },
+  "sftpEditorLeaveBody": "Perubahan yang belum disimpan akan hilang.",
+  "@sftpEditorLeaveBody": {
+    "description": "Isi konfirmasi keluar dari editor file."
+  },
+  "sftpEditorLeaveAction": "Buang perubahan",
+  "@sftpEditorLeaveAction": {
+    "description": "Aksi konfirmasi untuk membuang perubahan editor."
+  },
+  "keyBackspace": "Backspace",
+  "@keyBackspace": {
+    "description": "Label aksesibilitas tombol backspace."
+  },
+  "keyEnter": "Enter",
+  "@keyEnter": {
+    "description": "Label aksesibilitas tombol Enter."
+  },
+  "keyInsert": "Insert",
+  "@keyInsert": {
+    "description": "Label aksesibilitas tombol Ins."
+  },
+  "keyDelete": "Delete",
+  "@keyDelete": {
+    "description": "Label aksesibilitas tombol Del."
+  },
+  "keyCtrlZ": "Ctrl Z, jeda proses",
+  "@keyCtrlZ": {
+    "description": "Label aksesibilitas tombol ^Z."
+  },
+  "keyCtrlL": "Ctrl L, bersihkan layar",
+  "@keyCtrlL": {
+    "description": "Label aksesibilitas tombol ^L."
+  },
+  "keyCtrlR": "Ctrl R, cari riwayat",
+  "@keyCtrlR": {
+    "description": "Label aksesibilitas tombol ^R."
+  },
+  "keyCtrlA": "Ctrl A, awal baris",
+  "@keyCtrlA": {
+    "description": "Label aksesibilitas tombol ^A."
+  },
+  "keyCtrlE": "Ctrl E, akhir baris",
+  "@keyCtrlE": {
+    "description": "Label aksesibilitas tombol ^E."
+  },
+  "keyCtrlW": "Ctrl W, hapus kata",
+  "@keyCtrlW": {
+    "description": "Label aksesibilitas tombol ^W."
+  },
+  "keyCtrlU": "Ctrl U, hapus baris",
+  "@keyCtrlU": {
+    "description": "Label aksesibilitas tombol ^U."
+  },
+  "keyCtrlK": "Ctrl K, hapus ke akhir baris",
+  "@keyCtrlK": {
+    "description": "Label aksesibilitas tombol ^K."
+  },
+  "keyCtrlB": "Ctrl B, awalan tmux",
+  "@keyCtrlB": {
+    "description": "Label aksesibilitas tombol ^B."
+  },
+  "keyCtrlX": "Ctrl X",
+  "@keyCtrlX": {
+    "description": "Label aksesibilitas tombol ^X."
+  },
+  "settingsQuickKeysLabel": "Tombol cepat",
+  "@settingsQuickKeysLabel": {
+    "description": "Baris di Pengaturan > Terminal yang membuka pengaturan tombol cepat."
+  },
+  "settingsQuickKeysSummary": "2 baris · {count} tombol",
+  "@settingsQuickKeysSummary": {
+    "description": "Keterangan baris Tombol cepat di Pengaturan.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "quickKeysTitle": "Tombol cepat",
+  "@quickKeysTitle": {
+    "description": "Judul layar pengaturan tombol cepat."
+  },
+  "quickKeysPreviewLabel": "Pratinjau bilah tombol cepat",
+  "@quickKeysPreviewLabel": {
+    "description": "Label semantik pratinjau bilah."
+  },
+  "quickKeysFixedNote": "Tujuh kolom pertama terlihat tanpa digeser; sisanya digeser bersama kedua baris.",
+  "@quickKeysFixedNote": {
+    "description": "Catatan cara bilah tombol cepat digeser."
+  },
+  "quickKeysRow": "Baris {n}",
+  "@quickKeysRow": {
+    "description": "Judul daftar tombol per baris.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "quickKeysCount": "{count}/{max}",
+  "@quickKeysCount": {
+    "description": "Jumlah tombol di baris dan batasnya.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      },
+      "max": {
+        "type": "int"
+      }
+    }
+  },
+  "quickKeysEmptyRow": "Baris ini kosong.",
+  "@quickKeysEmptyRow": {
+    "description": "Daftar baris tanpa tombol."
+  },
+  "quickKeysAdd": "Tambah tombol",
+  "@quickKeysAdd": {
+    "description": "Tombol membuka katalog untuk baris itu."
+  },
+  "quickKeysFull": "Baris penuh",
+  "@quickKeysFull": {
+    "description": "Pengganti Tambah tombol saat baris sudah 10 tombol."
+  },
+  "quickKeysRemove": "Hapus {name}",
+  "@quickKeysRemove": {
+    "description": "Label tombol hapus per tombol.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quickKeysDragLabel": "Geser untuk mengubah urutan {name}",
+  "@quickKeysDragLabel": {
+    "description": "Label pegangan geser.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quickKeysAddTitle": "Tambah ke baris {n}",
+  "@quickKeysAddTitle": {
+    "description": "Judul sheet katalog tombol.",
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "quickKeysAddHint": "Tombol yang sudah dipakai di salah satu baris diredupkan.",
+  "@quickKeysAddHint": {
+    "description": "Keterangan sheet katalog."
+  },
+  "quickKeysUsed": "{name}, sudah dipakai",
+  "@quickKeysUsed": {
+    "description": "Label semantik tombol katalog yang sudah dipakai.",
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "quickKeysGroupAction": "Pengubah dan aksi",
+  "@quickKeysGroupAction": {
+    "description": "Kelompok katalog."
+  },
+  "quickKeysGroupNav": "Navigasi",
+  "@quickKeysGroupNav": {
+    "description": "Kelompok katalog."
+  },
+  "quickKeysGroupCtrl": "Pintasan Ctrl",
+  "@quickKeysGroupCtrl": {
+    "description": "Kelompok katalog."
+  },
+  "quickKeysGroupSymbol": "Simbol",
+  "@quickKeysGroupSymbol": {
+    "description": "Kelompok katalog."
+  },
+  "terminalMenuTitle": "Terminal",
+  "@terminalMenuTitle": {
+    "description": "Judul menu tekan-tahan di terminal."
+  },
+  "terminalMenuTarget": "{target} · {lines} baris",
+  "@terminalMenuTarget": {
+    "description": "Subjudul menu terminal: user@host dan jumlah baris scrollback.",
+    "placeholders": {
+      "target": {
+        "type": "String"
+      },
+      "lines": {
+        "type": "int"
+      }
+    }
+  },
+  "terminalMenuSelect": "Pilih teks",
+  "@terminalMenuSelect": {
+    "description": "Ubin menu terminal: mulai memilih teks dari kata yang ditekan."
+  },
+  "terminalMenuCopyAll": "Salin semua",
+  "@terminalMenuCopyAll": {
+    "description": "Ubin menu terminal: salin seluruh scrollback."
+  },
+  "terminalMenuPaste": "Tempel",
+  "@terminalMenuPaste": {
+    "description": "Ubin menu terminal: tempel dari papan klip."
+  },
+  "terminalMenuPasteEmpty": "Tempel, papan klip kosong",
+  "@terminalMenuPasteEmpty": {
+    "description": "Label aksesibilitas ubin Tempel yang nonaktif."
+  },
+  "terminalMenuSnippets": "Snippet",
+  "@terminalMenuSnippets": {
+    "description": "Ubin menu terminal: buka panel snippet."
+  },
+  "terminalMenuClipboard": "Papan klip:",
+  "@terminalMenuClipboard": {
+    "description": "Label pratinjau isi papan klip di menu terminal."
+  },
+  "terminalMenuSave": "Simpan transkrip",
+  "@terminalMenuSave": {
+    "description": "Baris menu terminal."
+  },
+  "terminalMenuSaveBody": "Seluruh scrollback sebagai .txt di Unduhan/TermUL",
+  "@terminalMenuSaveBody": {
+    "description": "Keterangan Simpan transkrip."
+  },
+  "terminalMenuShare": "Bagikan transkrip",
+  "@terminalMenuShare": {
+    "description": "Baris menu terminal."
+  },
+  "terminalMenuShareBody": "Kirim lewat aplikasi lain di HP",
+  "@terminalMenuShareBody": {
+    "description": "Keterangan Bagikan transkrip."
+  },
+  "terminalMenuKeepOn": "Layar tetap menyala",
+  "@terminalMenuKeepOn": {
+    "description": "Saklar menu terminal."
+  },
+  "terminalMenuKeepOnOn": "Nyala selama terminal ini terbuka",
+  "@terminalMenuKeepOnOn": {
+    "description": "Keterangan saklar layar tetap menyala saat nyala."
+  },
+  "terminalMenuKeepOnOff": "Mati; layar padam mengikuti pengaturan HP",
+  "@terminalMenuKeepOnOff": {
+    "description": "Keterangan saklar layar tetap menyala saat mati."
+  },
+  "terminalMenuClear": "Bersihkan layar",
+  "@terminalMenuClear": {
+    "description": "Baris menu terminal."
+  },
+  "terminalMenuClearBody": "Scrollback di HP dihapus; sesi di server tetap berjalan",
+  "@terminalMenuClearBody": {
+    "description": "Keterangan Bersihkan layar."
+  },
+  "terminalMenuClearUnavailable": "Tidak tersedia selagi program layar penuh berjalan (vim, htop)",
+  "@terminalMenuClearUnavailable": {
+    "description": "Keterangan Bersihkan layar saat layar alternatif aktif."
+  },
+  "terminalKeepOnChip": "menyala",
+  "@terminalKeepOnChip": {
+    "description": "Chip di header terminal saat layar tetap menyala."
+  },
+  "terminalKeepOnChipAria": "Layar tetap menyala",
+  "@terminalKeepOnChipAria": {
+    "description": "Label aksesibilitas chip layar tetap menyala."
+  },
+  "selectionGuideStart": "Seret gagang ke awal pilihan",
+  "@selectionGuideStart": {
+    "description": "Langkah 1 panduan Pilih teks dari menu terminal."
+  },
+  "selectionGuideEnd": "Sekarang seret ke akhir pilihan",
+  "@selectionGuideEnd": {
+    "description": "Langkah 2 panduan Pilih teks dari menu terminal."
+  },
+  "selectionGuideStep": "{step}/{total}",
+  "@selectionGuideStep": {
+    "description": "Nomor langkah panduan seleksi.",
+    "placeholders": {
+      "step": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "terminalCopiedLines": "Disalin · {count} baris",
+  "@terminalCopiedLines": {
+    "description": "Toast setelah Salin semua.",
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "terminalTranscriptEmpty": "Terminal masih kosong",
+  "@terminalTranscriptEmpty": {
+    "description": "Toast bila tidak ada teks untuk disalin atau disimpan."
+  },
+  "terminalTranscriptSaved": "Disimpan ke {location} · {name}",
+  "@terminalTranscriptSaved": {
+    "description": "Toast setelah Simpan transkrip.",
+    "placeholders": {
+      "location": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "terminalTranscriptSaveFailed": "Transkrip gagal disimpan",
+  "@terminalTranscriptSaveFailed": {
+    "description": "Toast bila simpan transkrip gagal."
+  },
+  "terminalTranscriptShareFailed": "Menu bagikan tidak bisa dibuka",
+  "@terminalTranscriptShareFailed": {
+    "description": "Toast bila bagikan transkrip gagal."
+  },
+  "terminalTranscriptShareTitle": "Bagikan transkrip",
+  "@terminalTranscriptShareTitle": {
+    "description": "Judul menu bagikan Android."
+  },
+  "terminalCleared": "Layar dibersihkan",
+  "@terminalCleared": {
+    "description": "Toast setelah Bersihkan layar."
   }
 }

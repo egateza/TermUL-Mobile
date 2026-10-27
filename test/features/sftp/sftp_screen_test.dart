@@ -9,6 +9,7 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/app_providers.dart';
 import 'package:termul_mobile/core/platform/downloads_saver.dart';
 import 'package:termul_mobile/core/models/host_profile.dart';
+import 'package:termul_mobile/core/models/app_settings.dart';
 import 'package:termul_mobile/core/sftp/sftp_service.dart';
 import 'package:termul_mobile/core/theme/termul_theme.dart';
 import 'package:termul_mobile/features/sftp/sftp_link.dart';
@@ -80,6 +81,7 @@ Future<FakeFiles> pumpBrowser(
   List<SftpEntry> extra = const [],
   bool confirmLeave = true,
   bool asSession = false,
+  AppSettings settings = const AppSettings(),
 }) async {
   _tmp = Directory.systemTemp.createTempSync('termul_layar_');
   addTearDown(() {
@@ -110,6 +112,7 @@ Future<FakeFiles> pumpBrowser(
         downloadsSaverProvider.overrideWithValue(_saver),
         uploadPickerProvider.overrideWithValue(_picker),
         tempDirProvider.overrideWithValue(() async => _tmp),
+        initialSettingsProvider.overrideWithValue(settings),
       ],
       child: MaterialApp(
         theme: termulTheme(),
@@ -186,6 +189,34 @@ void main() {
     await tester.pump(const Duration(seconds: 3));
   });
 
+  testWidgets('Edit hanya muncul untuk satu berkas dengan ekstensi yang diizinkan dan editor aktif', (tester) async {
+    await pumpBrowser(tester, extra: [file('/home/u', 'server.conf'), dir('/home/u', 'config')]);
+    await tester.longPress(find.text('catatan.txt'));
+    await tester.pump();
+    expect(find.text('Edit'), findsOneWidget);
+
+    await tester.tap(find.bySemanticsLabel('Batal pilih'));
+    await tester.pump();
+    await tester.longPress(find.text('config'));
+    await tester.pump();
+    expect(find.text('Edit'), findsNothing);
+
+    await tester.tap(find.bySemanticsLabel('Batal pilih'));
+    await tester.pump();
+    await tester.longPress(find.text('server.conf'));
+    await tester.pump();
+    await tester.longPress(find.text('catatan.txt'));
+    await tester.pump();
+    expect(find.text('Edit'), findsNothing, reason: 'seleksi lebih dari satu item');
+  });
+
+  testWidgets('Edit tidak muncul saat editor dinonaktifkan', (tester) async {
+    await pumpBrowser(tester, settings: const AppSettings(sftpEditor: SftpEditorSettings(enabled: false)));
+    await tester.longPress(find.text('catatan.txt'));
+    await tester.pump();
+    expect(find.text('Edit'), findsNothing);
+  });
+
   group('seleksi ganda', () {
     String? clip;
     setUp(() => clip = null);
@@ -199,6 +230,22 @@ void main() {
       return pumpBrowser(tester, extra: [file('/home/u', 'log.txt', size: 2048)]);
     }
 
+    testWidgets('ketukan memilih satu berkas; berkas kedua perlu ditekan lama untuk seleksi ganda', (tester) async {
+      await pumpSelectable(tester);
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
+      expect(find.text('catatan.txt dipilih'), findsOneWidget);
+
+      await tester.tap(find.text('log.txt'));
+      await tester.pump();
+      expect(find.text('catatan.txt dipilih'), findsOneWidget);
+      expect(find.text('2 dipilih'), findsNothing, reason: 'ketukan biasa tidak mengaktifkan seleksi ganda');
+
+      await tester.longPress(find.text('log.txt'));
+      await tester.pump();
+      expect(find.text('2 dipilih'), findsOneWidget);
+    });
+
     testWidgets('tekan lama pada folder memilihnya tanpa membukanya; jumlah dan ukuran tanpa folder', (tester) async {
       final fake = await pumpSelectable(tester);
       await tester.longPress(find.text('proyek'));
@@ -208,8 +255,8 @@ void main() {
       expect(find.text('0 B'), findsNothing, reason: 'folder saja: tidak ada total ukuran');
       expect(find.text('Unduh'), findsOneWidget, reason: 'folder juga bisa diunduh');
 
-      // Dalam mode seleksi, ketukan menambah pilihan (juga folder), bukan membuka.
-      await tester.tap(find.text('catatan.txt'));
+      // Tahan berkas kedua untuk memulai seleksi ganda; setelah itu ketukan menambah pilihan.
+      await tester.longPress(find.text('catatan.txt'));
       await tester.pump();
       expect(find.text('2 dipilih'), findsOneWidget);
       expect(find.text('1,2 KB'), findsNWidgets(2), reason: 'baris dan total');
@@ -224,7 +271,7 @@ void main() {
       await pumpSelectable(tester);
       await tester.longPress(find.text('catatan.txt'));
       await tester.pump();
-      await tester.tap(find.text('log.txt'));
+      await tester.longPress(find.text('log.txt'));
       await tester.pump();
       await tester.tap(find.text('Salin path'));
       await tester.pump();
@@ -251,7 +298,7 @@ void main() {
       await pumpSelectable(tester);
       await tester.longPress(find.text('catatan.txt'));
       await tester.pump();
-      await tester.tap(find.text('log.txt'));
+      await tester.longPress(find.text('log.txt'));
       await tester.pump();
       await tester.tap(find.text('Unduh'));
       await settle(tester, rounds: 14);
@@ -265,7 +312,7 @@ void main() {
       _saver.existing.addAll({'catatan.txt', 'log.txt'});
       await tester.longPress(find.text('catatan.txt'));
       await tester.pump();
-      await tester.tap(find.text('log.txt'));
+      await tester.longPress(find.text('log.txt'));
       await tester.pump();
       await tester.tap(find.text('Unduh'));
       await tester.pumpAndSettle();
@@ -323,7 +370,7 @@ void main() {
       await pumpFolders(tester);
       await tester.longPress(find.text('proyek'));
       await tester.pump();
-      await tester.tap(find.text('log.txt'));
+      await tester.longPress(find.text('log.txt'));
       await tester.pump();
       await tester.tap(find.text('Unduh'));
       await settle(tester, rounds: 20);
