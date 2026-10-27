@@ -4482,6 +4482,42 @@ abstract class AppLocalizations {
   /// In id, this message translates to:
   /// **'Layar dibersihkan'**
   String get terminalCleared;
+
+  /// Judul notifikasi DownloadManager selama unduhan pembaruan.
+  ///
+  /// In id, this message translates to:
+  /// **'Mengunduh TermUL {version}'**
+  String updateDownloadNotificationTitle(String version);
+
+  /// Notifikasi saat unduhan pembaruan selesai (aplikasi mungkin tertutup).
+  ///
+  /// In id, this message translates to:
+  /// **'TermUL {version} sudah diunduh'**
+  String updateReadyNotificationTitle(String version);
+
+  /// Isi notifikasi unduhan pembaruan selesai.
+  ///
+  /// In id, this message translates to:
+  /// **'Buka TermUL untuk memeriksa dan memasang.'**
+  String get updateReadyNotificationText;
+
+  /// Nama kanal notifikasi pembaruan di pengaturan Android.
+  ///
+  /// In id, this message translates to:
+  /// **'Pembaruan'**
+  String get updateNotificationChannel;
+
+  /// Keterangan di bagian Pembaruan selama unduhan lewat DownloadManager.
+  ///
+  /// In id, this message translates to:
+  /// **'Unduhan tetap berjalan walau aplikasi ditutup.'**
+  String get updateBackgroundNote;
+
+  /// Status saat unduhan selesai dan checksum serta sertifikat diperiksa.
+  ///
+  /// In id, this message translates to:
+  /// **'Memeriksa berkas…'**
+  String get updateVerifying;
 }
 
 class _AppLocalizationsDelegate extends LocalizationsDelegate<AppLocalizations> {

@@ -76,6 +76,11 @@ abstract interface class UpdateService {
     void Function(int received, int total)? onProgress,
     UpdateCancelToken? cancel,
   });
+
+  /// Menyalin APK [release] yang diunduh di luar aplikasi (DownloadManager) dari [path] ke folder sementara yang sama
+  /// dengan [download], sambil mencocokkan SHA-256 dan ukurannya dengan manifest. Berkas sumber tidak dipercaya dan
+  /// tidak dipasang langsung. Melempar [UpdateException] (`checksum` atau `storage`) atau [UpdateCancelled].
+  Future<String> adopt(ReleaseInfo release, String path, {UpdateCancelToken? cancel});
 }
 
 /// Rilis dari GitHub Releases, seperti TermUL desktop (ADR 0003): `releases/latest/download/manifest.json`, lalu
@@ -167,32 +172,79 @@ class GitHubUpdateService implements UpdateService {
     void Function(int received, int total)? onProgress,
     UpdateCancelToken? cancel,
   }) async {
-    final expectedSize = release.apk.size;
-    if (expectedSize > maxApkBytes) throw const UpdateException(UpdateFailure.badRelease, 'terlalu besar');
-    final Directory dir;
-    try {
-      dir = Directory('${(await tempDir()).path}${Platform.pathSeparator}$folderName');
-      if (await dir.exists()) await dir.delete(recursive: true);
-      await dir.create(recursive: true);
-    } on FileSystemException catch (e) {
-      throw UpdateException(UpdateFailure.storage, e.osError?.errorCode);
-    }
-    // Nama unik: unduhan yang baru dibatalkan tidak menghapus berkas unduhan berikutnya.
-    final part = File('${dir.path}${Platform.pathSeparator}$apkName.${DateTime.now().microsecondsSinceEpoch}.part');
+    _checkSize(release);
+    final dir = await _freshFolder();
     final client = _client();
-    IOSink? sink;
     try {
       final res = await _get(client, release.apk.url);
       if (res.statusCode != HttpStatus.ok) {
         await res.drain<void>();
         throw UpdateException(UpdateFailure.server, res.statusCode);
       }
+      return await _writeVerified(dir, res.timeout(timeout), release, onProgress: onProgress, cancel: cancel);
+    } on UpdateException {
+      rethrow;
+    } on UpdateCancelled {
+      rethrow;
+    } on Object catch (e) {
+      throw UpdateException(UpdateFailure.network, e.runtimeType);
+    } finally {
+      client.close(force: true);
+    }
+  }
+
+  @override
+  Future<String> adopt(ReleaseInfo release, String path, {UpdateCancelToken? cancel}) async {
+    _checkSize(release);
+    final dir = await _freshFolder();
+    try {
+      return await _writeVerified(dir, File(path).openRead(), release, cancel: cancel);
+    } on UpdateException {
+      rethrow;
+    } on UpdateCancelled {
+      rethrow;
+    } on Object catch (e) {
+      throw UpdateException(UpdateFailure.storage, e.runtimeType);
+    }
+  }
+
+  void _checkSize(ReleaseInfo release) {
+    if (release.apk.size > maxApkBytes) throw const UpdateException(UpdateFailure.badRelease, 'terlalu besar');
+  }
+
+  /// `cache/update/` dikosongkan: berkas lama selalu diganti.
+  Future<Directory> _freshFolder() async {
+    try {
+      final dir = Directory('${(await tempDir()).path}${Platform.pathSeparator}$folderName');
+      if (await dir.exists()) await dir.delete(recursive: true);
+      await dir.create(recursive: true);
+      return dir;
+    } on FileSystemException catch (e) {
+      throw UpdateException(UpdateFailure.storage, e.osError?.errorCode);
+    }
+  }
+
+  /// Menulis [data] ke [dir] sambil menghitung SHA-256; berkas yang ukuran atau SHA-256-nya tidak sama dengan manifest
+  /// dihapus. Mengembalikan path berkas siap pasang. Galat aliran [data] diteruskan apa adanya ke pemanggil (yang
+  /// memetakannya ke jaringan atau penyimpanan); berkas setengah jadi selalu dihapus.
+  Future<String> _writeVerified(
+    Directory dir,
+    Stream<List<int>> data,
+    ReleaseInfo release, {
+    void Function(int received, int total)? onProgress,
+    UpdateCancelToken? cancel,
+  }) async {
+    final expectedSize = release.apk.size;
+    // Nama unik: unduhan yang baru dibatalkan tidak menghapus berkas unduhan berikutnya.
+    final part = File('${dir.path}${Platform.pathSeparator}$apkName.${DateTime.now().microsecondsSinceEpoch}.part');
+    IOSink? sink;
+    try {
       final digest = _DigestSink();
       final hasher = sha256.startChunkedConversion(digest);
       sink = part.openWrite();
       var received = 0;
       onProgress?.call(0, expectedSize);
-      await for (final chunk in res.timeout(timeout)) {
+      await for (final chunk in data) {
         if (cancel?.isCancelled ?? false) throw const UpdateCancelled();
         received += chunk.length;
         // Lebih besar dari manifest: pasti bukan berkas yang ditandatangani.
@@ -209,23 +261,14 @@ class GitHubUpdateService implements UpdateService {
       if (received != expectedSize || digest.value.toString() != release.apk.sha256) {
         throw const UpdateException(UpdateFailure.checksum);
       }
-
       final ready = await part.rename('${dir.path}${Platform.pathSeparator}$apkName');
       return ready.path;
-    } on UpdateException {
-      await _discard(sink, part);
-      rethrow;
-    } on UpdateCancelled {
-      await _discard(sink, part);
-      rethrow;
     } on FileSystemException catch (e) {
       await _discard(sink, part);
       throw UpdateException(UpdateFailure.storage, e.osError?.errorCode);
-    } on Object catch (e) {
+    } on Object {
       await _discard(sink, part);
-      throw UpdateException(UpdateFailure.network, e.runtimeType);
-    } finally {
-      client.close(force: true);
+      rethrow;
     }
   }
 
@@ -298,4 +341,8 @@ class NoReleaseUpdateService implements UpdateService {
     void Function(int received, int total)? onProgress,
     UpdateCancelToken? cancel,
   }) async => throw const UpdateException(UpdateFailure.badRelease);
+
+  @override
+  Future<String> adopt(ReleaseInfo release, String path, {UpdateCancelToken? cancel}) async =>
+      throw const UpdateException(UpdateFailure.badRelease);
 }

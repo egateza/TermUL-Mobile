@@ -5,6 +5,7 @@ import 'package:path_provider/path_provider.dart';
 import 'core/models/app_settings.dart';
 import 'core/platform/keepalive_platform.dart';
 import 'core/platform/reminder_platform.dart';
+import 'core/platform/update_downloader.dart';
 import 'core/platform/update_platform.dart';
 import 'core/platform/screen_monitor.dart';
 import 'core/storage/host_repository.dart';
@@ -76,6 +77,7 @@ class AppDependencies {
     this.streak,
     this.reminder,
     this.updatePlatform,
+    this.updateDownloader,
     this.updateService,
   });
 
@@ -115,6 +117,9 @@ class AppDependencies {
 
   /// Versi terpasang dan penginstal Android. `null` di tes (memakai `FakeUpdatePlatform`).
   final UpdatePlatform? updatePlatform;
+
+  /// Unduhan pembaruan lewat DownloadManager; null (tes) = unduh di dalam aplikasi.
+  final UpdateDownloader? updateDownloader;
 
   /// Rilis dari GitHub. `null` di tes (tanpa jaringan, tanpa rilis).
   final UpdateService? updateService;
@@ -178,6 +183,7 @@ Future<AppDependencies> bootstrap({Directory? directory, DeviceAuth? auth, Secre
     streak: streakRepo,
     reminder: MethodChannelReminder(),
     updatePlatform: MethodChannelUpdatePlatform(),
+    updateDownloader: MethodChannelUpdateDownloader(),
     updateService: GitHubUpdateService(repo: updateRepo, tempDir: getTemporaryDirectory),
     report: BootReport(
       hosts: hostsLoad,

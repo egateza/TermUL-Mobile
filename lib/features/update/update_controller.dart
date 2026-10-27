@@ -1,12 +1,17 @@
+import 'dart:async';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/services.dart' show PlatformException;
+import 'package:flutter/widgets.dart' show Locale;
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 
 import '../../app_providers.dart' show appSettingsProvider, uiStateRepositoryProvider;
+import '../../core/platform/update_downloader.dart';
 import '../../core/platform/update_platform.dart';
 import '../../core/storage/ui_state_repository.dart';
 import '../../core/update/release.dart';
 import '../../core/update/update_service.dart';
+import '../../l10n/app_localizations.dart';
 
 /// Repo rilis aplikasi di GitHub.
 const updateRepo = 'egateza/TermUL-Mobile';
@@ -17,8 +22,17 @@ final updatePlatformProvider = Provider<UpdatePlatform>((ref) => FakeUpdatePlatf
 /// Sumber rilis; bawaan tanpa jaringan dan tanpa rilis (tes), bootstrap memasang GitHub.
 final updateServiceProvider = Provider<UpdateService>((ref) => const NoReleaseUpdateService());
 
+/// Unduhan lewat DownloadManager sistem (tetap berjalan walau aplikasi ditutup); null (tes, atau bila tidak dipasang
+/// bootstrap) = unduh di dalam aplikasi lewat [UpdateService.download].
+final updateDownloaderProvider = Provider<UpdateDownloader?>((ref) => null);
+
+/// Selang membaca kemajuan unduhan DownloadManager selama aplikasi terbuka.
+const backgroundPollInterval = Duration(milliseconds: 700);
+
 /// Versi yang terpasang (dibaca sekali dari Android).
-final installedVersionProvider = FutureProvider<AppVersion>((ref) => ref.watch(updatePlatformProvider).installedVersion());
+final installedVersionProvider = FutureProvider<AppVersion>(
+  (ref) => ref.watch(updatePlatformProvider).installedVersion(),
+);
 
 /// Keadaan pembaruan. Satu untuk seluruh aplikasi: pengecekan saat dibuka, layar Pengaturan, dan lencana tab.
 sealed class UpdateState {
@@ -55,12 +69,25 @@ class UpdateAvailable extends UpdateState {
 }
 
 class UpdateDownloading extends UpdateState {
-  const UpdateDownloading(this.release, {required this.received, required this.total, required this.cancel});
+  const UpdateDownloading(
+    this.release, {
+    required this.received,
+    required this.total,
+    required this.cancel,
+    this.background = false,
+    this.verifying = false,
+  });
 
   final ReleaseInfo release;
   final int received;
   final int total;
   final UpdateCancelToken cancel;
+
+  /// Diunduh DownloadManager sistem: tetap berjalan walau aplikasi ditutup.
+  final bool background;
+
+  /// Unduhan selesai; ukuran, SHA-256, dan sertifikat sedang diperiksa.
+  final bool verifying;
 
   /// 0-100, atau null bila ukuran tidak diketahui.
   int? get percent => total <= 0 ? null : (received * 100 ~/ total).clamp(0, 100);
@@ -96,9 +123,19 @@ class UpdateFailed extends UpdateState {
 
 class UpdateController extends Notifier<UpdateState> {
   @override
-  UpdateState build() => const UpdateIdle();
+  UpdateState build() {
+    ref.onDispose(_stopPoll);
+    return const UpdateIdle();
+  }
 
   bool get _busy => state is UpdateChecking || state is UpdateDownloading;
+
+  Timer? _poll;
+
+  void _stopPoll() {
+    _poll?.cancel();
+    _poll = null;
+  }
 
   /// Memeriksa rilis terbaru. Diabaikan selagi memeriksa atau mengunduh, dan selagi berkas siap pasang ada.
   Future<void> check() async {
@@ -108,9 +145,7 @@ class UpdateController extends Notifier<UpdateState> {
       final installed = await ref.read(installedVersionProvider.future);
       final latest = await ref.read(updateServiceProvider).latest();
       if (!ref.mounted) return;
-      state = latest != null && latest.isNewerThan(installed)
-          ? UpdateAvailable(latest)
-          : UpdateUpToDate(latest);
+      state = latest != null && latest.isNewerThan(installed) ? UpdateAvailable(latest) : UpdateUpToDate(latest);
     } on UpdateException catch (e) {
       debugPrint('[termul] periksa pembaruan gagal: $e');
       if (ref.mounted) state = UpdateFailed(e.failure);
@@ -130,6 +165,34 @@ class UpdateController extends Notifier<UpdateState> {
     };
     if (release == null) return;
     final cancel = UpdateCancelToken();
+    final downloader = ref.read(updateDownloaderProvider);
+    if (downloader != null) {
+      try {
+        final l = lookupAppLocalizations(const Locale('id'));
+        await downloader.enqueue(
+          url: release.apk.url,
+          fileName: release.apk.name,
+          title: l.updateDownloadNotificationTitle(release.version),
+          versionCode: release.versionCode,
+          version: release.version,
+          doneTitle: l.updateReadyNotificationTitle(release.version),
+          doneText: l.updateReadyNotificationText,
+          channelName: l.updateNotificationChannel,
+        );
+        if (!ref.mounted) return;
+        state = UpdateDownloading(release, received: 0, total: release.apk.size, cancel: cancel, background: true);
+        _watch(downloader, release, cancel);
+        return;
+      } on BackgroundDownloadUnavailable catch (e) {
+        // DownloadManager dimatikan atau penyimpanan eksternal tidak ada: unduh di dalam aplikasi seperti dulu.
+        debugPrint('[termul] DownloadManager tidak tersedia, unduh di aplikasi: $e');
+      }
+    }
+    await _downloadInApp(release, cancel);
+  }
+
+  /// Unduhan di dalam proses aplikasi (berhenti bila aplikasi ditutup); cadangan bila DownloadManager tidak ada.
+  Future<void> _downloadInApp(ReleaseInfo release, UpdateCancelToken cancel) async {
     state = UpdateDownloading(release, received: 0, total: release.apk.size, cancel: cancel);
     try {
       final path = await ref
@@ -149,17 +212,7 @@ class UpdateController extends Notifier<UpdateState> {
             },
           );
       if (!_owns(cancel)) return;
-      final apk = await ref.read(updatePlatformProvider).inspectApk(path);
-      if (!_owns(cancel)) return;
-      if (apk.packageName != appPackageName || !apk.sameSigner || apk.versionCode != release.versionCode) {
-        debugPrint(
-          '[termul] APK pembaruan ditolak: paket ${apk.packageName}, versionCode ${apk.versionCode}, '
-          'sertifikat sama ${apk.sameSigner}',
-        );
-        state = UpdateFailed(UpdateFailure.signer, release: release);
-        return;
-      }
-      state = UpdateReady(release, path);
+      await _accept(release, path, cancel);
     } on PlatformException catch (e) {
       debugPrint('[termul] memeriksa APK pembaruan gagal: ${e.code}');
       if (_owns(cancel)) state = UpdateFailed(UpdateFailure.signer, release: release);
@@ -168,6 +221,127 @@ class UpdateController extends Notifier<UpdateState> {
     } on UpdateException catch (e) {
       debugPrint('[termul] unduh pembaruan gagal: $e');
       if (_owns(cancel)) state = UpdateFailed(e.failure, release: release);
+    }
+  }
+
+  /// APK di `cache/update/` sudah cocok dengan manifest; terima bila untuk aplikasi ini (nama paket, versionCode,
+  /// sertifikat penandatangan sama dengan yang terpasang). Melempar [PlatformException] bila tidak bisa dibaca.
+  Future<void> _accept(ReleaseInfo release, String path, UpdateCancelToken cancel) async {
+    final apk = await ref.read(updatePlatformProvider).inspectApk(path);
+    if (!_owns(cancel)) return;
+    if (apk.packageName != appPackageName || !apk.sameSigner || apk.versionCode != release.versionCode) {
+      debugPrint(
+        '[termul] APK pembaruan ditolak: paket ${apk.packageName}, versionCode ${apk.versionCode}, '
+        'sertifikat sama ${apk.sameSigner}',
+      );
+      state = UpdateFailed(UpdateFailure.signer, release: release);
+      return;
+    }
+    state = UpdateReady(release, path);
+  }
+
+  /// Membaca kemajuan DownloadManager selama aplikasi terbuka; selesai: berkas diperiksa dan disalin ke
+  /// `cache/update/`, lalu unduhan sistem (dan berkasnya) dihapus.
+  void _watch(UpdateDownloader downloader, ReleaseInfo release, UpdateCancelToken cancel) {
+    _stopPoll();
+    var busy = false;
+    Future<void> tick() async {
+      if (busy) return;
+      busy = true;
+      try {
+        await _pollOnce(downloader, release, cancel);
+      } finally {
+        busy = false;
+      }
+    }
+
+    _poll = Timer.periodic(backgroundPollInterval, (_) => unawaited(tick()));
+    unawaited(tick());
+  }
+
+  Future<void> _pollOnce(UpdateDownloader downloader, ReleaseInfo release, UpdateCancelToken cancel) async {
+    if (!_owns(cancel)) {
+      _stopPoll();
+      return;
+    }
+    final d = await downloader.active();
+    if (!_owns(cancel)) return;
+    if (d == null || d.versionCode != release.versionCode || d.status == BackgroundDownloadStatus.missing) {
+      _stopPoll();
+      state = UpdateFailed(UpdateFailure.network, release: release);
+      return;
+    }
+    switch (d.status) {
+      case BackgroundDownloadStatus.pending || BackgroundDownloadStatus.running || BackgroundDownloadStatus.paused:
+        final total = d.total > 0 ? d.total : release.apk.size;
+        final current = state as UpdateDownloading;
+        if (current.received == d.received && current.total == total) return;
+        state = UpdateDownloading(release, received: d.received, total: total, cancel: cancel, background: true);
+      case BackgroundDownloadStatus.failed:
+        _stopPoll();
+        debugPrint('[termul] unduhan pembaruan gagal di DownloadManager: alasan ${d.reason}');
+        await downloader.remove();
+        if (!_owns(cancel)) return;
+        state = UpdateFailed(
+          d.storageFailure ? UpdateFailure.storage : (d.serverFailure ? UpdateFailure.server : UpdateFailure.network),
+          release: release,
+        );
+      case BackgroundDownloadStatus.done:
+        _stopPoll();
+        final source = d.path;
+        state = UpdateDownloading(
+          release,
+          received: release.apk.size,
+          total: release.apk.size,
+          cancel: cancel,
+          background: true,
+          verifying: true,
+        );
+        try {
+          if (source == null) throw const UpdateException(UpdateFailure.storage, 'tanpa berkas');
+          final path = await ref.read(updateServiceProvider).adopt(release, source, cancel: cancel);
+          await downloader.remove();
+          if (!_owns(cancel)) return;
+          await _accept(release, path, cancel);
+        } on UpdateCancelled {
+          // Keadaan sudah dikembalikan oleh [cancelDownload].
+        } on UpdateException catch (e) {
+          debugPrint('[termul] memeriksa unduhan pembaruan gagal: $e');
+          await downloader.remove();
+          if (_owns(cancel)) state = UpdateFailed(e.failure, release: release);
+        } on PlatformException catch (e) {
+          debugPrint('[termul] memeriksa APK pembaruan gagal: ${e.code}');
+          await downloader.remove();
+          if (_owns(cancel)) state = UpdateFailed(UpdateFailure.signer, release: release);
+        }
+      case BackgroundDownloadStatus.missing:
+        break;
+    }
+  }
+
+  /// Saat aplikasi dibuka: unduhan DownloadManager yang dimulai sebelumnya (mungkin sudah selesai saat aplikasi
+  /// tertutup) dilanjutkan pemantauannya. Rilisnya diambil lagi dari manifest bertanda tangan; bila versinya tidak lagi
+  /// cocok dengan rilis terbaru atau sudah terpasang, unduhan dibuang.
+  Future<void> resume() async {
+    final downloader = ref.read(updateDownloaderProvider);
+    if (downloader == null || _busy || state is UpdateReady) return;
+    final d = await downloader.active();
+    if (d == null || !ref.mounted) return;
+    try {
+      final installed = await ref.read(installedVersionProvider.future);
+      final latest = await ref.read(updateServiceProvider).latest();
+      if (!ref.mounted) return;
+      if (latest == null || latest.versionCode != d.versionCode || !latest.isNewerThan(installed)) {
+        await downloader.remove();
+        return;
+      }
+      if (_busy || state is UpdateReady) return;
+      final cancel = UpdateCancelToken();
+      state = UpdateDownloading(latest, received: d.received, total: latest.apk.size, cancel: cancel, background: true);
+      _watch(downloader, latest, cancel);
+    } on UpdateException catch (e) {
+      // Belum bisa memastikan rilisnya (mis. tanpa jaringan): biarkan unduhan, coba lagi saat dibuka berikutnya.
+      debugPrint('[termul] melanjutkan unduhan pembaruan tertunda: $e');
     }
   }
 
@@ -183,6 +357,8 @@ class UpdateController extends Notifier<UpdateState> {
     final current = state;
     if (current is! UpdateDownloading) return;
     current.cancel.cancel();
+    _stopPoll();
+    if (current.background) unawaited(ref.read(updateDownloaderProvider)?.remove());
     state = UpdateAvailable(current.release);
   }
 

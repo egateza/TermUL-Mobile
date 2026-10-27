@@ -2535,4 +2535,26 @@ class AppLocalizationsId extends AppLocalizations {
 
   @override
   String get terminalCleared => 'Layar dibersihkan';
+
+  @override
+  String updateDownloadNotificationTitle(String version) {
+    return 'Mengunduh TermUL $version';
+  }
+
+  @override
+  String updateReadyNotificationTitle(String version) {
+    return 'TermUL $version sudah diunduh';
+  }
+
+  @override
+  String get updateReadyNotificationText => 'Buka TermUL untuk memeriksa dan memasang.';
+
+  @override
+  String get updateNotificationChannel => 'Pembaruan';
+
+  @override
+  String get updateBackgroundNote => 'Unduhan tetap berjalan walau aplikasi ditutup.';
+
+  @override
+  String get updateVerifying => 'Memeriksa berkas…';
 }

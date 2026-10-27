@@ -178,6 +178,25 @@ class MainActivity : FlutterFragmentActivity() {
                         UpdateInstaller.openInstallSettings(this)
                         result.success(null)
                     }
+                    "downloadEnqueue" -> {
+                        val id = UpdateDownloader.enqueue(
+                            applicationContext,
+                            url = call.argument<String>("url") ?: "",
+                            fileName = call.argument<String>("fileName") ?: "",
+                            title = call.argument<String>("title") ?: "",
+                            versionCode = call.argument<Int>("versionCode") ?: 0,
+                            version = call.argument<String>("version") ?: "",
+                            doneTitle = call.argument<String>("doneTitle") ?: "",
+                            doneText = call.argument<String>("doneText") ?: "",
+                            channelName = call.argument<String>("channelName") ?: "",
+                        )
+                        result.success(id)
+                    }
+                    "downloadActive" -> result.success(UpdateDownloader.active(applicationContext))
+                    "downloadRemove" -> {
+                        UpdateDownloader.remove(applicationContext)
+                        result.success(null)
+                    }
                     "install" -> {
                         val path = call.argument<String>("path")
                         if (path == null) {

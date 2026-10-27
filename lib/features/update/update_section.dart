@@ -221,7 +221,9 @@ class _UpdateSectionState extends ConsumerState<UpdateSection> with WidgetsBindi
                 children: [
                   Expanded(
                     child: Text(
-                      l.updateProgress(formatSize(state.received), formatSize(state.total)),
+                      state.verifying
+                          ? l.updateVerifying
+                          : l.updateProgress(formatSize(state.received), formatSize(state.total)),
                       style: TermulText.bodySm.copyWith(fontFamily: TermulFonts.mono, color: TermulPalette.inkMuted),
                     ),
                   ),
@@ -244,9 +246,11 @@ class _UpdateSectionState extends ConsumerState<UpdateSection> with WidgetsBindi
                   ),
                 ),
               ),
+              if (state.background && !state.verifying)
+                Text(l.updateBackgroundNote, style: TermulText.caption.copyWith(color: TermulPalette.inkMuted)),
             ],
           ),
-          TermulButton(label: l.updateCancel, onPressed: controller.cancelDownload),
+          if (!state.verifying) TermulButton(label: l.updateCancel, onPressed: controller.cancelDownload),
         ],
         UpdateReady() || UpdateFailed(readyPath: String()) => [
           if (_needsPermission)

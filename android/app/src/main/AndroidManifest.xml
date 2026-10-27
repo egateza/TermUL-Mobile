@@ -62,6 +62,15 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED"/>
             </intent-filter>
         </receiver>
+        <!-- Unduhan pembaruan selesai (UpdateDownloader.kt): dikirim DownloadManager walau aplikasi tertutup, jadi
+             harus exported; id dicocokkan dengan unduhan yang dicatat sebelum notifikasi dipasang. -->
+        <receiver
+            android:name=".UpdateDownloader$DoneReceiver"
+            android:exported="true">
+            <intent-filter>
+                <action android:name="android.intent.action.DOWNLOAD_COMPLETE"/>
+            </intent-filter>
+        </receiver>
         <!-- Membagikan berkas ekspor (FileSharer.kt, cache/share/) dan APK pembaruan ke penginstal (UpdateInstaller.kt,
              cache/update/). -->
         <provider

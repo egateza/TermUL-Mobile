@@ -64,8 +64,9 @@ class _MainShellState extends ConsumerState<MainShell> with WidgetsBindingObserv
       _syncReminder();
       // Pembaruan seperti desktop: saat aplikasi dibuka lalu tiap 12 jam selama terbuka (bila saklar "Periksa update
       // otomatis" menyala); hasilnya lencana di tab Pengaturan. Memasang tetap manual.
+      // Unduhan yang dimulai sebelum aplikasi ditutup (DownloadManager) dilanjutkan pemantauannya lebih dulu.
       final updates = ref.read(updateControllerProvider.notifier);
-      unawaited(updates.autoCheck());
+      unawaited(updates.resume().whenComplete(updates.autoCheck));
       _updateCheck = Timer.periodic(autoCheckInterval, (_) => unawaited(updates.autoCheck()));
       unawaited(_whatsNew());
       _dayCheck = Timer.periodic(dayCheckInterval, (_) => _checkDay());

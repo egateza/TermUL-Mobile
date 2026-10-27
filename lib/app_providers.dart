@@ -30,7 +30,8 @@ import 'core/vault/vault_lock.dart';
 import 'features/connect/keepalive_sync.dart';
 import 'features/streak/streak_controller.dart' show streakRepositoryProvider;
 import 'features/streak/streak_reminder.dart' show reminderPlatformProvider;
-import 'features/update/update_controller.dart' show updatePlatformProvider, updateServiceProvider;
+import 'features/update/update_controller.dart'
+    show updateDownloaderProvider, updatePlatformProvider, updateServiceProvider;
 import 'features/connect/connect_flow.dart' show ConnectFunction;
 import 'features/hosts/host_list_model.dart';
 import 'features/terminal/shell_channel.dart';
@@ -174,6 +175,7 @@ extension AppDependenciesOverrides on AppDependencies {
     if (streak != null) streakRepositoryProvider.overrideWithValue(streak!),
     if (reminder != null) reminderPlatformProvider.overrideWithValue(reminder!),
     if (updatePlatform != null) updatePlatformProvider.overrideWithValue(updatePlatform!),
+    if (updateDownloader != null) updateDownloaderProvider.overrideWithValue(updateDownloader),
     if (updateService != null) updateServiceProvider.overrideWithValue(updateService!),
     if (uiState != null) uiStateRepositoryProvider.overrideWithValue(uiState!),
     bootReportProvider.overrideWithValue(report),

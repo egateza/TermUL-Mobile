@@ -4,6 +4,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart' show PlatformException;
 import 'package:flutter_test/flutter_test.dart';
 import 'package:termul_mobile/core/models/app_settings.dart';
+import 'package:termul_mobile/core/platform/update_downloader.dart';
 import 'package:termul_mobile/core/platform/update_platform.dart';
 import 'package:termul_mobile/core/storage/ui_state_repository.dart';
 import 'package:termul_mobile/core/update/release.dart';
@@ -66,10 +67,60 @@ class _FakeService implements UpdateService {
   void finish([String path = '/cache/update/termul-update.apk']) => _pending!.complete(path);
 
   void fail(UpdateFailure failure) => _pending!.completeError(UpdateException(failure));
+
+  /// Berkas dari DownloadManager palsu: dianggap cocok, kecuali [adoptError] diisi.
+  Object? adoptError;
+  final adopted = <String>[];
+
+  @override
+  Future<String> adopt(ReleaseInfo release, String path, {UpdateCancelToken? cancel}) async {
+    if (adoptError != null) throw adoptError!;
+    adopted.add(path);
+    return '/cache/update/termul-update.apk';
+  }
+}
+
+/// DownloadManager palsu: tes mengatur [current] (keadaan unduhan yang dicatat sistem).
+class _FakeDownloader implements UpdateDownloader {
+  BackgroundDownload? current;
+  final enqueued = <Map<String, Object?>>[];
+  int removed = 0;
+  bool unavailable = false;
+
+  @override
+  Future<void> enqueue({
+    required Uri url,
+    required String fileName,
+    required String title,
+    required int versionCode,
+    required String version,
+    required String doneTitle,
+    required String doneText,
+    required String channelName,
+  }) async {
+    if (unavailable) throw const BackgroundDownloadUnavailable('mati');
+    enqueued.add({
+      'url': url,
+      'fileName': fileName,
+      'title': title,
+      'doneTitle': doneTitle,
+      'versionCode': versionCode,
+    });
+    current = BackgroundDownload(versionCode: versionCode, status: BackgroundDownloadStatus.pending);
+  }
+
+  @override
+  Future<BackgroundDownload?> active() async => current;
+
+  @override
+  Future<void> remove() async {
+    removed++;
+    current = null;
+  }
 }
 
 class _Setup {
-  _Setup({ReleaseInfo? release, this.settings = const AppSettings(), MemoryUiStateRepository? uiState})
+  _Setup({ReleaseInfo? release, this.settings = const AppSettings(), MemoryUiStateRepository? uiState, this.downloader})
     : service = _FakeService(latestRelease: release),
       // Bawaan: versi terpasang sudah pernah dibuka, jadi "Yang baru" tidak muncul di tes yang tidak membahasnya.
       uiState = uiState ?? MemoryUiStateRepository(const {}, 1) {
@@ -81,11 +132,16 @@ class _Setup {
   final MemoryUiStateRepository uiState;
   final platform = FakeUpdatePlatform();
   final saved = <AppSettings>[];
+  final _FakeDownloader? downloader;
 
   Future<void> launch(WidgetTester tester) async {
     await Harness(settings: settings, uiState: uiState, saveSettings: (s) async => saved.add(s)).pump(
       tester,
-      overrides: [updateServiceProvider.overrideWithValue(service), updatePlatformProvider.overrideWithValue(platform)],
+      overrides: [
+        updateServiceProvider.overrideWithValue(service),
+        updatePlatformProvider.overrideWithValue(platform),
+        if (downloader != null) updateDownloaderProvider.overrideWithValue(downloader),
+      ],
     );
   }
 
@@ -114,6 +170,138 @@ class _Setup {
 Finder get _dot => find.byKey(const ValueKey('nav-dot-settings'));
 
 void main() {
+  group('unduhan lewat DownloadManager (tetap berjalan walau aplikasi ditutup)', () {
+    const apkPath = '/storage/emulated/0/Android/data/io.github.egateza.termul/files/update/termul-mobile-0.2.0.apk';
+
+    Future<void> poll(WidgetTester tester) async {
+      await tester.pump(backgroundPollInterval);
+      await tester.pump();
+    }
+
+    testWidgets('Unduh memulai unduhan sistem; kemajuan dibaca berkala; selesai diperiksa lalu siap dipasang', (
+      tester,
+    ) async {
+      final downloader = _FakeDownloader();
+      final setup = _Setup(release: _release(), downloader: downloader);
+      await setup.launch(tester);
+      await setup.openSettings(tester);
+      await tester.tap(find.text('Unduh dan pasang'));
+      await tester.pump();
+      final job = downloader.enqueued.single;
+      expect(job['fileName'], 'termul-mobile-0.2.0.apk');
+      expect(job['title'], 'Mengunduh TermUL 0.2.0');
+      expect(job['doneTitle'], 'TermUL 0.2.0 sudah diunduh');
+      expect(setup.service.token, isNull, reason: 'tidak mengunduh di dalam aplikasi');
+      expect(find.text('Unduhan tetap berjalan walau aplikasi ditutup.'), findsOneWidget);
+
+      downloader.current = const BackgroundDownload(
+        versionCode: 2,
+        status: BackgroundDownloadStatus.running,
+        received: 10 * 1024 * 1024,
+        total: 25 * 1024 * 1024,
+      );
+      await poll(tester);
+      expect(find.text('40%'), findsOneWidget);
+
+      downloader.current = const BackgroundDownload(
+        versionCode: 2,
+        status: BackgroundDownloadStatus.done,
+        received: 25 * 1024 * 1024,
+        total: 25 * 1024 * 1024,
+        path: apkPath,
+      );
+      await poll(tester);
+      await tester.pumpAndSettle();
+      expect(setup.service.adopted, [apkPath], reason: 'berkas sistem disalin dengan pemeriksaan SHA-256');
+      expect(downloader.removed, greaterThan(0), reason: 'unduhan sistem dibuang setelah disalin');
+      expect(find.text('Versi 0.2.0 siap dipasang'), findsOneWidget);
+      expect(find.text('Pasang'), findsOneWidget);
+    });
+
+    testWidgets('berkas tidak cocok dengan checksum: ditolak, unduhan sistem dibuang', (tester) async {
+      final downloader = _FakeDownloader();
+      final setup = _Setup(release: _release(), downloader: downloader);
+      setup.service.adoptError = const UpdateException(UpdateFailure.checksum);
+      await setup.launch(tester);
+      await setup.openSettings(tester);
+      await tester.tap(find.text('Unduh dan pasang'));
+      await tester.pump();
+      downloader.current = const BackgroundDownload(
+        versionCode: 2,
+        status: BackgroundDownloadStatus.done,
+        path: apkPath,
+      );
+      await poll(tester);
+      await tester.pumpAndSettle();
+      expect(find.text('Gagal mengunduh versi 0.2.0'), findsOneWidget);
+      expect(downloader.current, isNull);
+    });
+
+    testWidgets('gagal di DownloadManager (penyimpanan penuh): pesan penyimpanan', (tester) async {
+      final downloader = _FakeDownloader();
+      final setup = _Setup(release: _release(), downloader: downloader);
+      await setup.launch(tester);
+      await setup.openSettings(tester);
+      await tester.tap(find.text('Unduh dan pasang'));
+      await tester.pump();
+      downloader.current = const BackgroundDownload(
+        versionCode: 2,
+        status: BackgroundDownloadStatus.failed,
+        reason: 1006,
+      );
+      await poll(tester);
+      await tester.pumpAndSettle();
+      expect(find.text('Berkas tidak bisa disimpan. Kosongkan ruang penyimpanan lalu coba lagi.'), findsOneWidget);
+    });
+
+    testWidgets('Batalkan unduhan menghapus unduhan sistem', (tester) async {
+      final downloader = _FakeDownloader();
+      final setup = _Setup(release: _release(), downloader: downloader);
+      await setup.launch(tester);
+      await setup.openSettings(tester);
+      await tester.tap(find.text('Unduh dan pasang'));
+      await tester.pump();
+      await tester.tap(find.text('Batalkan unduhan'));
+      await tester.pumpAndSettle();
+      expect(downloader.current, isNull);
+      expect(find.text('Unduh dan pasang'), findsOneWidget);
+    });
+
+    testWidgets('aplikasi dibuka lagi: unduhan yang selesai saat tertutup dilanjutkan sampai siap dipasang', (
+      tester,
+    ) async {
+      final downloader = _FakeDownloader()
+        ..current = const BackgroundDownload(versionCode: 2, status: BackgroundDownloadStatus.done, path: apkPath);
+      final setup = _Setup(release: _release(), downloader: downloader);
+      await setup.launch(tester);
+      await tester.pumpAndSettle();
+      await setup.openSettings(tester);
+      expect(find.text('Versi 0.2.0 siap dipasang'), findsOneWidget);
+      expect(setup.service.adopted, [apkPath]);
+    });
+
+    testWidgets('aplikasi dibuka lagi: unduhan untuk versi yang bukan rilis terbaru dibuang', (tester) async {
+      final downloader = _FakeDownloader()
+        ..current = const BackgroundDownload(versionCode: 9, status: BackgroundDownloadStatus.running);
+      final setup = _Setup(release: _release(), downloader: downloader);
+      await setup.launch(tester);
+      await tester.pumpAndSettle();
+      expect(downloader.current, isNull);
+      await setup.openSettings(tester);
+      expect(find.text('Versi 0.2.0 tersedia'), findsOneWidget);
+    });
+
+    testWidgets('DownloadManager tidak tersedia: unduh di dalam aplikasi seperti sebelumnya', (tester) async {
+      final downloader = _FakeDownloader()..unavailable = true;
+      final setup = _Setup(release: _release(), downloader: downloader);
+      await setup.launch(tester);
+      await setup.openSettings(tester);
+      await setup.downloadAndFinish(tester);
+      expect(find.text('Versi 0.2.0 siap dipasang'), findsOneWidget);
+      expect(find.text('Unduhan tetap berjalan walau aplikasi ditutup.'), findsNothing);
+    });
+  });
+
   testWidgets('versi dan build tampil di paling bawah Pengaturan; belum ada rilis', (tester) async {
     final setup = _Setup();
     await setup.launch(tester);

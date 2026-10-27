@@ -160,6 +160,37 @@ void main() {
     });
   });
 
+  group('adopt (berkas dari DownloadManager)', () {
+    late Directory external;
+    setUp(() async => external = await Directory.systemTemp.createTemp('termul_dm_test'));
+    tearDown(() => external.delete(recursive: true));
+
+    Future<String> place(List<int> bytes) async {
+      final f = File('${external.path}${Platform.pathSeparator}termul-mobile.apk');
+      await f.writeAsBytes(bytes);
+      return f.path;
+    }
+
+    test('cocok dengan manifest: disalin ke folder siap pasang', () async {
+      final release = (await service.latest())!;
+      final path = await service.adopt(release, await place(gh.apk));
+      expect(await File(path).readAsBytes(), gh.apk);
+      expect(File(path).parent.path, endsWith(GitHubUpdateService.folderName));
+      expect(updateDir(), hasLength(1));
+    });
+
+    test('isi berbeda, lebih besar, atau berkas hilang: ditolak tanpa sisa berkas', () async {
+      final release = (await service.latest())!;
+      await expectLater(
+        service.adopt(release, await place(List.generate(gh.apk.length, (i) => 7))),
+        fails(UpdateFailure.checksum),
+      );
+      await expectLater(service.adopt(release, await place([...gh.apk, 1])), fails(UpdateFailure.checksum));
+      await expectLater(service.adopt(release, '${external.path}/tidak-ada.apk'), fails(UpdateFailure.storage));
+      expect(updateDir(), isEmpty);
+    });
+  });
+
   group('download', () {
     test('cocok dengan manifest: berkas siap dengan kemajuan sampai 100%', () async {
       final release = (await service.latest())!;

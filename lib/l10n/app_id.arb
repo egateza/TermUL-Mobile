@@ -3728,5 +3728,39 @@
   "terminalCleared": "Layar dibersihkan",
   "@terminalCleared": {
     "description": "Toast setelah Bersihkan layar."
+  },
+  "updateDownloadNotificationTitle": "Mengunduh TermUL {version}",
+  "@updateDownloadNotificationTitle": {
+    "description": "Judul notifikasi DownloadManager selama unduhan pembaruan.",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateReadyNotificationTitle": "TermUL {version} sudah diunduh",
+  "@updateReadyNotificationTitle": {
+    "description": "Notifikasi saat unduhan pembaruan selesai (aplikasi mungkin tertutup).",
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "updateReadyNotificationText": "Buka TermUL untuk memeriksa dan memasang.",
+  "@updateReadyNotificationText": {
+    "description": "Isi notifikasi unduhan pembaruan selesai."
+  },
+  "updateNotificationChannel": "Pembaruan",
+  "@updateNotificationChannel": {
+    "description": "Nama kanal notifikasi pembaruan di pengaturan Android."
+  },
+  "updateBackgroundNote": "Unduhan tetap berjalan walau aplikasi ditutup.",
+  "@updateBackgroundNote": {
+    "description": "Keterangan di bagian Pembaruan selama unduhan lewat DownloadManager."
+  },
+  "updateVerifying": "Memeriksa berkas…",
+  "@updateVerifying": {
+    "description": "Status saat unduhan selesai dan checksum serta sertifikat diperiksa."
   }
 }

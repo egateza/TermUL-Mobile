@@ -662,6 +662,15 @@
    "title": "16 · Ikon aplikasi T-kursor: masker launcher, layar utama, ikon bertema (Android 13+), ikon notifikasi",
    "radius": 12
   },
+  "SettingsUpdateDownloading.dc.html": {
+   "x": 6110,
+   "y": 0,
+   "w": 390,
+   "h": 844,
+   "title": "6e · Pengaturan: unduhan pembaruan berjalan lewat DownloadManager (tetap berjalan walau aplikasi ditutup)",
+   "is_interactive": true,
+   "radius": 28
+  },
   "SettingsUpdate.dc.html": {
    "x": 3760,
    "y": 0,
@@ -763,6 +772,7 @@
   "AppIcon.dc.html",
   "SettingsUpdate.dc.html",
   "SettingsUpdateInstall.dc.html",
+  "SettingsUpdateDownloading.dc.html",
   "SettingsWhatsNew.dc.html",
   "TerminalHoldMenuOpen.dc.html",
   "TerminalHoldMenuSelect.dc.html",
