@@ -85,14 +85,16 @@ enum CloseReason { userClosed, serverClosed, keepAliveTimeout, error }
 class SshConnection {
   /// Hanya untuk tes: membungkus [client] tanpa melewati [SshConnector.connect].
   @visibleForTesting
-  SshConnection.forTest(SSHClient client, HostProfile profile) : this._(client, profile);
+  SshConnection.forTest(SSHClient client, HostProfile profile) : this._(client, profile, null);
 
-  SshConnection._(this.client, this.profile) {
+  SshConnection._(this.client, this.profile, InboundActivitySocket? socket)
+    : _probe = KeepAliveProbe(ping: client.ping, isClosed: () => client.isClosed, nextInbound: socket?.nextInbound) {
     client.done.then<void>((_) => _finish(CloseReason.serverClosed), onError: (Object _) => _finish(CloseReason.error));
   }
 
   final SSHClient client;
   final HostProfile profile;
+  final KeepAliveProbe _probe;
   Timer? _watchdog;
   CloseReason? _reason;
   final _closed = Completer<CloseReason>();
@@ -112,7 +114,8 @@ class SshConnection {
 
   void _startWatchdog({required Duration interval, required Duration timeout}) {
     _watchdog = startKeepAliveWatchdog(
-      client,
+      _probe,
+      onClose: client.close,
       interval: interval,
       timeout: timeout,
       onDead: () => _reason ??= CloseReason.keepAliveTimeout,
@@ -126,13 +129,11 @@ class SshConnection {
     client.close();
   }
 
-  /// Memeriksa apakah sambungan masih hidup (dipakai saat kembali dari latar belakang): sudah tertutup, atau
-  /// `ping` tidak dibalas dalam [timeout]. Terbukti di spike (A4); batas 5 detik.
+  /// Memeriksa apakah sambungan masih hidup (dipakai saat kembali dari latar belakang): sudah tertutup, atau tidak
+  /// ada tanda hidup ([KeepAliveProbe]) dalam [timeout]. Terbukti di spike (A4); batas 5 detik.
   Future<bool> checkAlive({Duration timeout = const Duration(seconds: 5)}) async {
-    if (client.isClosed) return false;
     try {
-      await client.ping().timeout(timeout);
-      return true;
+      return await _probe.check(timeout);
     } on Object {
       return false;
     }
@@ -145,7 +146,8 @@ class SshConnection {
 /// - Host key yang berubah memblokir koneksi kecuali pengguna eksplisit memilih [HostKeyChoice.replaceAndTrust].
 /// - Algoritma host key dibatasi ke keluarga yang tersimpan untuk host itu.
 /// - ChaCha20-Poly1305 didahulukan (AES-GCM di Dart murni sekitar 1 MB/s; spike A3).
-/// - Keepalive buatan sendiri (`keepAliveInterval: null` agar tidak ganda).
+/// - Keepalive buatan sendiri (`keepAliveInterval: null` agar tidak ganda). Data apa pun dari server dihitung tanda
+///   hidup, karena sebagian server (mis. MikroTik) tidak membalas `ping` global.
 class SshConnector {
   SshConnector({
     required this.knownHosts,
@@ -268,9 +270,9 @@ class SshConnector {
       }
     }
 
-    final SSHSocket socket;
+    final InboundActivitySocket socket;
     try {
-      socket = await _socketFactory(profile.host, profile.port, connectTimeout);
+      socket = InboundActivitySocket(await _socketFactory(profile.host, profile.port, connectTimeout));
     } on SocketException catch (e) {
       throw SshNetworkFailure('Tidak bisa tersambung ke server', e);
     } on TimeoutException catch (e) {
@@ -299,7 +301,7 @@ class SshConnector {
       throw _map(e, outcome, timedOut);
     }
     deadline?.cancel();
-    final connection = SshConnection._(client, profile)
+    final connection = SshConnection._(client, profile, socket)
       .._startWatchdog(interval: keepAliveInterval, timeout: keepAliveTimeout);
     return connection;
   }
