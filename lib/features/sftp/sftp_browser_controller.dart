@@ -125,6 +125,15 @@ class SftpBrowserController extends ChangeNotifier {
     _notify();
   }
 
+  /// Hanya [entry] yang dipilih (sentuh singkat saat pilihan tunggal: pilihan pindah).
+  void selectOnly(SftpEntry entry) {
+    if (_selected.length == 1 && _selected.contains(entry.path)) return;
+    _selected
+      ..clear()
+      ..add(entry.path);
+    _notify();
+  }
+
   /// Memilih semua entri di folder ini.
   void selectAll() {
     _selected

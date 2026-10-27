@@ -1,5 +1,7 @@
 ﻿# Sumber dokumentasi desain
 
+**Dipublish 2026-10-27 (gestur seleksi SFTP):** design system versi 75 (`1793103078-c3b5`; dari versi 74 hanya `README.md`: kalimat "Seleksi ganda dan unduh folder" di butir SFTP, sentuh singkat memindahkan pilihan, sentuh tahan menambah item). Prototipe tidak berubah.
+
 **Dipublish 2026-10-27 (menu tekan-tahan terminal):** prototipe versi 74 (`1793101179-1a66`; dari versi 73 (`1793074337-3681`) hanya `canvas.json` (papan 2q, 2r, 2s di y 5732) dan empat berkas baru `TerminalHoldMenu`, `TerminalHoldMenuOpen`, `TerminalHoldMenuSelect`, `TerminalHoldMenuSelected`; `canvas.json` digabung di atas versi artifact yang dibaca ulang, prototipe dirender di Chrome), design system versi 74 (`1793101227-960a`; dari versi `1793068987-9d39` hanya `README.md` (butir "Menu tekan-tahan terminal", butir "Tempel di terminal" diperbarui) dan `components/Icon/README.md` (ikon `text-select`, `copy-text`, `paste`, `share`, `sun`, `eraser`); keduanya digabung di atas versi artifact yang dibaca ulang). Salinan lokal di `docs/design/` memakai isi yang sama di atas salinan lokal yang ada; perubahan lokal lain yang belum dipublish (lihat catatan di bawah dan staging `quick-keys`) tetap belum ada di artifact.
 
 Tanggal salin: 2026-10-15

@@ -904,19 +904,19 @@ class _Listing extends StatelessWidget {
               browser.toggle(e);
             }
           },
+          // Sentuh singkat memilih satu item (pilihan pindah); sentuh tahan menambah item sehingga masuk seleksi
+          // ganda, dan selama seleksi ganda sentuh singkat menambah atau melepas item. Folder dibuka dengan sentuh
+          // singkat kecuali saat seleksi ganda.
           onPressed: () {
-            if (!browser.hasSelection) {
-              if (e.isDirectory) {
-                unawaited(browser.open(e.path));
-              } else {
-                browser.toggle(e);
-              }
-            } else if (browser.selectionCount == 1) {
-              // Pilihan tunggal tidak berkembang lewat ketukan biasa. Tahan item kedua
-              // untuk masuk ke seleksi ganda; ketukan pada item terpilih melepasnya.
-              if (browser.isSelected(e)) browser.clearSelection();
-            } else {
+            if (browser.selectionCount > 1) {
               browser.toggle(e);
+            } else if (browser.isSelected(e)) {
+              browser.clearSelection();
+            } else if (e.isDirectory) {
+              browser.clearSelection();
+              unawaited(browser.open(e.path));
+            } else {
+              browser.selectOnly(e);
             }
           },
         ),

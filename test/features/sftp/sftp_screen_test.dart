@@ -230,7 +230,7 @@ void main() {
       return pumpBrowser(tester, extra: [file('/home/u', 'log.txt', size: 2048)]);
     }
 
-    testWidgets('ketukan memilih satu berkas; berkas kedua perlu ditekan lama untuk seleksi ganda', (tester) async {
+    testWidgets('sentuh singkat memindahkan pilihan; sentuh tahan menambah item untuk seleksi ganda', (tester) async {
       await pumpSelectable(tester);
       await tester.tap(find.text('catatan.txt'));
       await tester.pump();
@@ -238,12 +238,28 @@ void main() {
 
       await tester.tap(find.text('log.txt'));
       await tester.pump();
-      expect(find.text('catatan.txt dipilih'), findsOneWidget);
-      expect(find.text('2 dipilih'), findsNothing, reason: 'ketukan biasa tidak mengaktifkan seleksi ganda');
+      expect(find.text('log.txt dipilih'), findsOneWidget, reason: 'pilihan pindah ke berkas yang disentuh');
+      expect(find.text('2 dipilih'), findsNothing, reason: 'sentuh singkat tidak mengaktifkan seleksi ganda');
 
-      await tester.longPress(find.text('log.txt'));
+      await tester.longPress(find.text('catatan.txt'));
       await tester.pump();
       expect(find.text('2 dipilih'), findsOneWidget);
+    });
+
+    testWidgets('pilihan tunggal: sentuh item yang sama melepasnya; sentuh folder membuka folder', (tester) async {
+      final fake = await pumpSelectable(tester);
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
+      await tester.tap(find.text('catatan.txt'));
+      await tester.pump();
+      expect(find.text('catatan.txt dipilih'), findsNothing);
+
+      await tester.tap(find.text('log.txt'));
+      await tester.pump();
+      await tester.tap(find.text('proyek'));
+      await tester.pumpAndSettle();
+      expect(fake.listed.last, '/home/u/proyek');
+      expect(find.text('log.txt dipilih'), findsNothing, reason: 'pindah folder melepas pilihan');
     });
 
     testWidgets('tekan lama pada folder memilihnya tanpa membukanya; jumlah dan ukuran tanpa folder', (tester) async {
